@@ -1,14 +1,12 @@
 #!/bin/bash
 
-# Fails if task.toml sets [environment].allow_internet = false.
-# This benchmark runs tasks with open internet access by default; tasks that
-# disable network would diverge from the rest of the benchmark and break
-# agents that rely on internet to install dependencies, fetch data, or hit
-# live APIs. Remove this check or invert it if your benchmark is offline-only.
+# Validate Harbor's explicit runtime network policy.
+#
+# Tracks may use "public", "allowlist", or "no-network" according to their
+# requirements and Harbor backend support. Allowlist mode must name a host.
 
 set -e
 
-# Arguments: task directories (e.g., tasks/my-task) or no args to check all
 if [ $# -eq 0 ]; then
     FILES_TO_CHECK=$(find tasks -type f -name "task.toml")
 else
@@ -27,11 +25,6 @@ fi
 
 FAILED=0
 for file in $FILES_TO_CHECK; do
-    if [ ! -f "$file" ]; then
-        echo "File $file does not exist, skipping"
-        continue
-    fi
-
     echo "Checking $file..."
 
     RESULT=$(python3 - "$file" <<'PYEOF'
@@ -47,26 +40,34 @@ except ModuleNotFoundError:
 with open(path, "rb") as f:
     data = tomllib.load(f)
 
-value = data.get("environment", {}).get("allow_internet")
-if value is False:
-    print("environment.allow_internet=false; this benchmark requires internet access")
+environment = data.get("environment", {})
+mode = environment.get("network_mode")
+
+if mode is None:
+    print('missing [environment].network_mode; use "no-network", "allowlist", or "public"')
     sys.exit(1)
+
+if mode not in {"no-network", "allowlist", "public"}:
+    print(f"invalid [environment].network_mode={mode!r}")
+    sys.exit(1)
+
+if mode == "allowlist" and not environment.get("allowed_hosts"):
+    print('[environment].network_mode="allowlist" requires allowed_hosts')
+    sys.exit(1)
+
 PYEOF
     ) || {
-        echo "$RESULT" | while IFS= read -r line; do
+        while IFS= read -r line; do
             [ -n "$line" ] && echo "FAIL $file: $line"
-        done
+        done <<< "$RESULT"
         FAILED=1
-        continue
     }
 done
 
 if [ $FAILED -eq 1 ]; then
     echo ""
-    echo "Some task.toml files set environment.allow_internet = false."
-    echo "This benchmark runs tasks with open internet access. Remove the"
-    echo "line (default is true) or set allow_internet = true."
+    echo "One or more tasks have an invalid runtime network policy."
     exit 1
 fi
 
-echo "All task.toml files allow internet access"
+echo "All task.toml files declare a valid runtime network policy"

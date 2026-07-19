@@ -149,7 +149,7 @@ Caps the task folder name at 3 hyphen-separated tokens. Long slugs become unwiel
 
 #### check-allow-internet
 
-Fails if `task.toml` sets `[environment].allow_internet = false`. Assumes the benchmark runs tasks with open internet access; tasks that disable network would diverge from the rest of the benchmark and break agents that rely on internet to install dependencies, fetch data, or hit live APIs. The default (`true`) is fine — only explicit `false` is rejected. Remove or invert this check if your benchmark is offline-only.
+Requires an explicit, current `[environment].network_mode`. Supported values are `"public"`, `"allowlist"`, and `"no-network"`; allowlisted tasks must name their hosts. The correct mode depends on the track and Harbor backend.
 
 #### check-separate-verifier
 
@@ -181,7 +181,7 @@ Fails if a task's Dockerfile, `tests/test.sh`, or `solution/solve.sh` calls bare
 
 #### check-no-allow-internet-true
 
-Fails if `task.toml` sets `[environment].allow_internet = true`. The benchmark already runs tasks with open internet access, so an explicit opt-in is redundant and tasks should rely on the default. This complements `check-allow-internet` (which rejects `= false`): together they force tasks to omit the key entirely rather than pin either value.
+Rejects the legacy `[environment].allow_internet` key. Tasks must use Harbor's explicit `network_mode` field so network policy is unambiguous.
 
 #### check-pytest-version
 

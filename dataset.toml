@@ -1,0 +1,13 @@
+# Dataset manifest for 3720/benchmark
+# Add accepted tasks with: harbor add tasks/<task-name>
+# Publish with: harbor publish
+
+[dataset]
+name = "3720/benchmark"
+description = "Harbor-format benchmark tasks across agent capabilities and domains"
+keywords = ["agents", "evals", "harbor"]
+
+[[dataset.authors]]
+name = "3720"
+
+# No [[tasks]] entries are included until the first scored case passes review.

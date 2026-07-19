@@ -1,64 +1,99 @@
-# Benchmark Template
+# 3720 Benchmark
 
-This is a template for building agent benchmarks with [Harbor](https://harborframework.com).
+A task bank and review pipeline for benchmarks in
+[Harbor](https://harborframework.com) format.
 
-It provides structure, CI workflows, and example tasks to help you build your own benchmark following [best practices](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents) and leveraging automation where it is appropriate. Everything is designed to be customized to your benchmark.
+This repository is not tied to one capability, domain, or fixed taxonomy. It can
+contain any benchmark that belongs in the shared task bank. Each curated dataset
+or track owns its scope, task-selection rules, and metrics while sharing one
+Harbor task format and quality bar.
 
-## What's Included
+The repository starts from Harbor's official
+[benchmark template](https://github.com/harbor-framework/benchmark-template).
 
-- **[Contributing Guide](CONTRIBUTING.md)**: guide for creating, testing, and submitting tasks
-  - [PR Checklist](.github/pull_request_template.md): submission template for contributors
-- **[Task Proposal Rubric](rubrics/task-proposal.md)**: LLM evaluation criteria for task proposals (Discussions)
-  - [Discussion Review Workflow](.github/workflows/discussion-review.yml): auto-reviews proposals in GitHub Discussions
-- **[Task Review Automation](TASK_REVIEW_AUTOMATION.md)**: CI automation for validating task PRs
-  - [Static checks](TASK_REVIEW_AUTOMATION.md#static-checks): path validation, Dockerfile sanity, canary, metadata, test references
-  - [Implementation rubric review](TASK_REVIEW_AUTOMATION.md#implementation-rubric-review): `harbor check` with [27-criteria rubric](rubrics/task-implementation.toml) (auto on PR)
-  - [Docker build + oracle/nop validation](TASK_REVIEW_AUTOMATION.md#docker-build-oracle-nop): environment builds, solution passes, no-op fails
-  - [Agent trials](TASK_REVIEW_AUTOMATION.md#agent-trials): multi-agent runs with analysis
-  - [Cheat trials](TASK_REVIEW_AUTOMATION.md#cheat-trials): adversarial reward-hack detection
-- **[Test Tasks](ci_checks/test-tasks/)**: intentionally broken tasks for regression testing the QA pipeline
-- **[Reviewing Guide](REVIEWING.md)**: guide for human reviewers evaluating task PRs
+## Repository layout
 
-## Getting Started
-
-#### 1. Create your repo
-
-Click "Use this template" on GitHub.
-
-#### 2. Customize
-
-Grep for `CUSTOMIZE` in source files to find what to edit.
-
-> [!TIP]
-> Edit [`rubrics/task-implementation.toml`](rubrics/task-implementation.toml) to define criteria for evaluating task implementations on PRs.
-
-> [!TIP]
-> Edit [`rubrics/task-proposal.md`](rubrics/task-proposal.md) to define criteria for evaluating task proposals on Discussions.
-
-> [!TIP]
-> Edit [`.github/harbor-run-defaults.yml`](.github/harbor-run-defaults.yml) to change default agents, trial count, timeout, and trigger.
-
-#### 3. Set repo secrets
-
-| Secret | Used by | Required? |
-|--------|---------|-----------|
-| `ANTHROPIC_API_KEY` | Implementation rubric review | Yes |
-| `GPTZERO_API_KEY` | AI detection (optional, not in default workflow) | Optional |
-| `OPENAI_API_KEY` | `/run` trials | Optional |
-| `GEMINI_API_KEY` | `/run` trials | Optional |
-| `MODAL_TOKEN_ID`, `MODAL_TOKEN_SECRET` | `/run`, `/cheat`, and `/validate` when `env: modal` / `validate_env: modal` is set in `harbor-run-defaults.yml` (or comment override) | Optional |
-
-#### 4. Get future improvements
-
-```bash
-# One-time setup
-git remote add template https://github.com/harbor-framework/benchmark-template.git
-
-# Pull latest
-git fetch template
-git merge template/main
+```text
+.
+├── dataset.toml                 # Umbrella Harbor dataset manifest
+├── tasks/                       # Harbor task bank
+│   └── hello-world/             # Toolchain smoke task; not a scored case
+├── docs/
+│   └── tracks/                  # Track-specific goals and case design
+├── task-template.toml           # Shared defaults for new tasks
+├── rubrics/                     # Proposal, implementation, and trial review
+├── ci_checks/                   # Static task checks
+└── .github/workflows/           # Oracle, Nop, trial, and review automation
 ```
 
-#### 5. Join the community
+Track-specific notes live under [docs/tracks](docs/tracks/README.md).
+Multitasking, task interleaving, and asynchronous collaboration are grouped into
+one optional track there; they do not define the repository.
 
-Join our active [Terminal Bench community](https://discord.gg/ZvcWupVXjz) to share your benchmark or get help.
+## Create a task
+
+Install Harbor:
+
+```bash
+uv tool install harbor
+```
+
+Scaffold a task:
+
+```bash
+harbor task init "3720/<task-name>" \
+  --include-canary-strings \
+  --metadata-template task-template.toml \
+  --tasks-dir tasks/
+```
+
+Fill in the task's `category`, `tags`, and track-specific evidence, then validate
+it:
+
+```bash
+for check in ci_checks/check-*.sh; do
+  bash "$check" "tasks/<task-name>"
+done
+
+HARBOR_TELEMETRY=off harbor run \
+  --path "tasks/<task-name>" \
+  --agent oracle
+
+HARBOR_TELEMETRY=off harbor run \
+  --path "tasks/<task-name>" \
+  --agent nop
+```
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a scored case.
+
+## CI configuration
+
+Static checks and local Oracle/Nop validation do not require a model API key.
+Automated rubric review requires `ANTHROPIC_API_KEY`; optional agent trials use
+the provider keys configured in `.github/harbor-run-defaults.yml`. Do not commit
+secret values—add them as GitHub Actions secrets when those workflows are
+enabled.
+
+See [TASK_REVIEW_AUTOMATION.md](TASK_REVIEW_AUTOMATION.md) for the complete
+workflow.
+
+## Dataset status
+
+The root `dataset.toml` is intentionally empty until the first real case passes
+the acceptance gates. `tasks/hello-world` only verifies the Harbor and CI
+plumbing and must not be interpreted as a benchmark result.
+
+Additional curated datasets can later be added as track-specific slices of the
+same task bank.
+
+## Template updates
+
+The upstream template can be tracked with:
+
+```bash
+git remote add template https://github.com/harbor-framework/benchmark-template.git
+git fetch template
+```
+
+Merge template updates deliberately; repository-specific verifier, network, and
+evidence rules take precedence.

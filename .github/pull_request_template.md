@@ -6,6 +6,17 @@ Link to the approved task proposal (Discord thread or GitHub Discussion):
 
 <!-- Paste the link to your approved task proposal here -->
 
+## Source and Evidence
+
+Link or describe the real workflow, agent trajectory, dataset, or other source
+that motivated this case:
+
+<!-- Do not include secrets, private user data, or internal process notes. -->
+
+Declared benchmark track:
+
+Representative agent result:
+
 ## Checklist
 
 This task meets the following criteria. If it doesn't match a criterion, I've explained why below.
@@ -17,6 +28,9 @@ This task meets the following criteria. If it doesn't match a criterion, I've ex
 - [ ] My `solution/` was written by a human (with minimal help from a language model).
 - [ ] I ran this task with a strong model (e.g. Claude Opus) using `harbor run -p tasks/<task-name> -m <model>`.
 - [ ] It is hard for the agent to cheat on my task.
+- [ ] The task names the capability and benchmark track it measures.
+- [ ] The runtime is deterministic and has no unreviewed live dependencies.
+- [ ] The task satisfies the acceptance gates documented for its track.
 - [ ] For failing runs (expected for hard tasks), I've added an [analysis below](#agent-run-analysis) to confirm the task itself is valid.
 
 ## Agent Run Analysis
@@ -34,4 +48,3 @@ For hard tasks, agents are expected to fail. Add your analysis here:
 - What was the failure mode?
 - Is the failure due to task difficulty (good) or unclear instructions (needs fixing)?
 -->
-

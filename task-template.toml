@@ -4,7 +4,7 @@
 [metadata]
 author_name = ""
 author_email = ""
-author_organization = ""
+author_organization = "3720"
 difficulty_explanation = ""
 solution_explanation = ""
 verification_explanation = ""
@@ -20,9 +20,9 @@ timeout_sec = 120.0
 timeout_sec = 120.0
 
 [environment]
+network_mode = "public"
 build_timeout_sec = 600.0
 cpus = 1
 memory_mb = 2048
 storage_mb = 10240
 gpus = 0
-allow_internet = true

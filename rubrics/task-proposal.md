@@ -18,7 +18,10 @@
 
 # About This Benchmark
 
-This is an agent benchmark that evaluates the ability of AI agents to solve tasks in a controlled environment. Your job is to review task proposals against the rubric below.
+3720 Benchmark is a multi-track collection of Harbor tasks. A proposal must name
+the capability and track it measures, provide evidence that the workflow is
+representative, and define a deterministic verifier. Track-specific rules live
+under `docs/tracks/`.
 
 # Your Task
 
@@ -28,12 +31,14 @@ Your decisions do not have to be perfect. Err on the side of accepting a task if
 
 # Rubric
 
-> **Note:** The following criteria are provided as an example. Replace them with criteria appropriate for your benchmark.
-
 1. **Verifiable:** The task must be checkable with a program that reliably separates correct from incorrect solutions.
 2. **Well-specified:** The problem description completely describes what the verification algorithm will look for.
 3. **Solvable:** There must be a convincing argument the problem is solvable, ideally demonstrated by a reference solution.
-4. **Appropriately Difficult:** The task should be challenging enough to differentiate capable agents while remaining solvable.
+4. **Valuable:** The proposal is grounded in a real workflow, observed failure, representative dataset, or other documented source.
+5. **Targeted:** The task isolates the named capability well enough that failures can be interpreted.
+6. **Track-aligned:** The task satisfies the additional acceptance gates for its declared track.
+7. **Deterministic:** Runtime services, inputs, randomness, and verification are local, seeded, and repeatable.
+8. **Appropriately Difficult:** The task differentiates capable agents without relying on ambiguous instructions or trick behavior.
 
 ## Misc. Considerations
 
@@ -42,6 +47,7 @@ Other common pitfalls to avoid:
 - Tasks must not be gimmicks or trick questions. The task description should not be misleading.
 - Tasks must not duplicate existing tasks in this benchmark.
 - Tasks should grade outcomes, not process. The verifier should check the final result, not how the agent got there. Constraints on process are acceptable only to prevent cheating.
+- Tasks should not call live external services at runtime unless the declared track explicitly requires it and the proposal explains how results remain reproducible.
 
 <!-- Add accept/reject examples here to calibrate the reviewer. -->
 
