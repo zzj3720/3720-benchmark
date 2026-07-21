@@ -85,6 +85,21 @@ Fixes and post-fix evidence:
 
 The focused comparison confirms that boxes retain one-cell scale, actual wall runs remain visually connected, and map openings remain open to the parent context. The official reference is a different level/state, so the comparison is limited to recursive scale and boundary grammar. No new typography, color, image-quality, copy, interaction, accessibility, or responsive regression was found; the mobile document remains exactly 390 px wide and browser diagnostics contain no warnings or errors.
 
+## Corrected exit-boundary finding
+
+- [P1] The left-side player exit had no map wall, but it still showed a rectangular boundary. The actual sources were not the wall renderer: the parent-context focus cell still rendered the complete colored box face behind the child space, the focused space and parent context had whole-rectangle shadows, and every cell had a generic 0.5 px inset grid line.
+
+An intermediate diagnosis incorrectly proposed changing wall thickness. That wall change was reverted completely; walls retain the prior map-driven full-cell rendering and exposed-edge treatment.
+
+Fixes and post-fix evidence:
+
+- The parent focus cell no longer renders the containing `BoxFace`; it becomes the aperture occupied by the focused child scene.
+- Whole-rectangle focus and parent-context shadows were removed.
+- The generic per-cell inset line was removed. Scene floor and colored box/wall surfaces now provide the visual separation without closing exits.
+- At the real left-side `a4 / Enter` exit, the exit cell, focused grid, focused-space wrapper, and parent focus cell each report 0 px borders, `box-shadow: none`, and `filter: none`. The parent focus cell has no child shell.
+- Current implementation capture: `$HOME/.codex/visualizations/2026/07/22/parabox-live-renderer/exit-border-fixed.jpg`.
+- Focused before/after evidence: `$HOME/.codex/visualizations/2026/07/22/parabox-live-renderer/exit-border-before-after.jpg`. The left image shows the incorrect complete cyan shell; the right image shows the same walls and boxes with the exit open directly into the parent scene.
+
 ## Final result
 
 passed

@@ -223,7 +223,6 @@ function BoxFace({
   depth,
   ancestry,
   flipH,
-  suppressInterior = false,
   legacy = false,
 }: {
   block?: GameState | null;
@@ -232,14 +231,13 @@ function BoxFace({
   depth: number;
   ancestry: number[];
   flipH: boolean;
-  suppressInterior?: boolean;
   legacy?: boolean;
 }) {
   const definition = asNumber(block?.definition_id, 0);
   const color = BOX_COLORS[((definition % BOX_COLORS.length) + BOX_COLORS.length) % BOX_COLORS.length];
   const subspace = asNumber(block?.subspace, -1);
   const cycle = ancestry.includes(subspace);
-  const canRender = !suppressInterior && scene && scene.spaces.has(subspace) && !cycle && depth < 4;
+  const canRender = scene && scene.spaces.has(subspace) && !cycle && depth < 4;
   return (
     <span
       className={`parabox-box-face ${legacy ? "legacy" : ""}`}
@@ -331,7 +329,7 @@ function SpaceGrid({
             >
               {kind === "player" ? (
                 <PlayerFace />
-              ) : kind === "box" ? (
+              ) : kind === "box" && !focusContainer ? (
                 <BoxFace
                   block={block}
                   scene={scene}
@@ -339,7 +337,6 @@ function SpaceGrid({
                   depth={depth}
                   ancestry={ancestry}
                   flipH={flipH}
-                  suppressInterior={focusContainer}
                 />
               ) : [".", "+"].includes(symbol) ? (
                 <span className="parabox-target-mark" />

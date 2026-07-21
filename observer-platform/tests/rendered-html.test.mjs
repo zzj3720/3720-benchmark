@@ -89,8 +89,11 @@ test("implements a real multi-run scoreboard and drill-down", async () => {
   assert.match(parabox, /内部空间已渲染/);
   assert.match(parabox, /盒子内部与外层场景未记录/);
   assert.match(parabox, /data-wall-top/);
+  assert.match(parabox, /kind === "box" && !focusContainer/);
   assert.match(paraboxStyles, /\.parabox-box-face\s*\{[\s\S]*?width: 100%/);
   assert.doesNotMatch(paraboxStyles, /border: clamp\(5px, 0\.7vw, 9px\)/);
+  assert.doesNotMatch(paraboxStyles, /parabox-focus-space[^}]*drop-shadow/);
+  assert.match(paraboxStyles, /\.parabox-cell\s*\{[\s\S]*?box-shadow: none/);
   assert.match(parabox, /describeParaboxEvent/);
   assert.match(parabox, /相较上一步有变化/);
   assert.doesNotMatch(page, /JSON\.stringify\(\{ action:/);
