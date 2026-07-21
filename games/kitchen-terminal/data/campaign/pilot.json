@@ -1,0 +1,52 @@
+{
+  "schema": "kitchen-campaign-v1",
+  "id": "kitchen-rush-pilot-v1",
+  "title": "Harbor Street Dinner Rush",
+  "max_score": 708,
+  "shift": {
+    "id": "dinner-1",
+    "title": "Opening Rush",
+    "duration_ms": 1200000,
+    "stations": [
+      { "id": "prep-1", "label": "Prep Counter", "kind": "prep" },
+      { "id": "griddle-1", "label": "Griddle", "kind": "griddle" },
+      { "id": "fryer-1", "label": "Fryer", "kind": "fryer" },
+      { "id": "stove-1", "label": "Soup Stove", "kind": "stove" }
+    ],
+    "recipes": [
+      {
+        "id": "harbor-burger",
+        "title": "Harbor Burger",
+        "base_score": 100,
+        "components": [
+          { "id": "bun", "label": "Toast and dress bun", "station": "prep", "ready_ms": 60000, "burn_ms": 180000 },
+          { "id": "patty", "label": "Griddle patty", "station": "griddle", "ready_ms": 180000, "burn_ms": 240000 }
+        ]
+      },
+      {
+        "id": "fish-and-fries",
+        "title": "Fish and Fries",
+        "base_score": 130,
+        "components": [
+          { "id": "fish", "label": "Fry fish", "station": "fryer", "ready_ms": 180000, "burn_ms": 240000 },
+          { "id": "fries", "label": "Fry potatoes", "station": "fryer", "ready_ms": 120000, "burn_ms": 180000 }
+        ]
+      },
+      {
+        "id": "soup-and-salad",
+        "title": "Soup and Salad",
+        "base_score": 120,
+        "components": [
+          { "id": "salad", "label": "Prepare salad", "station": "prep", "ready_ms": 90000, "burn_ms": 300000 },
+          { "id": "soup", "label": "Simmer soup", "station": "stove", "ready_ms": 300000, "burn_ms": 420000 }
+        ]
+      }
+    ],
+    "orders": [
+      { "id": "burger-1", "recipe": "harbor-burger", "arrival_ms": 0, "patience_ms": 600000 },
+      { "id": "fish-1", "recipe": "fish-and-fries", "arrival_ms": 180000, "patience_ms": 720000 },
+      { "id": "burger-2", "recipe": "harbor-burger", "arrival_ms": 300000, "patience_ms": 540000 },
+      { "id": "soup-1", "recipe": "soup-and-salad", "arrival_ms": 420000, "patience_ms": 720000 }
+    ]
+  }
+}

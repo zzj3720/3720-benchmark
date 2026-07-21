@@ -5,9 +5,23 @@
 [dataset]
 name = "3720/benchmark"
 description = "Harbor-format benchmark tasks across agent capabilities and domains"
-keywords = ["agents", "evals", "harbor"]
-
+keywords = [ "agents", "evals", "harbor",]
 [[dataset.authors]]
 name = "3720"
 
-# No [[tasks]] entries are included until the first scored case passes review.
+
+[[tasks]]
+name = "3720/parabox-intro"
+digest = "sha256:12579834a970f268d7652d7a7cbe9f0d5d7ffafb00126590490358007f383f8c"
+
+[[tasks]]
+name = "3720/swarm-farming"
+digest = "sha256:bfc9a0777f9c5f63b953223f85d6a7a0c31ce8824111e9d3cd58acfb76b10819"
+
+[[tasks]]
+name = "3720/sausage-roll"
+digest = "sha256:5d4b2c72dd4fa69b4f040c768bf226d5dc0eb54731cf2b8119bc9b3fc192e89e"
+
+[[tasks]]
+name = "3720/emergency-operator"
+digest = "sha256:239d0fcac2d68a77489784188f63d4385cf3a5b9bc998f0be601405eba071b76"

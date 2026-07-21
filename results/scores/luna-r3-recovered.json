@@ -1,0 +1,92 @@
+{
+  "scoring": {
+    "version": "parabox-integer-score-token-tiebreak-v5",
+    "chain_version": "parabox-continuation-chain-v2",
+    "formula": "score = solved_levels at agent_execution.finished_at; rank by score descending, then total_tokens ascending",
+    "level_count": 364,
+    "time_policy": "Elapsed duration is not a score factor. The configured Agent cutoff only excludes sidecar actions recorded after agent_execution.finished_at.",
+    "ordering_guarantee": "Each solved puzzle contributes exactly one point. Token use only breaks ties between trials with the same integer score.",
+    "eligibility_policy": "A valid verifier result retains its integer score even when token accounting is unavailable. Such a trial is excluded only from token-based tie ranking. Reaching the configured Agent timeout is an expected benchmark cutoff. The isolated verifier establishes final-state integrity, while the sidecar event stream removes any score gained after the recorded Agent cutoff. Other infrastructure exceptions invalidate the score itself.",
+    "continuation_policy": "Ordered continuation segments must share task, checksum, model, and reasoning effort, and cumulative scores may not decrease. The chain score is the final cumulative score; tokens are summed across every segment. When a cumulative runtime budget cuts through a segment, score and cumulative tokens come from the last raw rollout evidence at that exact cutoff."
+  },
+  "trials": [
+    {
+      "source": {
+        "result_json": ".harbor/jobs/parabox-v12-logic-gpt-luna-xhigh-r3-goal-cont-4h/parabox-intro__RnQhZVE/result.json",
+        "result_sha256": "3890b4cfef04672b8be0ceaa28cb2cc767e4dfec943adab9b83d4719974239b2",
+        "field_paths": {
+          "solved_levels": "verifier_result.rewards.reward",
+          "input_tokens": "agent_result.n_input_tokens",
+          "cache_tokens": "agent_result.n_cache_tokens",
+          "output_tokens": "agent_result.n_output_tokens",
+          "termination": "exception_info.exception_type",
+          "diagnostic_agent_started_at": "agent_execution.started_at",
+          "diagnostic_agent_finished_at": "agent_execution.finished_at"
+        },
+        "verifier_recovery": {
+          "attestation": "results/recoveries/parabox-v12-logic-gpt-luna-xhigh-r3-goal-cont-4h/attestation.json",
+          "attestation_sha256": "8d9ab4abb75caae0ba51e39de866674f6d9a71d22b4203d4a704942ff9055caf",
+          "schema": "parabox-verifier-recovery-v1"
+        }
+      },
+      "identity": {
+        "harbor_trial_id": "155bd483-7971-4cb0-b4de-af8ab2aed619",
+        "trial_name": "parabox-intro__RnQhZVE",
+        "task_name": "3720/parabox-intro",
+        "task_checksum": "323dcc315cdcdf928e3deef2d14d19d761c1b2894fab736f18797888a52afc3b",
+        "agent": "tools.agents.isolated_codex:ContinueParaboxGoalResumeIsolatedCodex",
+        "model": "openai/gpt-5.6-luna",
+        "reasoning_effort": "xhigh"
+      },
+      "score_valid": true,
+      "ranking_eligible": true,
+      "eligible": true,
+      "ineligible_reason": null,
+      "termination": {
+        "status": "expected_agent_timeout",
+        "exception_type": "AgentTimeoutError"
+      },
+      "raw": {
+        "solved_levels": 20,
+        "verified_final_solved_levels": 20,
+        "sidecar_cutoff": {
+          "path": "results/recoveries/parabox-v12-logic-gpt-luna-xhigh-r3-goal-cont-4h/parabox-events.jsonl",
+          "sha256": "15af7483272778de61e534e3770bd806ef0d865e11f25a89e71510b777493a74",
+          "cutoff_timestamp": "2026-07-20T16:40:45.495390+00:00",
+          "cutoff_timestamp_ms": 1784565645495,
+          "score_at_cutoff": {
+            "line": 511,
+            "timestamp_ms": 1784565612756,
+            "score": 20,
+            "selected": "b7",
+            "type": "request",
+            "command": "move"
+          },
+          "final_record": {
+            "line": 512,
+            "timestamp_ms": 1784565664287,
+            "score": 20,
+            "selected": "b7",
+            "type": "request",
+            "command": "restart"
+          },
+          "post_agent_score_delta": 0
+        },
+        "input_tokens": 116874827,
+        "cache_tokens": 114523648,
+        "output_tokens": 555906,
+        "total_tokens": 117430733,
+        "diagnostic_agent_seconds": 7204.372689,
+        "token_accounting": "input_tokens + output_tokens; cache_tokens is a subset of input_tokens and is not added again"
+      },
+      "derived": {
+        "score": 20,
+        "token_tiebreak": 117430733,
+        "ascending_rank_key": [
+          -20,
+          117430733
+        ]
+      }
+    }
+  ]
+}

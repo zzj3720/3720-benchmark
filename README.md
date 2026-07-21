@@ -16,8 +16,10 @@ The repository starts from Harbor's official
 ```text
 .
 ├── dataset.toml                 # Umbrella Harbor dataset manifest
+├── games/                       # Complete per-game vertical slices
 ├── tasks/                       # Harbor task bank
 │   └── hello-world/             # Toolchain smoke task; not a scored case
+├── results/                     # Reviewed scores and acceptance evidence
 ├── docs/
 │   └── tracks/                  # Track-specific goals and case design
 ├── task-template.toml           # Shared defaults for new tasks
@@ -29,6 +31,25 @@ The repository starts from Harbor's official
 Track-specific notes live under [docs/tracks](docs/tracks/README.md).
 Multitasking, task interleaving, and asynchronous collaboration are grouped into
 one optional track there; they do not define the repository.
+
+Each benchmark game is a complete vertical slice under [`games/`](games/README.md):
+its rules engine, API, scoring and replay verifier, authoritative campaign data,
+development and packaging scripts, and live-console renderer stay together in
+`games/<game>/`. Packaging copies only runtime artifacts and a frozen data
+snapshot into the corresponding Harbor task. Raw model trajectories and
+recovery workspaces remain local rather than entering the repository.
+
+Each game sidecar also exposes a common read-only state subscription. The
+private [live operations console](docs/observer-platform.md) can watch Agent
+actions, authoritative environment state, virtual time, progress, and results
+across concurrent benchmark runs.
+
+Scored game tasks use a 240-hour Agent timeout as a safety ceiling, not as a
+required run length. Calibration runs may be stopped earlier by the operator
+when the episode is complete, the Agent explicitly refuses to continue,
+progress has become persistently unproductive, or available resources require
+it. The saved native session, workspace, authoritative environment state, and
+append-only action trace remain the evidence boundary for any early stop.
 
 ## Create a task
 
@@ -68,20 +89,27 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a scored case.
 
 ## CI configuration
 
-Static checks and local Oracle/Nop validation do not require a model API key.
-Automated rubric review requires `ANTHROPIC_API_KEY`; optional agent trials use
-the provider keys configured in `.github/harbor-run-defaults.yml`. Do not commit
-secret values—add them as GitHub Actions secrets when those workflows are
-enabled.
+Pull-request CI never executes a real benchmark. It runs static task checks and
+the implementation rubric review only; `tasks/hello-world` is available as a
+separate plumbing smoke. Oracle/Nop validation, model trials, and adversarial
+trials require an explicit maintainer command or local/dedicated runner.
+Automated rubric review requires `ANTHROPIC_API_KEY`; manually dispatched agent
+trials use the provider keys configured in `.github/harbor-run-defaults.yml`.
+Do not commit secret values—add them as repository secrets only when those
+manual workflows are enabled.
 
 See [TASK_REVIEW_AUTOMATION.md](TASK_REVIEW_AUTOMATION.md) for the complete
 workflow.
 
 ## Dataset status
 
-The root `dataset.toml` is intentionally empty until the first real case passes
-the acceptance gates. `tasks/hello-world` only verifies the Harbor and CI
-plumbing and must not be interpreted as a benchmark result.
+The root `dataset.toml` contains four game-reasoning cases: the complete
+364-puzzle `3720/parabox-intro` campaign, the model-controlled-clock
+`3720/swarm-farming` time-planning pilot, and the complete 86-puzzle
+`3720/sausage-roll` three-dimensional spatial-planning campaign, plus the
+continuous-wall-clock `3720/emergency-operator` dispatch shift.
+`tasks/hello-world` only verifies the Harbor and CI plumbing and is deliberately
+excluded from benchmark results.
 
 Additional curated datasets can later be added as track-specific slices of the
 same task bank.

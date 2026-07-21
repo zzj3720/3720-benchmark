@@ -1,0 +1,61 @@
+{
+  "scoring": {
+    "version": "parabox-integer-score-token-tiebreak-v4",
+    "formula": "score = solved_levels; rank by score descending, then total_tokens ascending",
+    "level_count": 364,
+    "time_policy": "Agent wall time is retained only as a diagnostic and does not affect the score because it is sensitive to service stability.",
+    "ordering_guarantee": "Each solved puzzle contributes exactly one point. Token use only breaks ties between trials with the same integer score.",
+    "eligibility_policy": "A valid verifier result retains its integer score even when token accounting is unavailable. Such a trial is excluded only from token-based tie ranking. Reaching the configured Agent timeout is an expected benchmark cutoff and retains the verified score; other infrastructure exceptions invalidate the score itself."
+  },
+  "trials": [
+    {
+      "source": {
+        "result_json": ".harbor/jobs/parabox-v12-logic-deepseek-flash-native-goal-r1/parabox-intro__Ezw9gQ9/result.json",
+        "result_sha256": "37575ea74ff12f81422b29ed1ceb834f9dbf19c91d7f75ecdc1b223d90ef7a42",
+        "field_paths": {
+          "solved_levels": "verifier_result.rewards.reward",
+          "input_tokens": "agent_result.n_input_tokens",
+          "cache_tokens": "agent_result.n_cache_tokens",
+          "output_tokens": "agent_result.n_output_tokens",
+          "termination": "exception_info.exception_type",
+          "diagnostic_agent_started_at": "agent_execution.started_at",
+          "diagnostic_agent_finished_at": "agent_execution.finished_at"
+        }
+      },
+      "identity": {
+        "harbor_trial_id": "b78a4154-eeb7-45c3-ab1e-fb9e66c8a5bc",
+        "trial_name": "parabox-intro__Ezw9gQ9",
+        "task_name": "3720/parabox-intro",
+        "task_checksum": "7e63d299d7445d32ce0b4109dc44c1ba8cda3fe9981aa140b61ae20512c64c8c",
+        "agent": "tools.agents.deepseek_claude_code:GoalDeepSeekClaudeCode",
+        "model": "deepseek-v4-flash",
+        "reasoning_effort": "xhigh"
+      },
+      "score_valid": true,
+      "ranking_eligible": true,
+      "eligible": true,
+      "ineligible_reason": null,
+      "termination": {
+        "status": "completed",
+        "exception_type": null
+      },
+      "raw": {
+        "solved_levels": 6,
+        "input_tokens": 79816859,
+        "cache_tokens": 79663872,
+        "output_tokens": 459135,
+        "total_tokens": 80275994,
+        "diagnostic_agent_seconds": 4371.181594,
+        "token_accounting": "input_tokens + output_tokens; cache_tokens is a subset of input_tokens and is not added again"
+      },
+      "derived": {
+        "score": 6,
+        "token_tiebreak": 80275994,
+        "ascending_rank_key": [
+          -6,
+          80275994
+        ]
+      }
+    }
+  ]
+}

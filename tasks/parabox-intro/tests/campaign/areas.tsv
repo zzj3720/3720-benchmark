@@ -1,0 +1,23 @@
+Area_Intro	Intro	start	-	0	0	1
+Area_Enter	Enter	gate	Area_Intro	0	2	1
+Area_Empty	Empty	gate	Area_Enter	0	2	1
+Area_Eat	Eat	gate	Area_Empty	0	2	1
+Area_Reference	Reference	gate	Area_Eat	0	2	1
+Area_Swap	Swap	gate	Area_Reference	-1	2	1
+Area_Center	Center	gate	Area_Swap	0	2	1
+Area_Clone	Clone	gate	Area_Center	0	2	1
+Area_Transfer	Transfer	gate	Area_Clone	0	2	1
+Area_Open	Open	gate	Area_Transfer	0	2	1
+Area_Flip	Flip	gate	Area_Open	0	2	1
+Area_Cycle	Cycle	gate	Area_Flip	0	2	1
+Area_Player	Player	gate	Area_Cycle	0	2	1
+Area_Possess	Possess	gate	Area_Player	0	2	1
+Area_Wall	Wall	gate	Area_Possess	-1	2	1
+Area_InfiniteExit	Infinite Exit	gate	Area_Wall	0	2	1
+Area_InfiniteEnter	Infinite Enter	gate	Area_InfiniteExit	0	2	1
+Area_MultiInfinite	Multi Infinite	gate	Area_InfiniteEnter	0	2	0
+Area_Challenge	Challenge	nexus	r11	0	2	0
+Area_Gallery	Gallery	nexus	r11	0	2	0
+Area_Priority	Priority	nexus	r11	0	1	0
+Area_Extrude	Extrude	nexus	r11	0	1	0
+Area_Push	Push	nexus	r11	0	1	0

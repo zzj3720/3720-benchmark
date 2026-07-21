@@ -1,0 +1,87 @@
+{
+  "scoring": {
+    "version": "parabox-integer-score-token-tiebreak-v5",
+    "chain_version": "parabox-continuation-chain-v2",
+    "formula": "score = solved_levels at agent_execution.finished_at; rank by score descending, then total_tokens ascending",
+    "level_count": 364,
+    "time_policy": "Elapsed duration is not a score factor. The configured Agent cutoff only excludes sidecar actions recorded after agent_execution.finished_at.",
+    "ordering_guarantee": "Each solved puzzle contributes exactly one point. Token use only breaks ties between trials with the same integer score.",
+    "eligibility_policy": "A valid verifier result retains its integer score even when token accounting is unavailable. Such a trial is excluded only from token-based tie ranking. Reaching the configured Agent timeout is an expected benchmark cutoff. The isolated verifier establishes final-state integrity, while the sidecar event stream removes any score gained after the recorded Agent cutoff. Other infrastructure exceptions invalidate the score itself.",
+    "continuation_policy": "Ordered continuation segments must share task, checksum, model, and reasoning effort, and cumulative scores may not decrease. The chain score is the final cumulative score; tokens are summed across every segment. When a cumulative runtime budget cuts through a segment, score and cumulative tokens come from the last raw rollout evidence at that exact cutoff."
+  },
+  "trials": [
+    {
+      "source": {
+        "result_json": ".harbor/jobs/parabox-v12-logic-deepseek-flash-r3-goal-cont-2h-retry/parabox-intro__8x6Y5w7/result.json",
+        "result_sha256": "977fb570443b5f8d702acc326a610dbfdc2d2b67339a6dff35b5a9420b4424a8",
+        "field_paths": {
+          "solved_levels": "verifier_result.rewards.reward",
+          "input_tokens": "agent_result.n_input_tokens",
+          "cache_tokens": "agent_result.n_cache_tokens",
+          "output_tokens": "agent_result.n_output_tokens",
+          "termination": "exception_info.exception_type",
+          "diagnostic_agent_started_at": "agent_execution.started_at",
+          "diagnostic_agent_finished_at": "agent_execution.finished_at"
+        }
+      },
+      "identity": {
+        "harbor_trial_id": "7120f084-92ee-4251-b913-b4338ce5febb",
+        "trial_name": "parabox-intro__8x6Y5w7",
+        "task_name": "3720/parabox-intro",
+        "task_checksum": "323dcc315cdcdf928e3deef2d14d19d761c1b2894fab736f18797888a52afc3b",
+        "agent": "tools.agents.deepseek_claude_code:GoalDeepSeekClaudeCode",
+        "model": "deepseek-v4-flash",
+        "reasoning_effort": "xhigh"
+      },
+      "score_valid": true,
+      "ranking_eligible": true,
+      "eligible": true,
+      "ineligible_reason": null,
+      "termination": {
+        "status": "completed",
+        "exception_type": null
+      },
+      "raw": {
+        "solved_levels": 7,
+        "verified_final_solved_levels": 7,
+        "sidecar_cutoff": {
+          "path": ".harbor/jobs/parabox-v12-logic-deepseek-flash-r3-goal-cont-2h-retry/parabox-intro__8x6Y5w7/artifacts/var/lib/parabox/parabox-events.jsonl",
+          "sha256": "525794ca6dab444a2a0a0024b1d6a5e378d06b000a31aac66024fd4817ace219",
+          "cutoff_timestamp": "2026-07-20T16:19:21.791475+00:00",
+          "cutoff_timestamp_ms": 1784564361791,
+          "score_at_cutoff": {
+            "line": 295,
+            "timestamp_ms": 1784564346527,
+            "score": 7,
+            "selected": "a8",
+            "type": "request",
+            "command": "submit"
+          },
+          "final_record": {
+            "line": 295,
+            "timestamp_ms": 1784564346527,
+            "score": 7,
+            "selected": "a8",
+            "type": "request",
+            "command": "submit"
+          },
+          "post_agent_score_delta": 0
+        },
+        "input_tokens": 66036100,
+        "cache_tokens": 65891072,
+        "output_tokens": 306581,
+        "total_tokens": 66342681,
+        "diagnostic_agent_seconds": 2849.714181,
+        "token_accounting": "input_tokens + output_tokens; cache_tokens is a subset of input_tokens and is not added again"
+      },
+      "derived": {
+        "score": 7,
+        "token_tiebreak": 66342681,
+        "ascending_rank_key": [
+          -7,
+          66342681
+        ]
+      }
+    }
+  ]
+}

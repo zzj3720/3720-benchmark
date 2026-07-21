@@ -1,0 +1,4235 @@
+{
+  "notice": "Extracted from a locally owned game copy; do not redistribute.",
+  "steam_app_id": "1260520",
+  "build_id": "8556490",
+  "depot_manifest": "3584933846739862178",
+  "resources_sha256": "f450c89b400ce88035f318faf8d4b07a1da31f6f556cbbc01f28e2e3798a75be",
+  "puzzle_count": 364,
+  "puzzle_lines_sha256": "dd90da2f2453a5c3196574b96719d8a4393230b6d2643d0b874ccd05dec167bf",
+  "graph": [
+    {
+      "from": "n20",
+      "to": "n21",
+      "immediate": true
+    },
+    {
+      "from": "n21",
+      "to": "n22",
+      "immediate": true
+    },
+    {
+      "from": "n19",
+      "to": "n20",
+      "immediate": true
+    },
+    {
+      "from": "h21",
+      "to": "h22",
+      "immediate": true
+    },
+    {
+      "from": "h28",
+      "to": "h29",
+      "immediate": true
+    },
+    {
+      "from": "k17",
+      "to": "k18",
+      "immediate": true
+    },
+    {
+      "from": "n16",
+      "to": "n17",
+      "immediate": true
+    },
+    {
+      "from": "f9",
+      "to": "f12",
+      "immediate": false
+    },
+    {
+      "from": "f9",
+      "to": "f10",
+      "immediate": false
+    },
+    {
+      "from": "f9",
+      "to": "f11",
+      "immediate": false
+    },
+    {
+      "from": "b14",
+      "to": "b15",
+      "immediate": true
+    },
+    {
+      "from": "b15",
+      "to": "b16",
+      "immediate": true
+    },
+    {
+      "from": "c13",
+      "to": "c14",
+      "immediate": true
+    },
+    {
+      "from": "d10",
+      "to": "d11",
+      "immediate": false
+    },
+    {
+      "from": "d10",
+      "to": "d12",
+      "immediate": false
+    },
+    {
+      "from": "b1",
+      "to": "b2",
+      "immediate": true
+    },
+    {
+      "from": "f12",
+      "to": "f13",
+      "immediate": true
+    },
+    {
+      "from": "f13",
+      "to": "f14",
+      "immediate": true
+    },
+    {
+      "from": "g1",
+      "to": "g2",
+      "immediate": true
+    },
+    {
+      "from": "g2",
+      "to": "g3",
+      "immediate": true
+    },
+    {
+      "from": "g7",
+      "to": "g8",
+      "immediate": true
+    },
+    {
+      "from": "g8",
+      "to": "g9",
+      "immediate": true
+    },
+    {
+      "from": "g10",
+      "to": "g11",
+      "immediate": true
+    },
+    {
+      "from": "g13",
+      "to": "g14",
+      "immediate": false
+    },
+    {
+      "from": "g13",
+      "to": "g15",
+      "immediate": false
+    },
+    {
+      "from": "g4",
+      "to": "g5",
+      "immediate": false
+    },
+    {
+      "from": "g4",
+      "to": "g7",
+      "immediate": false
+    },
+    {
+      "from": "g4",
+      "to": "g6",
+      "immediate": false
+    },
+    {
+      "from": "g11",
+      "to": "g13",
+      "immediate": false
+    },
+    {
+      "from": "g11",
+      "to": "g12",
+      "immediate": false
+    },
+    {
+      "from": "h12",
+      "to": "h13",
+      "immediate": false
+    },
+    {
+      "from": "h12",
+      "to": "h14",
+      "immediate": false
+    },
+    {
+      "from": "h12",
+      "to": "h15",
+      "immediate": false
+    },
+    {
+      "from": "b3",
+      "to": "b4",
+      "immediate": true
+    },
+    {
+      "from": "k2",
+      "to": "k3",
+      "immediate": true
+    },
+    {
+      "from": "k4",
+      "to": "k5",
+      "immediate": true
+    },
+    {
+      "from": "k3",
+      "to": "k4",
+      "immediate": true
+    },
+    {
+      "from": "k5",
+      "to": "k6",
+      "immediate": false
+    },
+    {
+      "from": "k5",
+      "to": "k7",
+      "immediate": false
+    },
+    {
+      "from": "k5",
+      "to": "k8",
+      "immediate": false
+    },
+    {
+      "from": "k1",
+      "to": "k2",
+      "immediate": true
+    },
+    {
+      "from": "n13",
+      "to": "n14",
+      "immediate": true
+    },
+    {
+      "from": "m5",
+      "to": "m6",
+      "immediate": true
+    },
+    {
+      "from": "m6",
+      "to": "m7",
+      "immediate": true
+    },
+    {
+      "from": "m7",
+      "to": "m8",
+      "immediate": false
+    },
+    {
+      "from": "m7",
+      "to": "m9",
+      "immediate": false
+    },
+    {
+      "from": "g22",
+      "to": "g23",
+      "immediate": true
+    },
+    {
+      "from": "d2",
+      "to": "d3",
+      "immediate": true
+    },
+    {
+      "from": "d3",
+      "to": "d4",
+      "immediate": true
+    },
+    {
+      "from": "d1",
+      "to": "d2",
+      "immediate": true
+    },
+    {
+      "from": "m4",
+      "to": "m5",
+      "immediate": true
+    },
+    {
+      "from": "d7",
+      "to": "d8",
+      "immediate": false
+    },
+    {
+      "from": "d7",
+      "to": "d9",
+      "immediate": false
+    },
+    {
+      "from": "d9",
+      "to": "d10",
+      "immediate": true
+    },
+    {
+      "from": "a5",
+      "to": "a6",
+      "immediate": true
+    },
+    {
+      "from": "c6",
+      "to": "c7",
+      "immediate": true
+    },
+    {
+      "from": "a4",
+      "to": "a5",
+      "immediate": true
+    },
+    {
+      "from": "f1",
+      "to": "f2",
+      "immediate": true
+    },
+    {
+      "from": "f2",
+      "to": "f3",
+      "immediate": true
+    },
+    {
+      "from": "g15",
+      "to": "g18",
+      "immediate": false
+    },
+    {
+      "from": "g15",
+      "to": "g16",
+      "immediate": false
+    },
+    {
+      "from": "g15",
+      "to": "g17",
+      "immediate": false
+    },
+    {
+      "from": "g15",
+      "to": "g19",
+      "immediate": false
+    },
+    {
+      "from": "a8",
+      "to": "a9",
+      "immediate": true
+    },
+    {
+      "from": "c1",
+      "to": "c2",
+      "immediate": true
+    },
+    {
+      "from": "b9",
+      "to": "b10",
+      "immediate": true
+    },
+    {
+      "from": "a1",
+      "to": "a2",
+      "immediate": true
+    },
+    {
+      "from": "j4",
+      "to": "j5",
+      "immediate": true
+    },
+    {
+      "from": "j3",
+      "to": "j4",
+      "immediate": true
+    },
+    {
+      "from": "j5",
+      "to": "j7",
+      "immediate": false
+    },
+    {
+      "from": "j5",
+      "to": "j6",
+      "immediate": false
+    },
+    {
+      "from": "j5",
+      "to": "j9",
+      "immediate": false
+    },
+    {
+      "from": "j7",
+      "to": "j8",
+      "immediate": true
+    },
+    {
+      "from": "j9",
+      "to": "j10",
+      "immediate": true
+    },
+    {
+      "from": "j10",
+      "to": "j11",
+      "immediate": false
+    },
+    {
+      "from": "j10",
+      "to": "j12",
+      "immediate": false
+    },
+    {
+      "from": "j1",
+      "to": "j2",
+      "immediate": true
+    },
+    {
+      "from": "j2",
+      "to": "j3",
+      "immediate": true
+    },
+    {
+      "from": "k13",
+      "to": "k15",
+      "immediate": false
+    },
+    {
+      "from": "k13",
+      "to": "k14",
+      "immediate": false
+    },
+    {
+      "from": "g20",
+      "to": "g21",
+      "immediate": false
+    },
+    {
+      "from": "g20",
+      "to": "g22",
+      "immediate": false
+    },
+    {
+      "from": "g19",
+      "to": "g20",
+      "immediate": true
+    },
+    {
+      "from": "m13",
+      "to": "m14",
+      "immediate": true
+    },
+    {
+      "from": "m14",
+      "to": "m15",
+      "immediate": false
+    },
+    {
+      "from": "m12",
+      "to": "m13",
+      "immediate": true
+    },
+    {
+      "from": "f3",
+      "to": "f4",
+      "immediate": true
+    },
+    {
+      "from": "m18",
+      "to": "m19",
+      "immediate": true
+    },
+    {
+      "from": "m2",
+      "to": "m3",
+      "immediate": true
+    },
+    {
+      "from": "q17",
+      "to": "q19",
+      "immediate": false
+    },
+    {
+      "from": "q17",
+      "to": "q18",
+      "immediate": false
+    },
+    {
+      "from": "q17",
+      "to": "q20",
+      "immediate": false
+    },
+    {
+      "from": "q4",
+      "to": "q5",
+      "immediate": true
+    },
+    {
+      "from": "q2",
+      "to": "q3",
+      "immediate": true
+    },
+    {
+      "from": "q5",
+      "to": "q6",
+      "immediate": false
+    },
+    {
+      "from": "q5",
+      "to": "q8",
+      "immediate": false
+    },
+    {
+      "from": "q5",
+      "to": "q7",
+      "immediate": false
+    },
+    {
+      "from": "q1",
+      "to": "q2",
+      "immediate": true
+    },
+    {
+      "from": "s30",
+      "to": "s31",
+      "immediate": true
+    },
+    {
+      "from": "q3",
+      "to": "q4",
+      "immediate": true
+    },
+    {
+      "from": "p12",
+      "to": "p13",
+      "immediate": true
+    },
+    {
+      "from": "p3",
+      "to": "p5",
+      "immediate": false
+    },
+    {
+      "from": "p3",
+      "to": "p4",
+      "immediate": false
+    },
+    {
+      "from": "p2",
+      "to": "p3",
+      "immediate": true
+    },
+    {
+      "from": "p1",
+      "to": "p2",
+      "immediate": true
+    },
+    {
+      "from": "s28",
+      "to": "s29",
+      "immediate": true
+    },
+    {
+      "from": "p7",
+      "to": "p8",
+      "immediate": true
+    },
+    {
+      "from": "r8",
+      "to": "r9",
+      "immediate": true
+    },
+    {
+      "from": "r9",
+      "to": "r10",
+      "immediate": true
+    },
+    {
+      "from": "r10",
+      "to": "r11",
+      "immediate": false
+    },
+    {
+      "from": "r3",
+      "to": "r4",
+      "immediate": true
+    },
+    {
+      "from": "r2",
+      "to": "r3",
+      "immediate": true
+    },
+    {
+      "from": "r1",
+      "to": "r2",
+      "immediate": true
+    },
+    {
+      "from": "r5",
+      "to": "r8",
+      "immediate": false
+    },
+    {
+      "from": "r5",
+      "to": "r6",
+      "immediate": false
+    },
+    {
+      "from": "r5",
+      "to": "r7",
+      "immediate": false
+    },
+    {
+      "from": "r4",
+      "to": "r5",
+      "immediate": true
+    },
+    {
+      "from": "p13",
+      "to": "p18",
+      "immediate": false
+    },
+    {
+      "from": "p13",
+      "to": "p14",
+      "immediate": false
+    },
+    {
+      "from": "p13",
+      "to": "p17",
+      "immediate": false
+    },
+    {
+      "from": "p13",
+      "to": "p16",
+      "immediate": false
+    },
+    {
+      "from": "q12",
+      "to": "q13",
+      "immediate": true
+    },
+    {
+      "from": "q13",
+      "to": "q17",
+      "immediate": false
+    },
+    {
+      "from": "q13",
+      "to": "q15",
+      "immediate": false
+    },
+    {
+      "from": "q13",
+      "to": "q14",
+      "immediate": false
+    },
+    {
+      "from": "q13",
+      "to": "q16",
+      "immediate": false
+    },
+    {
+      "from": "q9",
+      "to": "q10",
+      "immediate": false
+    },
+    {
+      "from": "q9",
+      "to": "q12",
+      "immediate": false
+    },
+    {
+      "from": "q9",
+      "to": "q11",
+      "immediate": false
+    },
+    {
+      "from": "q8",
+      "to": "q9",
+      "immediate": true
+    },
+    {
+      "from": "p8",
+      "to": "p9",
+      "immediate": true
+    },
+    {
+      "from": "p6",
+      "to": "p7",
+      "immediate": true
+    },
+    {
+      "from": "p5",
+      "to": "p6",
+      "immediate": true
+    },
+    {
+      "from": "p14",
+      "to": "p15",
+      "immediate": true
+    },
+    {
+      "from": "p9",
+      "to": "p12",
+      "immediate": false
+    },
+    {
+      "from": "p9",
+      "to": "p10",
+      "immediate": false
+    },
+    {
+      "from": "p9",
+      "to": "p11",
+      "immediate": false
+    },
+    {
+      "from": "e4",
+      "to": "e5",
+      "immediate": true
+    },
+    {
+      "from": "e3",
+      "to": "e4",
+      "immediate": false
+    },
+    {
+      "from": "e3",
+      "to": "e8",
+      "immediate": false
+    },
+    {
+      "from": "e3",
+      "to": "e6",
+      "immediate": false
+    },
+    {
+      "from": "w1",
+      "to": "w2",
+      "immediate": true
+    },
+    {
+      "from": "w2",
+      "to": "w3",
+      "immediate": true
+    },
+    {
+      "from": "w3",
+      "to": "w7",
+      "immediate": false
+    },
+    {
+      "from": "w3",
+      "to": "w6",
+      "immediate": false
+    },
+    {
+      "from": "w3",
+      "to": "w8",
+      "immediate": false
+    },
+    {
+      "from": "w3",
+      "to": "w4",
+      "immediate": false
+    },
+    {
+      "from": "w4",
+      "to": "w5",
+      "immediate": true
+    },
+    {
+      "from": "k8",
+      "to": "k9",
+      "immediate": false
+    },
+    {
+      "from": "k8",
+      "to": "k10",
+      "immediate": false
+    },
+    {
+      "from": "k8",
+      "to": "k11",
+      "immediate": false
+    },
+    {
+      "from": "j12",
+      "to": "j16",
+      "immediate": false
+    },
+    {
+      "from": "j12",
+      "to": "j15",
+      "immediate": false
+    },
+    {
+      "from": "j12",
+      "to": "j14",
+      "immediate": false
+    },
+    {
+      "from": "j12",
+      "to": "j13",
+      "immediate": false
+    },
+    {
+      "from": "c4",
+      "to": "c6",
+      "immediate": false
+    },
+    {
+      "from": "c4",
+      "to": "c5",
+      "immediate": false
+    },
+    {
+      "from": "c4",
+      "to": "c8",
+      "immediate": false
+    },
+    {
+      "from": "s20",
+      "to": "s21",
+      "immediate": true
+    },
+    {
+      "from": "m22",
+      "to": "m23",
+      "immediate": true
+    },
+    {
+      "from": "s19",
+      "to": "s20",
+      "immediate": true
+    },
+    {
+      "from": "m21",
+      "to": "m22",
+      "immediate": true
+    },
+    {
+      "from": "m23",
+      "to": "m24",
+      "immediate": true
+    },
+    {
+      "from": "d5",
+      "to": "d6",
+      "immediate": true
+    },
+    {
+      "from": "e9",
+      "to": "e7",
+      "immediate": false
+    },
+    {
+      "from": "e9",
+      "to": "e10",
+      "immediate": false
+    },
+    {
+      "from": "d6",
+      "to": "d7",
+      "immediate": false
+    },
+    {
+      "from": "e1",
+      "to": "e2",
+      "immediate": true
+    },
+    {
+      "from": "b4",
+      "to": "b5",
+      "immediate": false
+    },
+    {
+      "from": "b4",
+      "to": "b6",
+      "immediate": false
+    },
+    {
+      "from": "i1",
+      "to": "i2",
+      "immediate": true
+    },
+    {
+      "from": "i2",
+      "to": "i3",
+      "immediate": true
+    },
+    {
+      "from": "i3",
+      "to": "i4",
+      "immediate": false
+    },
+    {
+      "from": "i3",
+      "to": "i6",
+      "immediate": false
+    },
+    {
+      "from": "i4",
+      "to": "i5",
+      "immediate": true
+    },
+    {
+      "from": "i6",
+      "to": "i7",
+      "immediate": false
+    },
+    {
+      "from": "i6",
+      "to": "i9",
+      "immediate": false
+    },
+    {
+      "from": "i7",
+      "to": "i8",
+      "immediate": true
+    },
+    {
+      "from": "k16",
+      "to": "k17",
+      "immediate": true
+    },
+    {
+      "from": "f4",
+      "to": "f5",
+      "immediate": false
+    },
+    {
+      "from": "f4",
+      "to": "f6",
+      "immediate": false
+    },
+    {
+      "from": "g3",
+      "to": "g4",
+      "immediate": true
+    },
+    {
+      "from": "f8",
+      "to": "f9",
+      "immediate": true
+    },
+    {
+      "from": "u2",
+      "to": "u3",
+      "immediate": true
+    },
+    {
+      "from": "u1",
+      "to": "u2",
+      "immediate": true
+    },
+    {
+      "from": "u8",
+      "to": "u9",
+      "immediate": true
+    },
+    {
+      "from": "u3",
+      "to": "u5",
+      "immediate": false
+    },
+    {
+      "from": "u3",
+      "to": "u7",
+      "immediate": false
+    },
+    {
+      "from": "u3",
+      "to": "u4",
+      "immediate": false
+    },
+    {
+      "from": "u3",
+      "to": "u8",
+      "immediate": false
+    },
+    {
+      "from": "u3",
+      "to": "u6",
+      "immediate": false
+    },
+    {
+      "from": "h3",
+      "to": "h4",
+      "immediate": true
+    },
+    {
+      "from": "h2",
+      "to": "h3",
+      "immediate": true
+    },
+    {
+      "from": "h4",
+      "to": "h5",
+      "immediate": false
+    },
+    {
+      "from": "h4",
+      "to": "h6",
+      "immediate": false
+    },
+    {
+      "from": "m9",
+      "to": "m10",
+      "immediate": false
+    },
+    {
+      "from": "m9",
+      "to": "m12",
+      "immediate": false
+    },
+    {
+      "from": "m9",
+      "to": "m11",
+      "immediate": false
+    },
+    {
+      "from": "m19",
+      "to": "m20",
+      "immediate": false
+    },
+    {
+      "from": "m15",
+      "to": "m18",
+      "immediate": false
+    },
+    {
+      "from": "m15",
+      "to": "m16",
+      "immediate": false
+    },
+    {
+      "from": "m15",
+      "to": "m17",
+      "immediate": false
+    },
+    {
+      "from": "m3",
+      "to": "m4",
+      "immediate": true
+    },
+    {
+      "from": "m1",
+      "to": "m2",
+      "immediate": true
+    },
+    {
+      "from": "e8",
+      "to": "e9",
+      "immediate": true
+    },
+    {
+      "from": "n14",
+      "to": "n16",
+      "immediate": false
+    },
+    {
+      "from": "n14",
+      "to": "n15",
+      "immediate": false
+    },
+    {
+      "from": "n14",
+      "to": "n18",
+      "immediate": false
+    },
+    {
+      "from": "n4",
+      "to": "n5",
+      "immediate": true
+    },
+    {
+      "from": "n1",
+      "to": "n2",
+      "immediate": true
+    },
+    {
+      "from": "n2",
+      "to": "n3",
+      "immediate": true
+    },
+    {
+      "from": "n5",
+      "to": "n6",
+      "immediate": false
+    },
+    {
+      "from": "n5",
+      "to": "n7",
+      "immediate": false
+    },
+    {
+      "from": "n3",
+      "to": "n4",
+      "immediate": true
+    },
+    {
+      "from": "o7",
+      "to": "o12",
+      "immediate": false
+    },
+    {
+      "from": "o7",
+      "to": "o10",
+      "immediate": false
+    },
+    {
+      "from": "o7",
+      "to": "o9",
+      "immediate": false
+    },
+    {
+      "from": "o7",
+      "to": "o8",
+      "immediate": false
+    },
+    {
+      "from": "o2",
+      "to": "o3",
+      "immediate": true
+    },
+    {
+      "from": "o3",
+      "to": "o4",
+      "immediate": true
+    },
+    {
+      "from": "o4",
+      "to": "o5",
+      "immediate": true
+    },
+    {
+      "from": "o1",
+      "to": "o2",
+      "immediate": true
+    },
+    {
+      "from": "o12",
+      "to": "o13",
+      "immediate": false
+    },
+    {
+      "from": "o12",
+      "to": "o14",
+      "immediate": false
+    },
+    {
+      "from": "o10",
+      "to": "o11",
+      "immediate": true
+    },
+    {
+      "from": "o5",
+      "to": "o7",
+      "immediate": false
+    },
+    {
+      "from": "o5",
+      "to": "o6",
+      "immediate": false
+    },
+    {
+      "from": "c8",
+      "to": "c9",
+      "immediate": true
+    },
+    {
+      "from": "b12",
+      "to": "b13",
+      "immediate": true
+    },
+    {
+      "from": "e2",
+      "to": "e3",
+      "immediate": true
+    },
+    {
+      "from": "g9",
+      "to": "g10",
+      "immediate": true
+    },
+    {
+      "from": "f6",
+      "to": "f7",
+      "immediate": false
+    },
+    {
+      "from": "f6",
+      "to": "f8",
+      "immediate": false
+    },
+    {
+      "from": "h11",
+      "to": "h12",
+      "immediate": true
+    },
+    {
+      "from": "b16",
+      "to": "b18",
+      "immediate": false
+    },
+    {
+      "from": "b16",
+      "to": "b17",
+      "immediate": false
+    },
+    {
+      "from": "b13",
+      "to": "b14",
+      "immediate": true
+    },
+    {
+      "from": "b11",
+      "to": "b12",
+      "immediate": false
+    },
+    {
+      "from": "a6",
+      "to": "a7",
+      "immediate": true
+    },
+    {
+      "from": "a2",
+      "to": "a3",
+      "immediate": true
+    },
+    {
+      "from": "a7",
+      "to": "a8",
+      "immediate": true
+    },
+    {
+      "from": "v2",
+      "to": "v3",
+      "immediate": true
+    },
+    {
+      "from": "v7",
+      "to": "v8",
+      "immediate": false
+    },
+    {
+      "from": "v6",
+      "to": "v7",
+      "immediate": true
+    },
+    {
+      "from": "v3",
+      "to": "v4",
+      "immediate": false
+    },
+    {
+      "from": "v3",
+      "to": "v5",
+      "immediate": false
+    },
+    {
+      "from": "v3",
+      "to": "v6",
+      "immediate": false
+    },
+    {
+      "from": "v1",
+      "to": "v2",
+      "immediate": true
+    },
+    {
+      "from": "b6",
+      "to": "b7",
+      "immediate": true
+    },
+    {
+      "from": "b7",
+      "to": "b9",
+      "immediate": false
+    },
+    {
+      "from": "b7",
+      "to": "b8",
+      "immediate": false
+    },
+    {
+      "from": "b7",
+      "to": "b11",
+      "immediate": false
+    },
+    {
+      "from": "c2",
+      "to": "c3",
+      "immediate": true
+    },
+    {
+      "from": "i9",
+      "to": "i10",
+      "immediate": true
+    },
+    {
+      "from": "h22",
+      "to": "h23",
+      "immediate": true
+    },
+    {
+      "from": "h24",
+      "to": "h25",
+      "immediate": true
+    },
+    {
+      "from": "d4",
+      "to": "d5",
+      "immediate": false
+    },
+    {
+      "from": "n8",
+      "to": "n13",
+      "immediate": false
+    },
+    {
+      "from": "n8",
+      "to": "n12",
+      "immediate": false
+    },
+    {
+      "from": "n8",
+      "to": "n9",
+      "immediate": false
+    },
+    {
+      "from": "n8",
+      "to": "n11",
+      "immediate": false
+    },
+    {
+      "from": "n9",
+      "to": "n10",
+      "immediate": true
+    },
+    {
+      "from": "n7",
+      "to": "n8",
+      "immediate": true
+    },
+    {
+      "from": "c3",
+      "to": "c4",
+      "immediate": true
+    },
+    {
+      "from": "L2",
+      "to": "L4",
+      "immediate": false
+    },
+    {
+      "from": "L2",
+      "to": "L5",
+      "immediate": false
+    },
+    {
+      "from": "L2",
+      "to": "L3",
+      "immediate": false
+    },
+    {
+      "from": "L1",
+      "to": "L2",
+      "immediate": true
+    },
+    {
+      "from": "f15",
+      "to": "f16",
+      "immediate": true
+    },
+    {
+      "from": "a3",
+      "to": "a4",
+      "immediate": false
+    },
+    {
+      "from": "k11",
+      "to": "k12",
+      "immediate": true
+    },
+    {
+      "from": "k12",
+      "to": "k13",
+      "immediate": true
+    },
+    {
+      "from": "h1",
+      "to": "h2",
+      "immediate": true
+    },
+    {
+      "from": "h18",
+      "to": "h19",
+      "immediate": true
+    },
+    {
+      "from": "h15",
+      "to": "h16",
+      "immediate": true
+    },
+    {
+      "from": "h19",
+      "to": "h20",
+      "immediate": true
+    },
+    {
+      "from": "s4",
+      "to": "s5",
+      "immediate": true
+    },
+    {
+      "from": "h23",
+      "to": "h24",
+      "immediate": false
+    },
+    {
+      "from": "h23",
+      "to": "h26",
+      "immediate": false
+    },
+    {
+      "from": "h7",
+      "to": "h11",
+      "immediate": false
+    },
+    {
+      "from": "h7",
+      "to": "h10",
+      "immediate": false
+    },
+    {
+      "from": "h7",
+      "to": "h8",
+      "immediate": false
+    },
+    {
+      "from": "h6",
+      "to": "h7",
+      "immediate": true
+    },
+    {
+      "from": "h8",
+      "to": "h9",
+      "immediate": true
+    },
+    {
+      "from": "b2",
+      "to": "b3",
+      "immediate": true
+    },
+    {
+      "from": "c12",
+      "to": "c13",
+      "immediate": false
+    },
+    {
+      "from": "c9",
+      "to": "c11",
+      "immediate": false
+    },
+    {
+      "from": "c9",
+      "to": "c10",
+      "immediate": false
+    },
+    {
+      "from": "c9",
+      "to": "c12",
+      "immediate": false
+    },
+    {
+      "from": "h16",
+      "to": "h17",
+      "immediate": true
+    },
+    {
+      "from": "h17",
+      "to": "h21",
+      "immediate": false
+    },
+    {
+      "from": "h17",
+      "to": "h18",
+      "immediate": false
+    },
+    {
+      "from": "e11",
+      "to": "e12",
+      "immediate": true
+    }
+  ],
+  "areas": [
+    {
+      "id": "Area_Intro",
+      "name": "Intro",
+      "access": "start",
+      "from": "-",
+      "required_adjustment": 0,
+      "lookahead": 0,
+      "has_gate": true
+    },
+    {
+      "id": "Area_Enter",
+      "name": "Enter",
+      "access": "gate",
+      "from": "Area_Intro",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_Empty",
+      "name": "Empty",
+      "access": "gate",
+      "from": "Area_Enter",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_Eat",
+      "name": "Eat",
+      "access": "gate",
+      "from": "Area_Empty",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_Reference",
+      "name": "Reference",
+      "access": "gate",
+      "from": "Area_Eat",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_Swap",
+      "name": "Swap",
+      "access": "gate",
+      "from": "Area_Reference",
+      "required_adjustment": -1,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_Center",
+      "name": "Center",
+      "access": "gate",
+      "from": "Area_Swap",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_Clone",
+      "name": "Clone",
+      "access": "gate",
+      "from": "Area_Center",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_Transfer",
+      "name": "Transfer",
+      "access": "gate",
+      "from": "Area_Clone",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_Open",
+      "name": "Open",
+      "access": "gate",
+      "from": "Area_Transfer",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_Flip",
+      "name": "Flip",
+      "access": "gate",
+      "from": "Area_Open",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_Cycle",
+      "name": "Cycle",
+      "access": "gate",
+      "from": "Area_Flip",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_Player",
+      "name": "Player",
+      "access": "gate",
+      "from": "Area_Cycle",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_Possess",
+      "name": "Possess",
+      "access": "gate",
+      "from": "Area_Player",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_Wall",
+      "name": "Wall",
+      "access": "gate",
+      "from": "Area_Possess",
+      "required_adjustment": -1,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_InfiniteExit",
+      "name": "Infinite Exit",
+      "access": "gate",
+      "from": "Area_Wall",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_InfiniteEnter",
+      "name": "Infinite Enter",
+      "access": "gate",
+      "from": "Area_InfiniteExit",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": true
+    },
+    {
+      "id": "Area_MultiInfinite",
+      "name": "Multi Infinite",
+      "access": "gate",
+      "from": "Area_InfiniteEnter",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": false
+    },
+    {
+      "id": "Area_Challenge",
+      "name": "Challenge",
+      "access": "nexus",
+      "from": "r11",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": false
+    },
+    {
+      "id": "Area_Gallery",
+      "name": "Gallery",
+      "access": "nexus",
+      "from": "r11",
+      "required_adjustment": 0,
+      "lookahead": 2,
+      "has_gate": false
+    },
+    {
+      "id": "Area_Priority",
+      "name": "Priority",
+      "access": "nexus",
+      "from": "r11",
+      "required_adjustment": 0,
+      "lookahead": 1,
+      "has_gate": false
+    },
+    {
+      "id": "Area_Extrude",
+      "name": "Extrude",
+      "access": "nexus",
+      "from": "r11",
+      "required_adjustment": 0,
+      "lookahead": 1,
+      "has_gate": false
+    },
+    {
+      "id": "Area_Push",
+      "name": "Push",
+      "access": "nexus",
+      "from": "r11",
+      "required_adjustment": 0,
+      "lookahead": 1,
+      "has_gate": false
+    }
+  ],
+  "levels": [
+    {
+      "ref": "a1",
+      "asset": "first_puzzle",
+      "area": "Area_Intro",
+      "kind": "core",
+      "sha256": "50c833fffeaeb8be7d832cd13d81e3c4c4827a8563e7ba17c8aeff78f53bd5e6"
+    },
+    {
+      "ref": "a2",
+      "asset": "second_puzzle",
+      "area": "Area_Intro",
+      "kind": "core",
+      "sha256": "5c8263ee2599763de02e8c3b27035e108d75459adee492029cd5790e58974a9e"
+    },
+    {
+      "ref": "a3",
+      "asset": "third_puzzle",
+      "area": "Area_Intro",
+      "kind": "core",
+      "sha256": "a597daf253121e4bfe53bbd6fe25b26ebb81c174952f79d958b3dc22e619d68e"
+    },
+    {
+      "ref": "a4",
+      "asset": "enter",
+      "area": "Area_Intro",
+      "kind": "core",
+      "sha256": "f483c2021fd326d010bc0e0eee1f333eacc1132e045535fd62635a303269f4e1"
+    },
+    {
+      "ref": "a5",
+      "asset": "elbow_finish_idiom",
+      "area": "Area_Intro",
+      "kind": "core",
+      "sha256": "9e8cb76c83bbf6c3025608a58cf9ab981a8126a76afc547530a0d3cc81fab5bf"
+    },
+    {
+      "ref": "a6",
+      "asset": "round_corners",
+      "area": "Area_Intro",
+      "kind": "core",
+      "sha256": "fa2aef7cbf2a22de2cec472361fb61556f802a0c4c0534be350afc733e307c0a"
+    },
+    {
+      "ref": "a7",
+      "asset": "separate",
+      "area": "Area_Intro",
+      "kind": "core",
+      "sha256": "d6e8fd67faab5017a448582f3fb890b7c9ad2e3d17e671088c816c73ee48daaa"
+    },
+    {
+      "ref": "a8",
+      "asset": "enter_two_sides",
+      "area": "Area_Intro",
+      "kind": "core",
+      "sha256": "db46b3820e663c5724eecf7cad99b21ef8b3395f02783d1dcc9679c974602c50"
+    },
+    {
+      "ref": "a9",
+      "asset": "lock_door",
+      "area": "Area_Intro",
+      "kind": "core",
+      "sha256": "aa50b469e2d79c0e052d50594d3882466d05c375bee8e32ee826fef47b90fd99"
+    },
+    {
+      "ref": "b1",
+      "asset": "carry",
+      "area": "Area_Enter",
+      "kind": "core",
+      "sha256": "ffb6f098f980fe19c9cad40f83e0ca5787a71644a7dc499c07fea530f88c9b6d"
+    },
+    {
+      "ref": "b2",
+      "asset": "turn_around",
+      "area": "Area_Enter",
+      "kind": "core",
+      "sha256": "3d559ab481d4e6db12951ec7ed9a88f716d0810d26170e9632f7d90ee74aeee3"
+    },
+    {
+      "ref": "b3",
+      "asset": "correct_placement",
+      "area": "Area_Enter",
+      "kind": "core",
+      "sha256": "a62c27bfbc7d4d837305f657e6557f928233a1219c48ca89c13a039985cf5df1"
+    },
+    {
+      "ref": "b4",
+      "asset": "nest_two",
+      "area": "Area_Enter",
+      "kind": "core",
+      "sha256": "0c30e1e0fd7f61172f6361194adfb30ee3a070942fc10ea39625a0aac3eb5b6a"
+    },
+    {
+      "ref": "b5",
+      "asset": "puzzlescript",
+      "area": "Area_Enter",
+      "kind": "challenge",
+      "sha256": "7959ecd90e91769b17a3de66909cda4367f10eb5a137eb6ef52a6278e3343809"
+    },
+    {
+      "ref": "b6",
+      "asset": "squash_inside_2",
+      "area": "Area_Enter",
+      "kind": "core",
+      "sha256": "a02702fb972ff07cb5cba6b9ad52a42a061bc10384638404a30ff60ffc2eeada"
+    },
+    {
+      "ref": "b7",
+      "asset": "squash_inside_3",
+      "area": "Area_Enter",
+      "kind": "core",
+      "sha256": "c27670874e08389418f68a299b601ab52f5fa52359ad6ddcc211be2778016b8b"
+    },
+    {
+      "ref": "b8",
+      "asset": "load_elbow",
+      "area": "Area_Enter",
+      "kind": "challenge",
+      "sha256": "4a45c2bbdcad08bcc6cb281c18e3367c66bba307fb2043f93ccb383cfd3c679f"
+    },
+    {
+      "ref": "b9",
+      "asset": "exit_and_push_2",
+      "area": "Area_Enter",
+      "kind": "challenge",
+      "sha256": "21c68cda465059146f6afbf8b19dcfc44b99be87358fc1b031f1aec39de69a90"
+    },
+    {
+      "ref": "b10",
+      "asset": "cage",
+      "area": "Area_Enter",
+      "kind": "challenge",
+      "sha256": "25b8d931fc2bb5c38361cb7707b4a7ff42da1d3248479fc384cbba343add7b87"
+    },
+    {
+      "ref": "b11",
+      "asset": "rescue",
+      "area": "Area_Enter",
+      "kind": "core",
+      "sha256": "f849e2b6dbea91a36bc9313f31983ec5fa4844ab7e30849594b6047dff5f3332"
+    },
+    {
+      "ref": "b12",
+      "asset": "ref",
+      "area": "Area_Enter",
+      "kind": "core",
+      "sha256": "f6dec16fbc365f43fdc5b9fb2ad3d6b8c7afda20034af1c362bc39dc50133892"
+    },
+    {
+      "ref": "b13",
+      "asset": "ref2",
+      "area": "Area_Enter",
+      "kind": "core",
+      "sha256": "d04ad6aea2fea0042fd720681bb8d7ad5387b4e2f069ee6ca59e72cd0e441330"
+    },
+    {
+      "ref": "b14",
+      "asset": "cannon",
+      "area": "Area_Enter",
+      "kind": "core",
+      "sha256": "c8b25fb8e9437aa7d7ac33aac6336b7af302116faeb3d03527edd3b5d837393e"
+    },
+    {
+      "ref": "b15",
+      "asset": "cannon2",
+      "area": "Area_Enter",
+      "kind": "core",
+      "sha256": "9a05d28446ee0dd5c83355eccd2125cdd3af7a569ff2dc376585d8e5767d742e"
+    },
+    {
+      "ref": "b16",
+      "asset": "ref_turn_around",
+      "area": "Area_Enter",
+      "kind": "core",
+      "sha256": "a7c84d98b428a30b6743d990204ad00725997ce4f8ec4d249fd33aa8d4717620"
+    },
+    {
+      "ref": "b17",
+      "asset": "ref_static",
+      "area": "Area_Enter",
+      "kind": "challenge",
+      "sha256": "cf2d1f165ab4c9ce16688b0cc2577425d8984daa06f5f6625d4066f3f78a91bb"
+    },
+    {
+      "ref": "b18",
+      "asset": "lock_3",
+      "area": "Area_Enter",
+      "kind": "challenge",
+      "sha256": "20249e92b4acf8c391dc8d8027c1fde6f606ff72a5855711398f06a140a5ff06"
+    },
+    {
+      "ref": "c1",
+      "asset": "exit_all_sides",
+      "area": "Area_Empty",
+      "kind": "core",
+      "sha256": "e666c5b239af1a21b5ccb3a879545c6da9ba69160e5f4594c9026fbbcfab573d"
+    },
+    {
+      "ref": "c2",
+      "asset": "squash_inside_4",
+      "area": "Area_Empty",
+      "kind": "core",
+      "sha256": "b479474806365f4ce060159e2dedbde7a0f5fe8aa4aedb8992b00882c336a6dc"
+    },
+    {
+      "ref": "c3",
+      "asset": "swap_blocks",
+      "area": "Area_Empty",
+      "kind": "core",
+      "sha256": "369d16116dc6a640aa02d7d84b2169c13f19c5ad1b87db1bd8036481a024872c"
+    },
+    {
+      "ref": "c4",
+      "asset": "lock_door_setup",
+      "area": "Area_Empty",
+      "kind": "core",
+      "sha256": "1bd38c1a240ca82d5b379d084e26f106704a68719ff3a5ffcc8ebbc1f5aec7a3"
+    },
+    {
+      "ref": "c5",
+      "asset": "empty_lock_door",
+      "area": "Area_Empty",
+      "kind": "challenge",
+      "sha256": "03f39ce2f8a3390a3a7dc808373efc086c502a9567307c21ec65fb3df39802d3"
+    },
+    {
+      "ref": "c6",
+      "asset": "empty_carry_better",
+      "area": "Area_Empty",
+      "kind": "challenge",
+      "sha256": "52e08d45d49f1b9c7b9c1264e63dc6a12bc16000dc926f1576de532bcc82bba7"
+    },
+    {
+      "ref": "c7",
+      "asset": "tight_turnaround",
+      "area": "Area_Empty",
+      "kind": "challenge",
+      "sha256": "17e8dd1185b2c322f26a2e1c4fbafcfecc25b158bc93cf763dd4c6587e2171b0"
+    },
+    {
+      "ref": "c8",
+      "asset": "push_once_entry_allowed_4",
+      "area": "Area_Empty",
+      "kind": "core",
+      "sha256": "264a23106b0f6a1ab15eafba95b5c20a519c655197d2f05fa41ec577e3a34f46"
+    },
+    {
+      "ref": "c9",
+      "asset": "up_down_shuffle",
+      "area": "Area_Empty",
+      "kind": "core",
+      "sha256": "d3238ab6863e4f628500435ff1bb6e3002910143fd0cdd47db34439ebc3081ed"
+    },
+    {
+      "ref": "c10",
+      "asset": "pack_three",
+      "area": "Area_Empty",
+      "kind": "challenge",
+      "sha256": "7b0d2ea6b8d06683e8565da13d898bd76152f304de2d0680a24fd7687c18358b"
+    },
+    {
+      "ref": "c11",
+      "asset": "carry_swap",
+      "area": "Area_Empty",
+      "kind": "challenge",
+      "sha256": "2facb7c01e502bb8a9b77b1ce05ee40d59071bea69fa2fca7357250a88f04e39"
+    },
+    {
+      "ref": "c12",
+      "asset": "two_peel_easy",
+      "area": "Area_Empty",
+      "kind": "core",
+      "sha256": "5f2960ab24e08e31ee2575acfb46929cf8e61e1f3c249fbcf34a31daa332e27f"
+    },
+    {
+      "ref": "c13",
+      "asset": "careful_cannon",
+      "area": "Area_Empty",
+      "kind": "challenge",
+      "sha256": "9eae8bf53beb804c9375a0397dee90b8bb4880e92f0fb2d1d79a7245006a874d"
+    },
+    {
+      "ref": "c14",
+      "asset": "two_peel_careful",
+      "area": "Area_Empty",
+      "kind": "challenge",
+      "sha256": "808813f369774819f7c6d9bccfc3076de62b5aa06ee8fa00e9beddb8aa223755"
+    },
+    {
+      "ref": "d1",
+      "asset": "eat_recognize",
+      "area": "Area_Eat",
+      "kind": "core",
+      "sha256": "8ea8a74369a47ebe72eb33bce0e464164ae9e2e8194b02bec58707b275c6761f"
+    },
+    {
+      "ref": "d2",
+      "asset": "eat_4_sides",
+      "area": "Area_Eat",
+      "kind": "core",
+      "sha256": "7820124c73ba10782c55860e1e77ef4c9e21441e50c718bdac9a613d8f0d1cd8"
+    },
+    {
+      "ref": "d3",
+      "asset": "eat_long_line",
+      "area": "Area_Eat",
+      "kind": "core",
+      "sha256": "c5bf19bffe8fdb6a2151392bd6239b947f3cd65a9893e4ca99dfea2b311ce414"
+    },
+    {
+      "ref": "d4",
+      "asset": "sticky_carry2_v2",
+      "area": "Area_Eat",
+      "kind": "core",
+      "sha256": "ad430a0eeee967e3036df442980278261078b74fe34e5e0627584c278d6e1b31"
+    },
+    {
+      "ref": "d5",
+      "asset": "narrow_door",
+      "area": "Area_Eat",
+      "kind": "core",
+      "sha256": "ca5ede7f96ea13f0ba7588fb12c5b15c17fbdd60289cd4ea30df384642619c9b"
+    },
+    {
+      "ref": "d6",
+      "asset": "narrower_door",
+      "area": "Area_Eat",
+      "kind": "core",
+      "sha256": "300f8fa4fbaeb768d58f81ba545d917486da02cdec469e62bb3ea3008d6a6e78"
+    },
+    {
+      "ref": "d7",
+      "asset": "eat_stack_v2",
+      "area": "Area_Eat",
+      "kind": "core",
+      "sha256": "d39c6b840db074faac1086e1694722cf8f24511a7be443328fa85f60b5e1f613"
+    },
+    {
+      "ref": "d8",
+      "asset": "eat_ref_rescue_v2",
+      "area": "Area_Eat",
+      "kind": "challenge",
+      "sha256": "e1f74c76343a6fa233d8a9c0bc5bcb0afb2ac8b4fa485e3785fc620321c62eae"
+    },
+    {
+      "ref": "d9",
+      "asset": "eat_then_tight_squash",
+      "area": "Area_Eat",
+      "kind": "core",
+      "sha256": "a3d27c8bba3afe7431dad7cb1606c12cf7f8ff11b0165c34b81981d39d255078"
+    },
+    {
+      "ref": "d10",
+      "asset": "careful_packing0",
+      "area": "Area_Eat",
+      "kind": "core",
+      "sha256": "04981b88870ff2fbc31fac5ab00f5744f53c2cf83a61540da8584c8e3778fe35"
+    },
+    {
+      "ref": "d11",
+      "asset": "careful_packing1",
+      "area": "Area_Eat",
+      "kind": "challenge",
+      "sha256": "5159827e1e3ab07e91557c0aacbaf0bb32fd7f7a4fb869b80564e34ca6d37dbe"
+    },
+    {
+      "ref": "d12",
+      "asset": "eat_correct_order",
+      "area": "Area_Eat",
+      "kind": "challenge",
+      "sha256": "2daa542a28fc14bfa19f3aa137a2a6d2383dcb58af8bd1ad423b144f6494e701"
+    },
+    {
+      "ref": "d13",
+      "asset": "text_eat_v2",
+      "area": "Area_Eat",
+      "kind": "side",
+      "sha256": "42210025c72279001ede2e119773664c5225a4999d9b260024e8a788bd66abb7"
+    },
+    {
+      "ref": "e1",
+      "asset": "nest_ref",
+      "area": "Area_Reference",
+      "kind": "core",
+      "sha256": "4d06834fa548c5bf549266bb3783642eef9d48d55e7267ff33aced316d3b2b6d"
+    },
+    {
+      "ref": "e2",
+      "asset": "ref_carry_simple",
+      "area": "Area_Reference",
+      "kind": "core",
+      "sha256": "063255288aeebab083331a73019663ceeefe2332be99516efba8bcf90e2fc249"
+    },
+    {
+      "ref": "e3",
+      "asset": "initiate_peel_0",
+      "area": "Area_Reference",
+      "kind": "core",
+      "sha256": "6c47b09d9f76b454916944b04902dcdce6e5191e8e2978073a18eb53f826805d"
+    },
+    {
+      "ref": "e4",
+      "asset": "initiate_peel",
+      "area": "Area_Reference",
+      "kind": "challenge",
+      "sha256": "0de51b452276fe4af9fff537a2dbd8e32ee3849e1c382d07f355dffa3d94b422"
+    },
+    {
+      "ref": "e5",
+      "asset": "ref_stack_lock",
+      "area": "Area_Reference",
+      "kind": "challenge",
+      "sha256": "5b760fdf49c8749c117b197a9cf5d84c7fa7f4e4ed4f21cce2daf864cf9f812c"
+    },
+    {
+      "ref": "e6",
+      "asset": "portal_setup_both",
+      "area": "Area_Reference",
+      "kind": "challenge",
+      "sha256": "8724518f8f742f51baede0eed3039441cd17e3a67f3cc6d5842646364fdfb5e4"
+    },
+    {
+      "ref": "e7",
+      "asset": "ref_carry_careful",
+      "area": "Area_Reference",
+      "kind": "challenge",
+      "sha256": "b66ec0d0c485f4ff671d2fa7ed6a15d25e36ebff6b653297fbc24a8cee950de1"
+    },
+    {
+      "ref": "e8",
+      "asset": "portal_open_close",
+      "area": "Area_Reference",
+      "kind": "core",
+      "sha256": "eff9632810a89009441236486097c852e7dd316ca90c15cc9b2848ff4f5acd97"
+    },
+    {
+      "ref": "e9",
+      "asset": "narrow_door_two_deep",
+      "area": "Area_Reference",
+      "kind": "core",
+      "sha256": "9d3270c46dece371fd3e58cac135ebeca9d8295b072e383f661e747d4df09eb3"
+    },
+    {
+      "ref": "e10",
+      "asset": "sokosoko",
+      "area": "Area_Reference",
+      "kind": "challenge",
+      "sha256": "8e2b7e741b9c24af08d7f921af5ea1a2a35970bbbf709b7971244c64ae6c4f61"
+    },
+    {
+      "ref": "e11",
+      "asset": "zoom_in_anim",
+      "area": "Area_Reference",
+      "kind": "side",
+      "sha256": "31575b7a28b48880c924d5d06ec6bc6e1972fb33a48181b54d06ff0249f53d9d"
+    },
+    {
+      "ref": "e12",
+      "asset": "zoom_out_anim",
+      "area": "Area_Reference",
+      "kind": "side",
+      "sha256": "3f13d0e264e3eb3e840ddfe452884f7bf8dccde9765e080449430b03b1f81cfd"
+    },
+    {
+      "ref": "L1",
+      "asset": "swap_first",
+      "area": "Area_Swap",
+      "kind": "core",
+      "sha256": "470096a1bae96aeef3c20af1ffa4bfba8e9fa91116e4a2b28dbcc165fd2c719e"
+    },
+    {
+      "ref": "L2",
+      "asset": "swap_cannon",
+      "area": "Area_Swap",
+      "kind": "core",
+      "sha256": "797877f10889ca0650a9640cfe141858ed080ba17a6e0acac36ee1a67b312fe5"
+    },
+    {
+      "ref": "L3",
+      "asset": "three_goals_in_one",
+      "area": "Area_Swap",
+      "kind": "challenge",
+      "sha256": "01092cf8fcc9fde09f4a04aba426fec72e097981d6b163a141435b31456c83de"
+    },
+    {
+      "ref": "L4",
+      "asset": "swap_back",
+      "area": "Area_Swap",
+      "kind": "challenge",
+      "sha256": "7db90554b189d9997b759f637885644f6bf62091092dfc146b126809806a8e6c"
+    },
+    {
+      "ref": "L5",
+      "asset": "swap_chain",
+      "area": "Area_Swap",
+      "kind": "challenge",
+      "sha256": "8af1f60ba22d31e9e910376bd1896cdbd76f726091988996cd90977c264cb44b"
+    },
+    {
+      "ref": "f1",
+      "asset": "enter_in_center_first",
+      "area": "Area_Center",
+      "kind": "core",
+      "sha256": "e29e78691cdb43c65fbaf36b7cd78575df6e925d6b888b5ff4408aa4d61264a6"
+    },
+    {
+      "ref": "f2",
+      "asset": "enter_in_center_unstuck",
+      "area": "Area_Center",
+      "kind": "core",
+      "sha256": "13082a02653e615348b9755ed1aea5614ffe81ebb371ff0732e049a2dfc640bf"
+    },
+    {
+      "ref": "f3",
+      "asset": "get_in_center",
+      "area": "Area_Center",
+      "kind": "core",
+      "sha256": "2b9f2608caa21a88669b4918b73c4e9c33b25ab0c37ad60c0f150d5e1f1d88c3"
+    },
+    {
+      "ref": "f4",
+      "asset": "off_the_wall",
+      "area": "Area_Center",
+      "kind": "core",
+      "sha256": "7afe5c2042cbec35488e1800fa99bcd13369cfd1656e6c1108ea7b7ebb1e0cf3"
+    },
+    {
+      "ref": "f5",
+      "asset": "off_the_wall_three",
+      "area": "Area_Center",
+      "kind": "challenge",
+      "sha256": "431e35b1beec6de3446830b3dbfac5bcb7b06de0cf9c79087a2a41d3a6e6eb51"
+    },
+    {
+      "ref": "f6",
+      "asset": "ref_enter_in_center",
+      "area": "Area_Center",
+      "kind": "core",
+      "sha256": "ae05bc5780cf0d6ed735a58b77593cbaea6b87037fa81e1faa3f9709cd4d3a8a"
+    },
+    {
+      "ref": "f7",
+      "asset": "dual_unstuck",
+      "area": "Area_Center",
+      "kind": "challenge",
+      "sha256": "5f35b99bda5b34ef1379d8b88dc4b2128e72ee36b6f9f5c8f57307f80f61a721"
+    },
+    {
+      "ref": "f8",
+      "asset": "open_door",
+      "area": "Area_Center",
+      "kind": "core",
+      "sha256": "a306dd5ea8f487693662781bee892f1f34384a095b3a071294a28ea4dad25425"
+    },
+    {
+      "ref": "f9",
+      "asset": "break_in",
+      "area": "Area_Center",
+      "kind": "core",
+      "sha256": "31d2abcdc3e0a9c4c1991fcf0345f40f9d212e7131376b419906f75a62c92839"
+    },
+    {
+      "ref": "f10",
+      "asset": "no_entry_off_wall_both",
+      "area": "Area_Center",
+      "kind": "challenge",
+      "sha256": "8edeb04f9ed0b426c11221de92fb6643016cf1f8bb443f8118e351b8a6713f5a"
+    },
+    {
+      "ref": "f11",
+      "asset": "topology_stack",
+      "area": "Area_Center",
+      "kind": "challenge",
+      "sha256": "a5f58f8cba3181aec0827a18822f79221171d5d62c7c8ed353bce7bcd761fce9"
+    },
+    {
+      "ref": "f12",
+      "asset": "carry_adjust",
+      "area": "Area_Center",
+      "kind": "challenge",
+      "sha256": "b71b9134b3a1e3e6d687c550fe256411219c44d1bc7ad2a7194a10f4bb35478c"
+    },
+    {
+      "ref": "f13",
+      "asset": "carry_adjust_donut_hole",
+      "area": "Area_Center",
+      "kind": "challenge",
+      "sha256": "3d0002d6d43fc498285e65c8b1aa219df8918817b4ad52dce3bcd38c4a3e0cb1"
+    },
+    {
+      "ref": "f14",
+      "asset": "tricky_pack",
+      "area": "Area_Center",
+      "kind": "challenge",
+      "sha256": "d95ac1178c969b1ede4608381abad0532943c3c759cf4a2ba1c7fdccca1f3e9f"
+    },
+    {
+      "ref": "f15",
+      "asset": "text_1",
+      "area": "Area_Center",
+      "kind": "side",
+      "sha256": "673e9a6258a438924e2a138e34da01bcdd96101357510586535ac7caa41cb83d"
+    },
+    {
+      "ref": "f16",
+      "asset": "text_3",
+      "area": "Area_Center",
+      "kind": "side",
+      "sha256": "eb3740aad03edb42290a8d128cf5877f7e4b6e8b8bb09b8cfacde2d3aa77ba77"
+    },
+    {
+      "ref": "g1",
+      "asset": "clone_first_2",
+      "area": "Area_Clone",
+      "kind": "core",
+      "sha256": "1c7af4f4da127c88b7bc39d9c182725c21ce9c2ecaecb851b7d228bcdaead0e9"
+    },
+    {
+      "ref": "g2",
+      "asset": "clone_peel",
+      "area": "Area_Clone",
+      "kind": "core",
+      "sha256": "a97797333328e91de6b850470bcaea9f39d32abcbd3cfab056ead8a63a368ded"
+    },
+    {
+      "ref": "g3",
+      "asset": "one_way_portal_2",
+      "area": "Area_Clone",
+      "kind": "core",
+      "sha256": "b532e6763d511bc1b33730779a15ec73aa07afbb1dedb06634db41f927210068"
+    },
+    {
+      "ref": "g4",
+      "asset": "clone_strategic_entrances",
+      "area": "Area_Clone",
+      "kind": "core",
+      "sha256": "a01997b3fa3f5551bdedcedf81ec5c1f6a86df2664475a1b59486b431f165698"
+    },
+    {
+      "ref": "g5",
+      "asset": "clone_peel_setup",
+      "area": "Area_Clone",
+      "kind": "challenge",
+      "sha256": "381a3a29a09b6994323e9e3491d6832e6136c40522a341708c96d164cea167a7"
+    },
+    {
+      "ref": "g6",
+      "asset": "clone_unstuck_trick",
+      "area": "Area_Clone",
+      "kind": "challenge",
+      "sha256": "c73d344b1754566365ccb39a77c7db0a48416bee3da840840e14c93d86e48463"
+    },
+    {
+      "ref": "g7",
+      "asset": "clone_ref_first_contact_2",
+      "area": "Area_Clone",
+      "kind": "core",
+      "sha256": "6c5354c329ff12d9be0dc5f979fe18a6f19c3a0ab8858e2fff4fcf39914671ed"
+    },
+    {
+      "ref": "g8",
+      "asset": "clone_ref_first_contact_3",
+      "area": "Area_Clone",
+      "kind": "core",
+      "sha256": "d6b85791037be13f06a30747760aefdc480697bb2b9b921b0e0fb417be1fe850"
+    },
+    {
+      "ref": "g9",
+      "asset": "ref_clone",
+      "area": "Area_Clone",
+      "kind": "core",
+      "sha256": "7d0f2e6e173564a929f16068e96ca6be570d20c5dc83988f4b24231cbcb3a3f8"
+    },
+    {
+      "ref": "g10",
+      "asset": "clone_rescue_ref_2",
+      "area": "Area_Clone",
+      "kind": "core",
+      "sha256": "d7052402eb86f9ce454080b681a35c721f1ccb43738a66edc4fb7d46b739dbfa"
+    },
+    {
+      "ref": "g11",
+      "asset": "clone_switch_sides",
+      "area": "Area_Clone",
+      "kind": "core",
+      "sha256": "b42de573b9f26d5a2a669310fdadd31bc9e9dfa92ec538b2225ad12912a6ec4c"
+    },
+    {
+      "ref": "g12",
+      "asset": "clone_switch_sides_rescue",
+      "area": "Area_Clone",
+      "kind": "challenge",
+      "sha256": "d73ca49ff6f8ea2d7a623e3cea258021cd11a2fab38067494d9ef519ad6080cb"
+    },
+    {
+      "ref": "g13",
+      "asset": "clone_separate_line",
+      "area": "Area_Clone",
+      "kind": "core",
+      "sha256": "cdf9b27a6ed3069918f149df424e4087d8741d4899118bb50a71b74e3c4ca99d"
+    },
+    {
+      "ref": "g14",
+      "asset": "clone_separate_line_hard",
+      "area": "Area_Clone",
+      "kind": "challenge",
+      "sha256": "80bf19836694d7b07410003e4e833bfd2fde6a2be0cdee226b8fe4f087c39fc5"
+    },
+    {
+      "ref": "g15",
+      "asset": "enter_the_ocean_v2",
+      "area": "Area_Clone",
+      "kind": "core",
+      "sha256": "5fead1ad17481a3f3bd76634ad6eb1a7921b0c0ac921e31cdd30177a7c50d30d"
+    },
+    {
+      "ref": "g16",
+      "asset": "clone_unstuck_trick_3",
+      "area": "Area_Clone",
+      "kind": "challenge",
+      "sha256": "0ecb388ba71c05b810de56d0956e854474ef41a96d44b394b2f2cc79869740bb"
+    },
+    {
+      "ref": "g17",
+      "asset": "enter_the_ocean_10_foot_pole",
+      "area": "Area_Clone",
+      "kind": "challenge",
+      "sha256": "b91c92e163a1f7643c08b6923c09bc5d928234d677dea332281b8a704facdcf5"
+    },
+    {
+      "ref": "g18",
+      "asset": "clone_carousel",
+      "area": "Area_Clone",
+      "kind": "challenge",
+      "sha256": "63e4b995f6f398473db74ebe8dee808d00e091925ffcbaf4ab184bb1b31047fb"
+    },
+    {
+      "ref": "g19",
+      "asset": "float_in_space_0",
+      "area": "Area_Clone",
+      "kind": "core",
+      "sha256": "78041c790c1d4506b4a13c4a31baf8fb9a31cdcb4f35540795c688d59823f715"
+    },
+    {
+      "ref": "g20",
+      "asset": "float_in_space",
+      "area": "Area_Clone",
+      "kind": "core",
+      "sha256": "07cd322f33bd5ca3f9572a014ce36b23ad24fce6cadb793fb7ce866b7c508882"
+    },
+    {
+      "ref": "g21",
+      "asset": "clone_mutual_rescue",
+      "area": "Area_Clone",
+      "kind": "challenge",
+      "sha256": "9da674fae634fa5e3a5eb571a3dfa056c83af7155d1a3840e49ac588ba6fdce8"
+    },
+    {
+      "ref": "g22",
+      "asset": "dismantle_one_ocean_using_another",
+      "area": "Area_Clone",
+      "kind": "challenge",
+      "sha256": "2ebcbd7ae115fdf05e4f9e2c6b5f5770825df8c1f241719b5a2a1e8339290581"
+    },
+    {
+      "ref": "g23",
+      "asset": "dismantle_ocean_start_no_exit",
+      "area": "Area_Clone",
+      "kind": "challenge",
+      "sha256": "c44c42f79a5a3ca18bc3fea6cd1d7c5cdab4c34da57e3faaf3935c277d9b42d3"
+    },
+    {
+      "ref": "g24",
+      "asset": "grid_clone",
+      "area": "Area_Clone",
+      "kind": "side",
+      "sha256": "529c12c4882332c504967fdd289e19ab7052c30d0211986a5a4dfda58dd6e3f6"
+    },
+    {
+      "ref": "g25",
+      "asset": "text_clone_v2",
+      "area": "Area_Clone",
+      "kind": "side",
+      "sha256": "c3f217726f9f6e17d94afd1829b54b48578414c073e0bfb8913943adc1d003e7"
+    },
+    {
+      "ref": "h1",
+      "asset": "transfer",
+      "area": "Area_Transfer",
+      "kind": "core",
+      "sha256": "6ab372e5b5e25113dbc059ff124c607966a4b594dc5d0f5c51051c7c53334614"
+    },
+    {
+      "ref": "h2",
+      "asset": "pack_0",
+      "area": "Area_Transfer",
+      "kind": "core",
+      "sha256": "66e3b12df39401e21632dd47b82ac47c6fd6b7607668eec798394e62b04af252"
+    },
+    {
+      "ref": "h3",
+      "asset": "pack",
+      "area": "Area_Transfer",
+      "kind": "core",
+      "sha256": "97f284628e314d47783d5ce4b7030bbf082af673682bee8fcd3d23c9f8fb6587"
+    },
+    {
+      "ref": "h4",
+      "asset": "pack_3",
+      "area": "Area_Transfer",
+      "kind": "core",
+      "sha256": "b874a8ade852c536e51c899415b3c5b45d71708d7656a39a5da7206d783566a3"
+    },
+    {
+      "ref": "h5",
+      "asset": "find_spot",
+      "area": "Area_Transfer",
+      "kind": "challenge",
+      "sha256": "8149852fb9405bdbc35896094895a317798f82c33bf913559184ca2b3b43020d"
+    },
+    {
+      "ref": "h6",
+      "asset": "transfer_peel",
+      "area": "Area_Transfer",
+      "kind": "core",
+      "sha256": "75aaf90934194beb7d7583ac6aa375f3ebb24f54af86c73602fb96fbdf03bfc9"
+    },
+    {
+      "ref": "h7",
+      "asset": "transfer_mutual",
+      "area": "Area_Transfer",
+      "kind": "core",
+      "sha256": "6eaf35743fcab60a0cb37807f485a4549a3c55e38f155785499889ecf756e31f"
+    },
+    {
+      "ref": "h8",
+      "asset": "transfer_straight_line",
+      "area": "Area_Transfer",
+      "kind": "challenge",
+      "sha256": "645eb1b094e290fa4c80d7813e008f13d6fa0bb46571e98a21616a24aa52770f"
+    },
+    {
+      "ref": "h9",
+      "asset": "transfer_two_sides_thinking_face",
+      "area": "Area_Transfer",
+      "kind": "challenge",
+      "sha256": "86fb73344a6e2bfe8673458238b3c9c5d1e3737dc7a44010d38e2a15f9c998d3"
+    },
+    {
+      "ref": "h10",
+      "asset": "transfer_keep_off_wall",
+      "area": "Area_Transfer",
+      "kind": "challenge",
+      "sha256": "b9924476e45c9970f0aec5e5e510801e9d518771c485bc5a6b094eeaf027b761"
+    },
+    {
+      "ref": "h11",
+      "asset": "ref_transfer_first",
+      "area": "Area_Transfer",
+      "kind": "core",
+      "sha256": "69333e7b7930c245e101bc259a02a37ad588f466ecbdca6607274c48b511bbd4"
+    },
+    {
+      "ref": "h12",
+      "asset": "clone_transfer",
+      "area": "Area_Transfer",
+      "kind": "core",
+      "sha256": "6c690e3d19d64e143d851cb34362c16ef28a917947452a63777ae7c60338246a"
+    },
+    {
+      "ref": "h13",
+      "asset": "pack_ref",
+      "area": "Area_Transfer",
+      "kind": "challenge",
+      "sha256": "53f66b2a80f9aa0a93e1e8aaf82ff923a9b6dc810bf2cf85e58b80be16cbbce8"
+    },
+    {
+      "ref": "h14",
+      "asset": "ref_transfer_lock",
+      "area": "Area_Transfer",
+      "kind": "challenge",
+      "sha256": "ee23e77e51109c63960a8bea23e8bdce8d977bd0dc1bf323c4042a73af9045c2"
+    },
+    {
+      "ref": "h15",
+      "asset": "transfer_clones_back_forth_0",
+      "area": "Area_Transfer",
+      "kind": "core",
+      "sha256": "26aa45127bf7d455cd3b06c84838e7b2c805f90916943e3d6b86f3e1af8517fd"
+    },
+    {
+      "ref": "h16",
+      "asset": "wrap",
+      "area": "Area_Transfer",
+      "kind": "core",
+      "sha256": "eb2ca270ded5d1edc3b13342a42ec173d874d1d8da756d92c60a3f53c98c90cd"
+    },
+    {
+      "ref": "h17",
+      "asset": "wrap2",
+      "area": "Area_Transfer",
+      "kind": "core",
+      "sha256": "e0108642cd00ea1c6a9289f053fb36a74205d13f2675ff14c350d8a2d0a8346f"
+    },
+    {
+      "ref": "h18",
+      "asset": "transfer_clones_back_forth",
+      "area": "Area_Transfer",
+      "kind": "challenge",
+      "sha256": "5ea776dcdaac53bb9e8a9dcd6d9433a733faaa485ec3dc7044fbca690b98f1dd"
+    },
+    {
+      "ref": "h19",
+      "asset": "transfer_clones_back_forth_2",
+      "area": "Area_Transfer",
+      "kind": "challenge",
+      "sha256": "b88f8ed11e26124cf11b9753e3273a0d3960eb8957a21e94ee248afaccc6c610"
+    },
+    {
+      "ref": "h20",
+      "asset": "transfer_clones_back_forth_3",
+      "area": "Area_Transfer",
+      "kind": "challenge",
+      "sha256": "0d04e044ba604fefcdd1f0571deb9008f92bc81e455770a688e867b9666a128c"
+    },
+    {
+      "ref": "h21",
+      "asset": "3_and_9",
+      "area": "Area_Transfer",
+      "kind": "core",
+      "sha256": "3c4563cb33beef06f296bb86c93bc34cd8345f38fa9ab18c34ee6b988f0c5cb7"
+    },
+    {
+      "ref": "h22",
+      "asset": "stack_transfer",
+      "area": "Area_Transfer",
+      "kind": "core",
+      "sha256": "14595dab572dbac0d4e956a25d61cdecc7f46dc5b1e3b5b0be99eabe3098c89b"
+    },
+    {
+      "ref": "h23",
+      "asset": "transfer_mismatched_v2",
+      "area": "Area_Transfer",
+      "kind": "core",
+      "sha256": "86ed27b2bc4239051778be5f0a2a9fd0427ce0257ab48d76671f69baa63f308d"
+    },
+    {
+      "ref": "h24",
+      "asset": "stack_transfer_3_v2",
+      "area": "Area_Transfer",
+      "kind": "challenge",
+      "sha256": "6be8389a9d447828fb83aacc1d246d1ef053111bf29d6ac85afc48932eb1fd77"
+    },
+    {
+      "ref": "h25",
+      "asset": "double_enter_transfer",
+      "area": "Area_Transfer",
+      "kind": "challenge",
+      "sha256": "761ad9cc3ceb3d69942f78bc370002498798e2341d07335c16b2ca155ad1c1d9"
+    },
+    {
+      "ref": "h26",
+      "asset": "transfer_ultra_stack",
+      "area": "Area_Transfer",
+      "kind": "challenge",
+      "sha256": "780f137e18171018f3d469a370fef2042126b39aee21314a1e91635586b4b2b8"
+    },
+    {
+      "ref": "h27",
+      "asset": "hue_shift",
+      "area": "Area_Transfer",
+      "kind": "side",
+      "sha256": "2959fb90f6f59edaf08a25b134fe52b8b54ec87e0d3f60907f1a803a5fe9ffe6"
+    },
+    {
+      "ref": "h28",
+      "asset": "4by4_linear",
+      "area": "Area_Transfer",
+      "kind": "side",
+      "sha256": "9a4e0f891ed2bedf72fdc1a5e54fd16544fa3d4a7a598786a25af565594b5256"
+    },
+    {
+      "ref": "h29",
+      "asset": "2by2",
+      "area": "Area_Transfer",
+      "kind": "side",
+      "sha256": "9d4d585ca8664954baa6bb6e0bdd13c349e925680245c546444bfbd5e39cf8bd"
+    },
+    {
+      "ref": "i1",
+      "asset": "no_up_walls_1",
+      "area": "Area_Open",
+      "kind": "core",
+      "sha256": "dadeec9ccbc807b3b70617f6fa51e3d82366af3b4c40d705a631179320ac5367"
+    },
+    {
+      "ref": "i2",
+      "asset": "no_up_walls_2",
+      "area": "Area_Open",
+      "kind": "core",
+      "sha256": "bd6aa944f1c1c2c675a5ca70fd4d4426f87fa3f404eb233b769647dbdb8de168"
+    },
+    {
+      "ref": "i3",
+      "asset": "no_up_walls_3",
+      "area": "Area_Open",
+      "kind": "core",
+      "sha256": "e3ebacfa96e277406f70c471056ce689138db6503d2a201863da6c39cff95592"
+    },
+    {
+      "ref": "i4",
+      "asset": "no_up_walls_4",
+      "area": "Area_Open",
+      "kind": "challenge",
+      "sha256": "57d1fd7d4066f777aceb98fd21d9a5f08f40027a64c4545be1c0c93185df36ed"
+    },
+    {
+      "ref": "i5",
+      "asset": "no_up_walls_block_stool_v2",
+      "area": "Area_Open",
+      "kind": "challenge",
+      "sha256": "3d18c8c02cbcc61e4ee5e461156182473dba0b83bfdf5ffec22328b37fea8810"
+    },
+    {
+      "ref": "i6",
+      "asset": "no_walls",
+      "area": "Area_Open",
+      "kind": "core",
+      "sha256": "090d55e72a0e33ef6483e03a379a58fbf1b6fdc0d897279ffa27f5677fc45a41"
+    },
+    {
+      "ref": "i7",
+      "asset": "no_walls_2",
+      "area": "Area_Open",
+      "kind": "challenge",
+      "sha256": "b07384822446b32c3cf44e12bd08fa89b670758bf1d92651cbebbec3c694c70b"
+    },
+    {
+      "ref": "i8",
+      "asset": "no_walls_3_v2",
+      "area": "Area_Open",
+      "kind": "challenge",
+      "sha256": "2ec69922e03e1efd1d7e6e56b43eade06accad983d35d8675f1417c47d70494c"
+    },
+    {
+      "ref": "i9",
+      "asset": "squash_inside_outer_wall",
+      "area": "Area_Open",
+      "kind": "challenge",
+      "sha256": "31f7001afdcfe852c46aaa3e5ad85738363b290041acba0d99a293cd0f2bd6f4"
+    },
+    {
+      "ref": "i10",
+      "asset": "squash_inside_outer_wall_straightline",
+      "area": "Area_Open",
+      "kind": "challenge",
+      "sha256": "b5f5ac1d11d5ee80fc2a695a9a2b6fc401773a1c4580957b38e381e9ce587b53"
+    },
+    {
+      "ref": "i11",
+      "asset": "3by3ref",
+      "area": "Area_Open",
+      "kind": "side",
+      "sha256": "2a45766e29f84941152cea192ef0733e48cfa126281fb6117d8f96000a216e2c"
+    },
+    {
+      "ref": "i12",
+      "asset": "3by3_fun_clone_heist",
+      "area": "Area_Open",
+      "kind": "side",
+      "sha256": "0c5d8b9ee300fbffcf7083d89561bb45c42978db276313dc1585d1df38f6da13"
+    },
+    {
+      "ref": "j1",
+      "asset": "flip_first",
+      "area": "Area_Flip",
+      "kind": "core",
+      "sha256": "53ab2ea11bb0d171a41a7319217d5dbf0d60bda91c7e7b2ba651d830f347dc73"
+    },
+    {
+      "ref": "j2",
+      "asset": "flip_ref_maze",
+      "area": "Area_Flip",
+      "kind": "core",
+      "sha256": "1dbd35c710c809abe88cac91461f704ddeda32dc983cf019a107313245720463"
+    },
+    {
+      "ref": "j3",
+      "asset": "flip_block3",
+      "area": "Area_Flip",
+      "kind": "core",
+      "sha256": "ad221102c5e4626168c2f5b0f2865ae2beb879d6aeab8a402c5f2fbed809d155"
+    },
+    {
+      "ref": "j4",
+      "asset": "flip_block_with_clone_3",
+      "area": "Area_Flip",
+      "kind": "core",
+      "sha256": "0c4febde04b543ea146b772c5c6683e2646103820f9ad56ac13eae1379bf4e06"
+    },
+    {
+      "ref": "j5",
+      "asset": "flip_blocks",
+      "area": "Area_Flip",
+      "kind": "core",
+      "sha256": "accc3609efb16ade0e21b76f6cbf975f8760a315f8b01ef6e9c1bc17b8d535c2"
+    },
+    {
+      "ref": "j6",
+      "asset": "flip_elbows",
+      "area": "Area_Flip",
+      "kind": "challenge",
+      "sha256": "48e300a3f2e168d373e8bcfa9e2310074eedd89c633ed39d6b53f404a234d83b"
+    },
+    {
+      "ref": "j7",
+      "asset": "flip_clone_line",
+      "area": "Area_Flip",
+      "kind": "challenge",
+      "sha256": "ffa610842446eec234d1f03f76a381c010ff02535e0fa8b5208fd5761dd1a286"
+    },
+    {
+      "ref": "j8",
+      "asset": "flip_non_ref_clones",
+      "area": "Area_Flip",
+      "kind": "challenge",
+      "sha256": "f4da24425d85c91ff0e7c03b82e92db1c142add0007221f5efbb7a44f7db8cd7"
+    },
+    {
+      "ref": "j9",
+      "asset": "flip_exit_block_1",
+      "area": "Area_Flip",
+      "kind": "core",
+      "sha256": "493d0ff9f05797e2afbdb0cea96f14c4d8321e1d1518d9e6e485b614b8ed78b8"
+    },
+    {
+      "ref": "j10",
+      "asset": "flip_exit_block_3",
+      "area": "Area_Flip",
+      "kind": "core",
+      "sha256": "15dcd68cfa13cc1dd5a172306a2cc7e0fb6b4e41b6a740a35a375aa3f9f46c5d"
+    },
+    {
+      "ref": "j11",
+      "asset": "flip_exit_block_2",
+      "area": "Area_Flip",
+      "kind": "challenge",
+      "sha256": "6e9eb87356d2226ea9af2e0018eaebfed7e799defa42bab6336bf49edc5630d1"
+    },
+    {
+      "ref": "j12",
+      "asset": "kiss_yourself_toggle",
+      "area": "Area_Flip",
+      "kind": "core",
+      "sha256": "33f9e361dbedaabb7cf6de8302d52ca48a0e956641c2c31b862ec1b3256711ef"
+    },
+    {
+      "ref": "j13",
+      "asset": "kiss_yourself_flip_first",
+      "area": "Area_Flip",
+      "kind": "challenge",
+      "sha256": "600ff31e677a0c5f6eb131245f8d8c4a5d5e5cb1f553c9328d39856bac02fea8"
+    },
+    {
+      "ref": "j14",
+      "asset": "flip_ref_basket",
+      "area": "Area_Flip",
+      "kind": "challenge",
+      "sha256": "986eb58b27e7907676ac98265d4fa6426e5e47cd20d9f637e7a75aaa990fc4a1"
+    },
+    {
+      "ref": "j15",
+      "asset": "clone_flip_ref",
+      "area": "Area_Flip",
+      "kind": "challenge",
+      "sha256": "98ddf03f71db6a5e45be3bafadbff0e7d28a54e41e0db059d14c31f99e8ab630"
+    },
+    {
+      "ref": "j16",
+      "asset": "catch_and_flip_2",
+      "area": "Area_Flip",
+      "kind": "challenge",
+      "sha256": "06beb03571bad128d3fc3fd3153b2b4f2d9a348e7d7a809db41df1f94e54daaa"
+    },
+    {
+      "ref": "j17",
+      "asset": "text_flip",
+      "area": "Area_Flip",
+      "kind": "side",
+      "sha256": "bc5d649843338bf7b0ab490fbc61b7b29ea9186451d42e1a0546051fc2bf1332"
+    },
+    {
+      "ref": "k1",
+      "asset": "cycle_line",
+      "area": "Area_Cycle",
+      "kind": "core",
+      "sha256": "cdff6277739f549d3d2713496b6d7482e20b6cde63223f6f94d90edbfb7d0f1b"
+    },
+    {
+      "ref": "k2",
+      "asset": "cycle_careful_left",
+      "area": "Area_Cycle",
+      "kind": "core",
+      "sha256": "48364b8873b7ffaf576f23445c7177b255aee865bd5dc459a3d0b45d48909192"
+    },
+    {
+      "ref": "k3",
+      "asset": "cycle_interlope_align",
+      "area": "Area_Cycle",
+      "kind": "core",
+      "sha256": "c904bdd36b25fc6e08548cce2f978233448b9ec3bacd2b281c304c50d44680a2"
+    },
+    {
+      "ref": "k4",
+      "asset": "cycle_interlope_2",
+      "area": "Area_Cycle",
+      "kind": "core",
+      "sha256": "cb7890d41e7fdfdce223a9dfd91c6a263f71925105d67a5fd32706aa4ab9e693"
+    },
+    {
+      "ref": "k5",
+      "asset": "cycle_interlope_from_back_2_v2",
+      "area": "Area_Cycle",
+      "kind": "core",
+      "sha256": "2c1a7e2e9b544ccc123c57a0fc24759776aca9173c66eaa53e91e09ccdc45693"
+    },
+    {
+      "ref": "k6",
+      "asset": "cycle_align",
+      "area": "Area_Cycle",
+      "kind": "challenge",
+      "sha256": "11875dd1991df0690f210754ce4cb94c3957ec3315d6a25795b675c68f5308e1"
+    },
+    {
+      "ref": "k7",
+      "asset": "cycle_cross",
+      "area": "Area_Cycle",
+      "kind": "challenge",
+      "sha256": "ac01967be3c4b151eb4cb3c1f8b6f9308173989debb6ff93f80b9f45e4354e61"
+    },
+    {
+      "ref": "k8",
+      "asset": "interlope_setup",
+      "area": "Area_Cycle",
+      "kind": "core",
+      "sha256": "7f2f65407c1780d13d1b45cf5a9908a9149f180daff4eb5b6b181001a7d3fcb1"
+    },
+    {
+      "ref": "k9",
+      "asset": "cycle_setup",
+      "area": "Area_Cycle",
+      "kind": "challenge",
+      "sha256": "293e7e609a313cc9335f651d610101a00750141b79970b2887fbd9e1a708920d"
+    },
+    {
+      "ref": "k10",
+      "asset": "eat_cycle",
+      "area": "Area_Cycle",
+      "kind": "challenge",
+      "sha256": "81e2ef9e7dd51f6f0b51e2fded350f6d1bc39e720975847ac4bcd99372f9ccd3"
+    },
+    {
+      "ref": "k11",
+      "asset": "train",
+      "area": "Area_Cycle",
+      "kind": "core",
+      "sha256": "e56be040e1e017f8a3e755a7d24217d497992e22a098b86cd4b3b81f4bc89c1f"
+    },
+    {
+      "ref": "k12",
+      "asset": "train_align",
+      "area": "Area_Cycle",
+      "kind": "core",
+      "sha256": "5c3b0ff1e1666710f8b1fe71c78d07f488cf710794c254779c8b55ddfcdb426f"
+    },
+    {
+      "ref": "k13",
+      "asset": "flip_train",
+      "area": "Area_Cycle",
+      "kind": "core",
+      "sha256": "1403c54386b3ac7069f021cbcf31da487daa7b13d69f1849017ce228ee1ded22"
+    },
+    {
+      "ref": "k14",
+      "asset": "train_portal",
+      "area": "Area_Cycle",
+      "kind": "challenge",
+      "sha256": "4da769ab2b1363bd166a342c6187a84d2e4034347ac57aa889c383be5506df16"
+    },
+    {
+      "ref": "k15",
+      "asset": "cycle_ref",
+      "area": "Area_Cycle",
+      "kind": "challenge",
+      "sha256": "1936157bebeb43b8031e806ada9f1eb6f146b95db8af5f9bf666fb03ecbc880c"
+    },
+    {
+      "ref": "k16",
+      "asset": "oblong_intro",
+      "area": "Area_Cycle",
+      "kind": "side",
+      "sha256": "6057a4c5c66fe4e2cbbea55ce890391b5aa7db274e3a9d22b7fb2dc9c4c9516f"
+    },
+    {
+      "ref": "k17",
+      "asset": "5by1",
+      "area": "Area_Cycle",
+      "kind": "side",
+      "sha256": "1916e3d5f26fd5033d9b07f1b6033a0553d993ccc1e73c9990bfb9fa35e0b7ab"
+    },
+    {
+      "ref": "k18",
+      "asset": "7by3ref",
+      "area": "Area_Cycle",
+      "kind": "side",
+      "sha256": "f49a8723538240fc778fc63b65cdfb9c079801d4d06e9a8cf76de740bb319283"
+    },
+    {
+      "ref": "m1",
+      "asset": "playerr_first",
+      "area": "Area_Player",
+      "kind": "core",
+      "sha256": "e1c7a24b8bd85d5dd770d9df8dc9b65546ecffe5e0bb92fe42cafd5391284b41"
+    },
+    {
+      "ref": "m2",
+      "asset": "hungry",
+      "area": "Area_Player",
+      "kind": "core",
+      "sha256": "c35ceeb9c667e0552ce8d470848bf6994383e7e1711a27d9b915b176d94ed114"
+    },
+    {
+      "ref": "m3",
+      "asset": "playerr_eat_four_correct",
+      "area": "Area_Player",
+      "kind": "core",
+      "sha256": "40754b1ba45b1359fcc149d60b11a07f41f86f5b6357c0ac9180daf0fa924fd9"
+    },
+    {
+      "ref": "m4",
+      "asset": "eat_same_side",
+      "area": "Area_Player",
+      "kind": "core",
+      "sha256": "235aa46a6d923c4eb6d6bd499a627bf7d3239e81b29a92eb6ac1b1ab81684eff"
+    },
+    {
+      "ref": "m5",
+      "asset": "digest_2",
+      "area": "Area_Player",
+      "kind": "core",
+      "sha256": "b5128426fda54404ad3bcf82aa444839b6000255f01b26906ae5bbe50ca30287"
+    },
+    {
+      "ref": "m6",
+      "asset": "digest_backing_1",
+      "area": "Area_Player",
+      "kind": "core",
+      "sha256": "57224114ab7454154c307e1077d2c1cab2ecef063c38b044f2739de9134d6900"
+    },
+    {
+      "ref": "m7",
+      "asset": "digest_eject_elbow",
+      "area": "Area_Player",
+      "kind": "core",
+      "sha256": "729e446601a888b9a8ad9b1f858b9b16ceaf525f52523c5f8cfe34f2123e6267"
+    },
+    {
+      "ref": "m8",
+      "asset": "digest_backing_3_v2",
+      "area": "Area_Player",
+      "kind": "challenge",
+      "sha256": "394e6e001fb9fc0c462af7dc01953b14d44b199d6a97b7af1aa26711a3ef4226"
+    },
+    {
+      "ref": "m9",
+      "asset": "player_clone_rescue_v2",
+      "area": "Area_Player",
+      "kind": "core",
+      "sha256": "dfc6fa1a3ed1be2d08eaea124ef94c0c96b1262b9883d929fbbecd8c88cb1a23"
+    },
+    {
+      "ref": "m10",
+      "asset": "carry_player",
+      "area": "Area_Player",
+      "kind": "challenge",
+      "sha256": "d54d5ce6f329fb92ef63ba3e7eccce299bab0a99f55fa809ed2c7c27633a8eeb"
+    },
+    {
+      "ref": "m11",
+      "asset": "playerr_carousel",
+      "area": "Area_Player",
+      "kind": "challenge",
+      "sha256": "113c3f2678960615c5b880b3e9e148e5f0696ea5cb2d218821b3fb98aad6c8e8"
+    },
+    {
+      "ref": "m12",
+      "asset": "full_v2",
+      "area": "Area_Player",
+      "kind": "core",
+      "sha256": "197856086db0fdff88812428a9a2156258610b8f8258d1ef04e318a93095e86b"
+    },
+    {
+      "ref": "m13",
+      "asset": "full_align",
+      "area": "Area_Player",
+      "kind": "core",
+      "sha256": "59b6957cf15015a7cc981d2a9b9388a5e43a16a90b11d86d9c6043398a87cd75"
+    },
+    {
+      "ref": "m14",
+      "asset": "full_align_2",
+      "area": "Area_Player",
+      "kind": "core",
+      "sha256": "776656ee21b56bad985e66e56947af3546dd4e0836af8a866e3c52a7c0df2cac"
+    },
+    {
+      "ref": "m15",
+      "asset": "playerr_cycle_carry",
+      "area": "Area_Player",
+      "kind": "core",
+      "sha256": "dd2293663d1ced6d7443a3666d9d203d27392e4a172544a7172bb62a54be5a32"
+    },
+    {
+      "ref": "m16",
+      "asset": "hungry_flip",
+      "area": "Area_Player",
+      "kind": "challenge",
+      "sha256": "9428d4a4e9701376377e1dfbb4b91ec35cd4c6db8a53a57475a29c778581b214"
+    },
+    {
+      "ref": "m17",
+      "asset": "hungry_ref_flip",
+      "area": "Area_Player",
+      "kind": "challenge",
+      "sha256": "d13a6879532bc1f0fe1dd3ec7066ed017e44a39a77a64d73e8b49ec9fe839e49"
+    },
+    {
+      "ref": "m18",
+      "asset": "get_inside_yourself",
+      "area": "Area_Player",
+      "kind": "core",
+      "sha256": "251ed5c2f34b2d40c4ecbbb9a655cfd852ceac972f68d92b5a59c791e35d2ab1"
+    },
+    {
+      "ref": "m19",
+      "asset": "player_cycle_rescue",
+      "area": "Area_Player",
+      "kind": "core",
+      "sha256": "b6441713eadcedb2d79d922f5c6d4b35945dd34145fb18e46867395bd19afa4c"
+    },
+    {
+      "ref": "m20",
+      "asset": "rescue_my_clones",
+      "area": "Area_Player",
+      "kind": "challenge",
+      "sha256": "c2b545cebcc1129b94a39d391c3970ae2be5c5e034160be3dc73afdf340a1a62"
+    },
+    {
+      "ref": "m21",
+      "asset": "multi_valign",
+      "area": "Area_Player",
+      "kind": "side",
+      "sha256": "124a94b478995bbeb0e0335ebb53157bdaad207bb53afed07add333e0da5af08"
+    },
+    {
+      "ref": "m22",
+      "asset": "multi_gun",
+      "area": "Area_Player",
+      "kind": "side",
+      "sha256": "bc9999dfdbfe1d1f5b8f7b9b64c640d89a51f7274408457a9df1b0390c9c8f86"
+    },
+    {
+      "ref": "m23",
+      "asset": "multi_valign_ref",
+      "area": "Area_Player",
+      "kind": "side",
+      "sha256": "0360bbae0385008aa08a482d01b7dc2895763997a43e257e2e56fadfd47e99c3"
+    },
+    {
+      "ref": "m24",
+      "asset": "multi_swap",
+      "area": "Area_Player",
+      "kind": "side",
+      "sha256": "4ed73416f4c5500351bbe7a16d59ac3abc01eed1e7ef629ec9ae47e9596431bf"
+    },
+    {
+      "ref": "n1",
+      "asset": "possess_first",
+      "area": "Area_Possess",
+      "kind": "core",
+      "sha256": "039abaaf2ace95432681cc50baaf418e6454c8d482f924a76db9a1ba8dfa433d"
+    },
+    {
+      "ref": "n2",
+      "asset": "possess_first_2",
+      "area": "Area_Possess",
+      "kind": "core",
+      "sha256": "ca713660458d1ad4e4afdd8245ce5162a15e92779583d28a3db876240971fdcc"
+    },
+    {
+      "ref": "n3",
+      "asset": "possess_through",
+      "area": "Area_Possess",
+      "kind": "core",
+      "sha256": "fbbf463b61253e8faccb4fabab9892e09116bcd581b11f46d30aa94713cff97b"
+    },
+    {
+      "ref": "n4",
+      "asset": "possess_correct_block_v2",
+      "area": "Area_Possess",
+      "kind": "core",
+      "sha256": "e0cf26ad168be08bc3ff57283d50ad3b9a5dd283dbeade257a39fafbdcc79272"
+    },
+    {
+      "ref": "n5",
+      "asset": "possess_partner_recovery",
+      "area": "Area_Possess",
+      "kind": "core",
+      "sha256": "9336e1fa72c67b813908ef12914a10d259642ab57644c17e598e40bdfddd2f79"
+    },
+    {
+      "ref": "n6",
+      "asset": "exit_possess_setup",
+      "area": "Area_Possess",
+      "kind": "challenge",
+      "sha256": "5d91f1e9846dc629deee0edede860d6ff809cea140cf5b1211cc6cfc2173dde5"
+    },
+    {
+      "ref": "n7",
+      "asset": "stool_possess_v3",
+      "area": "Area_Possess",
+      "kind": "core",
+      "sha256": "705b4d81276ff2b5c7734cfab9fda9b5b50dcd4db579f8a34a0fda8722530d83"
+    },
+    {
+      "ref": "n8",
+      "asset": "stool_possess_2_v3",
+      "area": "Area_Possess",
+      "kind": "core",
+      "sha256": "9b669b116fe5b28476f161772f47cb6c7d00b24166efe30f3efcbcc570df41bf"
+    },
+    {
+      "ref": "n9",
+      "asset": "stool_possess_empty",
+      "area": "Area_Possess",
+      "kind": "challenge",
+      "sha256": "163a97a2c7e54d696cfeb2549525e824dea5319a265e148eb7b4417a5b3f34d4"
+    },
+    {
+      "ref": "n10",
+      "asset": "stool_possess_empty_other",
+      "area": "Area_Possess",
+      "kind": "challenge",
+      "sha256": "1f9251185dfdf6c197a01b4f1dba40e56158383dca4914667bff44e6098e2d24"
+    },
+    {
+      "ref": "n11",
+      "asset": "transfer_possess",
+      "area": "Area_Possess",
+      "kind": "challenge",
+      "sha256": "6300c0200ac8fc080b624e7d23f838e898f68ab14d139591c352dde4485a95ab"
+    },
+    {
+      "ref": "n12",
+      "asset": "possess_ref_stack",
+      "area": "Area_Possess",
+      "kind": "challenge",
+      "sha256": "068a1e3e0d3aa0b6848a8af83c3dbd331a56796a1f7b2a5b2dd2e8eec443c879"
+    },
+    {
+      "ref": "n13",
+      "asset": "dig",
+      "area": "Area_Possess",
+      "kind": "core",
+      "sha256": "d774cf83e6ec1e86523ae4ecc3c1c141a94c4b3cd7c1bf347818d5f6acee0d0e"
+    },
+    {
+      "ref": "n14",
+      "asset": "possess_catch_flip_v2",
+      "area": "Area_Possess",
+      "kind": "core",
+      "sha256": "c94c9cb8cc4ead3a30d090d49e5cb3023d2a6b9c817bd7319c22694bdc157214"
+    },
+    {
+      "ref": "n15",
+      "asset": "flip_elbows_possess",
+      "area": "Area_Possess",
+      "kind": "challenge",
+      "sha256": "1c0d88ee809d1b57def06ea9a742efd4e4087d6017592e538074d806d5262e98"
+    },
+    {
+      "ref": "n16",
+      "asset": "align_setup_transfer",
+      "area": "Area_Possess",
+      "kind": "challenge",
+      "sha256": "89de9665a83bd0c49412d7764449cd214d50dd596200e06718468febfa3c7880"
+    },
+    {
+      "ref": "n17",
+      "asset": "align_setup_transfer_flip",
+      "area": "Area_Possess",
+      "kind": "challenge",
+      "sha256": "0921b2288ff92a859d7cfcc0fe39f3dc8022ac57a10aaa70e630d4853cade9c4"
+    },
+    {
+      "ref": "n18",
+      "asset": "possess_edge_circulate",
+      "area": "Area_Possess",
+      "kind": "challenge",
+      "sha256": "522119117c237019e100e1d50b121d52927951a9cb4515162df3c6509af3c352"
+    },
+    {
+      "ref": "n19",
+      "asset": "1by1_stack",
+      "area": "Area_Possess",
+      "kind": "side",
+      "sha256": "b7de226a26d630e2fa2ed6ac13999f3dabe482b52d464f1b5b1f7462cbae29c3"
+    },
+    {
+      "ref": "n20",
+      "asset": "1by1_clone_flower",
+      "area": "Area_Possess",
+      "kind": "side",
+      "sha256": "fa6ee6badea88613c4887d9bdfd5089943ed7ed2820851d03c82e07cc788868e"
+    },
+    {
+      "ref": "n21",
+      "asset": "1by1_order_line",
+      "area": "Area_Possess",
+      "kind": "side",
+      "sha256": "73adb653883ba4cfd2a1fccd709a704ad258ec2d411583c2688e05e92927b0c4"
+    },
+    {
+      "ref": "n22",
+      "asset": "1by1_possess_v3",
+      "area": "Area_Possess",
+      "kind": "side",
+      "sha256": "52832a7cdc417f9225f7bb814e4e57b017277981b3228f527560115a2aac1d14"
+    },
+    {
+      "ref": "o1",
+      "asset": "poswall_intro",
+      "area": "Area_Wall",
+      "kind": "core",
+      "sha256": "33952db2666f06a70e251224910e7eef28a119d0e8cd820ce724b85c849e2060"
+    },
+    {
+      "ref": "o2",
+      "asset": "poswall_doesnt_count_finish",
+      "area": "Area_Wall",
+      "kind": "core",
+      "sha256": "31cc290fca266bb10ae805ba506bcce4b0d5a20f386e07445314a2b32da97dbe"
+    },
+    {
+      "ref": "o3",
+      "asset": "poswall_doesnt_count_target",
+      "area": "Area_Wall",
+      "kind": "core",
+      "sha256": "41ae4b9b58644adfbce0e91dab84a7553b74e33616ee888afddd25d85be546b9"
+    },
+    {
+      "ref": "o4",
+      "asset": "poswall_first",
+      "area": "Area_Wall",
+      "kind": "core",
+      "sha256": "65bc9c396a853787f7a2166e076fec9f28cdc0808ff9b8669734a24b1f499bf6"
+    },
+    {
+      "ref": "o5",
+      "asset": "poswall_two_walls_intro",
+      "area": "Area_Wall",
+      "kind": "core",
+      "sha256": "9576c7e74d8f2ed56ed0522115d7051684559d42f8947b48ac5ea1b75e1105b4"
+    },
+    {
+      "ref": "o6",
+      "asset": "poswall_edge_eat_thing",
+      "area": "Area_Wall",
+      "kind": "challenge",
+      "sha256": "e2c50bc72a4753db3a26656d510c69276f7969e0d4686324d9efc7490c52ac1d"
+    },
+    {
+      "ref": "o7",
+      "asset": "poswall_chain_v2",
+      "area": "Area_Wall",
+      "kind": "core",
+      "sha256": "e74d36fcdc411a5b985685e8cb21a51a94f48abab4899a92f8e5facb5294d601"
+    },
+    {
+      "ref": "o8",
+      "asset": "poswall_two_walls_possess",
+      "area": "Area_Wall",
+      "kind": "challenge",
+      "sha256": "7c2c19b9f329606a5f35923d785f90f247ca421ca4e82e1c4d91473f9a44cb97"
+    },
+    {
+      "ref": "o9",
+      "asset": "poswall_stack_setup",
+      "area": "Area_Wall",
+      "kind": "challenge",
+      "sha256": "f6b17017bfd77b89f84ee2b95ad69fb612ca3cabe210f473341de9b935f7e567"
+    },
+    {
+      "ref": "o10",
+      "asset": "poswall_ref_stool",
+      "area": "Area_Wall",
+      "kind": "challenge",
+      "sha256": "fda31a2b88d152f01143bc91fa3c16c371f961a62b1fa9c47dffa1978234b8ae"
+    },
+    {
+      "ref": "o11",
+      "asset": "poswall_chain_ref_search",
+      "area": "Area_Wall",
+      "kind": "challenge",
+      "sha256": "49d6b630d9ba0df97b19fe883fa3fe91c35cf310b9026f535ad95617b118b3b4"
+    },
+    {
+      "ref": "o12",
+      "asset": "poswall_make_clone_edible",
+      "area": "Area_Wall",
+      "kind": "core",
+      "sha256": "ce99ffad525aad71814216d240172981a904feec90c1c1dfefb8ac8595e1688b"
+    },
+    {
+      "ref": "o13",
+      "asset": "poswall_chain_3",
+      "area": "Area_Wall",
+      "kind": "challenge",
+      "sha256": "37ed752dbfb528da5aa0273231241bddb9f42df05be9075538e2b8ab10bf59ab"
+    },
+    {
+      "ref": "o14",
+      "asset": "poswall_ref_off_wall",
+      "area": "Area_Wall",
+      "kind": "challenge",
+      "sha256": "4cd83c19f8f64d4963cd58882ff867c47e12c2a9be42657e09b7c8f3c7a05043"
+    },
+    {
+      "ref": "o15",
+      "asset": "text_poswall",
+      "area": "Area_Wall",
+      "kind": "side",
+      "sha256": "3d7b475b82b489cb4b87000491dc08ae09e66d76b50d977cb7c87547e272107a"
+    },
+    {
+      "ref": "p1",
+      "asset": "iexit_just_push_out",
+      "area": "Area_InfiniteExit",
+      "kind": "core",
+      "sha256": "bdd919c767886c89c6c3b2ef1dc2c745ba7bb41faa2f9aff3b77b71ae195c558"
+    },
+    {
+      "ref": "p2",
+      "asset": "iexit_garbage_dump_0",
+      "area": "Area_InfiniteExit",
+      "kind": "core",
+      "sha256": "78cbbaa34773a6b93d23d8ab12698499243c0b83ee6daa0f2bbe93d2486add02"
+    },
+    {
+      "ref": "p3",
+      "asset": "iexit_garbage_dump",
+      "area": "Area_InfiniteExit",
+      "kind": "core",
+      "sha256": "07b72a9e8b4881b85aed061234a44095d6419f01a994bd7b9281dcd9bba1c3d2"
+    },
+    {
+      "ref": "p4",
+      "asset": "vanilla_inf_exit",
+      "area": "Area_InfiniteExit",
+      "kind": "challenge",
+      "sha256": "de43587a97531ea06b43935f00a1e9fcccbd7899bc8c59f86a1e23200e8192e6"
+    },
+    {
+      "ref": "p5",
+      "asset": "infexit_ref_first",
+      "area": "Area_InfiniteExit",
+      "kind": "core",
+      "sha256": "3e4d7ab6b80928a2de84b26be8e512ce99a9c9be60c452b8cbdc001efdc25b38"
+    },
+    {
+      "ref": "p6",
+      "asset": "infexit_help_out",
+      "area": "Area_InfiniteExit",
+      "kind": "core",
+      "sha256": "72067ca41154980adefe6168241bd536d01dee12f4f144d5a9e8410d242bbc14"
+    },
+    {
+      "ref": "p7",
+      "asset": "iexit_peel",
+      "area": "Area_InfiniteExit",
+      "kind": "core",
+      "sha256": "c1fdf51b1c0ae9a956c1558bb2837577b501ba6bc9e48343f4af6a4c474cf445"
+    },
+    {
+      "ref": "p8",
+      "asset": "infexit_cannon",
+      "area": "Area_InfiniteExit",
+      "kind": "core",
+      "sha256": "c893670a75bc83e8e798cea6e3ed843d1bf9cbac92651f1f6b061f9bdef91a1a"
+    },
+    {
+      "ref": "p9",
+      "asset": "infexit_walk_out_reposition_d",
+      "area": "Area_InfiniteExit",
+      "kind": "core",
+      "sha256": "19a87a39008479da99d3643eae392153e2151ac75bf9db73874770b8d525ed1a"
+    },
+    {
+      "ref": "p10",
+      "asset": "infexit_off_wall",
+      "area": "Area_InfiniteExit",
+      "kind": "challenge",
+      "sha256": "fcda57a8a98168c5f92495a975247945c7be3349a5a2b543229f86f791184d27"
+    },
+    {
+      "ref": "p11",
+      "asset": "infexit_two_cannons_d",
+      "area": "Area_InfiniteExit",
+      "kind": "challenge",
+      "sha256": "5fdce8d93099f138d37e1fce8caeac52838855e844f2f3706925c4920d9a7652"
+    },
+    {
+      "ref": "p12",
+      "asset": "iexit_clone_peel_b",
+      "area": "Area_InfiniteExit",
+      "kind": "core",
+      "sha256": "ec5fdda38b065f483ff284419fc122e17a95591a4e33c5ec83ee438ddde117da"
+    },
+    {
+      "ref": "p13",
+      "asset": "inf_cannon_d",
+      "area": "Area_InfiniteExit",
+      "kind": "core",
+      "sha256": "5eef73ef7e531db08303a90d9cf4cfa623533ad688976ac889c47d0bf7564edb"
+    },
+    {
+      "ref": "p14",
+      "asset": "infexit_round_corner_d",
+      "area": "Area_InfiniteExit",
+      "kind": "challenge",
+      "sha256": "b5bc0fac1a97dfbcd2614c611e64e37540deebd8f2730ad705ffaa4b4f9d630b"
+    },
+    {
+      "ref": "p15",
+      "asset": "infexit_round_corner_2_d",
+      "area": "Area_InfiniteExit",
+      "kind": "challenge",
+      "sha256": "cdc8f97ec0ae66a800f6fafd65ac57e7feead7785c1f236a9dc08ceb1cdec58a"
+    },
+    {
+      "ref": "p16",
+      "asset": "playerr_iexit_carousel_d",
+      "area": "Area_InfiniteExit",
+      "kind": "challenge",
+      "sha256": "e2ea5e67c0a1f4e4b63d512c0bc76bd6b8c97db5e8b634cd241aec7b777645ce"
+    },
+    {
+      "ref": "p17",
+      "asset": "infexit_transfer_posseses",
+      "area": "Area_InfiniteExit",
+      "kind": "challenge",
+      "sha256": "6a67662242ddd072bf56645e0089dc0e6efd6f12de85be2cc425e28518f60d73"
+    },
+    {
+      "ref": "p18",
+      "asset": "inf_placeholder",
+      "area": "Area_InfiniteExit",
+      "kind": "challenge",
+      "sha256": "fd2fed9e601384d8bedf487928488796264c17dc353daa0a3e02143f62812d35"
+    },
+    {
+      "ref": "q1",
+      "asset": "ienter_just_ienter",
+      "area": "Area_InfiniteEnter",
+      "kind": "core",
+      "sha256": "a7cdc792122148d1b23f490de0ecb91a134e7d8451f047c1d5e56fa043371c4a"
+    },
+    {
+      "ref": "q2",
+      "asset": "ienter_clone_setup_0",
+      "area": "Area_InfiniteEnter",
+      "kind": "core",
+      "sha256": "8fb88929a12b6645e83bf1e6642d4706f74dc6f91ddfe6f29f0795de4cf9ef48"
+    },
+    {
+      "ref": "q3",
+      "asset": "ienter_send_block",
+      "area": "Area_InfiniteEnter",
+      "kind": "core",
+      "sha256": "eb29c0653cf63a4148ea8c7eb07481636f97a33820e8699d4c0051292258b70f"
+    },
+    {
+      "ref": "q4",
+      "asset": "ienter_clone_setup",
+      "area": "Area_InfiniteEnter",
+      "kind": "core",
+      "sha256": "758e6eb7ce34294b2b33c3119cd93487a1c7e3eb869e894ae5704270ee921e24"
+    },
+    {
+      "ref": "q5",
+      "asset": "ienter_clone_setup_alt",
+      "area": "Area_InfiniteEnter",
+      "kind": "core",
+      "sha256": "f18436b6cbb52aced65701d62e8e652427a05d7801a2fe0da2a3635fbf1b8399"
+    },
+    {
+      "ref": "q6",
+      "asset": "inf_zone_rescue",
+      "area": "Area_InfiniteEnter",
+      "kind": "challenge",
+      "sha256": "c529cc4bb691adbd309e0afc5104a0d50979f8344265532a648e0a46fb9ba4b9"
+    },
+    {
+      "ref": "q7",
+      "asset": "infenter_poswall_setup",
+      "area": "Area_InfiniteEnter",
+      "kind": "challenge",
+      "sha256": "c9e9c14576ad67ce5c861a9e86250aee3c973bd004272449cfc0d9ad8ab3de2f"
+    },
+    {
+      "ref": "q8",
+      "asset": "infenter_peel_0",
+      "area": "Area_InfiniteEnter",
+      "kind": "core",
+      "sha256": "37a0af5385517f34e6a44d008ab9a6eea535eca1c0428edc64a244e03969ef01"
+    },
+    {
+      "ref": "q9",
+      "asset": "infenter_peel",
+      "area": "Area_InfiniteEnter",
+      "kind": "core",
+      "sha256": "a3bbc6ec9fc846d081807d303b324138294a5ba0c4e680ba49bd1261761ad303"
+    },
+    {
+      "ref": "q10",
+      "asset": "inf_eat",
+      "area": "Area_InfiniteEnter",
+      "kind": "challenge",
+      "sha256": "1d3b02a7afd991e04bd4051ca6393f6826e6c9655f1c1c6171ca9c691f97b00f"
+    },
+    {
+      "ref": "q11",
+      "asset": "infenter_pick_corner_v2",
+      "area": "Area_InfiniteEnter",
+      "kind": "challenge",
+      "sha256": "dabeeedd2a3e04da2e8c7bd0322e3971194b746dfed0b9c58c91b897484ef948"
+    },
+    {
+      "ref": "q12",
+      "asset": "infenter_first_2",
+      "area": "Area_InfiniteEnter",
+      "kind": "core",
+      "sha256": "08c4b0d09efed742aedb6259848bf7f407be7e18b108f9563857db5537f1dcab"
+    },
+    {
+      "ref": "q13",
+      "asset": "infenter_line",
+      "area": "Area_InfiniteEnter",
+      "kind": "core",
+      "sha256": "f2a9658c2bc83998404d78885a6f8c565e8ba90ac3a1e35425f69b91fe127d40"
+    },
+    {
+      "ref": "q14",
+      "asset": "infenter_line_both_sides",
+      "area": "Area_InfiniteEnter",
+      "kind": "challenge",
+      "sha256": "14e04bcdb335edd637ed72a044c205aae17a4997406327b1d494ad9dba91ac93"
+    },
+    {
+      "ref": "q15",
+      "asset": "ienter_ref_setups",
+      "area": "Area_InfiniteEnter",
+      "kind": "challenge",
+      "sha256": "747e3af6f1ad10d0917c9323d17a2f2f14b52e1c2569c07d542e7180283b1c52"
+    },
+    {
+      "ref": "q16",
+      "asset": "infenter_toggle",
+      "area": "Area_InfiniteEnter",
+      "kind": "challenge",
+      "sha256": "669ff5897227af050fedff115d6820e9f809b916e5a072c132c6638770c7fae1"
+    },
+    {
+      "ref": "q17",
+      "asset": "iboth_ref_easy_d",
+      "area": "Area_InfiniteEnter",
+      "kind": "core",
+      "sha256": "92bee60594537ff904ad37e4a36665da89fd8bf8301d1a3ffcb6f7b920575c2f"
+    },
+    {
+      "ref": "q18",
+      "asset": "iboth_ref_peel_d_v2",
+      "area": "Area_InfiniteEnter",
+      "kind": "challenge",
+      "sha256": "3be9a4c8ecc96c9b7b0a03d707b8c3dbf0a7148a19e16c2688b48d04d1f30252"
+    },
+    {
+      "ref": "q19",
+      "asset": "iboth_peel",
+      "area": "Area_InfiniteEnter",
+      "kind": "challenge",
+      "sha256": "81add093b5cdd81e9eda4f20e9724bc4652ac0f660d4384c8e4f4de0b780ed35"
+    },
+    {
+      "ref": "q20",
+      "asset": "playerr_ienter",
+      "area": "Area_InfiniteEnter",
+      "kind": "challenge",
+      "sha256": "cad49700331722c599ca2f9fbfd58fe98664837524fedc8e8d5173a60a135406"
+    },
+    {
+      "ref": "r1",
+      "asset": "iiexit_intro_0_zone",
+      "area": "Area_MultiInfinite",
+      "kind": "core",
+      "sha256": "3c136e12acf41581e000cb621f761e67383fc3f2ce2a75e67d5d25ed583f2237"
+    },
+    {
+      "ref": "r2",
+      "asset": "iiexit_intro_0",
+      "area": "Area_MultiInfinite",
+      "kind": "core",
+      "sha256": "b8a8d07fee84189c31091b8254b47411de1b785fe35ea2aaa49abbbb9fdb9e3e"
+    },
+    {
+      "ref": "r3",
+      "asset": "iiexit_intro",
+      "area": "Area_MultiInfinite",
+      "kind": "core",
+      "sha256": "22b75093a3205931f4c9f682da234889d4e4ce0ca192a7b2f7eb889a85d8b962"
+    },
+    {
+      "ref": "r4",
+      "asset": "iiexit_peel",
+      "area": "Area_MultiInfinite",
+      "kind": "core",
+      "sha256": "9afb78ec158e878adbe69359131e5a110ee4ccc48510dbfc9edf090a32e08ea7"
+    },
+    {
+      "ref": "r5",
+      "asset": "iiexit_line",
+      "area": "Area_MultiInfinite",
+      "kind": "core",
+      "sha256": "043d2f8417429d1846546b77995a5029fc9f1a162f839667b2c0016e4f5d0c74"
+    },
+    {
+      "ref": "r6",
+      "asset": "iiexit_pack",
+      "area": "Area_MultiInfinite",
+      "kind": "challenge",
+      "sha256": "2f2136feda16a9b80e0cdc7de0c1c7f26bc945be9e52f4355e79b50e62ecddcd"
+    },
+    {
+      "ref": "r7",
+      "asset": "iiexit_round_corners",
+      "area": "Area_MultiInfinite",
+      "kind": "challenge",
+      "sha256": "d050a8a0bfe05fb46e9e2316e4c516a279aa3537fc55017921d15f89bc474ff2"
+    },
+    {
+      "ref": "r8",
+      "asset": "iienter",
+      "area": "Area_MultiInfinite",
+      "kind": "core",
+      "sha256": "678e1cf09c0e912bf5d73c741a9b58ddd4f36f33610e5e182ce8c69870177fc0"
+    },
+    {
+      "ref": "r9",
+      "asset": "iienter_bookmark_lite",
+      "area": "Area_MultiInfinite",
+      "kind": "core",
+      "sha256": "6d463d13c7eb590a54530a0572515659e05c1afcd213177390f46e461f0c4261"
+    },
+    {
+      "ref": "r10",
+      "asset": "iienter_hungry",
+      "area": "Area_MultiInfinite",
+      "kind": "core",
+      "sha256": "ff208f83833bbfbdcd1f944f5eb2ad8e500ac1a3103e693c83c6a50a155e05ff"
+    },
+    {
+      "ref": "r11",
+      "asset": "iii",
+      "area": "Area_MultiInfinite",
+      "kind": "core",
+      "sha256": "3988a9dd08bd9c35d7503d88fecd5b29cc3a2abdbeb48c2dcf4c505e70c95a06"
+    },
+    {
+      "ref": "s1",
+      "asset": "cage_hard_0",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "e814e9c41e96df1203ed297f7f1f9166cbe5b8feb19a9bc26a502c22d7253ffe"
+    },
+    {
+      "ref": "s2",
+      "asset": "competor_inspired",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "f0646885666a4ce1e4cb840122088b564e176eb64529c4c5fb8a390a3ef449c1"
+    },
+    {
+      "ref": "s3",
+      "asset": "pack_3_by_3",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "58f3979afd94aa55435add47ccbac862f3832fa45fcea58ca2da02ed0f999811"
+    },
+    {
+      "ref": "s4",
+      "asset": "transfer_eat_0",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "b1b1a78d64ad3f5ee896cf03a64e75831967f071539d1839c335bda4aab19700"
+    },
+    {
+      "ref": "s5",
+      "asset": "transfer_back_and_forth",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "5120c182e790b04d37fa5711ef8425220dd1b367b1eb8a8f13a1399671fced3d"
+    },
+    {
+      "ref": "s6",
+      "asset": "transfer_eat",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "87a019e86d6adb5db75da5b12352b6a1a1c8709b52159c4f456a699119b2a38e"
+    },
+    {
+      "ref": "s7",
+      "asset": "two_way_rope",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "5f7242a54e0872599ed14a42988bfa280cf20efa4bfad117a76a8bbc7a37e1fe"
+    },
+    {
+      "ref": "s8",
+      "asset": "eat_stack_ref",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "19b8eafe19fb55bdce000113f82fda7f0cfdf1fd46e8412079fbc86afc5c0d11"
+    },
+    {
+      "ref": "s9",
+      "asset": "ref_stack_four",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "9dc3c309b1eb739fb8c9432c40ec45423e6cd45f3b444edaa5a3dc819e32a2d9"
+    },
+    {
+      "ref": "s10",
+      "asset": "mutual_stool",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "25ddc589fd126c0564facdce6133f87b44f1b5c288cdba2d837de92d0a4415c4"
+    },
+    {
+      "ref": "s11",
+      "asset": "wrap_full",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "967a7277ce384c04d1b3374a5e603652947e971f0454cd336f624be4b6a13b1c"
+    },
+    {
+      "ref": "s12",
+      "asset": "double_enter_clone",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "335136d6ad812ab7d731fd9dd2be1676a281bf9b7d730f4c06a3704cd8de7b51"
+    },
+    {
+      "ref": "s13",
+      "asset": "no_walls_seven",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "9f91a8f67fe95b9081c8ea1ff371406660173eeb3f7afda0eb66dffb36e5bb9c"
+    },
+    {
+      "ref": "s14",
+      "asset": "flip_cycle_ref",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "f2187df93b98f0115fb048d871e3cc7a5978706a62146f7147974c7035ea4f46"
+    },
+    {
+      "ref": "s15",
+      "asset": "1by1_playerr_flip2",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "d1445b967948028c9c8548e489595a5d7a9b98b2c73c41b23472be1b03dc18c8"
+    },
+    {
+      "ref": "s16",
+      "asset": "train_remote_control",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "d86510c35de3137292d7e9a4318d51f6a99de6cdd77b8bca843809d31f6b5d8b"
+    },
+    {
+      "ref": "s17",
+      "asset": "digest_reorder",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "2081996840f61491c5b8217f2af8c26d433549ab606541819b9e7ee10ab63d19"
+    },
+    {
+      "ref": "s18",
+      "asset": "7by1_careful_stowaway",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "b7d7144a01ce3115234fd16b055277ffae8103d55f172c0eb805001ce6606a37"
+    },
+    {
+      "ref": "s19",
+      "asset": "multi_order_0",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "52fbbee494265331558e41618eb8c46afc603b7369af7adc3fd8c2698c035e94"
+    },
+    {
+      "ref": "s20",
+      "asset": "multi_cycle_reorder",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "c50aa9789ff6e69bc1fd62c520df7adc81b21fb0aacba0e33184ea51bc8eef3a"
+    },
+    {
+      "ref": "s21",
+      "asset": "multi_order",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "d687745c378be67c89a65a73aafdf63f81c0d803f463a5b0cdd1f769eddfdb45"
+    },
+    {
+      "ref": "s22",
+      "asset": "possess_slots",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "493bfde0821e4b2bcdbbd5057e6c847198e998f6c87aeb1a9517cec3f374d556"
+    },
+    {
+      "ref": "s23",
+      "asset": "possess_fifteen_puzzle_rescue",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "e632266dcb1ed9cf5e121a88667b040aba5cca36014d80f78bc2d5de4529a1a4"
+    },
+    {
+      "ref": "s24",
+      "asset": "cycle_poswall",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "c2307ae6bc692d8d3072fc957356b6afa78b76719bbc7393af1d454653afcfbb"
+    },
+    {
+      "ref": "s25",
+      "asset": "poswall_clone_transfer",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "44b9c0bb63bccbd509f8732f63053891ea597f22823793a541b8fb8a8e3df3e2"
+    },
+    {
+      "ref": "s26",
+      "asset": "1by1_poswall_silliness",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "6d6800f16bd394515a4bab5b0442fdb0c42b68ecac66140530ae729a7e1edf5d"
+    },
+    {
+      "ref": "s27",
+      "asset": "flipped_inf_block",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "54cd70ed4b400820b398c07d5a96ed96acbc5541b93dfeeedf5d21db9ae1b3ac"
+    },
+    {
+      "ref": "s28",
+      "asset": "iexit_nested_0_d",
+      "area": "Area_Challenge",
+      "kind": "core",
+      "sha256": "8c8a94e12d8b55631081fac01a650712ca2c698c2d3c5c84e2022596a678a656"
+    },
+    {
+      "ref": "s29",
+      "asset": "iexit_nested_setup_d",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "9d15651d52b4d20c24a1b30875133a035e660ddccda1204076a7d50056b16845"
+    },
+    {
+      "ref": "s30",
+      "asset": "ienter_nested_0",
+      "area": "Area_Challenge",
+      "kind": "core",
+      "sha256": "8f278cd6bc98fa083ac3a056482e2803216a7ed1f7a2781cb00d93709a944114"
+    },
+    {
+      "ref": "s31",
+      "asset": "ienter_nested",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "5ebf7761aceb1078b6f31d6a11633ba1adac2580f1684873accc529679264a0a"
+    },
+    {
+      "ref": "s32",
+      "asset": "infenter_zone_v2",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "3db0eb56225523f47726dc2ba5165447ccc3b8abd197de35652f5e16388a7e1e"
+    },
+    {
+      "ref": "s33",
+      "asset": "iienter_sequence",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "00227145a3ff6b929e4be4788d867735b1bcee343f041e50e0ff1d7a14e7f657"
+    },
+    {
+      "ref": "s34",
+      "asset": "1by1_inf",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "fedc2ddd69f2ab882812c781e5159595d9e73c06747d4ce01668dd22df004953"
+    },
+    {
+      "ref": "s35",
+      "asset": "flip_iiexit_block_2",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "3c80cd14e7c176a136d1979131c9937965850a3be3ecafb6bade12e9767d10b3"
+    },
+    {
+      "ref": "s36",
+      "asset": "iiexit_repeat_visit_d_v3",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "385f0c150ddbbc231ef052a17d5a52cdcb58c6f6519ac9bfce5332ca2066c966"
+    },
+    {
+      "ref": "s37",
+      "asset": "possess_ii_block_v2",
+      "area": "Area_Challenge",
+      "kind": "challenge",
+      "sha256": "f7a71197d121d2843d9e63c3574fa98ae4e7297efdb977432f2140c12e17f77c"
+    },
+    {
+      "ref": "s38",
+      "asset": "static_focus_block",
+      "area": "Area_Challenge",
+      "kind": "side",
+      "sha256": "e2ab6ad5b8dd21891277ab088e77bf02874effd45272379f1c2817bd24a963e9"
+    },
+    {
+      "ref": "t1",
+      "asset": "oldstyle_squash_4_sides_v2",
+      "area": "Area_Gallery",
+      "kind": "challenge",
+      "sha256": "723de641b8bf656524c1c69812e17117e54944739bee98d48fcf8beff55c895b"
+    },
+    {
+      "ref": "t2",
+      "asset": "oldstyle_lock_two_doors",
+      "area": "Area_Gallery",
+      "kind": "challenge",
+      "sha256": "c881c3a8e2e7b9469dff7f8305e001f70fd6a3734ac8ea26e73c2a2222b99eeb"
+    },
+    {
+      "ref": "t3",
+      "asset": "oldstyle_transfer_then_save",
+      "area": "Area_Gallery",
+      "kind": "challenge",
+      "sha256": "882dc21816bd64d82a32d745c2c03a33e732b12143a3a2f01bc438c286ead597"
+    },
+    {
+      "ref": "u1",
+      "asset": "order_elbow_push",
+      "area": "Area_Priority",
+      "kind": "core",
+      "sha256": "8b05f5523392c7aab26666f18a440a5ef924c8e2729255d2c9092d339d5c4b0e"
+    },
+    {
+      "ref": "u2",
+      "asset": "order_donut_push",
+      "area": "Area_Priority",
+      "kind": "core",
+      "sha256": "331f00e8fb345d8e6c2fcf62a3c4253a66bc0e171cd49d075e31c467bc4136eb"
+    },
+    {
+      "ref": "u3",
+      "asset": "order_ref_spiral",
+      "area": "Area_Priority",
+      "kind": "core",
+      "sha256": "8981f6c93db1790427ecb77f11ff21c7134baf653c57eb19e7602d4cf4886773"
+    },
+    {
+      "ref": "u4",
+      "asset": "order_mutual_carry",
+      "area": "Area_Priority",
+      "kind": "challenge",
+      "sha256": "3aa2e351432721c54fa7dad417395e8971d409828eb6d9168c179c6ffdf24b39"
+    },
+    {
+      "ref": "u5",
+      "asset": "order_empty_3by3",
+      "area": "Area_Priority",
+      "kind": "challenge",
+      "sha256": "afaddc3572b5a494ad7d047a6c7b7c44932e34d35258b212fbce5dc3d2a9eb13"
+    },
+    {
+      "ref": "u6",
+      "asset": "order_ref_piecewise_push",
+      "area": "Area_Priority",
+      "kind": "challenge",
+      "sha256": "e94c8b1d6a599e859c4ce41216f9a8a7ebb55210ee6a62c99fe5052a0c916829"
+    },
+    {
+      "ref": "u7",
+      "asset": "order_hungry",
+      "area": "Area_Priority",
+      "kind": "challenge",
+      "sha256": "2df10bf4ec0142706cb9f523f6dde55c6b1013f62621d2fae59fc5a6a6b74c84"
+    },
+    {
+      "ref": "u8",
+      "asset": "order_poswall_piecewise_push",
+      "area": "Area_Priority",
+      "kind": "challenge",
+      "sha256": "d897a3ae312985bd17c926c96302abdcccee5565881bf64beece3f683225e030"
+    },
+    {
+      "ref": "u9",
+      "asset": "order_1by1_clone_push",
+      "area": "Area_Priority",
+      "kind": "challenge",
+      "sha256": "0056f5e8eac8a75596709e87c4821b374abf75375d544e7777c13c1e74a026da"
+    },
+    {
+      "ref": "v1",
+      "asset": "shed_tricky_corners",
+      "area": "Area_Extrude",
+      "kind": "core",
+      "sha256": "2fbccefdbb681ffbb645f35793d64b5dea51ddae70d2a66dd58d5bf8de1741f4"
+    },
+    {
+      "ref": "v2",
+      "asset": "shed_first",
+      "area": "Area_Extrude",
+      "kind": "core",
+      "sha256": "d258d036a9e84eb21fdaf94e097b06ac82aa9114ad33f98ec230d4ff90432995"
+    },
+    {
+      "ref": "v3",
+      "asset": "shed_side_extrude",
+      "area": "Area_Extrude",
+      "kind": "core",
+      "sha256": "c447e52791fe6f4645c660e7bb5201098caf07990be76caf87ff504069ff8eb2"
+    },
+    {
+      "ref": "v4",
+      "asset": "shed_intro_box_manipulation",
+      "area": "Area_Extrude",
+      "kind": "challenge",
+      "sha256": "f6c6d4783371dfd74b56fafbcd1fc3a3777ebb89e971d04559dac934e5bddcfd"
+    },
+    {
+      "ref": "v5",
+      "asset": "shed_lock_door_2",
+      "area": "Area_Extrude",
+      "kind": "challenge",
+      "sha256": "f0d7ebde629366b6de376fcce1bf1b3e6403105ee1df767341ca1bca5b55ecd7"
+    },
+    {
+      "ref": "v6",
+      "asset": "shed_ref_flip_v3",
+      "area": "Area_Extrude",
+      "kind": "core",
+      "sha256": "8b7ffcb746d2b8a52dd4f19e3835beb65c4403dc12775968d278ad9b61479fcb"
+    },
+    {
+      "ref": "v7",
+      "asset": "shed_iiexit",
+      "area": "Area_Extrude",
+      "kind": "core",
+      "sha256": "13f2ebe89d8d7dde323b10a55943f6d0f062d4cd2ebf6af969c82de8e358363b"
+    },
+    {
+      "ref": "v8",
+      "asset": "shed_multi_simultaneous",
+      "area": "Area_Extrude",
+      "kind": "challenge",
+      "sha256": "17c026476aced1f86454d3226d49a388e898649476f62a7b337311f17d5e00d2"
+    },
+    {
+      "ref": "w1",
+      "asset": "inpush_intro",
+      "area": "Area_Push",
+      "kind": "core",
+      "sha256": "e926fb9f59782746b85b7e28f4806848155b8a972223edf9a8fcb745487faab8"
+    },
+    {
+      "ref": "w2",
+      "asset": "inpush_ref_flip",
+      "area": "Area_Push",
+      "kind": "core",
+      "sha256": "cfb122120c5d0b6e96df135a6ffab4798ba3516095ce9dff28ed28e184d27950"
+    },
+    {
+      "ref": "w3",
+      "asset": "inpush_ref_track",
+      "area": "Area_Push",
+      "kind": "core",
+      "sha256": "44e292b86290ddc7a2c6d8def8182a7022f58102729813234bb66a30594478dd"
+    },
+    {
+      "ref": "w4",
+      "asset": "inpush_sequential_rescue",
+      "area": "Area_Push",
+      "kind": "challenge",
+      "sha256": "56b02c1d474a3cbb6e34f66b75cee646b2ff723ee0b7c45900881c8204ef703e"
+    },
+    {
+      "ref": "w5",
+      "asset": "inpush_poswall_priority_v3",
+      "area": "Area_Push",
+      "kind": "challenge",
+      "sha256": "05a196de260a7cd29577be5d113049b8a445f73e347fe9f46435fdfa1079376c"
+    },
+    {
+      "ref": "w6",
+      "asset": "inpush_no_right",
+      "area": "Area_Push",
+      "kind": "challenge",
+      "sha256": "2092ffb81d7d5544a8672bd38d7ec875c340bc94d2b19e672418b206c54563b7"
+    },
+    {
+      "ref": "w7",
+      "asset": "inpush_navigate_inf_zone_v2",
+      "area": "Area_Push",
+      "kind": "challenge",
+      "sha256": "37f695366216d6aa8dd979c18a17dbd99086fef3a250b08c13b1ecbae8e284f4"
+    },
+    {
+      "ref": "w8",
+      "asset": "inpush_player_is_shift",
+      "area": "Area_Push",
+      "kind": "challenge",
+      "sha256": "f6babdcc35092df4a02cbea61e153f7e296eb37e401b2a1fd14386550b9c675a"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+[package]
+name = "sausage-terminal"
+version = "0.1.0"
+edition = "2024"
+license = "UNLICENSED"
+publish = false
+
+[lib]
+name = "sausage_terminal"
+path = "src/lib.rs"
+
+[dependencies]
+flate2 = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tar = "0.4"
+tiny_http = "0.12"
+
+[[bin]]
+name = "sausage-inspect"
+path = "src/bin/inspect.rs"
+
+[[bin]]
+name = "sausage-walkthrough"
+path = "src/bin/walkthrough.rs"
+
+[[bin]]
+name = "sausage-server"
+path = "src/bin/server.rs"
+
+[[bin]]
+name = "sausage-verifier"
+path = "src/bin/verifier.rs"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+panic = "abort"

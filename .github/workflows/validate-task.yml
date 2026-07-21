@@ -1,24 +1,19 @@
 name: Validate Task
 
-# Runs execution checks (Docker build, oracle/nop validation)
-# on every push to tasks/ and manually via /validate comment.
-# Cancels in-progress runs when a new commit arrives.
+# Manual-only execution checks (Docker build, Oracle/Nop validation).
+# Real benchmark tasks are never executed by pull-request CI.
 
 on:
-  pull_request_target:
-    types: [opened, ready_for_review, synchronize, reopened]
-    paths:
-      - "tasks/**"
   issue_comment:
     types: [created]
 
 concurrency:
-  # Non-`/validate` comments get a per-run group so they don't cancel in-flight runs.
-  # Real triggers (push, `/validate` comment) share `validate-<PR>` and cancel each other.
+  # Non-`/validate` comments get a per-run group so they do not cancel an
+  # explicitly requested validation.
   group: >-
     ${{ (github.event_name == 'issue_comment' && !contains(github.event.comment.body, '/validate'))
         && format('validate-noop-{0}', github.run_id)
-        || format('validate-{0}', github.event.pull_request.number || github.event.issue.number) }}
+        || format('validate-{0}', github.event.issue.number) }}
   cancel-in-progress: true
 
 jobs:
@@ -30,6 +25,7 @@ jobs:
       overrides: ${{ steps.check.outputs.overrides }}
     permissions:
       pull-requests: read
+      contents: read
     steps:
       - name: Check trigger conditions
         id: check
@@ -39,23 +35,24 @@ jobs:
           COMMENT_BODY: ${{ github.event.comment.body }}
           ISSUE_PR_URL: ${{ github.event.issue.pull_request.html_url }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          COMMENT_USER: ${{ github.event.comment.user.login }}
           REPO: ${{ github.repository }}
         run: |
-          if [ "$EVENT_NAME" = "pull_request_target" ]; then
-            echo "should_run=true" >> $GITHUB_OUTPUT
-            echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-            echo "overrides=" >> $GITHUB_OUTPUT
-            echo "Auto-triggered on PR event"
-          elif [[ -n "$ISSUE_PR_URL" ]] && [[ "$COMMENT_BODY" == *"/validate"* ]]; then
-            echo "should_run=true" >> $GITHUB_OUTPUT
-            echo "pr_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
-            {
-              echo "overrides<<OVERRIDES_EOF"
-              echo "$COMMENT_BODY"
-              echo "OVERRIDES_EOF"
-            } >> $GITHUB_OUTPUT
-            echo "Manual /validate trigger"
+          if [[ -n "$ISSUE_PR_URL" ]] && [[ "$COMMENT_BODY" == *"/validate"* ]]; then
+            PERMISSION=$(gh api "repos/${REPO}/collaborators/${COMMENT_USER}/permission" --jq '.permission' 2>/dev/null || echo "none")
+            if [[ "$PERMISSION" == "admin" || "$PERMISSION" == "write" ]]; then
+              echo "should_run=true" >> $GITHUB_OUTPUT
+              echo "pr_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+              {
+                echo "overrides<<OVERRIDES_EOF"
+                echo "$COMMENT_BODY"
+                echo "OVERRIDES_EOF"
+              } >> $GITHUB_OUTPUT
+              echo "Maintainer triggered /validate"
+            else
+              echo "should_run=false" >> $GITHUB_OUTPUT
+              echo "User does not have write access"
+            fi
           else
             echo "should_run=false" >> $GITHUB_OUTPUT
           fi

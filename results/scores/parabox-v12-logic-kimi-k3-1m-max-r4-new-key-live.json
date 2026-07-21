@@ -1,0 +1,48 @@
+{
+  "scoring": {
+    "version": "parabox-integer-score-token-tiebreak-v4",
+    "chain_version": "parabox-continuation-chain-v2",
+    "formula": "score = solved_levels; rank by score descending, then total_tokens ascending",
+    "level_count": 364,
+    "time_policy": "Agent wall time is retained only as a diagnostic and does not affect the score because it is sensitive to service stability.",
+    "ordering_guarantee": "Each solved puzzle contributes exactly one point. Token use only breaks ties between trials with the same integer score.",
+    "eligibility_policy": "A valid verifier result retains its integer score even when token accounting is unavailable. Such a trial is excluded only from token-based tie ranking. Reaching the configured Agent timeout is an expected benchmark cutoff and retains the verified score; other infrastructure exceptions invalidate the score itself.",
+    "continuation_policy": "Ordered continuation segments must share task, checksum, model, and reasoning effort, and cumulative scores may not decrease. The chain score is the final cumulative score; tokens are summed across every segment. When a cumulative runtime budget cuts through a segment, score and cumulative tokens come from the last raw rollout evidence at that exact cutoff."
+  },
+  "trials": [
+    {
+      "source": {
+        "result_json": ".harbor/jobs/parabox-v12-logic-kimi-k3-1m-max-r4-new-key-live/parabox-intro__7TtHgJP/result.json",
+        "result_sha256": "04b1051c02e2ae87f1d2cf20523d8955e1c7b2d1203b95ff14efbe35e08d3591",
+        "field_paths": {
+          "solved_levels": "verifier_result.rewards.reward",
+          "input_tokens": "agent_result.n_input_tokens",
+          "cache_tokens": "agent_result.n_cache_tokens",
+          "output_tokens": "agent_result.n_output_tokens",
+          "termination": "exception_info.exception_type",
+          "diagnostic_agent_started_at": "agent_execution.started_at",
+          "diagnostic_agent_finished_at": "agent_execution.finished_at"
+        }
+      },
+      "identity": {
+        "harbor_trial_id": "43737e4b-9eb8-45d5-a762-6f7235c7b451",
+        "trial_name": "parabox-intro__7TtHgJP",
+        "task_name": "3720/parabox-intro",
+        "task_checksum": "7e63d299d7445d32ce0b4109dc44c1ba8cda3fe9981aa140b61ae20512c64c8c",
+        "agent": "tools.agents.kimi_claude_code:GoalKimiClaudeCode",
+        "model": "k3[1m]",
+        "reasoning_effort": "max"
+      },
+      "score_valid": false,
+      "ranking_eligible": false,
+      "eligible": false,
+      "ineligible_reason": "'NoneType' object is not subscriptable",
+      "termination": {
+        "status": "expected_agent_timeout",
+        "exception_type": "AgentTimeoutError"
+      },
+      "raw": null,
+      "derived": null
+    }
+  ]
+}

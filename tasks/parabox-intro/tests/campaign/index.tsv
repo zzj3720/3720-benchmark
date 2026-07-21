@@ -1,0 +1,364 @@
+a1	First Puzzle	a1.level	Area_Intro	core	-	0
+a2	Second Puzzle	a2.level	Area_Intro	core	a1	1
+a3	Third Puzzle	a3.level	Area_Intro	core	a2	1
+a4	Enter	a4.level	Area_Intro	core	a3	0
+a5	Elbow Finish Idiom	a5.level	Area_Intro	core	a4	1
+a6	Round Corners	a6.level	Area_Intro	core	a5	1
+a7	Separate	a7.level	Area_Intro	core	a6	1
+a8	Enter Two Sides	a8.level	Area_Intro	core	a7	1
+a9	Lock Door	a9.level	Area_Intro	core	a8	1
+b1	Carry	b1.level	Area_Enter	core	-	0
+b2	Turn Around	b2.level	Area_Enter	core	b1	1
+b3	Correct Placement	b3.level	Area_Enter	core	b2	1
+b4	Nest Two	b4.level	Area_Enter	core	b3	1
+b5	Puzzlescript	b5.level	Area_Enter	challenge	b4	0
+b6	Squash Inside 2	b6.level	Area_Enter	core	b4	0
+b7	Squash Inside 3	b7.level	Area_Enter	core	b6	1
+b8	Load Elbow	b8.level	Area_Enter	challenge	b7	0
+b9	Exit And Push 2	b9.level	Area_Enter	challenge	b7	0
+b10	Cage	b10.level	Area_Enter	challenge	b9	1
+b11	Rescue	b11.level	Area_Enter	core	b7	0
+b12	Ref	b12.level	Area_Enter	core	b11	0
+b13	Ref2	b13.level	Area_Enter	core	b12	1
+b14	Cannon	b14.level	Area_Enter	core	b13	1
+b15	Cannon2	b15.level	Area_Enter	core	b14	1
+b16	Ref Turn Around	b16.level	Area_Enter	core	b15	1
+b17	Ref Static	b17.level	Area_Enter	challenge	b16	0
+b18	Lock 3	b18.level	Area_Enter	challenge	b16	0
+c1	Exit All Sides	c1.level	Area_Empty	core	-	0
+c2	Squash Inside 4	c2.level	Area_Empty	core	c1	1
+c3	Swap Blocks	c3.level	Area_Empty	core	c2	1
+c4	Lock Door Setup	c4.level	Area_Empty	core	c3	1
+c5	Empty Lock Door	c5.level	Area_Empty	challenge	c4	0
+c6	Empty Carry Better	c6.level	Area_Empty	challenge	c4	0
+c7	Tight Turnaround	c7.level	Area_Empty	challenge	c6	1
+c8	Push Once Entry Allowed 4	c8.level	Area_Empty	core	c4	0
+c9	Up Down Shuffle	c9.level	Area_Empty	core	c8	1
+c10	Pack Three	c10.level	Area_Empty	challenge	c9	0
+c11	Carry Swap	c11.level	Area_Empty	challenge	c9	0
+c12	Two Peel Easy	c12.level	Area_Empty	core	c9	0
+c13	Careful Cannon	c13.level	Area_Empty	challenge	c12	0
+c14	Two Peel Careful	c14.level	Area_Empty	challenge	c13	1
+d1	Eat Recognize	d1.level	Area_Eat	core	-	0
+d2	Eat 4 Sides	d2.level	Area_Eat	core	d1	1
+d3	Eat Long Line	d3.level	Area_Eat	core	d2	1
+d4	Sticky Carry2 V2	d4.level	Area_Eat	core	d3	1
+d5	Narrow Door	d5.level	Area_Eat	core	d4	0
+d6	Narrower Door	d6.level	Area_Eat	core	d5	1
+d7	Eat Stack V2	d7.level	Area_Eat	core	d6	0
+d8	Eat Ref Rescue V2	d8.level	Area_Eat	challenge	d7	0
+d9	Eat Then Tight Squash	d9.level	Area_Eat	core	d7	0
+d10	Careful Packing0	d10.level	Area_Eat	core	d9	1
+d11	Careful Packing1	d11.level	Area_Eat	challenge	d10	0
+d12	Eat Correct Order	d12.level	Area_Eat	challenge	d10	0
+d13	Text Eat V2	d13.level	Area_Eat	side	-	0
+e1	Nest Ref	e1.level	Area_Reference	core	-	0
+e2	Ref Carry Simple	e2.level	Area_Reference	core	e1	1
+e3	Initiate Peel 0	e3.level	Area_Reference	core	e2	1
+e4	Initiate Peel	e4.level	Area_Reference	challenge	e3	0
+e5	Ref Stack Lock	e5.level	Area_Reference	challenge	e4	1
+e6	Portal Setup Both	e6.level	Area_Reference	challenge	e3	0
+e7	Ref Carry Careful	e7.level	Area_Reference	challenge	e9	0
+e8	Portal Open Close	e8.level	Area_Reference	core	e3	0
+e9	Narrow Door Two Deep	e9.level	Area_Reference	core	e8	1
+e10	Sokosoko	e10.level	Area_Reference	challenge	e9	0
+e11	Zoom In Anim	e11.level	Area_Reference	side	-	0
+e12	Zoom Out Anim	e12.level	Area_Reference	side	e11	1
+L1	Swap First	L1.level	Area_Swap	core	-	0
+L2	Swap Cannon	L2.level	Area_Swap	core	L1	1
+L3	Three Goals In One	L3.level	Area_Swap	challenge	L2	0
+L4	Swap Back	L4.level	Area_Swap	challenge	L2	0
+L5	Swap Chain	L5.level	Area_Swap	challenge	L2	0
+f1	Enter In Center First	f1.level	Area_Center	core	-	0
+f2	Enter In Center Unstuck	f2.level	Area_Center	core	f1	1
+f3	Get In Center	f3.level	Area_Center	core	f2	1
+f4	Off The Wall	f4.level	Area_Center	core	f3	1
+f5	Off The Wall Three	f5.level	Area_Center	challenge	f4	0
+f6	Ref Enter In Center	f6.level	Area_Center	core	f4	0
+f7	Dual Unstuck	f7.level	Area_Center	challenge	f6	0
+f8	Open Door	f8.level	Area_Center	core	f6	0
+f9	Break In	f9.level	Area_Center	core	f8	1
+f10	No Entry Off Wall Both	f10.level	Area_Center	challenge	f9	0
+f11	Topology Stack	f11.level	Area_Center	challenge	f9	0
+f12	Carry Adjust	f12.level	Area_Center	challenge	f9	0
+f13	Carry Adjust Donut Hole	f13.level	Area_Center	challenge	f12	1
+f14	Tricky Pack	f14.level	Area_Center	challenge	f13	1
+f15	Text 1	f15.level	Area_Center	side	-	0
+f16	Text 3	f16.level	Area_Center	side	f15	1
+g1	Clone First 2	g1.level	Area_Clone	core	-	0
+g2	Clone Peel	g2.level	Area_Clone	core	g1	1
+g3	One Way Portal 2	g3.level	Area_Clone	core	g2	1
+g4	Clone Strategic Entrances	g4.level	Area_Clone	core	g3	1
+g5	Clone Peel Setup	g5.level	Area_Clone	challenge	g4	0
+g6	Clone Unstuck Trick	g6.level	Area_Clone	challenge	g4	0
+g7	Clone Ref First Contact 2	g7.level	Area_Clone	core	g4	0
+g8	Clone Ref First Contact 3	g8.level	Area_Clone	core	g7	1
+g9	Ref Clone	g9.level	Area_Clone	core	g8	1
+g10	Clone Rescue Ref 2	g10.level	Area_Clone	core	g9	1
+g11	Clone Switch Sides	g11.level	Area_Clone	core	g10	1
+g12	Clone Switch Sides Rescue	g12.level	Area_Clone	challenge	g11	0
+g13	Clone Separate Line	g13.level	Area_Clone	core	g11	0
+g14	Clone Separate Line Hard	g14.level	Area_Clone	challenge	g13	0
+g15	Enter The Ocean V2	g15.level	Area_Clone	core	g13	0
+g16	Clone Unstuck Trick 3	g16.level	Area_Clone	challenge	g15	0
+g17	Enter The Ocean 10 Foot Pole	g17.level	Area_Clone	challenge	g15	0
+g18	Clone Carousel	g18.level	Area_Clone	challenge	g15	0
+g19	Float In Space 0	g19.level	Area_Clone	core	g15	0
+g20	Float In Space	g20.level	Area_Clone	core	g19	1
+g21	Clone Mutual Rescue	g21.level	Area_Clone	challenge	g20	0
+g22	Dismantle One Ocean Using Another	g22.level	Area_Clone	challenge	g20	0
+g23	Dismantle Ocean Start No Exit	g23.level	Area_Clone	challenge	g22	1
+g24	Grid Clone	g24.level	Area_Clone	side	-	0
+g25	Text Clone V2	g25.level	Area_Clone	side	-	0
+h1	Transfer	h1.level	Area_Transfer	core	-	0
+h2	Pack 0	h2.level	Area_Transfer	core	h1	1
+h3	Pack	h3.level	Area_Transfer	core	h2	1
+h4	Pack 3	h4.level	Area_Transfer	core	h3	1
+h5	Find Spot	h5.level	Area_Transfer	challenge	h4	0
+h6	Transfer Peel	h6.level	Area_Transfer	core	h4	0
+h7	Transfer Mutual	h7.level	Area_Transfer	core	h6	1
+h8	Transfer Straight Line	h8.level	Area_Transfer	challenge	h7	0
+h9	Transfer Two Sides Thinking Face	h9.level	Area_Transfer	challenge	h8	1
+h10	Transfer Keep Off Wall	h10.level	Area_Transfer	challenge	h7	0
+h11	Ref Transfer First	h11.level	Area_Transfer	core	h7	0
+h12	Clone Transfer	h12.level	Area_Transfer	core	h11	1
+h13	Pack Ref	h13.level	Area_Transfer	challenge	h12	0
+h14	Ref Transfer Lock	h14.level	Area_Transfer	challenge	h12	0
+h15	Transfer Clones Back Forth 0	h15.level	Area_Transfer	core	h12	0
+h16	Wrap	h16.level	Area_Transfer	core	h15	1
+h17	Wrap2	h17.level	Area_Transfer	core	h16	1
+h18	Transfer Clones Back Forth	h18.level	Area_Transfer	challenge	h17	0
+h19	Transfer Clones Back Forth 2	h19.level	Area_Transfer	challenge	h18	1
+h20	Transfer Clones Back Forth 3	h20.level	Area_Transfer	challenge	h19	1
+h21	3 And 9	h21.level	Area_Transfer	core	h17	0
+h22	Stack Transfer	h22.level	Area_Transfer	core	h21	1
+h23	Transfer Mismatched V2	h23.level	Area_Transfer	core	h22	1
+h24	Stack Transfer 3 V2	h24.level	Area_Transfer	challenge	h23	0
+h25	Double Enter Transfer	h25.level	Area_Transfer	challenge	h24	1
+h26	Transfer Ultra Stack	h26.level	Area_Transfer	challenge	h23	0
+h27	Hue Shift	h27.level	Area_Transfer	side	-	0
+h28	4By4 Linear	h28.level	Area_Transfer	side	-	0
+h29	2By2	h29.level	Area_Transfer	side	h28	1
+i1	No Up Walls 1	i1.level	Area_Open	core	-	0
+i2	No Up Walls 2	i2.level	Area_Open	core	i1	1
+i3	No Up Walls 3	i3.level	Area_Open	core	i2	1
+i4	No Up Walls 4	i4.level	Area_Open	challenge	i3	0
+i5	No Up Walls Block Stool V2	i5.level	Area_Open	challenge	i4	1
+i6	No Walls	i6.level	Area_Open	core	i3	0
+i7	No Walls 2	i7.level	Area_Open	challenge	i6	0
+i8	No Walls 3 V2	i8.level	Area_Open	challenge	i7	1
+i9	Squash Inside Outer Wall	i9.level	Area_Open	challenge	i6	0
+i10	Squash Inside Outer Wall Straightline	i10.level	Area_Open	challenge	i9	1
+i11	3By3Ref	i11.level	Area_Open	side	-	0
+i12	3By3 Fun Clone Heist	i12.level	Area_Open	side	-	0
+j1	Flip First	j1.level	Area_Flip	core	-	0
+j2	Flip Ref Maze	j2.level	Area_Flip	core	j1	1
+j3	Flip Block3	j3.level	Area_Flip	core	j2	1
+j4	Flip Block With Clone 3	j4.level	Area_Flip	core	j3	1
+j5	Flip Blocks	j5.level	Area_Flip	core	j4	1
+j6	Flip Elbows	j6.level	Area_Flip	challenge	j5	0
+j7	Flip Clone Line	j7.level	Area_Flip	challenge	j5	0
+j8	Flip Non Ref Clones	j8.level	Area_Flip	challenge	j7	1
+j9	Flip Exit Block 1	j9.level	Area_Flip	core	j5	0
+j10	Flip Exit Block 3	j10.level	Area_Flip	core	j9	1
+j11	Flip Exit Block 2	j11.level	Area_Flip	challenge	j10	0
+j12	Kiss Yourself Toggle	j12.level	Area_Flip	core	j10	0
+j13	Kiss Yourself Flip First	j13.level	Area_Flip	challenge	j12	0
+j14	Flip Ref Basket	j14.level	Area_Flip	challenge	j12	0
+j15	Clone Flip Ref	j15.level	Area_Flip	challenge	j12	0
+j16	Catch And Flip 2	j16.level	Area_Flip	challenge	j12	0
+j17	Text Flip	j17.level	Area_Flip	side	-	0
+k1	Cycle Line	k1.level	Area_Cycle	core	-	0
+k2	Cycle Careful Left	k2.level	Area_Cycle	core	k1	1
+k3	Cycle Interlope Align	k3.level	Area_Cycle	core	k2	1
+k4	Cycle Interlope 2	k4.level	Area_Cycle	core	k3	1
+k5	Cycle Interlope From Back 2 V2	k5.level	Area_Cycle	core	k4	1
+k6	Cycle Align	k6.level	Area_Cycle	challenge	k5	0
+k7	Cycle Cross	k7.level	Area_Cycle	challenge	k5	0
+k8	Interlope Setup	k8.level	Area_Cycle	core	k5	0
+k9	Cycle Setup	k9.level	Area_Cycle	challenge	k8	0
+k10	Eat Cycle	k10.level	Area_Cycle	challenge	k8	0
+k11	Train	k11.level	Area_Cycle	core	k8	0
+k12	Train Align	k12.level	Area_Cycle	core	k11	1
+k13	Flip Train	k13.level	Area_Cycle	core	k12	1
+k14	Train Portal	k14.level	Area_Cycle	challenge	k13	0
+k15	Cycle Ref	k15.level	Area_Cycle	challenge	k13	0
+k16	Oblong Intro	k16.level	Area_Cycle	side	-	0
+k17	5By1	k17.level	Area_Cycle	side	k16	1
+k18	7By3Ref	k18.level	Area_Cycle	side	k17	1
+m1	Playerr First	m1.level	Area_Player	core	-	0
+m2	Hungry	m2.level	Area_Player	core	m1	1
+m3	Playerr Eat Four Correct	m3.level	Area_Player	core	m2	1
+m4	Eat Same Side	m4.level	Area_Player	core	m3	1
+m5	Digest 2	m5.level	Area_Player	core	m4	1
+m6	Digest Backing 1	m6.level	Area_Player	core	m5	1
+m7	Digest Eject Elbow	m7.level	Area_Player	core	m6	1
+m8	Digest Backing 3 V2	m8.level	Area_Player	challenge	m7	0
+m9	Player Clone Rescue V2	m9.level	Area_Player	core	m7	0
+m10	Carry Player	m10.level	Area_Player	challenge	m9	0
+m11	Playerr Carousel	m11.level	Area_Player	challenge	m9	0
+m12	Full V2	m12.level	Area_Player	core	m9	0
+m13	Full Align	m13.level	Area_Player	core	m12	1
+m14	Full Align 2	m14.level	Area_Player	core	m13	1
+m15	Playerr Cycle Carry	m15.level	Area_Player	core	m14	0
+m16	Hungry Flip	m16.level	Area_Player	challenge	m15	0
+m17	Hungry Ref Flip	m17.level	Area_Player	challenge	m15	0
+m18	Get Inside Yourself	m18.level	Area_Player	core	m15	0
+m19	Player Cycle Rescue	m19.level	Area_Player	core	m18	1
+m20	Rescue My Clones	m20.level	Area_Player	challenge	m19	0
+m21	Multi Valign	m21.level	Area_Player	side	-	0
+m22	Multi Gun	m22.level	Area_Player	side	m21	1
+m23	Multi Valign Ref	m23.level	Area_Player	side	m22	1
+m24	Multi Swap	m24.level	Area_Player	side	m23	1
+n1	Possess First	n1.level	Area_Possess	core	-	0
+n2	Possess First 2	n2.level	Area_Possess	core	n1	1
+n3	Possess Through	n3.level	Area_Possess	core	n2	1
+n4	Possess Correct Block V2	n4.level	Area_Possess	core	n3	1
+n5	Possess Partner Recovery	n5.level	Area_Possess	core	n4	1
+n6	Exit Possess Setup	n6.level	Area_Possess	challenge	n5	0
+n7	Stool Possess V3	n7.level	Area_Possess	core	n5	0
+n8	Stool Possess 2 V3	n8.level	Area_Possess	core	n7	1
+n9	Stool Possess Empty	n9.level	Area_Possess	challenge	n8	0
+n10	Stool Possess Empty Other	n10.level	Area_Possess	challenge	n9	1
+n11	Transfer Possess	n11.level	Area_Possess	challenge	n8	0
+n12	Possess Ref Stack	n12.level	Area_Possess	challenge	n8	0
+n13	Dig	n13.level	Area_Possess	core	n8	0
+n14	Possess Catch Flip V2	n14.level	Area_Possess	core	n13	1
+n15	Flip Elbows Possess	n15.level	Area_Possess	challenge	n14	0
+n16	Align Setup Transfer	n16.level	Area_Possess	challenge	n14	0
+n17	Align Setup Transfer Flip	n17.level	Area_Possess	challenge	n16	1
+n18	Possess Edge Circulate	n18.level	Area_Possess	challenge	n14	0
+n19	1By1 Stack	n19.level	Area_Possess	side	-	0
+n20	1By1 Clone Flower	n20.level	Area_Possess	side	n19	1
+n21	1By1 Order Line	n21.level	Area_Possess	side	n20	1
+n22	1By1 Possess V3	n22.level	Area_Possess	side	n21	1
+o1	Poswall Intro	o1.level	Area_Wall	core	-	0
+o2	Poswall Doesnt Count Finish	o2.level	Area_Wall	core	o1	1
+o3	Poswall Doesnt Count Target	o3.level	Area_Wall	core	o2	1
+o4	Poswall First	o4.level	Area_Wall	core	o3	1
+o5	Poswall Two Walls Intro	o5.level	Area_Wall	core	o4	1
+o6	Poswall Edge Eat Thing	o6.level	Area_Wall	challenge	o5	0
+o7	Poswall Chain V2	o7.level	Area_Wall	core	o5	0
+o8	Poswall Two Walls Possess	o8.level	Area_Wall	challenge	o7	0
+o9	Poswall Stack Setup	o9.level	Area_Wall	challenge	o7	0
+o10	Poswall Ref Stool	o10.level	Area_Wall	challenge	o7	0
+o11	Poswall Chain Ref Search	o11.level	Area_Wall	challenge	o10	1
+o12	Poswall Make Clone Edible	o12.level	Area_Wall	core	o7	0
+o13	Poswall Chain 3	o13.level	Area_Wall	challenge	o12	0
+o14	Poswall Ref Off Wall	o14.level	Area_Wall	challenge	o12	0
+o15	Text Poswall	o15.level	Area_Wall	side	-	0
+p1	Iexit Just Push Out	p1.level	Area_InfiniteExit	core	-	0
+p2	Iexit Garbage Dump 0	p2.level	Area_InfiniteExit	core	p1	1
+p3	Iexit Garbage Dump	p3.level	Area_InfiniteExit	core	p2	1
+p4	Vanilla Inf Exit	p4.level	Area_InfiniteExit	challenge	p3	0
+p5	Infexit Ref First	p5.level	Area_InfiniteExit	core	p3	0
+p6	Infexit Help Out	p6.level	Area_InfiniteExit	core	p5	1
+p7	Iexit Peel	p7.level	Area_InfiniteExit	core	p6	1
+p8	Infexit Cannon	p8.level	Area_InfiniteExit	core	p7	1
+p9	Infexit Walk Out Reposition D	p9.level	Area_InfiniteExit	core	p8	1
+p10	Infexit Off Wall	p10.level	Area_InfiniteExit	challenge	p9	0
+p11	Infexit Two Cannons D	p11.level	Area_InfiniteExit	challenge	p9	0
+p12	Iexit Clone Peel B	p12.level	Area_InfiniteExit	core	p9	0
+p13	Inf Cannon D	p13.level	Area_InfiniteExit	core	p12	1
+p14	Infexit Round Corner D	p14.level	Area_InfiniteExit	challenge	p13	0
+p15	Infexit Round Corner 2 D	p15.level	Area_InfiniteExit	challenge	p14	1
+p16	Playerr Iexit Carousel D	p16.level	Area_InfiniteExit	challenge	p13	0
+p17	Infexit Transfer Posseses	p17.level	Area_InfiniteExit	challenge	p13	0
+p18	Inf Placeholder	p18.level	Area_InfiniteExit	challenge	p13	0
+q1	Ienter Just Ienter	q1.level	Area_InfiniteEnter	core	-	0
+q2	Ienter Clone Setup 0	q2.level	Area_InfiniteEnter	core	q1	1
+q3	Ienter Send Block	q3.level	Area_InfiniteEnter	core	q2	1
+q4	Ienter Clone Setup	q4.level	Area_InfiniteEnter	core	q3	1
+q5	Ienter Clone Setup Alt	q5.level	Area_InfiniteEnter	core	q4	1
+q6	Inf Zone Rescue	q6.level	Area_InfiniteEnter	challenge	q5	0
+q7	Infenter Poswall Setup	q7.level	Area_InfiniteEnter	challenge	q5	0
+q8	Infenter Peel 0	q8.level	Area_InfiniteEnter	core	q5	0
+q9	Infenter Peel	q9.level	Area_InfiniteEnter	core	q8	1
+q10	Inf Eat	q10.level	Area_InfiniteEnter	challenge	q9	0
+q11	Infenter Pick Corner V2	q11.level	Area_InfiniteEnter	challenge	q9	0
+q12	Infenter First 2	q12.level	Area_InfiniteEnter	core	q9	0
+q13	Infenter Line	q13.level	Area_InfiniteEnter	core	q12	1
+q14	Infenter Line Both Sides	q14.level	Area_InfiniteEnter	challenge	q13	0
+q15	Ienter Ref Setups	q15.level	Area_InfiniteEnter	challenge	q13	0
+q16	Infenter Toggle	q16.level	Area_InfiniteEnter	challenge	q13	0
+q17	Iboth Ref Easy D	q17.level	Area_InfiniteEnter	core	q13	0
+q18	Iboth Ref Peel D V2	q18.level	Area_InfiniteEnter	challenge	q17	0
+q19	Iboth Peel	q19.level	Area_InfiniteEnter	challenge	q17	0
+q20	Playerr Ienter	q20.level	Area_InfiniteEnter	challenge	q17	0
+r1	Iiexit Intro 0 Zone	r1.level	Area_MultiInfinite	core	-	0
+r2	Iiexit Intro 0	r2.level	Area_MultiInfinite	core	r1	1
+r3	Iiexit Intro	r3.level	Area_MultiInfinite	core	r2	1
+r4	Iiexit Peel	r4.level	Area_MultiInfinite	core	r3	1
+r5	Iiexit Line	r5.level	Area_MultiInfinite	core	r4	1
+r6	Iiexit Pack	r6.level	Area_MultiInfinite	challenge	r5	0
+r7	Iiexit Round Corners	r7.level	Area_MultiInfinite	challenge	r5	0
+r8	Iienter	r8.level	Area_MultiInfinite	core	r5	0
+r9	Iienter Bookmark Lite	r9.level	Area_MultiInfinite	core	r8	1
+r10	Iienter Hungry	r10.level	Area_MultiInfinite	core	r9	1
+r11	Iii	r11.level	Area_MultiInfinite	core	r10	0
+s1	Cage Hard 0	s1.level	Area_Challenge	challenge	-	0
+s2	Competor Inspired	s2.level	Area_Challenge	challenge	-	0
+s3	Pack 3 By 3	s3.level	Area_Challenge	challenge	-	0
+s4	Transfer Eat 0	s4.level	Area_Challenge	challenge	-	0
+s5	Transfer Back And Forth	s5.level	Area_Challenge	challenge	s4	1
+s6	Transfer Eat	s6.level	Area_Challenge	challenge	-	0
+s7	Two Way Rope	s7.level	Area_Challenge	challenge	-	0
+s8	Eat Stack Ref	s8.level	Area_Challenge	challenge	-	0
+s9	Ref Stack Four	s9.level	Area_Challenge	challenge	-	0
+s10	Mutual Stool	s10.level	Area_Challenge	challenge	-	0
+s11	Wrap Full	s11.level	Area_Challenge	challenge	-	0
+s12	Double Enter Clone	s12.level	Area_Challenge	challenge	-	0
+s13	No Walls Seven	s13.level	Area_Challenge	challenge	-	0
+s14	Flip Cycle Ref	s14.level	Area_Challenge	challenge	-	0
+s15	1By1 Playerr Flip2	s15.level	Area_Challenge	challenge	-	0
+s16	Train Remote Control	s16.level	Area_Challenge	challenge	-	0
+s17	Digest Reorder	s17.level	Area_Challenge	challenge	-	0
+s18	7By1 Careful Stowaway	s18.level	Area_Challenge	challenge	-	0
+s19	Multi Order 0	s19.level	Area_Challenge	challenge	-	0
+s20	Multi Cycle Reorder	s20.level	Area_Challenge	challenge	s19	1
+s21	Multi Order	s21.level	Area_Challenge	challenge	s20	1
+s22	Possess Slots	s22.level	Area_Challenge	challenge	-	0
+s23	Possess Fifteen Puzzle Rescue	s23.level	Area_Challenge	challenge	-	0
+s24	Cycle Poswall	s24.level	Area_Challenge	challenge	-	0
+s25	Poswall Clone Transfer	s25.level	Area_Challenge	challenge	-	0
+s26	1By1 Poswall Silliness	s26.level	Area_Challenge	challenge	-	0
+s27	Flipped Inf Block	s27.level	Area_Challenge	challenge	-	0
+s28	Iexit Nested 0 D	s28.level	Area_Challenge	core	-	0
+s29	Iexit Nested Setup D	s29.level	Area_Challenge	challenge	s28	1
+s30	Ienter Nested 0	s30.level	Area_Challenge	core	-	0
+s31	Ienter Nested	s31.level	Area_Challenge	challenge	s30	1
+s32	Infenter Zone V2	s32.level	Area_Challenge	challenge	-	0
+s33	Iienter Sequence	s33.level	Area_Challenge	challenge	-	0
+s34	1By1 Inf	s34.level	Area_Challenge	challenge	-	0
+s35	Flip Iiexit Block 2	s35.level	Area_Challenge	challenge	-	0
+s36	Iiexit Repeat Visit D V3	s36.level	Area_Challenge	challenge	-	0
+s37	Possess Ii Block V2	s37.level	Area_Challenge	challenge	-	0
+s38	Static Focus Block	s38.level	Area_Challenge	side	-	0
+t1	Oldstyle Squash 4 Sides V2	t1.level	Area_Gallery	challenge	-	0
+t2	Oldstyle Lock Two Doors	t2.level	Area_Gallery	challenge	-	0
+t3	Oldstyle Transfer Then Save	t3.level	Area_Gallery	challenge	-	0
+u1	Order Elbow Push	u1.level	Area_Priority	core	-	0
+u2	Order Donut Push	u2.level	Area_Priority	core	u1	1
+u3	Order Ref Spiral	u3.level	Area_Priority	core	u2	1
+u4	Order Mutual Carry	u4.level	Area_Priority	challenge	u3	0
+u5	Order Empty 3By3	u5.level	Area_Priority	challenge	u3	0
+u6	Order Ref Piecewise Push	u6.level	Area_Priority	challenge	u3	0
+u7	Order Hungry	u7.level	Area_Priority	challenge	u3	0
+u8	Order Poswall Piecewise Push	u8.level	Area_Priority	challenge	u3	0
+u9	Order 1By1 Clone Push	u9.level	Area_Priority	challenge	u8	1
+v1	Shed Tricky Corners	v1.level	Area_Extrude	core	-	0
+v2	Shed First	v2.level	Area_Extrude	core	v1	1
+v3	Shed Side Extrude	v3.level	Area_Extrude	core	v2	1
+v4	Shed Intro Box Manipulation	v4.level	Area_Extrude	challenge	v3	0
+v5	Shed Lock Door 2	v5.level	Area_Extrude	challenge	v3	0
+v6	Shed Ref Flip V3	v6.level	Area_Extrude	core	v3	0
+v7	Shed Iiexit	v7.level	Area_Extrude	core	v6	1
+v8	Shed Multi Simultaneous	v8.level	Area_Extrude	challenge	v7	0
+w1	Inpush Intro	w1.level	Area_Push	core	-	0
+w2	Inpush Ref Flip	w2.level	Area_Push	core	w1	1
+w3	Inpush Ref Track	w3.level	Area_Push	core	w2	1
+w4	Inpush Sequential Rescue	w4.level	Area_Push	challenge	w3	0
+w5	Inpush Poswall Priority V3	w5.level	Area_Push	challenge	w4	1
+w6	Inpush No Right	w6.level	Area_Push	challenge	w3	0
+w7	Inpush Navigate Inf Zone V2	w7.level	Area_Push	challenge	w3	0
+w8	Inpush Player Is Shift	w8.level	Area_Push	challenge	w3	0

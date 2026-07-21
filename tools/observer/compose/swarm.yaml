@@ -1,0 +1,4 @@
+services:
+  game:
+    ports:
+      - "127.0.0.1:${SWARM_OBSERVER_PORT:-3732}:3721"

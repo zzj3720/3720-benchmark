@@ -1,0 +1,58 @@
+{
+  "scoring": {
+    "version": "parabox-integer-score-token-tiebreak-v4",
+    "formula": "score = solved_levels; rank by score descending, then total_tokens ascending",
+    "level_count": 364,
+    "time_policy": "Agent wall time is retained only as a diagnostic and does not affect the score because it is sensitive to service stability.",
+    "ordering_guarantee": "Each solved puzzle contributes exactly one point. Token use only breaks ties between trials with the same integer score.",
+    "eligibility_policy": "A valid verifier result retains its integer score even when token accounting is unavailable. Such a trial is excluded only from token-based tie ranking. Reaching the configured Agent timeout is an expected benchmark cutoff and retains the verified score; other infrastructure exceptions invalidate the score itself."
+  },
+  "trials": [
+    {
+      "source": {
+        "result_json": ".harbor/jobs/parabox-v12-logic-qoder-cn-qwen3-8-max-preview-max-r1-live/parabox-intro__e7k4Qaz/result.json",
+        "result_sha256": "2ccaceeadb5ea63e7caacf04fca0b394cbc1709df516064482ee4d5c79b0099d",
+        "field_paths": {
+          "solved_levels": "verifier_result.rewards.reward",
+          "input_tokens": "agent_result.n_input_tokens",
+          "cache_tokens": "agent_result.n_cache_tokens",
+          "output_tokens": "agent_result.n_output_tokens",
+          "termination": "exception_info.exception_type",
+          "diagnostic_agent_started_at": "agent_execution.started_at",
+          "diagnostic_agent_finished_at": "agent_execution.finished_at"
+        }
+      },
+      "identity": {
+        "harbor_trial_id": "e0d23a92-5fc6-4bd2-8402-a326a56168a2",
+        "trial_name": "parabox-intro__e7k4Qaz",
+        "task_name": "3720/parabox-intro",
+        "task_checksum": "7e63d299d7445d32ce0b4109dc44c1ba8cda3fe9981aa140b61ae20512c64c8c",
+        "agent": "tools.agents.qoder_cli_cn:GoalQoderCliCn",
+        "model": "Qwen3.8-Max-Preview",
+        "reasoning_effort": "max"
+      },
+      "score_valid": true,
+      "ranking_eligible": false,
+      "eligible": false,
+      "ineligible_reason": "token ranking unavailable: input_tokens is missing",
+      "termination": {
+        "status": "expected_agent_timeout",
+        "exception_type": "AgentTimeoutError"
+      },
+      "raw": {
+        "solved_levels": 15,
+        "input_tokens": null,
+        "cache_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null,
+        "diagnostic_agent_seconds": 7204.270216,
+        "token_accounting": "unavailable"
+      },
+      "derived": {
+        "score": 15,
+        "token_tiebreak": null,
+        "ascending_rank_key": null
+      }
+    }
+  ]
+}

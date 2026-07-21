@@ -1,0 +1,264 @@
+{
+  "scoring": {
+    "version": "parabox-integer-score-token-tiebreak-v4",
+    "chain_version": "parabox-continuation-chain-v2",
+    "formula": "score = solved_levels; rank by score descending, then total_tokens ascending",
+    "level_count": 364,
+    "time_policy": "Agent wall time is retained only as a diagnostic and does not affect the score because it is sensitive to service stability.",
+    "ordering_guarantee": "Each solved puzzle contributes exactly one point. Token use only breaks ties between trials with the same integer score.",
+    "eligibility_policy": "A valid verifier result retains its integer score even when token accounting is unavailable. Such a trial is excluded only from token-based tie ranking. Reaching the configured Agent timeout is an expected benchmark cutoff and retains the verified score; other infrastructure exceptions invalidate the score itself.",
+    "continuation_policy": "Ordered continuation segments must share task, checksum, model, and reasoning effort, and cumulative scores may not decrease. The chain score is the final cumulative score; tokens are summed across every segment. When a cumulative runtime budget cuts through a segment, score and cumulative tokens come from the last raw rollout evidence at that exact cutoff."
+  },
+  "trials": [
+    {
+      "source": {
+        "chain_scoring_version": "parabox-continuation-chain-v2",
+        "runtime_budget_seconds": 7200.0,
+        "segments": [
+          {
+            "result_json": ".harbor/jobs/parabox-v12-logic-gpt-terra-xhigh-r1-live/parabox-intro__7UxmwXR/result.json",
+            "result_sha256": "fa7f314b879cd2b9796687aa24a40524c1e514ca190206caa0e1bd00c0a7b61b"
+          },
+          {
+            "result_json": ".harbor/jobs/parabox-v12-logic-gpt-terra-xhigh-r1-goal-cont1/parabox-intro__TERLfN8/result.json",
+            "result_sha256": "85d2066c42d0b7da3b4786e2caca1571bef81bc624b15795c7f0af38a9e3f801"
+          },
+          {
+            "result_json": ".harbor/jobs/parabox-v12-logic-gpt-terra-xhigh-r1-goal-cont2/parabox-intro__PxcwtqQ/result.json",
+            "result_sha256": "a70bd77c80e4cd24673917d0bbb5c859941a7456dc21c4ae006b6356e0facfc6"
+          }
+        ]
+      },
+      "identity": {
+        "harbor_trial_id": "07d73523-1f7c-4a1b-a6ee-4563073f13a5",
+        "trial_name": "parabox-intro__7UxmwXR",
+        "task_name": "3720/parabox-intro",
+        "task_checksum": "7e63d299d7445d32ce0b4109dc44c1ba8cda3fe9981aa140b61ae20512c64c8c",
+        "agent": "continuation-chain",
+        "model": "openai/gpt-5.6-terra",
+        "reasoning_effort": "xhigh",
+        "segment_trial_ids": [
+          "07d73523-1f7c-4a1b-a6ee-4563073f13a5",
+          "d3622266-2d02-43dc-b3b6-c8a2661eea39",
+          "b5d5b637-9857-452a-960b-d598cd6aa2f4"
+        ]
+      },
+      "score_valid": true,
+      "ranking_eligible": true,
+      "eligible": true,
+      "ineligible_reason": null,
+      "termination": {
+        "status": "runtime_budget_cutoff",
+        "segments": [
+          {
+            "status": "completed",
+            "exception_type": null
+          },
+          {
+            "status": "completed",
+            "exception_type": null
+          },
+          {
+            "status": "completed",
+            "exception_type": null
+          }
+        ]
+      },
+      "raw": {
+        "solved_levels": 22,
+        "input_tokens": 47728554,
+        "cache_tokens": 46909440,
+        "output_tokens": 291370,
+        "total_tokens": 48019924,
+        "segment_count": 3,
+        "segment_scores": [
+          15,
+          20,
+          23
+        ],
+        "runtime_cutoff": {
+          "segment_index": 2,
+          "elapsed_before_segment_seconds": 6698.747791,
+          "seconds_into_segment": 501.2522090000002,
+          "evidence": {
+            "cutoff_timestamp": "2026-07-20T12:39:47.433912+00:00",
+            "score": {
+              "score": 22,
+              "timestamp": "2026-07-20T12:39:44.070Z",
+              "rollout_jsonl": ".harbor/jobs/parabox-v12-logic-gpt-terra-xhigh-r1-goal-cont2/parabox-intro__PxcwtqQ/agent/sessions/2026/07/20/rollout-2026-07-20T10-09-38-019f7f00-ad49-74f2-af96-d8b7abb37709.jsonl",
+              "rollout_sha256": "823846e960b631eb584b6821c41e84ad1530241e61925ce519fc0f158d9d6394",
+              "line": 2410
+            },
+            "tokens": {
+              "input_tokens": 47728554,
+              "cache_tokens": 46909440,
+              "output_tokens": 291370,
+              "timestamp": "2026-07-20T12:39:44.070Z",
+              "rollout_jsonl": ".harbor/jobs/parabox-v12-logic-gpt-terra-xhigh-r1-goal-cont2/parabox-intro__PxcwtqQ/agent/sessions/2026/07/20/rollout-2026-07-20T10-09-38-019f7f00-ad49-74f2-af96-d8b7abb37709.jsonl",
+              "rollout_sha256": "823846e960b631eb584b6821c41e84ad1530241e61925ce519fc0f158d9d6394",
+              "line": 2411
+            }
+          }
+        },
+        "token_accounting": "use the raw rollout's cumulative input_tokens + output_tokens at the exact runtime cutoff"
+      },
+      "derived": {
+        "score": 22,
+        "token_tiebreak": 48019924,
+        "ascending_rank_key": [
+          -22,
+          48019924
+        ]
+      },
+      "segments": [
+        {
+          "source": {
+            "result_json": ".harbor/jobs/parabox-v12-logic-gpt-terra-xhigh-r1-live/parabox-intro__7UxmwXR/result.json",
+            "result_sha256": "fa7f314b879cd2b9796687aa24a40524c1e514ca190206caa0e1bd00c0a7b61b",
+            "field_paths": {
+              "solved_levels": "verifier_result.rewards.reward",
+              "input_tokens": "agent_result.n_input_tokens",
+              "cache_tokens": "agent_result.n_cache_tokens",
+              "output_tokens": "agent_result.n_output_tokens",
+              "termination": "exception_info.exception_type",
+              "diagnostic_agent_started_at": "agent_execution.started_at",
+              "diagnostic_agent_finished_at": "agent_execution.finished_at"
+            }
+          },
+          "identity": {
+            "harbor_trial_id": "07d73523-1f7c-4a1b-a6ee-4563073f13a5",
+            "trial_name": "parabox-intro__7UxmwXR",
+            "task_name": "3720/parabox-intro",
+            "task_checksum": "7e63d299d7445d32ce0b4109dc44c1ba8cda3fe9981aa140b61ae20512c64c8c",
+            "agent": "tools.agents.isolated_codex:GoalIsolatedCodex",
+            "model": "openai/gpt-5.6-terra",
+            "reasoning_effort": "xhigh"
+          },
+          "score_valid": true,
+          "ranking_eligible": true,
+          "eligible": true,
+          "ineligible_reason": null,
+          "termination": {
+            "status": "completed",
+            "exception_type": null
+          },
+          "raw": {
+            "solved_levels": 15,
+            "input_tokens": 21737359,
+            "cache_tokens": 21455104,
+            "output_tokens": 129266,
+            "total_tokens": 21866625,
+            "diagnostic_agent_seconds": 3285.46278,
+            "token_accounting": "input_tokens + output_tokens; cache_tokens is a subset of input_tokens and is not added again"
+          },
+          "derived": {
+            "score": 15,
+            "token_tiebreak": 21866625,
+            "ascending_rank_key": [
+              -15,
+              21866625
+            ]
+          }
+        },
+        {
+          "source": {
+            "result_json": ".harbor/jobs/parabox-v12-logic-gpt-terra-xhigh-r1-goal-cont1/parabox-intro__TERLfN8/result.json",
+            "result_sha256": "85d2066c42d0b7da3b4786e2caca1571bef81bc624b15795c7f0af38a9e3f801",
+            "field_paths": {
+              "solved_levels": "verifier_result.rewards.reward",
+              "input_tokens": "agent_result.n_input_tokens",
+              "cache_tokens": "agent_result.n_cache_tokens",
+              "output_tokens": "agent_result.n_output_tokens",
+              "termination": "exception_info.exception_type",
+              "diagnostic_agent_started_at": "agent_execution.started_at",
+              "diagnostic_agent_finished_at": "agent_execution.finished_at"
+            }
+          },
+          "identity": {
+            "harbor_trial_id": "d3622266-2d02-43dc-b3b6-c8a2661eea39",
+            "trial_name": "parabox-intro__TERLfN8",
+            "task_name": "3720/parabox-intro",
+            "task_checksum": "7e63d299d7445d32ce0b4109dc44c1ba8cda3fe9981aa140b61ae20512c64c8c",
+            "agent": "tools.agents.isolated_codex:ContinueParaboxGoalResumeIsolatedCodex",
+            "model": "openai/gpt-5.6-terra",
+            "reasoning_effort": "xhigh"
+          },
+          "score_valid": true,
+          "ranking_eligible": true,
+          "eligible": true,
+          "ineligible_reason": null,
+          "termination": {
+            "status": "completed",
+            "exception_type": null
+          },
+          "raw": {
+            "solved_levels": 20,
+            "input_tokens": 46470639,
+            "cache_tokens": 45708544,
+            "output_tokens": 269874,
+            "total_tokens": 46740513,
+            "diagnostic_agent_seconds": 3413.285011,
+            "token_accounting": "input_tokens + output_tokens; cache_tokens is a subset of input_tokens and is not added again"
+          },
+          "derived": {
+            "score": 20,
+            "token_tiebreak": 46740513,
+            "ascending_rank_key": [
+              -20,
+              46740513
+            ]
+          }
+        },
+        {
+          "source": {
+            "result_json": ".harbor/jobs/parabox-v12-logic-gpt-terra-xhigh-r1-goal-cont2/parabox-intro__PxcwtqQ/result.json",
+            "result_sha256": "a70bd77c80e4cd24673917d0bbb5c859941a7456dc21c4ae006b6356e0facfc6",
+            "field_paths": {
+              "solved_levels": "verifier_result.rewards.reward",
+              "input_tokens": "agent_result.n_input_tokens",
+              "cache_tokens": "agent_result.n_cache_tokens",
+              "output_tokens": "agent_result.n_output_tokens",
+              "termination": "exception_info.exception_type",
+              "diagnostic_agent_started_at": "agent_execution.started_at",
+              "diagnostic_agent_finished_at": "agent_execution.finished_at"
+            }
+          },
+          "identity": {
+            "harbor_trial_id": "b5d5b637-9857-452a-960b-d598cd6aa2f4",
+            "trial_name": "parabox-intro__PxcwtqQ",
+            "task_name": "3720/parabox-intro",
+            "task_checksum": "7e63d299d7445d32ce0b4109dc44c1ba8cda3fe9981aa140b61ae20512c64c8c",
+            "agent": "tools.agents.isolated_codex:ContinueParaboxGoalResumeIsolatedCodex",
+            "model": "openai/gpt-5.6-terra",
+            "reasoning_effort": "xhigh"
+          },
+          "score_valid": true,
+          "ranking_eligible": true,
+          "eligible": true,
+          "ineligible_reason": null,
+          "termination": {
+            "status": "completed",
+            "exception_type": null
+          },
+          "raw": {
+            "solved_levels": 23,
+            "input_tokens": 62199076,
+            "cache_tokens": 61160448,
+            "output_tokens": 344799,
+            "total_tokens": 62543875,
+            "diagnostic_agent_seconds": 1870.315238,
+            "token_accounting": "input_tokens + output_tokens; cache_tokens is a subset of input_tokens and is not added again"
+          },
+          "derived": {
+            "score": 23,
+            "token_tiebreak": 62543875,
+            "ascending_rank_key": [
+              -23,
+              62543875
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

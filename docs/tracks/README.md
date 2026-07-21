@@ -15,5 +15,9 @@ Current notes:
 
 - [Async orchestration](async-orchestration.md): multitasking, task
   interleaving, and asynchronous collaboration.
+- [Game reasoning](game-reasoning.md): deterministic games, progressive
+  mechanics, planning, and state tracking.
+- [Real-time games](real-time-games.md): continuous wall-clock planning,
+  reminder-only wakeups, atomic Agent actions, and offline replay.
 
 Add other tracks only when their scope and acceptance criteria are concrete.
