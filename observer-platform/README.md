@@ -4,8 +4,9 @@
 benchmarks. It shows real Harbor runs rather than browser fixtures:
 
 - a separate scoreboard for Parabox, Swarm, Sausage, and Emergency Operator;
-- one score-over-effective-agent-time series per model, normalized to start at
-  `0h` and excluding gaps between continuation segments;
+- one score-over-effective-agent-time series per model, measured from the
+  logical run's first eligible Agent execution window and excluding pauses,
+  infrastructure-only attempts, and gaps between continuation segments;
 - a drill-down for the selected run with its current objective, authoritative
   environment state, latest action/result, visible native Agent session
   messages, and recent append-only events;
@@ -43,6 +44,11 @@ directory; the gateway never calls a game mutation endpoint.
 A separately launched Sausage sidecar on port 3733 is also shown, but is marked
 `No agent attached` until a real Harbor Agent run exists. Missing sources are
 shown as unavailable—there is no demo-data fallback.
+
+The current gateway has a legacy compatibility reader for Harbor continuation
+paths and checkpoint manifests. It is not the intended identity model for new
+runs. The target runtime ledger and migration boundary are specified in
+[`docs/tracks/live-observability.md`](../docs/tracks/live-observability.md).
 
 The production URL is [live.benchmark.3720.org](https://live.benchmark.3720.org).
 A Cloudflare Worker accepts only `GET` and `HEAD`, forwards to the named Tunnel

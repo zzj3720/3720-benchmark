@@ -28,6 +28,11 @@ score without ending the task so an Agent can check progress and continue.
 The sidecar additionally emits an append-only `parabox-events-v1` JSONL stream
 containing timestamped score, score-delta, solved-level, and selected-level
 state for every request. This is the authoritative source for score timelines.
+Each native record also carries a cycle-safe `parabox-observer-scene-v1`
+projection of the visible recursive world for human live rendering. It links
+the focused space to its real parent cell and real child spaces, but remains a
+private host artifact: the Agent command response and common sidecar observer
+relay intentionally continue to expose only the existing model-facing state.
 
 For local development:
 

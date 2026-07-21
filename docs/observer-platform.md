@@ -22,6 +22,10 @@ trigger cooldowns, alter scoring, or enter the Agent command audit.
 - Swarm projects its `swarm-audit-v1` initial state and command responses.
 - Sausage writes the common event schema directly.
 
+Parabox native records additionally contain a private recursive scene graph for
+the host dashboard. The common sidecar relay strips that field so richer human
+rendering does not expand the state available to the benchmark Agent.
+
 ## Multi-run live gateway
 
 `observer-platform/live-gateway/server.py` is the authority used by the public

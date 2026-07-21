@@ -52,6 +52,10 @@ test("implements a real multi-run scoreboard and drill-down", async () => {
     new URL("../../games/emergency-operator/observer/index.tsx", import.meta.url),
     "utf8",
   );
+  const parabox = await readFile(
+    new URL("../../games/parabox-intro/observer/index.tsx", import.meta.url),
+    "utf8",
+  );
   assert.match(page, /\/api\/live\/subscribe/);
   assert.match(page, /EventSource/);
   assert.doesNotMatch(page, /setTimeout\(refresh|fetch\("\/api\/live/);
@@ -61,12 +65,28 @@ test("implements a real multi-run scoreboard and drill-down", async () => {
   assert.match(page, /模型分数随累计有效运行时间变化图/);
   assert.doesNotMatch(page, /SCORE \/ WALL CLOCK/);
   assert.match(page, /Agent 当前活动/);
+  assert.match(page, /状态回放时间轴/);
+  assert.match(page, /播放回放/);
+  assert.match(page, /返回直播/);
+  assert.match(page, /Agent 经验板/);
+  assert.match(page, /不展示隐藏推理/);
+  assert.match(page, /function selectRun[\s\S]*?setDetail\(null\)[\s\S]*?setSelectedId/);
+  assert.match(page, /followingLive[\s\S]*?返回直播/);
   assert.match(page, /SIDECAR TRACE/);
   assert.match(registry, /games\/parabox-intro\/observer/);
   assert.match(registry, /games\/emergency-operator\/observer/);
   assert.match(registry, /games\/kitchen-terminal\/observer/);
   assert.match(operator, /Emergency Operator/);
   assert.match(operator, /OperatorState/);
+  assert.match(parabox, /CONTAINER PATH/);
+  assert.match(parabox, /当前容器路径/);
+  assert.match(parabox, /parabox-observer-scene-v1/);
+  assert.match(parabox, /OUTER SPACE/);
+  assert.match(parabox, /内部空间已渲染/);
+  assert.match(parabox, /盒子内部与外层场景未记录/);
+  assert.match(parabox, /describeParaboxEvent/);
+  assert.match(parabox, /相较上一步有变化/);
+  assert.doesNotMatch(page, /JSON\.stringify\(\{ action:/);
   assert.doesNotMatch(page, /DEMO_STATES|DEMO FIXTURE/);
   await assert.rejects(access(new URL("../app/_sites-preview", import.meta.url)));
   await access(new URL("../public/og.png", import.meta.url));

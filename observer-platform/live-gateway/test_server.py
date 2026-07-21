@@ -16,6 +16,53 @@ SPEC.loader.exec_module(gateway)
 
 
 class LiveGatewayTests(unittest.TestCase):
+    def test_parabox_private_scene_is_merged_only_into_live_projection(self):
+        row = {
+            "timestamp_ms": 1000,
+            "state": {"space": {"map": [["@"]]}},
+            "scene": {
+                "schema": "parabox-observer-scene-v1",
+                "root_space": 0,
+                "focus_space": 0,
+                "spaces": [],
+            },
+        }
+
+        event = gateway.LiveRepository._normalize_events("parabox-intro", [row])[0]
+
+        self.assertEqual(event["state"]["observer_scene"], row["scene"])
+        self.assertNotIn("observer_scene", row["state"])
+
+    def test_experience_notes_only_classify_explicit_markdown_bullets(self):
+        experience = gateway.parse_experience_notes([
+            """# Notes
+- Containers preserve their contents.
+## Solved this run
+- `a1` SOLVED: push right.
+## Active leads
+- `b2` still needs a portal turn.
+- `b3` confirmed wall entry behavior.
+- `b4` rejected route: it is a dead end.
+## b5 Nested Turn — solved
+- Route through the lower portal.
+Unbulleted hidden-looking prose must not be exposed.
+"""
+        ])
+
+        self.assertEqual(experience["solved"], [
+            "`a1` SOLVED: push right.",
+            "b5 Nested Turn — solved",
+        ])
+        self.assertEqual(experience["plan"], ["`b2` still needs a portal turn."])
+        self.assertEqual(experience["verified"], [
+            "Containers preserve their contents.",
+            "`b3` confirmed wall entry behavior.",
+            "Route through the lower portal.",
+        ])
+        self.assertEqual(experience["rejected"], [
+            "`b4` rejected route: it is a dead end."
+        ])
+
     def test_subscription_does_not_emit_for_elapsed_time_alone(self):
         before = {"runs": [{"id": "run-1", "score": 3, "consumed_ms": 1000}]}
         after = {"runs": [{"id": "run-1", "score": 3, "consumed_ms": 2000}]}
@@ -69,7 +116,14 @@ class LiveGatewayTests(unittest.TestCase):
             trial = job / "parabox-intro__abc/artifacts/var/lib/parabox"
             trial.mkdir(parents=True)
             (job / "config.json").write_text(json.dumps({
-                "agents": [{"name": "codex", "model_name": "openai/gpt-5.6-sol", "kwargs": {"reasoning_effort": "xhigh"}}],
+                "agents": [{
+                    "name": "codex",
+                    "model_name": "openai/gpt-5.6-sol",
+                    "kwargs": {
+                        "reasoning_effort": "xhigh",
+                        "resume_workspace_dir": str(root / "missing-workspace"),
+                    },
+                }],
                 "tasks": [{"path": "tasks/parabox-intro"}],
             }))
             started_at = 1_767_225_600_000
@@ -92,6 +146,19 @@ class LiveGatewayTests(unittest.TestCase):
             self.assertEqual(runs[0]["score_history"], [
                 {"timestamp_ms": started_at, "elapsed_ms": 0, "score": 0},
                 {"timestamp_ms": started_at + 1000, "elapsed_ms": 1000, "score": 1},
+            ])
+
+            workspace = result_dir / "agent/workspace"
+            workspace.mkdir(parents=True)
+            (workspace / "parabox_notes.md").write_text(
+                "# Notes\n- Verified reusable rule.\n## Active leads\n- `b2` remains open.\n"
+            )
+            detail = repository.get_run(runs[0]["id"])
+            self.assertEqual(detail["agent_experience"]["verified"], [
+                "Verified reusable rule."
+            ])
+            self.assertEqual(detail["agent_experience"]["plan"], [
+                "`b2` remains open."
             ])
 
     def test_continuation_timeline_counts_only_agent_execution(self):
@@ -158,6 +225,42 @@ class LiveGatewayTests(unittest.TestCase):
             self.assertEqual(
                 [point["elapsed_ms"] for point in run["score_history"]],
                 [1000, 5000],
+            )
+
+    def test_resume_trial_resolves_checkpoint_and_legacy_recovery_paths(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            jobs = root / ".harbor/jobs"
+            job = jobs / "parabox-gpt-sol-r1"
+            trial = job / "parabox-intro__one"
+            trial.mkdir(parents=True)
+
+            checkpoint = root / ".harbor/checkpoints/paused-gpt/sol"
+            checkpoint_events = checkpoint / "game/parabox-events.jsonl"
+            checkpoint_events.parent.mkdir(parents=True)
+            checkpoint_events.write_text("")
+            (checkpoint / "manifest.json").write_text(json.dumps({
+                "job": job.name,
+                "trial": trial.name,
+            }))
+            checkpoint_config = {
+                "agents": [{"kwargs": {"resume_game_events_path": str(checkpoint_events)}}]
+            }
+            self.assertEqual(
+                gateway.LiveRepository._resume_trial(checkpoint_config, jobs),
+                trial,
+            )
+
+            recovery = root / "results/recoveries" / job.name
+            recovery.mkdir(parents=True)
+            recovery_events = recovery / "parabox-events.jsonl"
+            recovery_events.write_text("")
+            recovery_config = {
+                "agents": [{"kwargs": {"resume_game_events_path": str(recovery_events)}}]
+            }
+            self.assertEqual(
+                gateway.LiveRepository._resume_trial(recovery_config, jobs),
+                trial,
             )
 
     def test_archived_operator_run_uses_common_events_and_dispatch_score(self):

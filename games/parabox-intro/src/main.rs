@@ -154,6 +154,19 @@ fn game_state(progress: &Progress) -> Result<Value, String> {
     }))
 }
 
+fn observer_scene(progress: &Progress) -> Result<Value, String> {
+    let Some(index) = progress.current else {
+        return Ok(Value::Null);
+    };
+    serde_json::to_value(
+        progress.games[index]
+            .as_ref()
+            .ok_or_else(|| "selected level was not loaded".to_string())?
+            .observer_scene()?,
+    )
+    .map_err(|error| format!("failed to serialize observer scene: {error}"))
+}
+
 fn level_list(progress: &Progress) -> Value {
     Value::Array(
         LEVELS
@@ -261,6 +274,7 @@ fn state_record(record_type: &str, timestamp_ms: u64) -> Result<Value, String> {
         "total": LEVELS.len(),
         "selected": state.selected.map(|index| LEVELS[index].reference),
         "state": game_state(&progress)?,
+        "scene": observer_scene(&progress)?,
     }))
 }
 

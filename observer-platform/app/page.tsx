@@ -2,22 +2,23 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { GAME_IDS, GAME_META, GameState, type GameId } from "./game-registry";
-import { EmptyState, Metric, asString, type Json } from "./game-observer";
+import {
+  GAME_IDS,
+  GAME_META,
+  GameState,
+  describeGameEvent,
+  type GameId,
+} from "./game-registry";
+import {
+  EmptyState,
+  Metric,
+  asString,
+  type Json,
+  type ObserverEvent,
+} from "./game-observer";
 
 type ScorePoint = { timestamp_ms: number; elapsed_ms?: number; score: number };
 type ElapsedScorePoint = { elapsed_ms: number; score: number };
-
-type LiveEvent = {
-  sequence: number;
-  timestamp_ms?: number | null;
-  type?: string;
-  action?: Record<string, Json> | null;
-  state?: Record<string, Json> | null;
-  result?: Record<string, Json> | null;
-  score?: number;
-  score_delta?: number;
-};
 
 type RunSummary = {
   id: string;
@@ -50,8 +51,17 @@ type RunSummary = {
 
 type RunDetail = RunSummary & {
   state: Record<string, Json>;
-  events: LiveEvent[];
+  events: ObserverEvent[];
   agent_activity: { timestamp?: string | null; text: string }[];
+  agent_experience: {
+    updated_at?: number | null;
+    source_count: number;
+    counts: Record<"plan" | "verified" | "rejected" | "solved", number>;
+    plan: string[];
+    verified: string[];
+    rejected: string[];
+    solved: string[];
+  };
 };
 
 const SERIES_COLORS = [
@@ -149,7 +159,9 @@ export default function Home() {
     if (paused) return;
     const local = ["localhost", "127.0.0.1"].includes(window.location.hostname);
     const url = new URL(
-      local ? "http://127.0.0.1:3740/v1/subscribe" : "/api/live/subscribe",
+      local
+        ? `${process.env.NEXT_PUBLIC_LIVE_GATEWAY_ORIGIN ?? "http://127.0.0.1:3740"}/v1/subscribe`
+        : "/api/live/subscribe",
       window.location.origin,
     );
     if (selectedId) url.searchParams.set("run_id", selectedId);
@@ -199,6 +211,7 @@ export default function Home() {
   const liveCount = runs.filter((run) => run.live).length;
 
   function selectRun(run: RunSummary) {
+    setDetail(null);
     setSelectedId(run.id);
     setSelectedGame(run.game);
     const url = new URL(window.location.href);
@@ -236,12 +249,14 @@ export default function Home() {
         </div>
         <div className="top-actions">
           <time>
-            {new Intl.DateTimeFormat("zh-CN", {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-              hour12: false,
-            }).format(now)}
+            {now
+              ? new Intl.DateTimeFormat("zh-CN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  hour12: false,
+                }).format(now)
+              : "--:--:--"}
           </time>
           <button onClick={() => setPaused((value) => !value)}>{paused ? "继续" : "暂停"}</button>
         </div>
@@ -261,6 +276,7 @@ export default function Home() {
               <button
                 className={`game-heading ${selectedGame === game && !selectedId ? "active" : ""}`}
                 onClick={() => showDashboard(game)}
+                aria-pressed={selectedGame === game && !selectedId}
               >
                 <span>{meta.short}</span>
                 <small>{gameRuns.length}</small>
@@ -271,6 +287,7 @@ export default function Home() {
                     key={run.id}
                     className={`model-run ${selectedId === run.id ? "selected" : ""}`}
                     onClick={() => selectRun(run)}
+                    aria-pressed={selectedId === run.id}
                   >
                     <span
                       className={`run-dot ${run.live ? "live" : run.sidecar_only ? "waiting" : "finished"}`}
@@ -395,11 +412,80 @@ function RunDetails({
   now: number;
   onBack: () => void;
 }) {
+  const runDetail = run as RunDetail | null;
+  const events = runDetail?.events ?? [];
+  const [cursorSequence, setCursorSequence] = useState<number | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+
+  useEffect(() => {
+    setCursorSequence(null);
+    setPlaying(false);
+  }, [run?.id]);
+
+  useEffect(() => {
+    if (
+      cursorSequence !== null &&
+      events.length > 0 &&
+      !events.some((event) => event.sequence === cursorSequence)
+    ) {
+      queueMicrotask(() => {
+        setCursorSequence(null);
+        setPlaying(false);
+      });
+    }
+  }, [cursorSequence, events]);
+
+  const cursorIndex = cursorSequence === null
+    ? events.length - 1
+    : events.findIndex((event) => event.sequence === cursorSequence);
+  const activeIndex = cursorIndex < 0 ? events.length - 1 : cursorIndex;
+  const activeEvent = events[activeIndex] ?? null;
+  const previousEvent = activeIndex > 0 ? events[activeIndex - 1] : null;
+  const isLatest = activeIndex >= events.length - 1;
+  const followingLive = cursorSequence === null;
+
+  useEffect(() => {
+    if (!playing || !events.length || isLatest) {
+      if (playing && isLatest) queueMicrotask(() => setPlaying(false));
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setCursorSequence(events[activeIndex + 1]?.sequence ?? null);
+    }, 900 / speed);
+    return () => window.clearTimeout(timer);
+  }, [activeIndex, events, isLatest, playing, speed]);
+
   if (!run) return <EmptyState title="正在接入测试" body="等待权威 sidecar 状态。" />;
   const detail = run as RunDetail;
-  const events = detail.events ?? [];
-  const state = detail.state ?? {};
+  const state = activeEvent?.state ?? detail.state ?? {};
+  const previousState = previousEvent?.state ?? null;
+  const eventDescription = activeEvent
+    ? describeGameEvent(run.game, activeEvent, previousEvent)
+    : null;
   const meta = GAME_META[run.game];
+
+  function moveCursor(index: number) {
+    const bounded = Math.max(0, Math.min(events.length - 1, index));
+    setCursorSequence(events[bounded]?.sequence ?? null);
+    setPlaying(false);
+  }
+
+  function togglePlayback() {
+    if (playing) {
+      setPlaying(false);
+      return;
+    }
+    if (!events.length) return;
+    if (isLatest) setCursorSequence(events[0].sequence);
+    setPlaying(true);
+  }
+
+  function followLive() {
+    setCursorSequence(null);
+    setPlaying(false);
+  }
+
   return (
     <div className="detail-page" style={{ "--accent": meta.accent } as React.CSSProperties}>
       <header className="detail-heading">
@@ -433,6 +519,52 @@ function RunDetails({
         </div>
       </header>
 
+      <section className="detail-grid">
+        <div className="environment-card">
+          <div className="section-title">
+            <div>
+              <span>{cursorSequence === null ? "AUTHORITATIVE LIVE STATE" : "AUTHORITATIVE REPLAY"}</span>
+              <strong>{cursorSequence === null ? "当前环境" : `回放事件 #${activeEvent?.sequence}`}</strong>
+            </div>
+            <small>{isLatest ? "最新状态" : `窗口内第 ${activeIndex + 1} / ${events.length} 步`}</small>
+          </div>
+          <GameState game={run.game} state={state} previousState={previousState} />
+        </div>
+        <div className={`operation-card ${eventDescription?.tone ?? "neutral"}`}>
+          <div className="section-title">
+            <div>
+              <span>{eventDescription?.label ?? "WAITING FOR EVENT"}</span>
+              <strong>{eventDescription?.title ?? "等待权威事件"}</strong>
+            </div>
+            <small>{activeEvent ? clockTime(activeEvent.timestamp_ms) : "—"}</small>
+          </div>
+          <div className="operation-summary">
+            <p>{eventDescription?.detail ?? "Sidecar 尚未产生可回放状态。"}</p>
+            <dl>
+              <div><dt>事件</dt><dd>#{activeEvent?.sequence ?? "—"}</dd></div>
+              <div><dt>命令</dt><dd>{actionLabel(activeEvent?.action)}</dd></div>
+              <div><dt>得分</dt><dd>{activeEvent?.score ?? run.score}</dd></div>
+              <div><dt>结果</dt><dd>{activeEvent?.result?.ok === false ? "未生效" : "已记录"}</dd></div>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <ReplayTimeline
+        events={events}
+        activeIndex={activeIndex}
+        isLatest={isLatest}
+        followingLive={followingLive}
+        playing={playing}
+        speed={speed}
+        onMove={moveCursor}
+        onTogglePlayback={togglePlayback}
+        onSpeed={setSpeed}
+        onFollowLive={followLive}
+      />
+
+      <ExperiencePanel experience={detail.agent_experience} />
+
       <section className="detail-chart chart-card">
         <div className="section-title">
           <div>
@@ -442,31 +574,6 @@ function RunDetails({
           <small>累计有效时间 {durationLabel(taskDuration(run, now))}</small>
         </div>
         <ScoreChart runs={[run]} now={now} />
-      </section>
-
-      <section className="detail-grid">
-        <div className="environment-card">
-          <div className="section-title">
-            <div>
-              <span>AUTHORITATIVE STATE</span>
-              <strong>当前环境</strong>
-            </div>
-            <small>{run.objective}</small>
-          </div>
-          <GameState game={run.game} state={state} />
-        </div>
-        <div className="operation-card">
-          <div className="section-title">
-            <div>
-              <span>LATEST OPERATION</span>
-              <strong>{actionLabel(run.latest_action)}</strong>
-            </div>
-            <small>{timeAgo(run.last_activity_at, now)}</small>
-          </div>
-          <pre>
-            {JSON.stringify({ action: run.latest_action, result: run.latest_result }, null, 2)}
-          </pre>
-        </div>
       </section>
 
       <section className="activity-grid">
@@ -514,22 +621,172 @@ function RunDetails({
               .slice()
               .reverse()
               .slice(0, 35)
-              .map((event) => (
-                <div className="event-row" key={event.sequence}>
+              .map((event) => {
+                const index = events.findIndex((candidate) => candidate.sequence === event.sequence);
+                const description = describeGameEvent(
+                  run.game,
+                  event,
+                  index > 0 ? events[index - 1] : null,
+                );
+                return (
+                <button
+                  className={`event-row ${event.sequence === activeEvent?.sequence ? "active" : ""}`}
+                  key={event.sequence}
+                  onClick={() => moveCursor(index)}
+                  aria-current={event.sequence === activeEvent?.sequence ? "step" : undefined}
+                >
                   <time>{clockTime(event.timestamp_ms)}</time>
-                  <strong>{actionLabel(event.action)}</strong>
-                  <span>
-                    {event.score_delta
-                      ? `+${event.score_delta} 分`
-                      : `score ${event.score ?? run.score}`}
-                  </span>
+                  <strong>{description.title}</strong>
+                  <span>{event.score_delta ? `+${event.score_delta} 分` : description.label}</span>
                   <small>#{event.sequence}</small>
-                </div>
-              ))}
+                </button>
+              )})}
           </div>
         </div>
       </section>
     </div>
+  );
+}
+
+function ReplayTimeline({
+  events,
+  activeIndex,
+  isLatest,
+  followingLive,
+  playing,
+  speed,
+  onMove,
+  onTogglePlayback,
+  onSpeed,
+  onFollowLive,
+}: {
+  events: ObserverEvent[];
+  activeIndex: number;
+  isLatest: boolean;
+  followingLive: boolean;
+  playing: boolean;
+  speed: number;
+  onMove: (index: number) => void;
+  onTogglePlayback: () => void;
+  onSpeed: (speed: number) => void;
+  onFollowLive: () => void;
+}) {
+  const active = events[activeIndex];
+  const scored = events
+    .map((event, index) => ({ event, index }))
+    .filter(({ event }) => (event.score_delta ?? 0) > 0);
+  return (
+    <section className="replay-card" aria-label="状态回放时间轴">
+      <div className="replay-heading">
+        <div>
+          <span>REPLAY WINDOW · {events.length} EVENTS</span>
+          <strong>{events.length ? `#${events[0].sequence} — #${events.at(-1)?.sequence}` : "暂无可回放事件"}</strong>
+        </div>
+        <div className="replay-status" aria-live="polite">
+          <i className={followingLive ? "live" : "replay"} />
+          {followingLive
+            ? "位于最新状态"
+            : isLatest
+              ? "回看最新事件 · 未跟随"
+              : `回看 ${clockTime(active?.timestamp_ms)}`}
+        </div>
+      </div>
+      <div className="replay-controls">
+        <button onClick={() => onMove(0)} disabled={!events.length || activeIndex <= 0}>最早</button>
+        <button onClick={() => onMove(activeIndex - 1)} disabled={!events.length || activeIndex <= 0}>上一步</button>
+        <button className="play-button" onClick={onTogglePlayback} disabled={events.length < 2}>
+          {playing ? "暂停回放" : "播放回放"}
+        </button>
+        <button onClick={() => onMove(activeIndex + 1)} disabled={!events.length || isLatest}>下一步</button>
+        <button onClick={onFollowLive} disabled={!events.length || followingLive}>返回直播</button>
+        <label>
+          速度
+          <select value={speed} onChange={(event) => onSpeed(Number(event.target.value))}>
+            <option value={0.5}>0.5×</option>
+            <option value={1}>1×</option>
+            <option value={2}>2×</option>
+            <option value={4}>4×</option>
+          </select>
+        </label>
+        <label>
+          得分事件
+          <select
+            value=""
+            onChange={(event) => event.target.value && onMove(Number(event.target.value))}
+            disabled={!scored.length}
+          >
+            <option value="">跳转…</option>
+            {scored.map(({ event, index }) => (
+              <option value={index} key={event.sequence}>#{event.sequence} · +{event.score_delta}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div className="replay-scrubber">
+        <input
+          type="range"
+          min="0"
+          max={Math.max(0, events.length - 1)}
+          value={Math.max(0, activeIndex)}
+          onChange={(event) => onMove(Number(event.target.value))}
+          disabled={!events.length}
+          aria-label="选择回放事件"
+        />
+        <div>
+          <span>{events[0] ? `#${events[0].sequence}` : "—"}</span>
+          <strong>{active ? `#${active.sequence} · ${actionLabel(active.action)}` : "等待事件"}</strong>
+          <span>{events.at(-1) ? `#${events.at(-1)?.sequence}` : "—"}</span>
+        </div>
+      </div>
+      <p className="replay-note">回放窗口来自 sidecar 最近 120 条完整状态；更早动作仍保留在运行产物中，但不会在此窗口伪装为可逐步回放。</p>
+    </section>
+  );
+}
+
+const EXPERIENCE_SECTIONS = [
+  ["plan", "CURRENT PLAN", "当前计划与开放问题"],
+  ["verified", "VERIFIED MECHANICS", "已验证规律与可复用经验"],
+  ["rejected", "REJECTED ROUTES", "已否定路线"],
+  ["solved", "SOLVED", "已解关卡"],
+] as const;
+
+function ExperiencePanel({ experience }: { experience?: RunDetail["agent_experience"] }) {
+  return (
+    <section className="experience-card">
+      <div className="section-title">
+        <div>
+          <span>EXPLICIT AGENT NOTES</span>
+          <strong>Agent 经验板</strong>
+        </div>
+        <small>
+          {experience?.updated_at
+            ? `${experience.source_count} 份可见笔记 · 更新于 ${clockTime(experience.updated_at)}`
+            : "仅投影 Agent 明确写入的可见 Markdown 条目"}
+        </small>
+      </div>
+      <div className="experience-grid">
+        {EXPERIENCE_SECTIONS.map(([key, eyebrow, title]) => {
+          const items = experience?.[key] ?? [];
+          return (
+            <section key={key} data-experience={key}>
+              <header>
+                <span>{eyebrow}</span>
+                <strong>{title}</strong>
+                <b>{experience?.counts[key] ?? 0}</b>
+              </header>
+              {items.length ? (
+                <ol>
+                  {items.slice().reverse().map((item, index) => <li key={`${key}-${index}`}>{item}</li>)}
+                </ol>
+              ) : (
+                <p>暂无明确记录</p>
+              )}
+            </section>
+          );
+        })}
+      </div>
+      <p className="experience-disclosure">不展示隐藏推理；分类只来自 Agent 自己保存的标题、项目符号和明确的 solved / rejected / verified 标记。</p>
+    </section>
   );
 }
 

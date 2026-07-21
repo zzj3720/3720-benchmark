@@ -401,12 +401,15 @@ mod tests {
                 "argument_count": 1,
                 "ok": true,
                 "state": {"campaign": {"score": 0}, "level": {"reference": "a1"}},
+                "scene": {"schema": "parabox-observer-scene-v1"},
             })],
         )
         .expect("events");
         assert_eq!(events[0]["sequence"], 1);
         assert_eq!(events[0]["action"]["command"], "move");
         assert_eq!(events[0]["state"]["level"]["reference"], "a1");
+        assert!(events[0].get("scene").is_none());
+        assert!(events[0]["state"].get("observer_scene").is_none());
     }
 
     #[test]

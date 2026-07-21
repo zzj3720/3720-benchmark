@@ -2,6 +2,22 @@ import type { ComponentType } from "react";
 
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 export type GameState = Record<string, Json>;
+export type ObserverEvent = {
+  sequence: number;
+  timestamp_ms?: number | null;
+  type?: string;
+  action?: Record<string, Json> | null;
+  state?: GameState | null;
+  result?: Record<string, Json> | null;
+  score?: number;
+  score_delta?: number;
+};
+export type EventDescription = {
+  label: string;
+  title: string;
+  detail: string;
+  tone?: "neutral" | "success" | "warning";
+};
 
 export type GameObserverModule<Game extends string = string> = {
   id: Game;
@@ -10,7 +26,8 @@ export type GameObserverModule<Game extends string = string> = {
     short: string;
     accent: string;
   };
-  State: ComponentType<{ state: GameState }>;
+  State: ComponentType<{ state: GameState; previousState?: GameState | null }>;
+  describeEvent?: (event: ObserverEvent, previous?: ObserverEvent | null) => EventDescription;
 };
 
 export function asRecord(value: Json | undefined): GameState | null {

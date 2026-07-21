@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import threading
 import time
@@ -26,6 +27,18 @@ SUPPORTED_TASKS = {
 }
 
 INFRASTRUCTURE_EXCEPTIONS = {"OutputTokenExceededError"}
+
+EXPERIENCE_MARKERS = {
+    "solved": re.compile(r"\bsolved\b|已解", re.IGNORECASE),
+    "rejected": re.compile(
+        r"\breject(?:ed|ion)?\b|\bdead[ -]?end\b|\binvalidated\b|死路|不可行",
+        re.IGNORECASE,
+    ),
+    "verified": re.compile(
+        r"\bverified\b|\bconfirmed\b|\breusable\b|\bproves?\b|规律|经验|机制",
+        re.IGNORECASE,
+    ),
+}
 
 
 def run_command(*args: str, timeout: float = 8) -> str:
@@ -65,6 +78,71 @@ def safe_json(path: Path) -> dict[str, Any]:
     except (OSError, json.JSONDecodeError):
         return {}
     return value if isinstance(value, dict) else {}
+
+
+def parse_experience_notes(texts: list[str]) -> dict[str, list[str]]:
+    """Project explicit Markdown notes without interpreting hidden reasoning."""
+    categories: dict[str, list[str]] = {
+        "plan": [],
+        "verified": [],
+        "rejected": [],
+        "solved": [],
+    }
+    for text in texts:
+        heading = ""
+        solved_list = False
+        solved_level = False
+        for raw_line in text.splitlines():
+            line = raw_line.strip()
+            if line.startswith("#"):
+                heading = line.lstrip("#").strip().lower()
+                solved_list = any(
+                    marker in heading for marker in ("solved this run", "solved levels", "已解关卡")
+                )
+                solved_level = bool(EXPERIENCE_MARKERS["solved"].search(heading)) and not solved_list
+                if solved_level:
+                    normalized_heading = re.sub(r"\s+", " ", line.lstrip("#").strip())[:700]
+                    if normalized_heading not in categories["solved"]:
+                        categories["solved"].append(normalized_heading)
+                continue
+            match = re.match(r"^[-*+]\s+(.+)$", line)
+            if not match:
+                continue
+            item = match.group(1).strip()
+            combined = f"{heading} {item}".lower()
+            if EXPERIENCE_MARKERS["solved"].search(item) or solved_list:
+                category = "solved"
+            elif EXPERIENCE_MARKERS["rejected"].search(item) or EXPERIENCE_MARKERS[
+                "rejected"
+            ].search(heading):
+                category = "rejected"
+            elif EXPERIENCE_MARKERS["verified"].search(item) or EXPERIENCE_MARKERS[
+                "verified"
+            ].search(heading) or any(
+                marker in heading for marker in ("mechanic", "verified", "rule", "规律", "经验")
+            ):
+                category = "verified"
+            elif any(
+                marker in combined
+                for marker in (
+                    "active",
+                    "lead",
+                    "plan",
+                    "unsolved",
+                    "remaining",
+                    "next",
+                    "partial",
+                    "in progress",
+                    "near-complete",
+                )
+            ):
+                category = "plan"
+            else:
+                category = "verified"
+            normalized = re.sub(r"\s+", " ", item)[:700]
+            if normalized not in categories[category]:
+                categories[category].append(normalized)
+    return categories
 
 
 def subscription_identity(value: Any) -> Any:
@@ -226,7 +304,7 @@ class LiveRepository:
                         "sh",
                         "-lc",
                         "while :; do set -- $(find /logs/agent -type f 2>/dev/null | "
-                        "grep -E '(\\.jsonl|claude-code\\.txt|qoder-cn\\.jsonl)$'); "
+                        "grep -E '(\\.jsonl|(claude-code|codex)\\.txt)$'); "
                         "if [ $# -gt 0 ]; then exec tail -n 0 -F \"$@\"; fi; sleep 1; done",
                     ],
                 )
@@ -579,6 +657,7 @@ class LiveRepository:
                     "state": state,
                     "events": normalized[-120:],
                     "agent_activity": self._agent_activity(source),
+                    "agent_experience": self._agent_experience(source),
                 }
             )
         return result
@@ -647,7 +726,7 @@ class LiveRepository:
             seen.add(trial)
             chain.append(trial)
             config = safe_json(trial.parent / "config.json")
-            previous = self._resume_trial(config)
+            previous = self._resume_trial(config, source.jobs_root or self.jobs)
             if previous is None:
                 break
             trial = previous
@@ -655,7 +734,7 @@ class LiveRepository:
         return chain
 
     @staticmethod
-    def _resume_trial(config: dict[str, Any]) -> Path | None:
+    def _resume_trial(config: dict[str, Any], jobs_root: Path) -> Path | None:
         agents = config.get("agents")
         agent = agents[0] if isinstance(agents, list) and agents else {}
         kwargs = agent.get("kwargs") if isinstance(agent, dict) else None
@@ -665,7 +744,42 @@ class LiveRepository:
         if not isinstance(raw_path, str):
             return None
         path = Path(raw_path)
-        return next((parent.parent for parent in path.parents if parent.name == "artifacts"), None)
+        artifact_trial = next(
+            (parent.parent for parent in path.parents if parent.name == "artifacts"),
+            None,
+        )
+        if artifact_trial is not None:
+            return artifact_trial
+
+        recovery = next(
+            (parent for parent in path.parents if parent.parent.name == "recoveries"),
+            None,
+        )
+        if recovery is not None:
+            job = jobs_root / recovery.name
+            if job.is_dir():
+                trials = [candidate for candidate in job.iterdir() if candidate.is_dir()]
+                if len(trials) == 1:
+                    return trials[0]
+
+        checkpoint = next(
+            (parent for parent in path.parents if (parent / "manifest.json").is_file()),
+            None,
+        )
+        if checkpoint is None:
+            return None
+        manifest = safe_json(checkpoint / "manifest.json")
+        job = manifest.get("job")
+        trial = manifest.get("trial")
+        if (
+            not isinstance(job, str)
+            or not isinstance(trial, str)
+            or Path(job).name != job
+            or Path(trial).name != trial
+        ):
+            return None
+        candidate = jobs_root / job / trial
+        return candidate if candidate.is_dir() else None
 
     @staticmethod
     def _normalize_events(task_id: str, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -698,6 +812,10 @@ class LiveRepository:
             return rows
         normalized = []
         for index, row in enumerate(rows, 1):
+            state = row.get("state")
+            scene = row.get("scene")
+            if isinstance(state, dict) and isinstance(scene, dict):
+                state = {**state, "observer_scene": scene}
             normalized.append(
                 {
                     "sequence": index,
@@ -709,7 +827,7 @@ class LiveRepository:
                     }
                     if row.get("command")
                     else None,
-                    "state": row.get("state"),
+                    "state": state,
                     "result": {
                         "ok": row.get("ok", True),
                         "code": row.get("code"),
@@ -802,7 +920,7 @@ class LiveRepository:
                 "sh",
                 "-lc",
                 "find /logs/agent -type f 2>/dev/null | "
-                "grep -E '(\\.jsonl|claude-code\\.txt|qoder-cn\\.jsonl)$' | "
+                "grep -E '(\\.jsonl|(claude-code|codex)\\.txt)$' | "
                 "while read -r f; do tail -n 700 \"$f\"; done",
                 timeout=12,
             )
@@ -821,8 +939,57 @@ class LiveRepository:
                 deduplicated.append(message)
         return deduplicated[-12:]
 
+    def _agent_experience(self, source: RunSource) -> dict[str, Any]:
+        workspaces: list[Path] = []
+        current = (source.jobs_root or self.jobs) / source.job_name / source.trial_name
+        for trial in [*self._continuation_trials(source), current]:
+            workspaces.append(trial / "agent" / "workspace")
+            config = safe_json(trial.parent / "config.json")
+            agents = config.get("agents")
+            agent = agents[0] if isinstance(agents, list) and agents else {}
+            kwargs = agent.get("kwargs") if isinstance(agent, dict) else {}
+            resumed = kwargs.get("resume_workspace_dir") if isinstance(kwargs, dict) else None
+            if isinstance(resumed, str):
+                workspaces.append(Path(resumed))
+
+        notes: list[Path] = []
+        for workspace in dict.fromkeys(workspaces):
+            try:
+                for path in workspace.iterdir():
+                    lower = path.name.lower()
+                    if path.is_file() and path.suffix.lower() == ".md" and (
+                        "note" in lower or "plan" in lower
+                    ):
+                        notes.append(path)
+            except OSError:
+                continue
+
+        readable: list[tuple[float, Path, str]] = []
+        for path in dict.fromkeys(notes):
+            try:
+                readable.append((path.stat().st_mtime, path, path.read_text(errors="replace")))
+            except OSError:
+                continue
+        readable.sort(key=lambda item: item[0])
+        texts = [text for _, _, text in readable]
+        categories = parse_experience_notes(texts)
+        return {
+            "updated_at": max((int(mtime * 1000) for mtime, _, _ in readable), default=None),
+            "source_count": len(readable),
+            "counts": {key: len(items) for key, items in categories.items()},
+            **{key: items[-8:] for key, items in categories.items()},
+        }
+
     @staticmethod
     def _message_text(payload: dict[str, Any]) -> str | None:
+        item = payload.get("item")
+        if (
+            payload.get("type") == "item.completed"
+            and isinstance(item, dict)
+            and item.get("type") == "agent_message"
+        ):
+            text = item.get("text")
+            return text.strip() if isinstance(text, str) and text.strip() else None
         if payload.get("type") == "message":
             content = payload.get("content")
             if isinstance(content, list):

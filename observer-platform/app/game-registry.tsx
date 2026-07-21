@@ -4,7 +4,13 @@ import parabox from "../../games/parabox-intro/observer";
 import sausage from "../../games/sausage-roll/observer";
 import swarm from "../../games/swarm-farming/observer";
 
-import type { GameState as State } from "./game-observer";
+import {
+  asString,
+  type EventDescription,
+  type GameObserverModule,
+  type GameState as State,
+  type ObserverEvent,
+} from "./game-observer";
 
 export const GAME_OBSERVERS = {
   parabox,
@@ -20,7 +26,33 @@ export const GAME_META = Object.fromEntries(
   GAME_IDS.map((id) => [id, GAME_OBSERVERS[id].meta]),
 ) as { [Game in GameId]: (typeof GAME_OBSERVERS)[Game]["meta"] };
 
-export function GameState({ game, state }: { game: GameId; state: State }) {
+export function GameState({
+  game,
+  state,
+  previousState,
+}: {
+  game: GameId;
+  state: State;
+  previousState?: State | null;
+}) {
   const StateView = GAME_OBSERVERS[game].State;
-  return <StateView state={state} />;
+  return <StateView state={state} previousState={previousState} />;
+}
+
+export function describeGameEvent(
+  game: GameId,
+  event: ObserverEvent,
+  previous?: ObserverEvent | null,
+): EventDescription {
+  const observer = GAME_OBSERVERS[game] as GameObserverModule;
+  return (
+    observer.describeEvent?.(event, previous) ?? {
+      label: "ENVIRONMENT EVENT",
+      title: asString(event.action?.command, event.type ?? "state").toUpperCase(),
+      detail: event.score_delta
+        ? `本步得分增加 ${event.score_delta}。`
+        : `权威状态已记录为事件 #${event.sequence}。`,
+      tone: event.score_delta ? "success" : "neutral",
+    }
+  );
 }

@@ -1,53 +1,419 @@
 .parabox-state {
-  min-height: 330px;
+  min-height: 480px;
+  background: #0a1d32;
+}
+
+.parabox-space-header {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 13px 18px;
+  border-bottom: 1px solid #264765;
+  background: #0d263f;
+}
+
+.parabox-space-header > div > span,
+.parabox-depth span {
+  display: block;
+  color: #82a8c5;
+  font: 800 10px/1 var(--font-geist-mono);
+  letter-spacing: 0.1em;
+}
+
+.parabox-space-header nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.parabox-space-header nav span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.parabox-space-header nav i {
+  color: #6090b3;
+  font-style: normal;
+}
+
+.parabox-space-header nav b {
+  color: #d9f2ff;
+  font: 800 12px/1 var(--font-geist-mono);
+}
+
+.parabox-depth {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.parabox-depth strong {
+  color: #091a2b;
+  background: #50d3ff;
+  padding: 8px 10px;
+  font: 900 16px/1 var(--font-geist-mono);
+}
+
+.parabox-stage {
+  min-height: 390px;
+  position: relative;
   display: grid;
   place-items: center;
-  padding: 25px;
-  background: radial-gradient(circle at 50% 50%, rgba(163, 255, 98, 0.045), transparent 45%);
+  padding: clamp(20px, 4vw, 42px);
+  background:
+    radial-gradient(circle at center, rgba(43, 126, 186, 0.24), transparent 57%),
+    #081827;
+  overflow: hidden;
+}
+
+.parabox-stage.recursive {
+  min-height: 500px;
+  padding: clamp(26px, 5vw, 56px);
+}
+
+.parabox-camera {
+  width: min(64vh, 610px, 82%);
+  aspect-ratio: 1;
+  position: relative;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+
+.parabox-parent-context {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.parabox-focus-space {
+  position: relative;
+  z-index: 3;
+  display: block;
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.34));
+}
+
+.parabox-context-label {
+  position: absolute;
+  left: -7%;
+  top: -8%;
+  z-index: 6;
+  padding: 7px 9px;
+  color: #dff6ff;
+  background: rgba(5, 20, 34, 0.88);
+  border-left: 3px solid #59cfff;
+  font: 800 10px/1.1 var(--font-geist-mono);
+  letter-spacing: 0.06em;
+}
+
+.parabox-context-label small {
+  display: block;
+  margin-bottom: 4px;
+  color: #7faac7;
+  font-size: 8px;
+}
+
+.parabox-legacy-notice {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  z-index: 8;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 28px);
+  padding: 7px 10px;
+  color: #ffe6a3;
+  background: rgba(45, 32, 7, 0.94);
+  border: 1px solid #9f7920;
+  font: 700 11px/1.35 var(--font-geist-mono);
 }
 
 .parabox-grid {
-  width: min(52vh, 430px);
-  max-width: 92%;
-  aspect-ratio: 1;
+  --cols: 7;
+  --rows: 7;
+  width: min(68vh, 680px, 100%);
+  aspect-ratio: var(--cols) / var(--rows);
   display: grid;
-  gap: 3px;
-  border: 1px solid #39433e;
-  background: #080a09;
-  padding: 14px;
+  border: clamp(5px, 0.7vw, 9px) solid #5bc8ff;
+  border-right-color: #2a70a3;
+  border-bottom-color: #215b86;
+  background: #173653;
+  box-shadow:
+    0 0 0 3px #092039,
+    0 20px 50px rgba(0, 0, 0, 0.34),
+    inset 0 0 40px rgba(0, 0, 0, 0.2);
 }
 
-.parabox-grid span {
+.parabox-focus-space > .parabox-grid,
+.parabox-parent-context > .parabox-grid,
+.parabox-box-interior > .parabox-grid {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.parabox-focus-space > .parabox-grid {
+  border-color: color-mix(in srgb, var(--focus-color, #5bc8ff) 78%, white);
+  border-right-color: color-mix(in srgb, var(--focus-color, #5bc8ff) 66%, #0b2942);
+  border-bottom-color: color-mix(in srgb, var(--focus-color, #5bc8ff) 54%, #06192a);
+}
+
+.parabox-parent-context > .parabox-grid {
+  border-width: clamp(6px, 0.55vw, 10px);
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.24);
+}
+
+.parabox-grid.compact {
   min-width: 0;
   min-height: 0;
+}
+
+.parabox-cell {
+  min-width: 0;
+  min-height: 0;
+  position: relative;
   display: grid;
   place-items: center;
-  background: #171c19;
-  color: #bdc7c0;
-  font: 800 clamp(8px, 1.5vh, 15px)/1 var(--font-geist-mono);
+  background: #173653;
+  box-shadow: inset 0 0 0 0.5px rgba(112, 176, 220, 0.08);
 }
 
-.parabox-grid span[data-symbol="#"] {
-  background: #313a33;
-  color: transparent;
+.parabox-cell[data-kind="wall"],
+.parabox-cell[data-kind="portal-wall"] {
+  z-index: 1;
+  background: #2f86cf;
+  box-shadow: inset 0 0 0 1px rgba(117, 209, 255, 0.1);
 }
 
-.parabox-grid span[data-symbol="@"],
-.parabox-grid span[data-symbol="P"] {
-  background: var(--acid);
-  color: #091006;
+.parabox-parent-context .parabox-cell[data-kind="wall"],
+.parabox-parent-context .parabox-cell[data-kind="portal-wall"] {
+  background: #2c86d2;
+  box-shadow: inset 0 0 0 2px rgba(91, 201, 255, 0.09);
 }
 
-.parabox-grid span[data-symbol="."] {
-  background: #1a2c21;
-  box-shadow: inset 0 0 0 2px #4a8159;
-  color: transparent;
+.parabox-cell[data-kind~="box-goal"],
+.parabox-cell[data-kind~="player-goal"] {
+  background: #1a3b59;
 }
 
-.parabox-grid
-  span:not([data-symbol=" "]):not([data-symbol="#"]):not([data-symbol="@"]):not(
-    [data-symbol="P"]
-  ):not([data-symbol="."]) {
-  background: #30364a;
-  color: #bcc5ef;
+.parabox-cell[data-kind="box-goal"]::before,
+.parabox-cell[data-kind="player-goal"]::before,
+.parabox-cell[data-kind~="occupied"]::before {
+  content: "";
+  position: absolute;
+  inset: 19%;
+  border: clamp(2px, 0.3vw, 4px) solid #88c7ed;
+  opacity: 0.82;
+}
+
+.parabox-cell[data-kind="player-goal"]::before,
+.parabox-cell[data-kind~="player-goal"]::before {
+  border-radius: 50%;
+}
+
+.parabox-cell.changed::after {
+  content: "";
+  position: absolute;
+  inset: 5%;
+  z-index: 5;
+  border: 3px solid #fff189;
+  box-shadow: 0 0 14px rgba(255, 235, 98, 0.85);
+  pointer-events: none;
+  animation: parabox-change 1.15s ease-out both;
+}
+
+@keyframes parabox-change {
+  0% { opacity: 0; transform: scale(0.75); }
+  24% { opacity: 1; }
+  100% { opacity: 0.68; transform: scale(1); }
+}
+
+.parabox-box-face,
+.parabox-player-face {
+  width: 74%;
+  aspect-ratio: 1;
+  position: relative;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  background: var(--box-color, #f1bd47);
+  border: 2px solid color-mix(in srgb, var(--box-color, #f1bd47) 65%, #0b243a);
+  box-shadow:
+    inset 5px 5px 0 color-mix(in srgb, var(--box-color, #f1bd47) 72%, white),
+    inset -5px -5px 0 color-mix(in srgb, var(--box-color, #f1bd47) 72%, black),
+    0 4px 0 rgba(4, 20, 33, 0.6);
+}
+
+.parabox-box-face b {
+  position: absolute;
+  top: 8%;
+  left: 10%;
+  z-index: 2;
+  color: #0b2235;
+  font: 900 clamp(8px, 1.1vw, 14px)/1 var(--font-geist-mono);
+}
+
+.parabox-box-face::before,
+.parabox-box-face::after,
+.parabox-player-face::before,
+.parabox-player-face::after {
+  content: "";
+  position: absolute;
+  top: 42%;
+  width: 8%;
+  height: 18%;
+  background: color-mix(in srgb, var(--box-color, #e74678) 66%, #0b243a);
+}
+
+.parabox-box-face::before,
+.parabox-player-face::before { left: -8%; }
+.parabox-box-face::after,
+.parabox-player-face::after { right: -8%; }
+
+.parabox-box-interior {
+  width: 64%;
+  aspect-ratio: 1;
+  position: relative;
+  z-index: 1;
+  display: block;
+  overflow: hidden;
+  background: #112e49;
+  border: max(1px, 0.08em) solid color-mix(in srgb, var(--box-color, #f1bd47) 60%, #0b243a);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--box-color, #f1bd47) 66%, white);
+}
+
+.parabox-box-interior > .parabox-grid {
+  border: 0;
+  box-shadow: none;
+  background: #143753;
+}
+
+.parabox-box-interior .parabox-cell {
+  box-shadow: none;
+}
+
+.parabox-box-interior .parabox-cell[data-kind="wall"],
+.parabox-box-interior .parabox-cell[data-kind="portal-wall"] {
+  background: #328bd4;
+}
+
+.parabox-box-interior .parabox-box-face,
+.parabox-box-interior .parabox-player-face {
+  width: 76%;
+  border-width: 1px;
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.2), inset -1px -1px 0 rgba(0, 0, 0, 0.22);
+}
+
+.parabox-box-interior .parabox-box-face::before,
+.parabox-box-interior .parabox-box-face::after,
+.parabox-box-interior .parabox-player-face::before,
+.parabox-box-interior .parabox-player-face::after,
+.parabox-box-interior .parabox-box-face > b {
+  display: none;
+}
+
+.parabox-box-interior .parabox-cell[data-kind="box-goal"]::before,
+.parabox-box-interior .parabox-cell[data-kind="player-goal"]::before,
+.parabox-box-interior .parabox-cell[data-kind~="occupied"]::before {
+  inset: 15%;
+  border-width: 1px;
+}
+
+.parabox-cell[data-focus-container="true"] > .parabox-box-face {
+  width: 92%;
+}
+
+.parabox-cycle-reference,
+.parabox-unrecorded {
+  position: absolute;
+  inset: 23%;
+  display: grid;
+  place-items: center;
+  color: #10253a;
+  background: color-mix(in srgb, var(--box-color, #f1bd47) 67%, #173653);
+  border: 1px solid color-mix(in srgb, var(--box-color, #f1bd47) 50%, #10253a);
+  font: 900 clamp(5px, 0.7vw, 9px)/1 var(--font-geist-mono);
+}
+
+.parabox-box-face.legacy {
+  background: color-mix(in srgb, var(--box-color, #f1bd47) 72%, #526170);
+}
+
+.legacy-grid {
+  filter: saturate(0.72);
+}
+
+.parabox-player-face {
+  grid-template-columns: 1fr 1fr;
+  gap: 17%;
+  padding: 0 22%;
+  background: #e74678;
+  border-color: #7e183d;
+  box-shadow:
+    inset 5px 5px 0 #ff6695,
+    inset -5px -5px 0 #a92351,
+    0 4px 0 rgba(4, 20, 33, 0.6);
+}
+
+.parabox-player-face i {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #42132a;
+}
+
+.parabox-target-mark {
+  width: 13%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #9bd8ff;
+  box-shadow: 0 0 9px #6ec6ff;
+}
+
+.parabox-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 11px 18px;
+  padding: 13px 18px 15px;
+  border-top: 1px solid #264765;
+  background: #0d263f;
+}
+
+.parabox-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #a9c7dc;
+  font-size: 12px;
+}
+
+.parabox-legend i {
+  width: 13px;
+  height: 13px;
+  display: inline-block;
+  background: #e74678;
+}
+
+.parabox-legend i[data-legend="box"] { background: #f2aa3b; box-shadow: inset 0 0 0 3px #95671d; }
+.parabox-legend i[data-legend="box-goal"] { background: transparent; border: 2px solid #88c7ed; }
+.parabox-legend i[data-legend="player-goal"] { background: transparent; border: 2px solid #88c7ed; border-radius: 50%; }
+.parabox-legend i[data-legend="changed"] { background: transparent; border: 2px solid #fff189; }
+
+@media (prefers-reduced-motion: reduce) {
+  .parabox-cell.changed::after { animation: none; }
+}
+
+@media (max-width: 620px) {
+  .parabox-state { min-height: 0; }
+  .parabox-space-header { align-items: flex-start; }
+  .parabox-stage { min-height: 280px; padding: 18px; }
+  .parabox-grid { width: 100%; }
+  .parabox-box-face,
+  .parabox-player-face { box-shadow: inset 2px 2px 0 rgba(255,255,255,0.2), inset -2px -2px 0 rgba(0,0,0,0.22); }
 }

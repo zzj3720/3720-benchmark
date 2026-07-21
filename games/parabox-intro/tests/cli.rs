@@ -151,6 +151,7 @@ fn cli_scores_each_solved_level_and_serializes_concurrent_calls() {
         map.iter()
             .all(|row| row.as_array().is_some_and(|cells| cells.len() == 7))
     );
+    assert!(shown["data"]["state"].get("observer_scene").is_none());
 
     let rejected = fixture.run(&["status"]);
     assert_eq!(rejected.status.code(), Some(2));
@@ -239,6 +240,13 @@ fn cli_scores_each_solved_level_and_serializes_concurrent_calls() {
         .collect();
     assert_eq!(events[0]["schema"], "parabox-events-v1");
     assert_eq!(events[0]["type"], "sidecar_started");
+    assert_eq!(events[0]["scene"]["schema"], "parabox-observer-scene-v1");
+    assert!(
+        events[0]["scene"]["spaces"]
+            .as_array()
+            .is_some_and(|spaces| !spaces.is_empty())
+    );
+    assert!(events[0]["scene"]["spaces"][0]["map"][0].is_string());
     assert!(events.iter().any(|event| {
         event["type"] == "request"
             && event["command"] == "move"
