@@ -72,5 +72,8 @@ live gateway  http://127.0.0.1:3740
 Vinext         http://127.0.0.1:3000
 ```
 
-Set `LIVE_GATEWAY_ORIGIN` on the Vinext process only when the gateway is at a
-different address. `GET /health` on the gateway is the process health check.
+Set `LIVE_GATEWAY_ORIGIN` when the server-side proxy targets a different
+gateway. For a local browser preview, set `VITE_LIVE_GATEWAY_ORIGIN` on the
+Vinext dev process as well; this keeps an isolated fixture gateway separate
+from the default live data on port 3740. `GET /health` on the gateway is the
+process health check.

@@ -67,6 +67,24 @@ No P0, P1, or P2 visual issue remains in the final comparison. The remaining dif
 
 The earlier version omitted real box interiors and the outer parent scene. The final observer-only recursive snapshot and renderer resolve both omissions, with positive real-entry E2E evidence above.
 
+## Reopened geometry findings
+
+- [P1] Recursive boxes render at only 74–76% of a logical cell, so each nested board is scaled from an undersized container and the recursion proportions drift.
+- [P1] Every space receives an unconditional rectangular frame, including cells where the level map has an opening. This closes visible exits that should connect to the parent space.
+
+The earlier pass checked data presence and viewport overflow but failed to verify these core grid invariants.
+
+Fixes and post-fix evidence:
+
+- Every recursive box face now measures exactly one logical cell at both inspected viewports: 66.06 × 66.05 px on desktop and 41.69 × 41.69 px on mobile. Nested box faces use the same rule.
+- The unconditional grid border and shadow were removed. Each real wall cell now records its exposed top/right/bottom/left edges from adjacent map cells and draws bevels only on those edges.
+- In the real `a4 / Enter` recursive state, the top opening and the player-side left opening both measured 0 px on all four borders. A real exposed wall edge measured 3 px only on its recorded sides.
+- Post-fix desktop viewport: `$HOME/.codex/visualizations/2026/07/22/parabox-live-renderer/geometry-fill-boundary-desktop-viewport-v2.jpg`.
+- Post-fix mobile viewport: `$HOME/.codex/visualizations/2026/07/22/parabox-live-renderer/geometry-fill-boundary-mobile-v2.jpg`.
+- Post-fix focused source/implementation comparison: `$HOME/.codex/visualizations/2026/07/22/parabox-live-renderer/geometry-fill-boundary-comparison-v2.jpg`.
+
+The focused comparison confirms that boxes retain one-cell scale, actual wall runs remain visually connected, and map openings remain open to the parent context. The official reference is a different level/state, so the comparison is limited to recursive scale and boundary grammar. No new typography, color, image-quality, copy, interaction, accessibility, or responsive regression was found; the mobile document remains exactly 390 px wide and browser diagnostics contain no warnings or errors.
+
 ## Final result
 
 passed

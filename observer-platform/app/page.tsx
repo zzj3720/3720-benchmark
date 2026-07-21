@@ -158,10 +158,9 @@ export default function Home() {
   useEffect(() => {
     if (paused) return;
     const local = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+    const gatewayOrigin = import.meta.env.VITE_LIVE_GATEWAY_ORIGIN ?? "http://127.0.0.1:3740";
     const url = new URL(
-      local
-        ? `${process.env.NEXT_PUBLIC_LIVE_GATEWAY_ORIGIN ?? "http://127.0.0.1:3740"}/v1/subscribe`
-        : "/api/live/subscribe",
+      local ? `${gatewayOrigin}/v1/subscribe` : "/api/live/subscribe",
       window.location.origin,
     );
     if (selectedId) url.searchParams.set("run_id", selectedId);

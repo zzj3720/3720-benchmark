@@ -89,6 +89,20 @@ function cellKind(symbol: string) {
   );
 }
 
+function isWall(symbol: Json | undefined) {
+  return ["#", "!"].includes(asString(symbol, " "));
+}
+
+function wallEdges(map: Json[][], row: number, column: number) {
+  if (!isWall(map[row]?.[column])) return null;
+  return {
+    top: !isWall(map[row - 1]?.[column]),
+    right: !isWall(map[row]?.[column + 1]),
+    bottom: !isWall(map[row + 1]?.[column]),
+    left: !isWall(map[row]?.[column - 1]),
+  };
+}
+
 function cellLabel(symbol: string, row: number, column: number) {
   const label = /^\d$/.test(symbol)
     ? `盒子 ${symbol}`
@@ -277,6 +291,7 @@ function SpaceGrid({
   const width = asNumber(space?.width, map[0]?.length ?? 1);
   const height = asNumber(space?.height, map.length || 1);
   const changed = changedSceneCells(scene, previousScene, spaceId);
+  const displayedMap = flipH ? map.map((row) => [...row].reverse()) : map;
   return (
     <span
       className={`parabox-grid ${compact ? "compact" : ""}`}
@@ -290,8 +305,8 @@ function SpaceGrid({
         gridTemplateRows: `repeat(${height}, minmax(0, 1fr))`,
       } as React.CSSProperties}
     >
-      {map.flatMap((row, rowIndex) =>
-        (flipH ? [...row].reverse() : row).map((cell, columnIndex) => {
+      {displayedMap.flatMap((row, rowIndex) =>
+        row.map((cell, columnIndex) => {
           const sourceColumn = flipH ? width - 1 - columnIndex : columnIndex;
           const symbol = asString(cell, " ");
           const key = `${rowIndex}:${columnIndex}`;
@@ -300,6 +315,7 @@ function SpaceGrid({
           const kind = asString(block?.kind, "");
           const subspace = asNumber(block?.subspace, -1);
           const focusContainer = focusSubspace >= 0 && subspace === focusSubspace;
+          const edges = wallEdges(displayedMap, rowIndex, columnIndex);
           return (
             <span
               className={`parabox-cell ${depth === 0 && changed.has(changeKey) ? "changed" : ""}`}
@@ -308,6 +324,10 @@ function SpaceGrid({
               aria-label={compact ? undefined : sceneCellLabel(symbol, block, rowIndex, columnIndex)}
               data-kind={cellKind(symbol)}
               data-focus-container={focusContainer || undefined}
+              data-wall-top={edges?.top || undefined}
+              data-wall-right={edges?.right || undefined}
+              data-wall-bottom={edges?.bottom || undefined}
+              data-wall-left={edges?.left || undefined}
             >
               {kind === "player" ? (
                 <PlayerFace />
@@ -358,6 +378,7 @@ function LegacyGrid({
         row.map((cell, columnIndex) => {
           const symbol = asString(cell, " ");
           const key = `${rowIndex}:${columnIndex}`;
+          const edges = wallEdges(map, rowIndex, columnIndex);
           return (
             <span
               className={`parabox-cell ${changed.has(key) ? "changed" : ""}`}
@@ -365,6 +386,10 @@ function LegacyGrid({
               role="gridcell"
               aria-label={cellLabel(symbol, rowIndex, columnIndex)}
               data-kind={cellKind(symbol)}
+              data-wall-top={edges?.top || undefined}
+              data-wall-right={edges?.right || undefined}
+              data-wall-bottom={edges?.bottom || undefined}
+              data-wall-left={edges?.left || undefined}
             >
               {["@", "P"].includes(symbol) ? (
                 <PlayerFace />
@@ -488,9 +513,6 @@ function ParaboxState({
                 style={{
                   width: `${(focusWidth / focusSpan) * 82}%`,
                   height: `${(focusHeight / focusSpan) * 82}%`,
-                  "--focus-color": BOX_COLORS[
-                    ((asNumber(parent?.definition_id, 2) % BOX_COLORS.length) + BOX_COLORS.length) % BOX_COLORS.length
-                  ],
                 } as React.CSSProperties}
               >
                 <SpaceGrid
