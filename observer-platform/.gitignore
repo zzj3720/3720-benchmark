@@ -40,5 +40,6 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+/public/parabox-render-qa-64.json
 __pycache__/
 *.pyc

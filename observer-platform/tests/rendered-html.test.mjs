@@ -60,6 +60,9 @@ test("implements a real multi-run scoreboard and drill-down", async () => {
     new URL("../../games/parabox-intro/observer/styles.css", import.meta.url),
     "utf8",
   );
+  const qaGalleryHtml = await readFile(new URL("../qa-gallery.html", import.meta.url), "utf8");
+  const qaGallery = await readFile(new URL("../qa-gallery-entry.tsx", import.meta.url), "utf8");
+  const qaGalleryStyles = await readFile(new URL("../qa-gallery.css", import.meta.url), "utf8");
   assert.match(page, /\/api\/live\/subscribe/);
   assert.match(page, /EventSource/);
   assert.doesNotMatch(page, /setTimeout\(refresh|fetch\("\/api\/live/);
@@ -85,15 +88,35 @@ test("implements a real multi-run scoreboard and drill-down", async () => {
   assert.match(parabox, /CONTAINER PATH/);
   assert.match(parabox, /当前容器路径/);
   assert.match(parabox, /parabox-observer-scene-v1/);
-  assert.match(parabox, /OUTER SPACE/);
+  assert.doesNotMatch(parabox, /OUTER SPACE/);
   assert.match(parabox, /内部空间已渲染/);
   assert.match(parabox, /盒子内部与外层场景未记录/);
   assert.match(parabox, /data-wall-top/);
-  assert.match(parabox, /kind === "box" && !focusContainer/);
+  assert.match(parabox, /focusContainer \? null : kind === "player"/);
+  assert.match(parabox, /MIN_RECURSIVE_SCALE = 1 \/ 512/);
+  assert.match(parabox, /scale \/ nestedSpan >= MIN_RECURSIVE_SCALE && depth < 12/);
+  assert.match(parabox, /scale \/ Math\.max\(width, height\)/);
+  assert.match(parabox, /gridTemplateColumns: `repeat\(\$\{width\}, \$\{100 \/ span\}%\)`/);
+  assert.match(parabox, /parentSpan - parentWidth/);
+  assert.match(parabox, /parentSpan - parentHeight/);
+  assert.doesNotMatch(parabox, /parabox-cycle-reference|ancestry/);
   assert.match(paraboxStyles, /\.parabox-box-face\s*\{[\s\S]*?width: 100%/);
+  assert.match(paraboxStyles, /\.parabox-box-face\s*\{[\s\S]*?border: 0/);
+  assert.match(paraboxStyles, /\.parabox-box-face > \.parabox-grid/);
+  assert.doesNotMatch(parabox, /parabox-box-interior/);
+  assert.doesNotMatch(paraboxStyles, /parabox-box-interior/);
+  assert.doesNotMatch(paraboxStyles, /\.parabox-box-face::before/);
+  assert.match(paraboxStyles, /\.parabox-focus-space\s*\{[\s\S]*?width: 100%;[\s\S]*?height: 100%/);
+  assert.doesNotMatch(parabox, /focusSpan|\* 82/);
   assert.doesNotMatch(paraboxStyles, /border: clamp\(5px, 0\.7vw, 9px\)/);
   assert.doesNotMatch(paraboxStyles, /parabox-focus-space[^}]*drop-shadow/);
   assert.match(paraboxStyles, /\.parabox-cell\s*\{[\s\S]*?box-shadow: none/);
+  assert.match(qaGalleryHtml, /src="\/qa-gallery-entry\.tsx"/);
+  assert.doesNotMatch(qaGalleryHtml, /src="\/qa-gallery\.tsx"/);
+  assert.match(qaGallery, /import \{ ParaboxState \}/);
+  assert.match(qaGallery, /samples\.map/);
+  assert.match(qaGalleryStyles, /grid-template-columns: repeat\(4/);
+  assert.match(qaGalleryStyles, /content-visibility: auto/);
   assert.match(parabox, /describeParaboxEvent/);
   assert.match(parabox, /相较上一步有变化/);
   assert.doesNotMatch(page, /JSON\.stringify\(\{ action:/);

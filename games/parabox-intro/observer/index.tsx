@@ -23,6 +23,14 @@ const BOX_COLORS = [
   "#64d477",
 ];
 
+const MIN_RECURSIVE_SCALE = 1 / 512;
+
+function observerColor(value: Json | undefined, fallback: string) {
+  if (!Array.isArray(value) || value.length !== 3) return fallback;
+  const channels = value.map((channel) => Math.max(0, Math.min(255, asNumber(channel, 0))));
+  return `rgb(${channels.join(" ")})`;
+}
+
 function spaceMap(state?: GameState | null) {
   const space = asRecord(state?.space);
   return Array.isArray(space?.map) ? (space.map as Json[][]) : [];
@@ -207,9 +215,14 @@ function sceneCellLabel(
   return `第 ${row + 1} 行第 ${column + 1} 列：${content}`;
 }
 
-function PlayerFace() {
+function PlayerFace({ block }: { block?: GameState | null }) {
   return (
-    <span className="parabox-player-face">
+    <span
+      className="parabox-player-face"
+      style={{
+        "--player-color": observerColor(block?.color, "#e74678"),
+      } as React.CSSProperties}
+    >
       <i aria-hidden="true" />
       <i aria-hidden="true" />
     </span>
@@ -221,7 +234,7 @@ function BoxFace({
   scene,
   previousScene,
   depth,
-  ancestry,
+  scale,
   flipH,
   legacy = false,
 }: {
@@ -229,35 +242,36 @@ function BoxFace({
   scene?: SceneGraph;
   previousScene?: SceneGraph | null;
   depth: number;
-  ancestry: number[];
+  scale: number;
   flipH: boolean;
   legacy?: boolean;
 }) {
   const definition = asNumber(block?.definition_id, 0);
-  const color = BOX_COLORS[((definition % BOX_COLORS.length) + BOX_COLORS.length) % BOX_COLORS.length];
+  const fallback = BOX_COLORS[((definition % BOX_COLORS.length) + BOX_COLORS.length) % BOX_COLORS.length];
+  const color = observerColor(block?.color, fallback);
   const subspace = asNumber(block?.subspace, -1);
-  const cycle = ancestry.includes(subspace);
-  const canRender = scene && scene.spaces.has(subspace) && !cycle && depth < 4;
+  const nestedSpace = scene?.spaces.get(subspace);
+  const nestedSpan = Math.max(
+    asNumber(nestedSpace?.width, 1),
+    asNumber(nestedSpace?.height, 1),
+  );
+  const canRender = nestedSpace && scale / nestedSpan >= MIN_RECURSIVE_SCALE && depth < 12;
   return (
     <span
       className={`parabox-box-face ${legacy ? "legacy" : ""}`}
+      data-expanded={canRender || undefined}
       style={{ "--box-color": color } as React.CSSProperties}
     >
-      <b>{definition}</b>
       {canRender ? (
-        <span className="parabox-box-interior">
-          <SpaceGrid
-            scene={scene}
-            previousScene={previousScene}
-            spaceId={subspace}
-            depth={depth + 1}
-            ancestry={[...ancestry, subspace]}
-            flipH={flipH !== (block?.flip_h === true)}
-            compact
-          />
-        </span>
-      ) : cycle ? (
-        <span className="parabox-cycle-reference">循环</span>
+        <SpaceGrid
+          scene={scene}
+          previousScene={previousScene}
+          spaceId={subspace}
+          depth={depth + 1}
+          scale={scale}
+          flipH={flipH !== (block?.flip_h === true)}
+          compact
+        />
       ) : legacy ? (
         <span className="parabox-unrecorded">未记录</span>
       ) : null}
@@ -270,7 +284,7 @@ function SpaceGrid({
   previousScene,
   spaceId,
   depth,
-  ancestry,
+  scale,
   flipH,
   compact = false,
   focusSubspace = -1,
@@ -279,7 +293,7 @@ function SpaceGrid({
   previousScene: SceneGraph | null;
   spaceId: number;
   depth: number;
-  ancestry: number[];
+  scale: number;
   flipH: boolean;
   compact?: boolean;
   focusSubspace?: number;
@@ -288,6 +302,7 @@ function SpaceGrid({
   const map = sceneMap(scene, spaceId);
   const width = asNumber(space?.width, map[0]?.length ?? 1);
   const height = asNumber(space?.height, map.length || 1);
+  const span = Math.max(width, height);
   const changed = changedSceneCells(scene, previousScene, spaceId);
   const displayedMap = flipH ? map.map((row) => [...row].reverse()) : map;
   return (
@@ -299,8 +314,9 @@ function SpaceGrid({
       style={{
         "--cols": width,
         "--rows": height,
-        gridTemplateColumns: `repeat(${width}, minmax(0, 1fr))`,
-        gridTemplateRows: `repeat(${height}, minmax(0, 1fr))`,
+        "--scene-color": observerColor(space?.color, "#2f86cf"),
+        gridTemplateColumns: `repeat(${width}, ${100 / span}%)`,
+        gridTemplateRows: `repeat(${height}, ${100 / span}%)`,
       } as React.CSSProperties}
     >
       {displayedMap.flatMap((row, rowIndex) =>
@@ -312,6 +328,7 @@ function SpaceGrid({
           const block = blockAt(space, rowIndex, sourceColumn);
           const kind = asString(block?.kind, "");
           const subspace = asNumber(block?.subspace, -1);
+          const childScale = scale / Math.max(width, height);
           const focusContainer = focusSubspace >= 0 && subspace === focusSubspace;
           const edges = wallEdges(displayedMap, rowIndex, columnIndex);
           return (
@@ -327,15 +344,15 @@ function SpaceGrid({
               data-wall-bottom={edges?.bottom || undefined}
               data-wall-left={edges?.left || undefined}
             >
-              {kind === "player" ? (
-                <PlayerFace />
-              ) : kind === "box" && !focusContainer ? (
+              {focusContainer ? null : kind === "player" ? (
+                <PlayerFace block={block} />
+              ) : kind === "box" ? (
                 <BoxFace
                   block={block}
                   scene={scene}
                   previousScene={previousScene}
                   depth={depth}
-                  ancestry={ancestry}
+                  scale={childScale}
                   flipH={flipH}
                 />
               ) : [".", "+"].includes(symbol) ? (
@@ -360,6 +377,7 @@ function LegacyGrid({
   height: number;
   changed: Set<string>;
 }) {
+  const span = Math.max(width, height);
   return (
     <div
       className="parabox-grid legacy-grid"
@@ -368,7 +386,8 @@ function LegacyGrid({
       style={{
         "--cols": width,
         "--rows": height,
-        gridTemplateColumns: `repeat(${width}, minmax(0, 1fr))`,
+        gridTemplateColumns: `repeat(${width}, ${100 / span}%)`,
+        gridTemplateRows: `repeat(${height}, ${100 / span}%)`,
       } as React.CSSProperties}
     >
       {map.flatMap((row, rowIndex) =>
@@ -394,7 +413,7 @@ function LegacyGrid({
                 <BoxFace
                   block={{ definition_id: /^\d$/.test(symbol) ? Number(symbol) : 0 }}
                   depth={0}
-                  ancestry={[]}
+                  scale={0}
                   flipH={false}
                   legacy
                 />
@@ -409,7 +428,7 @@ function LegacyGrid({
   );
 }
 
-function ParaboxState({
+export function ParaboxState({
   state,
   previousState,
 }: {
@@ -466,58 +485,46 @@ function ParaboxState({
           const parentSpace = scene.spaces.get(parentId);
           const parentWidth = asNumber(parentSpace?.width, 1);
           const parentHeight = asNumber(parentSpace?.height, 1);
+          const parentSpan = Math.max(parentWidth, parentHeight);
           const parentRow = asNumber(parent?.row, 0);
           const parentColumn = asNumber(parent?.column, 0);
           const displayedParentColumn = scene.cameraFlipH
             ? parentWidth - 1 - parentColumn
             : parentColumn;
-          const focusWidth = asNumber(focus?.width, width);
-          const focusHeight = asNumber(focus?.height, height);
-          const focusSpan = Math.max(focusWidth, focusHeight);
+          const parentX = (parentSpan - parentWidth) / 2 + displayedParentColumn;
+          const parentY = (parentSpan - parentHeight) / 2 + parentRow;
           return (
             <div className="parabox-camera" data-flipped={scene.cameraFlipH || undefined}>
               {parentSpace && (
-                <>
-                  <span className="parabox-context-label">
-                    <small>OUTER SPACE</small>
-                    BOX {asNumber(parent?.definition_id, 0)}
-                  </span>
-                  <span
-                    className="parabox-parent-context"
-                    aria-hidden="true"
-                    style={{
-                      width: `${parentWidth * 100}%`,
-                      height: `${parentHeight * 100}%`,
-                      left: `${-displayedParentColumn * 100}%`,
-                      top: `${-parentRow * 100}%`,
-                    }}
-                  >
-                    <SpaceGrid
-                      scene={scene}
-                      previousScene={previousScene}
-                      spaceId={parentId}
-                      depth={0}
-                      ancestry={[parentId]}
-                      flipH={scene.cameraFlipH}
-                      compact
-                      focusSubspace={scene.focusSpace}
-                    />
-                  </span>
-                </>
+                <span
+                  className="parabox-parent-context"
+                  aria-hidden="true"
+                  style={{
+                    width: `${parentSpan * 100}%`,
+                    height: `${parentSpan * 100}%`,
+                    left: `${-parentX * 100}%`,
+                    top: `${-parentY * 100}%`,
+                  }}
+                >
+                  <SpaceGrid
+                    scene={scene}
+                    previousScene={previousScene}
+                    spaceId={parentId}
+                    depth={0}
+                    scale={parentSpan}
+                    flipH={scene.cameraFlipH}
+                    compact
+                    focusSubspace={scene.focusSpace}
+                  />
+                </span>
               )}
-              <span
-                className="parabox-focus-space"
-                style={{
-                  width: `${(focusWidth / focusSpan) * 82}%`,
-                  height: `${(focusHeight / focusSpan) * 82}%`,
-                } as React.CSSProperties}
-              >
+              <span className="parabox-focus-space">
                 <SpaceGrid
                   scene={scene}
                   previousScene={previousScene}
                   spaceId={scene.focusSpace}
                   depth={0}
-                  ancestry={[scene.focusSpace]}
+                  scale={1}
                   flipH={scene.cameraFlipH}
                 />
               </span>

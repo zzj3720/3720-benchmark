@@ -75,6 +75,7 @@ impl Level {
 pub struct Block {
     pub uid: usize,
     pub definition_id: i32,
+    pub color: [u8; 3],
     pub x: i32,
     pub y: i32,
     pub is_player: bool,
@@ -132,6 +133,7 @@ pub struct ObserverScene {
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
 pub struct ObserverSpace {
     pub id: usize,
+    pub color: [u8; 3],
     pub width: i32,
     pub height: i32,
     pub map: Vec<String>,
@@ -154,6 +156,7 @@ pub struct ObserverBlock {
     pub row: usize,
     pub column: usize,
     pub definition_id: i32,
+    pub color: [u8; 3],
     pub kind: &'static str,
     pub flip_h: bool,
     pub subspace: Option<usize>,
@@ -230,6 +233,7 @@ impl Game {
         self.blocks.push(Block {
             uid,
             definition_id: self.blocks[self.levels[source].exit_block].definition_id,
+            color: self.blocks[self.levels[source].exit_block].color,
             x: 3,
             y: 3,
             is_player: false,
@@ -258,6 +262,7 @@ impl Game {
         self.blocks.push(Block {
             uid,
             definition_id: self.blocks[self.levels[source].exit_block].definition_id,
+            color: self.blocks[self.levels[source].exit_block].color,
             x: 3,
             y: 3,
             is_player: false,
@@ -477,6 +482,7 @@ impl Game {
                             row: (level.height - 1 - block.y) as usize,
                             column: block.x as usize,
                             definition_id: block.definition_id,
+                            color: block.color,
                             kind: if block.is_player {
                                 "player"
                             } else if block.is_wall && block.possessable {
@@ -493,6 +499,7 @@ impl Game {
                     .collect();
                 ObserverSpace {
                     id,
+                    color: exit.color,
                     width: level.width,
                     height: level.height,
                     map: self
@@ -1323,6 +1330,7 @@ fn create_inf_zone_parts(blocks: &mut Vec<Block>, levels: &mut Vec<Level>) -> us
     blocks.push(Block {
         uid: exit,
         definition_id: 0,
+        color: [47, 134, 207],
         x: 0,
         y: 0,
         is_player: false,
@@ -1429,6 +1437,7 @@ pub fn parse_level(text: &str) -> Result<Game, String> {
             let x = integer(&args, 1, raw_line)?;
             let y = integer(&args, 2, raw_line)?;
             let definition_id = integer(&args, 3, raw_line)?;
+            let color = hsv_color(&args, raw_line)?;
             let width = integer(&args, 4, raw_line)?;
             let height = integer(&args, 5, raw_line)?;
             let filled_with_walls = integer(&args, 10, raw_line)? != 0;
@@ -1447,6 +1456,7 @@ pub fn parse_level(text: &str) -> Result<Game, String> {
             blocks.push(Block {
                 uid,
                 definition_id,
+                color,
                 x,
                 y,
                 is_player,
@@ -1621,9 +1631,11 @@ pub fn parse_level(text: &str) -> Result<Game, String> {
         };
         ensure_free(&levels, &blocks, outer_level, x, y, &source)?;
         let uid = blocks.len();
+        let color = blocks[levels[sublevel].exit_block].color;
         blocks.push(Block {
             uid,
             definition_id,
+            color,
             x,
             y,
             is_player,
@@ -1701,6 +1713,7 @@ fn add_wall(
     blocks.push(Block {
         uid,
         definition_id: 0,
+        color: [47, 134, 207],
         x,
         y,
         is_player,
@@ -1739,6 +1752,38 @@ fn integer(args: &[&str], index: usize, source: &str) -> Result<i32, String> {
         .ok_or_else(|| format!("missing field in line: {source}"))?
         .parse()
         .map_err(|_| format!("invalid integer in line: {source}"))
+}
+
+fn color_component(args: &[&str], index: usize, source: &str) -> Result<f32, String> {
+    let value: f32 = args
+        .get(index)
+        .ok_or_else(|| format!("missing field in line: {source}"))?
+        .parse()
+        .map_err(|_| format!("invalid color in line: {source}"))?;
+    if !(0.0..=1.0).contains(&value) {
+        return Err(format!("color is outside 0..1 in line: {source}"));
+    }
+    Ok(value)
+}
+
+fn hsv_color(args: &[&str], source: &str) -> Result<[u8; 3], String> {
+    let hue = color_component(args, 6, source)?.rem_euclid(1.0) * 6.0;
+    let saturation = color_component(args, 7, source)?;
+    let value = color_component(args, 8, source)?;
+    let index = hue.floor() as usize;
+    let fraction = hue - index as f32;
+    let low = value * (1.0 - saturation);
+    let falling = value * (1.0 - saturation * fraction);
+    let rising = value * (1.0 - saturation * (1.0 - fraction));
+    let channels = match index % 6 {
+        0 => [value, rising, low],
+        1 => [falling, value, low],
+        2 => [low, value, rising],
+        3 => [low, falling, value],
+        4 => [rising, low, value],
+        _ => [value, low, falling],
+    };
+    Ok(channels.map(|channel| (channel * 255.0).round() as u8))
 }
 
 fn ensure_free(
@@ -1871,11 +1916,13 @@ mod tests {
             .iter()
             .find(|space| space.id == initial.root_space)
             .unwrap();
+        assert_eq!(root.color, [204, 204, 204]);
         let recursive_box = root
             .blocks
             .iter()
             .find(|block| block.kind == "box" && block.definition_id == 1)
             .unwrap();
+        assert_eq!(recursive_box.color, [255, 173, 51]);
         let child_id = recursive_box.subspace.unwrap();
         let child = initial
             .spaces

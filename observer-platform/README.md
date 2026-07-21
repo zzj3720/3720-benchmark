@@ -77,3 +77,16 @@ gateway. For a local browser preview, set `VITE_LIVE_GATEWAY_ORIGIN` on the
 Vinext dev process as well; this keeps an isolated fixture gateway separate
 from the default live data on port 3740. `GET /health` on the gateway is the
 process health check.
+
+## Parabox render QA
+
+The development-only gallery replays the complete Parabox walkthrough catalog,
+selects 64 recursive states, and renders them through the production observer
+component. Generate its ignored local fixture before starting the dev server:
+
+```bash
+vp run qa:parabox:data
+vp dev
+```
+
+Then open `http://localhost:5173/qa-gallery` (or the port printed by Vite).
