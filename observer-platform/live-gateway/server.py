@@ -546,7 +546,10 @@ class LiveRepository:
 
     def _events(self, source: RunSource) -> list[dict[str, Any]]:
         if source.run_id == "sausage-sidecar-only":
-            url = "http://127.0.0.1:3733/v1/observe/events?after=0&limit=1000&wait_ms=0"
+            url = (
+                f"{self.standalone_sausage_origin}"
+                "/v1/observe/events?after=0&limit=1000&wait_ms=0"
+            )
             payload = json.loads(urllib.request.urlopen(url, timeout=2).read())
             return payload.get("events", [])
         if source.active and source.game_container:

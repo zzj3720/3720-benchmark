@@ -6,6 +6,7 @@ import threading
 import unittest
 import urllib.request
 from pathlib import Path
+from unittest import mock
 
 
 SPEC = importlib.util.spec_from_file_location("live_gateway", Path(__file__).with_name("server.py"))
@@ -16,6 +17,46 @@ SPEC.loader.exec_module(gateway)
 
 
 class LiveGatewayTests(unittest.TestCase):
+    def test_standalone_sausage_detail_uses_the_configured_origin(self):
+        payload = {
+            "events": [
+                {
+                    "sequence": 1,
+                    "state": {"level": {"title": "Lachrymose Head"}},
+                }
+            ]
+        }
+
+        class Response:
+            def read(self):
+                return json.dumps(payload).encode()
+
+        with tempfile.TemporaryDirectory() as directory:
+            repository = gateway.LiveRepository(
+                Path(directory),
+                standalone_sausage_origin="http://127.0.0.1:4733",
+            )
+            source = gateway.RunSource(
+                run_id="sausage-sidecar-only",
+                job_name="sausage-sidecar-only",
+                task_id="sausage-roll",
+                trial_name="live-sausage",
+                config={},
+                active=True,
+            )
+            with mock.patch.object(
+                gateway.urllib.request,
+                "urlopen",
+                return_value=Response(),
+            ) as urlopen:
+                events = repository._events(source)
+
+        self.assertEqual(events, payload["events"])
+        urlopen.assert_called_once_with(
+            "http://127.0.0.1:4733/v1/observe/events?after=0&limit=1000&wait_ms=0",
+            timeout=2,
+        )
+
     def test_parabox_private_scene_is_merged_only_into_live_projection(self):
         row = {
             "timestamp_ms": 1000,

@@ -78,15 +78,23 @@ Vinext dev process as well; this keeps an isolated fixture gateway separate
 from the default live data on port 3740. `GET /health` on the gateway is the
 process health check.
 
-## Parabox render QA
+## Render QA
 
-The development-only gallery replays the complete Parabox walkthrough catalog,
-selects 64 recursive states, and renders them through the production observer
-component. Generate its ignored local fixture before starting the dev server:
+The development-only gallery renders ignored, locally generated fixtures through
+the production observer components. Parabox samples 64 recursive states from
+its complete walkthrough. Sausage samples 64 entry/mid/final states across the
+86-puzzle, 11,769-action walkthrough and includes height, grills, ladders,
+detached forks, cooked faces, multi-island puzzles, and exit-ready states.
+
+Generate the fixture you need before starting the dev server:
 
 ```bash
 vp run qa:parabox:data
+vp run qa:sausage:data
 vp dev
 ```
 
-Then open `http://localhost:5173/qa-gallery` (or the port printed by Vite).
+Then open `http://localhost:5173/qa-gallery` for Parabox or
+`http://localhost:5173/qa-gallery?game=sausage` for Sausage (using the port
+printed by Vite). Sausage is paginated to eight WebGL scenes at a time so the
+browser never creates all 64 contexts at once.

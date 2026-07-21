@@ -32,6 +32,10 @@ path = "src/bin/server.rs"
 name = "sausage-verifier"
 path = "src/bin/verifier.rs"
 
+[[bin]]
+name = "sausage-render-qa"
+path = "src/bin/render_qa.rs"
+
 [profile.release]
 strip = true
 lto = true

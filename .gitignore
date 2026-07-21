@@ -4,6 +4,7 @@
 __pycache__/
 *.pyc
 .venv/
+node_modules/
 target/
 .harbor/
 jobs/
@@ -28,3 +29,4 @@ task-proposal-results/
 /tasks/sausage-roll/tests/campaign/merged_binary.gz
 /tasks/sausage-roll/tests/campaign/entries.tar.gz
 /tasks/sausage-roll/solution/segments.tar.gz
+/observer-platform/public/sausage-render-qa-64.json

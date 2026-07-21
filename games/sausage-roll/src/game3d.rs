@@ -104,6 +104,10 @@ impl<'a> Game3d<'a> {
         self.won()
     }
 
+    pub fn exit(&self) -> (Coord, Direction) {
+        (self.exit_pos, self.exit_direction)
+    }
+
     pub fn can_exit(&self) -> bool {
         if !self.won() || !self.world.player_has_fork() || !self.exit_up {
             return false;

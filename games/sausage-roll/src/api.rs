@@ -56,7 +56,7 @@ fn execute_inner(session: &mut Session<'_>, command: &Command) -> Result<Value, 
         Command::Show => serde_json::to_value(session.snapshot()?)
             .map_err(|error| format!("could not serialize snapshot: {error}")),
         Command::Levels => Ok(json!({
-            "levels": session.levels(),
+            "levels": session.levels()?,
             "state": session.snapshot()?,
         })),
         Command::Move { directions } => {

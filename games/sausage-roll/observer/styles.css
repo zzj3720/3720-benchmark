@@ -1,15 +1,170 @@
 .sausage-state {
-  min-height: 330px;
+  min-height: 460px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-content: center;
-  gap: 1px;
-  padding: 50px;
-  background: var(--line);
+  grid-template-rows: auto minmax(340px, 1fr) auto;
+  overflow: hidden;
+  background: #121717;
 }
 
-.sausage-state .metric {
-  min-height: 92px;
+.sausage-scene-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 13px 16px;
+  border-bottom: 1px solid #303b39;
+  background: #111616;
+}
+
+.sausage-scene-header > div > span,
+.sausage-scene-header dt,
+.sausage-environment,
+.sausage-legend {
+  color: #8d9a95;
+  font: 800 9px/1.25 var(--font-geist-mono), monospace;
+  letter-spacing: 0.09em;
+}
+
+.sausage-scene-header strong {
+  display: block;
+  margin-top: 3px;
+  color: #f2f5ef;
+  font-size: 15px;
+}
+
+.sausage-scene-header dl {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+}
+
+.sausage-scene-header dl div {
+  min-width: 48px;
+}
+
+.sausage-scene-header dt,
+.sausage-scene-header dd {
+  margin: 0;
+}
+
+.sausage-scene-header dd {
+  margin-top: 3px;
+  color: #dfe7e1;
+  font: 800 12px/1 var(--font-geist-mono), monospace;
+}
+
+.sausage-scene-header .ready dd { color: #a7ff78; }
+.sausage-scene-header .locked dd { color: #a7b0ac; }
+
+.sausage-stage {
+  position: relative;
+  min-height: 340px;
+  background: #526c77;
+}
+
+.sausage-stage canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.sausage-environment {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 7px 8px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(9, 13, 13, 0.72);
+  color: rgba(255,255,255,0.78);
+  pointer-events: none;
+}
+
+.sausage-render-error {
+  position: absolute;
+  inset: 18px;
   display: grid;
-  align-content: center;
+  place-items: center;
+  padding: 20px;
+  border: 1px solid #ff7779;
+  background: rgba(36, 10, 12, 0.94);
+  color: #ffd7d8;
+  font-size: 12px;
+  text-align: center;
+}
+
+.sausage-legend {
+  display: grid;
+  gap: 10px;
+  padding: 11px 14px 13px;
+  border-top: 1px solid #303b39;
+  background: #111616;
+}
+
+.cook-key,
+.sausage-face-list,
+.sausage-face-list > span {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cook-key span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cook-key i,
+.sausage-face-list i {
+  display: inline-grid;
+  place-items: center;
+  font-style: normal;
+  color: #fff;
+  background: #e98468;
+}
+
+.cook-key i {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+.sausage-face-list {
+  max-height: 58px;
+  overflow: auto;
+}
+
+.sausage-face-list > span {
+  gap: 3px;
+  padding: 3px 5px;
+  border: 1px solid #33403d;
+}
+
+.sausage-face-list > span.changed {
+  border-color: #ffe079;
+  box-shadow: inset 0 0 0 1px rgba(255, 224, 121, 0.18);
+}
+
+.sausage-face-list b {
+  margin-right: 3px;
+  color: #dce4df;
+}
+
+.sausage-face-list i {
+  min-width: 21px;
+  height: 18px;
+  padding: 0 3px;
+  font: 900 7px/1 var(--font-geist-mono), monospace;
+}
+
+.cook-key i[data-cook="1"], .sausage-face-list i[data-cook="1"] { background: #a95d38; }
+.cook-key i[data-cook="2"], .sausage-face-list i[data-cook="2"] { background: #75412e; }
+.cook-key i[data-cook="3"], .sausage-face-list i[data-cook="3"] { background: #271d1a; outline: 1px solid #9b4c3e; }
+
+@media (max-width: 720px) {
+  .sausage-state { min-height: 410px; grid-template-rows: auto minmax(300px, 1fr) auto; }
+  .sausage-scene-header { align-items: flex-start; }
+  .sausage-scene-header dl { display: grid; grid-template-columns: repeat(2, auto); gap: 8px 14px; }
+  .sausage-stage { min-height: 300px; }
 }

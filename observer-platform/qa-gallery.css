@@ -29,6 +29,44 @@
 .qa-header p { margin: 0; color: #9eaaa8; }
 .qa-error { color: #ff7b7d; }
 
+.qa-actions {
+  display: grid;
+  justify-items: end;
+  gap: 11px;
+}
+
+.qa-actions nav,
+.qa-pagination {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.qa-actions button,
+.qa-pagination button {
+  border: 1px solid #344240;
+  background: #111818;
+  padding: 7px 10px;
+  color: #8ea3a1;
+  cursor: pointer;
+  font: 800 9px/1 var(--font-geist-mono), monospace;
+}
+
+.qa-actions button.active {
+  border-color: #a3ff62;
+  color: #c9ff9e;
+}
+
+.qa-pagination {
+  justify-content: space-between;
+  margin: -7px 0 14px;
+  color: #8ea3a1;
+  font: 800 9px/1 var(--font-geist-mono), monospace;
+  letter-spacing: 0.08em;
+}
+
+.qa-pagination button:disabled { opacity: 0.35; cursor: default; }
+
 .qa-gallery {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -68,6 +106,16 @@
   width: 240px;
   height: 240px;
 }
+
+.sausage-qa .qa-gallery {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.sausage-qa .qa-card > header { min-height: 72px; }
+.qa-render .sausage-state { min-height: 0; grid-template-rows: 250px; }
+.qa-render .sausage-scene-header,
+.qa-render .sausage-legend { display: none; }
+.qa-render .sausage-stage { min-height: 250px; height: 250px; }
 .qa-card footer {
   min-height: 50px;
   display: flex;
@@ -87,4 +135,6 @@
 
 @media (max-width: 900px) {
   .qa-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sausage-qa .qa-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .qa-header { align-items: flex-start; gap: 18px; }
 }

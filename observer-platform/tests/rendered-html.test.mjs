@@ -60,6 +60,14 @@ test("implements a real multi-run scoreboard and drill-down", async () => {
     new URL("../../games/parabox-intro/observer/styles.css", import.meta.url),
     "utf8",
   );
+  const sausage = await readFile(
+    new URL("../../games/sausage-roll/observer/index.tsx", import.meta.url),
+    "utf8",
+  );
+  const sausageScene = await readFile(
+    new URL("../../games/sausage-roll/observer/scene.ts", import.meta.url),
+    "utf8",
+  );
   const qaGalleryHtml = await readFile(new URL("../qa-gallery.html", import.meta.url), "utf8");
   const qaGallery = await readFile(new URL("../qa-gallery-entry.tsx", import.meta.url), "utf8");
   const qaGalleryStyles = await readFile(new URL("../qa-gallery.css", import.meta.url), "utf8");
@@ -82,6 +90,7 @@ test("implements a real multi-run scoreboard and drill-down", async () => {
   assert.match(page, /SIDECAR TRACE/);
   assert.match(registry, /games\/parabox-intro\/observer/);
   assert.match(registry, /games\/emergency-operator\/observer/);
+  assert.match(registry, /games\/sausage-roll\/observer/);
   assert.match(registry, /games\/kitchen-terminal\/observer/);
   assert.match(operator, /Emergency Operator/);
   assert.match(operator, /OperatorState/);
@@ -110,11 +119,22 @@ test("implements a real multi-run scoreboard and drill-down", async () => {
   assert.doesNotMatch(parabox, /focusSpan|\* 82/);
   assert.doesNotMatch(paraboxStyles, /border: clamp\(5px, 0\.7vw, 9px\)/);
   assert.doesNotMatch(paraboxStyles, /parabox-focus-space[^}]*drop-shadow/);
+  assert.match(sausage, /import\("\.\/scene"\)/);
+  assert.match(sausage, /每根香肠的四面状态/);
+  assert.match(sausageScene, /CapsuleGeometry\(0\.36, 1\.08/);
+  assert.match(sausageScene, /terrainTop\(tile\.pos\)/);
+  assert.match(sausageScene, /entity\.cells\.length > 1/);
+  assert.match(sausageScene, /heldFork\.position\.set\(0, 0\.72, 0\.5\)/);
+  assert.match(sausageScene, /function addFork\(parent: THREE\.Group\)/);
+  assert.doesNotMatch(sausageScene, /function addFork\([^)]*held/);
+  assert.match(sausage, /if \(!previousState\) return new Set<number>\(\)/);
+  assert.match(sausageScene, /new THREE\.PerspectiveCamera\(60/);
   assert.match(paraboxStyles, /\.parabox-cell\s*\{[\s\S]*?box-shadow: none/);
   assert.match(qaGalleryHtml, /src="\/qa-gallery-entry\.tsx"/);
   assert.doesNotMatch(qaGalleryHtml, /src="\/qa-gallery\.tsx"/);
   assert.match(qaGallery, /import \{ ParaboxState \}/);
-  assert.match(qaGallery, /samples\.map/);
+  assert.match(qaGallery, /visible\.map/);
+  assert.match(qaGallery, /samples\.slice\(page \* PAGE_SIZE/);
   assert.match(qaGalleryStyles, /grid-template-columns: repeat\(4/);
   assert.match(qaGalleryStyles, /content-visibility: auto/);
   assert.match(parabox, /describeParaboxEvent/);
