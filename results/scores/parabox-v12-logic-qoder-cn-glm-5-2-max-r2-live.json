@@ -1,0 +1,48 @@
+{
+  "scoring": {
+    "version": "parabox-integer-score-token-tiebreak-v4",
+    "chain_version": "parabox-continuation-chain-v2",
+    "formula": "score = solved_levels; rank by score descending, then total_tokens ascending",
+    "level_count": 364,
+    "time_policy": "Agent wall time is retained only as a diagnostic and does not affect the score because it is sensitive to service stability.",
+    "ordering_guarantee": "Each solved puzzle contributes exactly one point. Token use only breaks ties between trials with the same integer score.",
+    "eligibility_policy": "A valid verifier result retains its integer score even when token accounting is unavailable. Such a trial is excluded only from token-based tie ranking. Reaching the configured Agent timeout is an expected benchmark cutoff and retains the verified score; other infrastructure exceptions invalidate the score itself.",
+    "continuation_policy": "Ordered continuation segments must share task, checksum, model, and reasoning effort, and cumulative scores may not decrease. The chain score is the final cumulative score; tokens are summed across every segment. When a cumulative runtime budget cuts through a segment, score and cumulative tokens come from the last raw rollout evidence at that exact cutoff."
+  },
+  "trials": [
+    {
+      "source": {
+        "result_json": ".harbor/jobs/parabox-v12-logic-qoder-cn-glm-5-2-max-r2-live/parabox-intro__UDemtAT/result.json",
+        "result_sha256": "c3e4d4f346d3f562a8e3f4375698d46f49dc8189acb0323b22a8fbd95d499711",
+        "field_paths": {
+          "solved_levels": "verifier_result.rewards.reward",
+          "input_tokens": "agent_result.n_input_tokens",
+          "cache_tokens": "agent_result.n_cache_tokens",
+          "output_tokens": "agent_result.n_output_tokens",
+          "termination": "exception_info.exception_type",
+          "diagnostic_agent_started_at": "agent_execution.started_at",
+          "diagnostic_agent_finished_at": "agent_execution.finished_at"
+        }
+      },
+      "identity": {
+        "harbor_trial_id": "8366eb3c-cc5b-45b4-98b7-c9c134a9a9fc",
+        "trial_name": "parabox-intro__UDemtAT",
+        "task_name": "3720/parabox-intro",
+        "task_checksum": "7e63d299d7445d32ce0b4109dc44c1ba8cda3fe9981aa140b61ae20512c64c8c",
+        "agent": "tools.agents.qoder_cli_cn:QoderCliCn",
+        "model": "gm51model",
+        "reasoning_effort": "max"
+      },
+      "score_valid": false,
+      "ranking_eligible": false,
+      "eligible": false,
+      "ineligible_reason": "trial has an infrastructure exception",
+      "termination": {
+        "status": "error",
+        "exception_type": "RuntimeError"
+      },
+      "raw": null,
+      "derived": null
+    }
+  ]
+}

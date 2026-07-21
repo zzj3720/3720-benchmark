@@ -1,0 +1,30 @@
+[package]
+name = "operator-terminal"
+version = "0.1.0"
+edition = "2024"
+license = "UNLICENSED"
+publish = false
+
+[lib]
+name = "operator_terminal"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+tiny_http = "0.12"
+
+[[bin]]
+name = "operator-server"
+path = "src/bin/server.rs"
+
+[[bin]]
+name = "operator-verifier"
+path = "src/bin/verifier.rs"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+panic = "abort"

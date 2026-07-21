@@ -1,0 +1,4 @@
+services:
+  game:
+    ports:
+      - "127.0.0.1:${SAUSAGE_OBSERVER_PORT:-3733}:3720"

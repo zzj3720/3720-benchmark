@@ -1,0 +1,8 @@
+{
+  "schema": "benchmark-source-provenance-v1",
+  "campaign": "kitchen-rush-pilot-v1",
+  "origin": "Original benchmark fixture authored for 3720-benchmark",
+  "copyrighted_game_data": false,
+  "inspiration": "Fixed-station restaurant time-management games",
+  "notes": "This pilot contains no recipes, dialogue, art, audio, levels, or other proprietary data from a commercial kitchen game."
+}

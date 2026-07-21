@@ -1,0 +1,12 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "benchmark-live-3720-edge",
+  "main": "worker.js",
+  "compatibility_date": "2026-07-21",
+  "routes": [
+    {
+      "pattern": "live.benchmark.3720.org",
+      "custom_domain": true
+    }
+  ]
+}

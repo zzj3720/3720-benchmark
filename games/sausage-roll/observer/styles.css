@@ -1,0 +1,15 @@
+.sausage-state {
+  min-height: 330px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: center;
+  gap: 1px;
+  padding: 50px;
+  background: var(--line);
+}
+
+.sausage-state .metric {
+  min-height: 92px;
+  display: grid;
+  align-content: center;
+}

@@ -1,0 +1,63 @@
+{
+  "scoring": {
+    "version": "parabox-integer-score-token-tiebreak-v4",
+    "chain_version": "parabox-continuation-chain-v1",
+    "formula": "score = solved_levels; rank by score descending, then total_tokens ascending",
+    "level_count": 364,
+    "time_policy": "Agent wall time is retained only as a diagnostic and does not affect the score because it is sensitive to service stability.",
+    "ordering_guarantee": "Each solved puzzle contributes exactly one point. Token use only breaks ties between trials with the same integer score.",
+    "eligibility_policy": "A valid verifier result retains its integer score even when token accounting is unavailable. Such a trial is excluded only from token-based tie ranking. Reaching the configured Agent timeout is an expected benchmark cutoff and retains the verified score; other infrastructure exceptions invalidate the score itself.",
+    "continuation_policy": "Ordered continuation segments must share task, checksum, model, and reasoning effort, and cumulative scores may not decrease. The chain score is the final cumulative score; tokens are summed across every segment."
+  },
+  "trials": [
+    {
+      "source": {
+        "result_json": ".harbor/jobs/parabox-v12-logic-deepseek-pro-native-goal-r1/parabox-intro__Hbw2JLr/result.json",
+        "result_sha256": "84fef927aecbf914e0c1163d1de30674d7752d0e07f12c9be6794ba6527e5637",
+        "field_paths": {
+          "solved_levels": "verifier_result.rewards.reward",
+          "input_tokens": "agent_result.n_input_tokens",
+          "cache_tokens": "agent_result.n_cache_tokens",
+          "output_tokens": "agent_result.n_output_tokens",
+          "termination": "exception_info.exception_type",
+          "diagnostic_agent_started_at": "agent_execution.started_at",
+          "diagnostic_agent_finished_at": "agent_execution.finished_at"
+        }
+      },
+      "identity": {
+        "harbor_trial_id": "2b2553c4-4328-4d77-8375-58e8ae3f3212",
+        "trial_name": "parabox-intro__Hbw2JLr",
+        "task_name": "3720/parabox-intro",
+        "task_checksum": "7e63d299d7445d32ce0b4109dc44c1ba8cda3fe9981aa140b61ae20512c64c8c",
+        "agent": "tools.agents.deepseek_claude_code:GoalDeepSeekClaudeCode",
+        "model": "deepseek-v4-pro",
+        "reasoning_effort": "xhigh"
+      },
+      "score_valid": true,
+      "ranking_eligible": true,
+      "eligible": true,
+      "ineligible_reason": null,
+      "termination": {
+        "status": "expected_agent_timeout",
+        "exception_type": "AgentTimeoutError"
+      },
+      "raw": {
+        "solved_levels": 9,
+        "input_tokens": 130494937,
+        "cache_tokens": 130287744,
+        "output_tokens": 398743,
+        "total_tokens": 130893680,
+        "diagnostic_agent_seconds": 7204.206204,
+        "token_accounting": "input_tokens + output_tokens; cache_tokens is a subset of input_tokens and is not added again"
+      },
+      "derived": {
+        "score": 9,
+        "token_tiebreak": 130893680,
+        "ascending_rank_key": [
+          -9,
+          130893680
+        ]
+      }
+    }
+  ]
+}

@@ -1,6 +1,30 @@
 .env
+.env.kimi
+.DS_Store
 __pycache__/
 *.pyc
 .venv/
+target/
+.harbor/
+jobs/
 
 task-proposal-results/
+
+# Raw model trajectories and recovery bundles are local evaluation artifacts.
+# Keep only compact, reviewed acceptance evidence in the repository.
+/results/sessions/*
+!/results/sessions/README.md
+/results/recoveries/
+
+# Locally owned Stephen's Sausage Roll data and derived walkthrough fixtures.
+# The clean-room engine and packaging code are tracked; these assets must not
+# be redistributed without the copyright holder's permission.
+/games/sausage-roll/data/campaign/merged_binary.gz
+/games/sausage-roll/data/campaign/entries.tar.gz
+/games/sausage-roll/data/oracle/all.dem
+/games/sausage-roll/data/oracle/segments.tar.gz
+/tasks/sausage-roll/environment/game/campaign/merged_binary.gz
+/tasks/sausage-roll/environment/game/campaign/entries.tar.gz
+/tasks/sausage-roll/tests/campaign/merged_binary.gz
+/tasks/sausage-roll/tests/campaign/entries.tar.gz
+/tasks/sausage-roll/solution/segments.tar.gz

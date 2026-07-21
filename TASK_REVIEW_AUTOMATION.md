@@ -28,23 +28,27 @@ Pass `--repo <owner>/<name>` to each command (or `cd` into a clone of the target
 | [Review Labels](#review-label-automation) | Label transitions based on review actions | Auto on review/request |
 | [Static Checks](#static-checks) | Path validation, Dockerfile sanity, canary, metadata, test references | Auto on PR |
 | [Implementation Rubric Review](#implementation-rubric-review) | `harbor check` with custom rubric (28 criteria) | Auto on PR / `/review` |
-| [Docker Build](#docker-build-oracle-nop) | Environment builds successfully | Auto on PR + every push / `/validate` |
-| [Oracle Validation](#docker-build-oracle-nop) | Solution passes all tests | Auto on PR + every push / `/validate` |
-| [Nop Validation](#docker-build-oracle-nop) | Doing nothing fails tests | Auto on PR + every push / `/validate` |
-| [Agent Trials](#agent-trials) | Multi-agent runs | `/run` or auto on reviewer request |
-| [Cheat Trials](#cheat-trials) | Adversarial reward-hack detection | `/cheat` or auto on reviewer request |
+| [Docker Build](#docker-build-oracle-nop) | Environment builds successfully | Manual `/validate` only |
+| [Oracle Validation](#docker-build-oracle-nop) | Solution passes all tests | Manual `/validate` only |
+| [Nop Validation](#docker-build-oracle-nop) | Doing nothing fails tests | Manual `/validate` only |
+| [Agent Trials](#agent-trials) | Multi-agent runs | Manual `/run` only |
+| [Cheat Trials](#cheat-trials) | Adversarial reward-hack detection | Manual `/cheat` only |
 
-All automated checks (static checks, implementation rubric review, and validation) run automatically on every push to `tasks/`. A reviewer is assigned after all automated checks pass. Agent and cheat trials are then auto-triggered (once per head SHA) so reviewers see results on the latest version of the task. Maintainers can also invoke them manually with `/run` or `/cheat`.
+Pull-request CI runs static checks and implementation rubric review only. It
+never builds or executes a real benchmark. A reviewer is assigned after those
+two checks pass. Docker/Oracle/Nop validation, agent trials, and cheat trials
+require an explicit maintainer command and are intended for local or dedicated
+benchmark infrastructure.
 
 ```mermaid
 graph LR
-    A["Static Checks"]:::auto --> B["Autoreview"]:::auto --> C["Validation
-(Docker, Oracle,
-Nop, AI)"]:::auto -- all pass --> D["Reviewer Assigned"]:::assign -- /run --> E[Agent Trials]:::trials ~~~ F[ ]:::spacer
+    A["Static Checks"]:::auto --> B["Autoreview"]:::auto -- both pass --> C["Reviewer Assigned"]:::assign
+    C -. explicit /validate .-> D["Docker + Oracle/Nop"]:::manual
+    C -. explicit /run or /cheat .-> E["Agent / Cheat Trials"]:::trials
 
-    classDef spacer fill:none,stroke:none
     classDef auto fill:#d4edda,stroke:#28a745
     classDef assign fill:#cce5ff,stroke:#004085
+    classDef manual fill:#e2e3e5,stroke:#6c757d
     classDef trials fill:#fff3cd,stroke:#856404
 ```
 
@@ -52,8 +56,11 @@ Nop, AI)"]:::auto -- all pass --> D["Reviewer Assigned"]:::assign -- /run --> E[
 
 All PRs from forks use a secure checkout flow:
 
-1. **Automatic checks run on every push:** Static checks, autoreview, and validation all run automatically. Workflows use `pull_request_target` (base branch code) and only overlay `tasks/` from the PR, never executing PR workflow files.
-2. **Agent trials:** A maintainer comments `/run` to trigger full agent trials, and `/cheat` to trigger adversarial cheat trials.
+1. **Automatic checks run on every push:** Static checks and autoreview inspect
+   task files without executing the benchmark.
+2. **Execution is explicit:** A maintainer may comment `/validate`, `/run`, or
+   `/cheat`; those manual workflows use base-branch infrastructure and overlay
+   only `tasks/` from the PR.
 
 ### How `/run` and `/cheat` handle PR code
 
@@ -133,7 +140,11 @@ Enforces required metadata in `task.toml`: `author_name`, `author_email`, `diffi
 
 #### check-task-timeout
 
-Caps `[agent] timeout_sec` and `[verifier] timeout_sec` in `task.toml` at 18000 seconds (5 hours). GitHub-hosted runners enforce a 6-hour per-job limit, so the 5h cap leaves ~1h headroom for environment setup, teardown, and verifier execution before the runner kills the job. Edit `MAX_TIMEOUT_SEC` in `ci_checks/check-task-timeout.sh` to tune.
+Caps `[agent] timeout_sec` and `[verifier] timeout_sec` in `task.toml` at
+864,000 seconds (240 hours), the repository's outer safety ceiling. Real
+benchmark execution is excluded from pull-request CI and is normally stopped
+earlier by the operator. Edit `MAX_TIMEOUT_SEC` in
+`ci_checks/check-task-timeout.sh` to tune the ceiling.
 
 #### check-instruction-suffix
 
@@ -217,7 +228,10 @@ Requires `ANTHROPIC_API_KEY` secret. The rubric criteria are defined in [`rubric
 
 ## Execution Checks
 
-Runs automatically on every push to `tasks/`. Can also be triggered manually by commenting `/validate` on the PR. These checks execute task code (Dockerfiles, solutions) in a secure two-stage checkout (CI scripts from main, only `tasks/` from PR).
+Execution checks are excluded from pull-request CI. A maintainer must explicitly
+comment `/validate` on the PR. The manual workflow executes task code
+(Dockerfiles and solutions) in a secure two-stage checkout: workflow
+infrastructure comes from main and only `tasks/` is overlaid from the PR.
 
 #### Docker Build, Oracle, Nop
 
@@ -229,7 +243,9 @@ Checks for AI-generated content using GPTZero. Sends `instruction.md` and `solve
 
 ## Agent Trials
 
-Agent trials run on task PRs that have the `new task` label and passing automated checks. They fire automatically at two moments: (1) the **initial** auto-assignment after gating checks first go green, and (2) any time a reviewer is **re-requested** (typically by the author after addressing feedback). Intermediate pushes that re-green the checks do **not** auto-fire on their own — that prevents heavy push/force-push iteration from accumulating dozens of trial runs against work-in-progress commits. Maintainers can always trigger additional runs manually via `/run` or `/cheat`.
+Agent trials are never triggered by pull-request CI or reviewer assignment.
+A maintainer must explicitly use `/run` or workflow dispatch. Cheat trials
+likewise require `/cheat` or explicit workflow dispatch.
 
 Default agents, trial count, and analysis behavior are configured in [`.github/harbor-run-defaults.yml`](.github/harbor-run-defaults.yml); execution timeouts are defined per task in its `task.toml` (`timeout_sec`).
 
@@ -241,29 +257,6 @@ Each agent entry under `agents:` accepts:
 - **`env`** *(optional)* — dict of environment variables exported into the runner shell before `harbor run`. Use this for env-only knobs that harbor's agent classes pass through, e.g. `CLAUDE_CODE_MAX_OUTPUT_TOKENS: "128000"` to lift Claude Code's 64k output-token cap on long single-response edits.
 
 `/run` and `/cheat` comment overrides (`agents=…`) inherit `kwargs`/`env` from any matching config entry, matched by **agent name only** (not the full `agent:model` pair). This keeps agent-tier knobs like `reasoning_effort` and `CLAUDE_CODE_MAX_OUTPUT_TOKENS` attached to the agent even when overrides swap in a different model. There is no inline syntax for one-off `kwargs`/`env` changes — edit the YAML and push, or open a one-off PR.
-
-### Auto-trigger on reviewer request
-
-The [`auto-trials-on-review-request.yml`](.github/workflows/auto-trials-on-review-request.yml) workflow fires `/run` and `/cheat` via `workflow_dispatch` on either of two events:
-
-- `pull_request_target: review_requested` — a human re-requests a reviewer.
-- `workflow_run` completion of any of the 3 gating check workflows (`Validate Task`, `Task Implementation Rubric Review`, `Static Checks`). This covers the bot-assigned case: bot-generated `review_requested` events don't propagate as triggers under the default `GITHUB_TOKEN`, so listening on check completion is the only reliable bot-path signal without a PAT or GitHub App. We listen directly on these workflows (not on `PR Status & Reviewer Assignment`) because chained `workflow_run` events don't preserve PR head SHA — a listener on `PR Status` gets the default-branch tip instead of the PR head. The workflow fires ~3 times per commit (once per check); only the last passes gate 3, and gate 2 (checking prior `fire` job success) dedupes the rest.
-
-Trials are dispatched via `gh workflow run` rather than a reusable `workflow_call`. Reusable-workflow calls from `pull_request_target` on fork PRs fail at startup in this setup; `workflow_dispatch` runs in trusted default-branch context and avoids that.
-
-Gates (evaluated in the order listed — cheapest filter first):
-
-1. PR has the `new task` label.
-2. Dedupe — match criterion depends on the triggering event:
-   - **`workflow_run` (check completion):** skip if this workflow has **ever** successfully dispatched trials for this PR. This makes the workflow_run path strictly an *initial-green* signal — once the first auto-fire has happened, later check completions on subsequent commits no longer auto-fire on their own. The author must explicitly re-request review (or a maintainer must comment `/run`) to get trials on a later commit.
-   - **`pull_request_target` (review_requested):** skip only if a prior fire matched this PR **and** the current head SHA, so back-to-back re-requests on the same commit don't double-dispatch but a re-request against a new commit always fires.
-
-   The dedupe gate specifically checks `fire`-job success, not overall workflow conclusion, so a prior run that completed with `should_fire=false` does not block later runs from firing.
-3. The three gating check-runs (`static-checks`, `rubric-review`, `execution-checks`) are all passing on the current head SHA.
-
-Near-simultaneous runs on the same head SHA are also serialized via a `concurrency` group keyed on the head SHA, so the bot and human paths racing on the same commit cannot double-dispatch.
-
-Manual `/run` / `/cheat` comments never block the auto-trigger and can be used to force additional runs.
 
 ### Analysis (`harbor analyze`)
 
@@ -309,7 +302,7 @@ Results appear as a **Cheat Trial** column in a separate PR comment. Note that �
 | Command | What it does | Who can run it |
 |---------|-------------|----------------|
 | `/overview` | Re-generates the task overview comment (file tree, metadata, instruction) | Anyone |
-| `/validate` | Re-runs execution checks (Docker build, oracle, nop). Supports `env=backend` override. | Anyone |
+| `/validate` | Re-runs execution checks (Docker build, oracle, nop). Supports `env=backend` override. | Maintainers (write access) |
 | `/run` | Runs full agent trials across multiple agents and models | Maintainers (write access) |
 | `/cheat` | Runs adversarial cheat trials to detect reward hacking vulnerabilities | Maintainers (write access) |
 | `/review` | Re-runs the implementation rubric review | Anyone |

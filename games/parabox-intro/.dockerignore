@@ -1,0 +1,4 @@
+target
+campaign/*
+!campaign/index.tsv
+!campaign/areas.tsv

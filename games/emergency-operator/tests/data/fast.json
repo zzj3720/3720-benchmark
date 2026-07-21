@@ -1,0 +1,55 @@
+{
+  "schema": "emergency-operator-campaign-v1",
+  "id": "emergency-operator-live-test-v1",
+  "title": "Live HTTP Test",
+  "max_score": 120,
+  "shift": {
+    "id": "fast",
+    "title": "Three-second shift",
+    "duration_ms": 3000,
+    "units": [
+      {
+        "id": "medic-1",
+        "label": "Medic 1",
+        "role": "medical",
+        "base": { "x": 0, "y": 0 },
+        "speed_cells_per_minute": 60
+      }
+    ],
+    "calls": [
+      {
+        "id": "medical-1",
+        "caller": "Test caller",
+        "arrival_ms": 0,
+        "answer_window_ms": 2500,
+        "conversation_window_ms": 2500,
+        "initial_stage": "opening",
+        "stages": [
+          {
+            "id": "opening",
+            "caller": "A test patient needs a medic at dispatch.",
+            "choices": [
+              {
+                "id": "locate",
+                "text": "Confirm the location and send help.",
+                "reveal_incident": true,
+                "score_delta": 10
+              }
+            ]
+          }
+        ],
+        "incident": {
+          "id": "patient",
+          "title": "Test patient",
+          "location": { "x": 0, "y": 0 },
+          "health_milli": 100000,
+          "health_decay_milli_per_minute": 0,
+          "base_score": 10,
+          "requirements": [
+            { "role": "medical", "work_ms": 100 }
+          ]
+        }
+      }
+    ]
+  }
+}

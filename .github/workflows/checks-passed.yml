@@ -1,14 +1,14 @@
 name: PR Status & Reviewer Assignment
 
-# Orchestrator: runs when any of the 3 automated check workflows complete.
-# Checks if all 3 (static checks, autoreview, validation) passed.
+# Orchestrator: runs when either automated check workflow completes.
+# Checks if static checks and rubric review passed.
 # Posts a sticky status comment and assigns a reviewer when all checks pass.
 # May fire multiple times per commit (once per completing workflow) — the
 # comment is idempotent and reviewer assignment checks for existing requests.
 
 on:
   workflow_run:
-    workflows: ["Validate Task", "Task Implementation Rubric Review", "Static Checks"]
+    workflows: ["Task Implementation Rubric Review", "Static Checks"]
     types: [completed]
 
 jobs:
@@ -97,7 +97,6 @@ jobs:
           # Check each required workflow
           STATIC_STATUS="unknown"
           REVIEW_STATUS="unknown"
-          VALIDATE_STATUS="unknown"
 
           # Helper: get status for a check-run by name prefix
           get_check_status() {
@@ -120,11 +119,9 @@ jobs:
 
           STATIC_STATUS=$(get_check_status "static-checks")
           REVIEW_STATUS=$(get_check_status "rubric-review")
-          VALIDATE_STATUS=$(get_check_status "execution-checks")
 
           echo "static=$STATIC_STATUS" >> $GITHUB_OUTPUT
           echo "review=$REVIEW_STATUS" >> $GITHUB_OUTPUT
-          echo "validate=$VALIDATE_STATUS" >> $GITHUB_OUTPUT
 
           # Determine overall status
           # Only "pass" counts as passing. "not_applicable" means the check-run
@@ -132,7 +129,7 @@ jobs:
           # to avoid premature reviewer assignment.
           ALL_PASSED=true
           SOME_PENDING=false
-          for status in "$STATIC_STATUS" "$REVIEW_STATUS" "$VALIDATE_STATUS"; do
+          for status in "$STATIC_STATUS" "$REVIEW_STATUS"; do
             if [ "$status" = "pass" ]; then
               : # explicitly passing
             elif [ "$status" = "fail" ]; then
@@ -147,7 +144,7 @@ jobs:
           echo "all_passed=$ALL_PASSED" >> $GITHUB_OUTPUT
           echo "some_pending=$SOME_PENDING" >> $GITHUB_OUTPUT
 
-          echo "Static: $STATIC_STATUS | Review: $REVIEW_STATUS | Validate: $VALIDATE_STATUS"
+          echo "Static: $STATIC_STATUS | Review: $REVIEW_STATUS"
 
       - name: Find sticky comment links
         if: steps.pr-info.outputs.skip != 'true'
@@ -162,7 +159,6 @@ jobs:
 
           STATIC_LINK=""
           REVIEW_LINK=""
-          VALIDATE_LINK=""
 
           # Static checks comment
           STATIC_ID=$(echo "$COMMENTS" | jq -r 'select(.body | test("Static Checks")) | .id' | tail -1)
@@ -176,18 +172,11 @@ jobs:
             REVIEW_LINK="https://github.com/${REPO}/pull/${PR_NUMBER}#issuecomment-${REVIEW_ID}"
           fi
 
-          # Validation comment
-          VALIDATE_ID=$(echo "$COMMENTS" | jq -r 'select(.body | test("Task Validation|Validation Results")) | .id' | tail -1)
-          if [ -n "$VALIDATE_ID" ]; then
-            VALIDATE_LINK="https://github.com/${REPO}/pull/${PR_NUMBER}#issuecomment-${VALIDATE_ID}"
-          fi
-
           # Fallback to workflow run links
           RUN_URL="https://github.com/${REPO}/actions/runs/${{ github.event.workflow_run.id }}"
 
           echo "static_link=${STATIC_LINK:-$RUN_URL}" >> $GITHUB_OUTPUT
           echo "review_link=${REVIEW_LINK:-$RUN_URL}" >> $GITHUB_OUTPUT
-          echo "validate_link=${VALIDATE_LINK:-$RUN_URL}" >> $GITHUB_OUTPUT
 
       - uses: actions/checkout@v4
         if: steps.pr-info.outputs.skip != 'true' && steps.status.outputs.all_passed == 'true' && steps.pr-info.outputs.reviewer_assigned == 'false'
@@ -270,10 +259,8 @@ jobs:
           SOME_PENDING: ${{ steps.status.outputs.some_pending }}
           STATIC_STATUS: ${{ steps.status.outputs.static }}
           REVIEW_STATUS: ${{ steps.status.outputs.review }}
-          VALIDATE_STATUS: ${{ steps.status.outputs.validate }}
           STATIC_LINK: ${{ steps.links.outputs.static_link }}
           REVIEW_LINK: ${{ steps.links.outputs.review_link }}
-          VALIDATE_LINK: ${{ steps.links.outputs.validate_link }}
           REVIEWER: ${{ steps.assign.outputs.reviewer }}
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -288,10 +275,10 @@ jobs:
             esac
           }
 
-          # Always render a linked list of the three check stickies so reviewers
+          # Always render a linked list of the two check stickies so reviewers
           # can jump to any of them regardless of pass/fail/pending state.
           render_check_list() {
-            for pair in "Static checks:$STATIC_STATUS:$STATIC_LINK" "Autoreview:$REVIEW_STATUS:$REVIEW_LINK" "Validation:$VALIDATE_STATUS:$VALIDATE_LINK"; do
+            for pair in "Static checks:$STATIC_STATUS:$STATIC_LINK" "Autoreview:$REVIEW_STATUS:$REVIEW_LINK"; do
               NAME="${pair%%:*}"
               REST="${pair#*:}"
               STATUS="${REST%%:*}"

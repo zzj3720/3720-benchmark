@@ -1,0 +1,8 @@
+{
+  "schema": "benchmark-source-provenance-v1",
+  "campaign": "emergency-operator-pilot-v1",
+  "origin": "Original benchmark fixture authored for 3720-benchmark",
+  "copyrighted_game_data": false,
+  "inspiration": "Emergency-call triage and resource-dispatch games",
+  "notes": "This pilot contains no 911 Operator dialogue, map, audio, or other proprietary asset. It validates the real-time protocol before any separately authorized import from an owned installation."
+}

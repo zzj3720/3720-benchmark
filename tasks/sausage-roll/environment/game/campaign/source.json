@@ -1,0 +1,17 @@
+{
+  "game": "Stephen's Sausage Roll",
+  "steam_app_id": 353540,
+  "steam_build_id": "20267558",
+  "steam_depot": 353542,
+  "steam_manifest": "8330077508759653327",
+  "installed_platform": "macOS",
+  "unity_version": "2018.4.25f1",
+  "source_asset": "Sausage.app/Contents/Resources/Data/resources.assets",
+  "text_asset": "Generated/merged_binary",
+  "uncompressed_sha256": "f3d79934b249e61b339601f1dd97fc0455fe4887705d08d6f8f2373cac491be6",
+  "uncompressed_bytes": 11630025,
+  "checked_in_gzip_sha256": "a498f4bce9ebbf7825c261fe1ecb1b312f8adc07c3efb54ab8fd6bdd0005b694",
+  "entry_archive_sha256": "e9abac37fcfc492cbd04ebabaa784cad7e81f14e84f39776b7b5658d8473611e",
+  "entry_archive_contents": "86 solution-free original-engine states captured immediately after entering each puzzle",
+  "puzzle_count": 86
+}
