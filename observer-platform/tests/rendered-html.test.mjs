@@ -132,7 +132,8 @@ test("implements a real multi-run scoreboard and drill-down", async () => {
   assert.match(sausageScene, /heldFork\.position\.set\(0, 0\.72, 0\.5\)/);
   assert.match(sausageScene, /function addFork\(parent: THREE\.Group\)/);
   assert.doesNotMatch(sausageScene, /function addFork\([^)]*held/);
-  assert.match(sausage, /if \(!previousState\) return new Set<number>\(\)/);
+  assert.doesNotMatch(sausage, /changedEntityIds|previousState/);
+  assert.doesNotMatch(sausageScene, /changedIds|emissiveIntensity: changed/);
   assert.match(sausageScene, /new THREE\.PerspectiveCamera\(60/);
   assert.match(paraboxStyles, /\.parabox-cell\s*\{[\s\S]*?box-shadow: none/);
   assert.match(qaGalleryHtml, /src="\/qa-gallery-entry\.tsx"/);
@@ -143,7 +144,8 @@ test("implements a real multi-run scoreboard and drill-down", async () => {
   assert.match(qaGalleryStyles, /grid-template-columns: repeat\(4/);
   assert.match(qaGalleryStyles, /content-visibility: auto/);
   assert.match(parabox, /describeParaboxEvent/);
-  assert.match(parabox, /相较上一步有变化/);
+  assert.doesNotMatch(parabox, /changedSceneCells|data-legend="changed"|相较上一步有变化/);
+  assert.doesNotMatch(paraboxStyles, /parabox-cell\.changed|parabox-change/);
   assert.doesNotMatch(page, /JSON\.stringify\(\{ action:/);
   assert.doesNotMatch(page, /DEMO_STATES|DEMO FIXTURE/);
   await assert.rejects(access(new URL("../app/_sites-preview", import.meta.url)));

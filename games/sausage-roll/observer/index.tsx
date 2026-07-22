@@ -14,30 +14,13 @@ import { readSceneState } from "./scene-state";
 const TILE_SET_NAMES = ["GREEN", "SAND", "SNOW", "SWAMP", "TEMPLE"];
 const COOK_LABELS = ["RAW", "COOK ⟂", "COOK ∥", "BURNT"];
 
-function changedEntityIds(state: GameState, previousState?: GameState | null) {
-  if (!previousState) return new Set<number>();
-  const previous = new Map<number, string>();
-  for (const value of Array.isArray(previousState?.entities) ? previousState.entities : []) {
-    const entity = asRecord(value);
-    if (entity) previous.set(asNumber(entity.id), JSON.stringify(entity));
-  }
-  return new Set(
-    (Array.isArray(state.entities) ? state.entities : [])
-      .map(asRecord)
-      .filter((entity): entity is GameState => Boolean(entity))
-      .filter((entity) => previous.get(asNumber(entity.id)) !== JSON.stringify(entity))
-      .map((entity) => asNumber(entity.id)),
-  );
-}
-
-export function SausageState({ state, previousState }: { state: GameState; previousState?: GameState | null }) {
+export function SausageState({ state }: { state: GameState }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const runtimeRef = useRef<SausageSceneRuntime | null>(null);
-  const latestRef = useRef({ scene: readSceneState(state), changed: new Set<number>() });
+  const latestRef = useRef(readSceneState(state));
   const [renderError, setRenderError] = useState("");
   const scene = useMemo(() => readSceneState(state), [state]);
-  const changed = useMemo(() => changedEntityIds(state, previousState), [state, previousState]);
-  latestRef.current = { scene, changed };
+  latestRef.current = scene;
   const level = asRecord(state.level);
   const sausages = scene.entities.filter((entity) => entity.kind === "sausage");
 
@@ -50,7 +33,7 @@ export function SausageState({ state, previousState }: { state: GameState; previ
         if (cancelled) return;
         const runtime = new SausageScene(canvas);
         runtimeRef.current = runtime;
-        runtime.update(latestRef.current.scene, latestRef.current.changed);
+        runtime.update(latestRef.current);
         setRenderError("");
       })
       .catch((reason) => setRenderError(reason instanceof Error ? reason.message : String(reason)));
@@ -63,12 +46,12 @@ export function SausageState({ state, previousState }: { state: GameState; previ
 
   useEffect(() => {
     try {
-      runtimeRef.current?.update(scene, changed);
+      runtimeRef.current?.update(scene);
       setRenderError("");
     } catch (reason) {
       setRenderError(reason instanceof Error ? reason.message : String(reason));
     }
-  }, [scene, changed]);
+  }, [scene]);
 
   return (
     <div className="sausage-state">
@@ -100,7 +83,7 @@ export function SausageState({ state, previousState }: { state: GameState; previ
         </div>
         <div className="sausage-face-list" aria-label="每根香肠的四面状态">
           {sausages.map((sausage) => (
-            <span className={changed.has(sausage.id) ? "changed" : ""} key={sausage.id}>
+            <span key={sausage.id}>
               <b>S{sausage.id}</b>
               {(sausage.cookedFaces ?? [0, 0, 0, 0]).map((face, index) => (
                 <i data-cook={Math.max(0, Math.min(3, face))} key={index}>F{index + 1}</i>

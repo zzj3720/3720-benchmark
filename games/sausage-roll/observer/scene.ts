@@ -214,7 +214,7 @@ function sausageGeometry(faces: number[], rotation: number) {
   return geometry;
 }
 
-function addSausage(root: THREE.Group, entity: SceneEntity, changed: boolean, spectral = false) {
+function addSausage(root: THREE.Group, entity: SceneEntity, spectral = false) {
   const group = new THREE.Group();
   group.name = `sausage-${entity.id}`;
   const forward = directionVector(entity.direction);
@@ -231,8 +231,6 @@ function addSausage(root: THREE.Group, entity: SceneEntity, changed: boolean, sp
     metalness: 0,
     transparent: spectral,
     opacity: spectral ? 0.48 : 1,
-    emissive: changed ? 0xffd85a : 0x000000,
-    emissiveIntensity: changed ? 0.22 : 0,
   });
   const faces = entity.cookedFaces ?? [0, 0, 0, 0];
   const sausage = new THREE.Mesh(sausageGeometry(faces, entity.rotation), sausageMaterial);
@@ -311,7 +309,7 @@ export class SausageScene {
     this.resize();
   }
 
-  update(state: SausageSceneState, changedIds: Set<number>) {
+  update(state: SausageSceneState) {
     const previous = this.state;
     this.state = state;
     this.scene.remove(this.root);
@@ -323,8 +321,8 @@ export class SausageScene {
     addTerrain(this.root, state, palette);
     for (const entity of state.entities) {
       if (entity.kind === "player") addPlayer(this.root, entity);
-      else if (entity.kind === "sausage") addSausage(this.root, entity, changedIds.has(entity.id));
-      else if (entity.kind === "spectral_sausage") addSausage(this.root, entity, changedIds.has(entity.id), true);
+      else if (entity.kind === "sausage") addSausage(this.root, entity);
+      else if (entity.kind === "spectral_sausage") addSausage(this.root, entity, true);
       else if (entity.kind === "fork") addDetachedFork(this.root, entity);
     }
     if (state.exit) addExit(this.root, state.exit);

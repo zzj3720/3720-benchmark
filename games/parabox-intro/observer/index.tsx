@@ -178,25 +178,6 @@ function blockAt(space: GameState | undefined, row: number, column: number) {
   );
 }
 
-function changedSceneCells(
-  scene: SceneGraph,
-  previousScene: SceneGraph | null,
-  spaceId: number,
-) {
-  if (!previousScene) return new Set<string>();
-  const map = sceneMap(scene, spaceId);
-  const previousMap = sceneMap(previousScene, spaceId);
-  return new Set(
-    map.flatMap((row, rowIndex) =>
-      row.flatMap((cell, columnIndex) =>
-        asString(cell, " ") === asString(previousMap[rowIndex]?.[columnIndex], " ")
-          ? []
-          : [`${rowIndex}:${columnIndex}`],
-      ),
-    ),
-  );
-}
-
 function sceneCellLabel(
   symbol: string,
   block: GameState | null | undefined,
@@ -232,7 +213,6 @@ function PlayerFace({ block }: { block?: GameState | null }) {
 function BoxFace({
   block,
   scene,
-  previousScene,
   depth,
   scale,
   flipH,
@@ -240,7 +220,6 @@ function BoxFace({
 }: {
   block?: GameState | null;
   scene?: SceneGraph;
-  previousScene?: SceneGraph | null;
   depth: number;
   scale: number;
   flipH: boolean;
@@ -265,7 +244,6 @@ function BoxFace({
       {canRender ? (
         <SpaceGrid
           scene={scene}
-          previousScene={previousScene}
           spaceId={subspace}
           depth={depth + 1}
           scale={scale}
@@ -281,7 +259,6 @@ function BoxFace({
 
 function SpaceGrid({
   scene,
-  previousScene,
   spaceId,
   depth,
   scale,
@@ -290,7 +267,6 @@ function SpaceGrid({
   focusSubspace = -1,
 }: {
   scene: SceneGraph;
-  previousScene: SceneGraph | null;
   spaceId: number;
   depth: number;
   scale: number;
@@ -303,7 +279,6 @@ function SpaceGrid({
   const width = asNumber(space?.width, map[0]?.length ?? 1);
   const height = asNumber(space?.height, map.length || 1);
   const span = Math.max(width, height);
-  const changed = changedSceneCells(scene, previousScene, spaceId);
   const displayedMap = flipH ? map.map((row) => [...row].reverse()) : map;
   return (
     <span
@@ -324,7 +299,6 @@ function SpaceGrid({
           const sourceColumn = flipH ? width - 1 - columnIndex : columnIndex;
           const symbol = asString(cell, " ");
           const key = `${rowIndex}:${columnIndex}`;
-          const changeKey = `${rowIndex}:${sourceColumn}`;
           const block = blockAt(space, rowIndex, sourceColumn);
           const kind = asString(block?.kind, "");
           const subspace = asNumber(block?.subspace, -1);
@@ -333,7 +307,7 @@ function SpaceGrid({
           const edges = wallEdges(displayedMap, rowIndex, columnIndex);
           return (
             <span
-              className={`parabox-cell ${depth === 0 && changed.has(changeKey) ? "changed" : ""}`}
+              className="parabox-cell"
               key={key}
               role={compact ? undefined : "gridcell"}
               aria-label={compact ? undefined : sceneCellLabel(symbol, block, rowIndex, columnIndex)}
@@ -350,7 +324,6 @@ function SpaceGrid({
                 <BoxFace
                   block={block}
                   scene={scene}
-                  previousScene={previousScene}
                   depth={depth}
                   scale={childScale}
                   flipH={flipH}
@@ -370,12 +343,10 @@ function LegacyGrid({
   map,
   width,
   height,
-  changed,
 }: {
   map: Json[][];
   width: number;
   height: number;
-  changed: Set<string>;
 }) {
   const span = Math.max(width, height);
   return (
@@ -397,7 +368,7 @@ function LegacyGrid({
           const edges = wallEdges(map, rowIndex, columnIndex);
           return (
             <span
-              className={`parabox-cell ${changed.has(key) ? "changed" : ""}`}
+              className="parabox-cell"
               key={key}
               role="gridcell"
               aria-label={cellLabel(symbol, rowIndex, columnIndex)}
@@ -430,17 +401,13 @@ function LegacyGrid({
 
 export function ParaboxState({
   state,
-  previousState,
 }: {
   state: GameState;
-  previousState?: GameState | null;
 }) {
   const space = asRecord(state.space);
   const map = spaceMap(state);
   const path = spacePath(state);
-  const changed = new Set(boardChanges(state, previousState));
   const scene = observerScene(state);
-  const previousScene = observerScene(previousState);
   if (!map.length) {
     return (
       <EmptyState
@@ -508,7 +475,6 @@ export function ParaboxState({
                 >
                   <SpaceGrid
                     scene={scene}
-                    previousScene={previousScene}
                     spaceId={parentId}
                     depth={0}
                     scale={parentSpan}
@@ -521,7 +487,6 @@ export function ParaboxState({
               <span className="parabox-focus-space">
                 <SpaceGrid
                   scene={scene}
-                  previousScene={previousScene}
                   spaceId={scene.focusSpace}
                   depth={0}
                   scale={1}
@@ -535,7 +500,7 @@ export function ParaboxState({
             <div className="parabox-legacy-notice" role="note">
               旧事件只记录了当前空间；盒子内部与外层场景未记录。
             </div>
-            <LegacyGrid map={map} width={width} height={height} changed={changed} />
+            <LegacyGrid map={map} width={width} height={height} />
           </>
         )}
       </div>
@@ -545,7 +510,6 @@ export function ParaboxState({
         <span><i data-legend="box" />递归盒子（内部为真实子空间）</span>
         <span><i data-legend="box-goal" />盒子目标</span>
         <span><i data-legend="player-goal" />玩家目标</span>
-        <span><i data-legend="changed" />相较上一步有变化</span>
       </footer>
     </div>
   );

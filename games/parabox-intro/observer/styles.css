@@ -191,23 +191,6 @@
   border-radius: 50%;
 }
 
-.parabox-cell.changed::after {
-  content: "";
-  position: absolute;
-  inset: 5%;
-  z-index: 5;
-  border: 3px solid #fff189;
-  box-shadow: 0 0 14px rgba(255, 235, 98, 0.85);
-  pointer-events: none;
-  animation: parabox-change 1.15s ease-out both;
-}
-
-@keyframes parabox-change {
-  0% { opacity: 0; transform: scale(0.75); }
-  24% { opacity: 1; }
-  100% { opacity: 0.68; transform: scale(1); }
-}
-
 .parabox-box-face,
 .parabox-player-face {
   position: relative;
@@ -341,12 +324,6 @@
 .parabox-legend i[data-legend="box"] { background: #f2aa3b; box-shadow: inset 0 0 0 3px #95671d; }
 .parabox-legend i[data-legend="box-goal"] { background: transparent; border: 2px solid #88c7ed; }
 .parabox-legend i[data-legend="player-goal"] { background: transparent; border: 2px solid #88c7ed; border-radius: 50%; }
-.parabox-legend i[data-legend="changed"] { background: transparent; border: 2px solid #fff189; }
-
-@media (prefers-reduced-motion: reduce) {
-  .parabox-cell.changed::after { animation: none; }
-}
-
 @media (max-width: 620px) {
   .parabox-state { min-height: 0; }
   .parabox-space-header { align-items: flex-start; }
