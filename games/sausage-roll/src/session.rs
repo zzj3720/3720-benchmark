@@ -19,6 +19,10 @@ pub struct SessionRecord {
     pub overworld_histories: Option<Vec<Vec<Direction>>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub in_level: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_levels: Option<Vec<String>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub active_level: Option<String>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
@@ -99,7 +103,7 @@ pub struct OverworldStatus {
     pub title: String,
     pub actions: usize,
     pub bounds: BoundsView,
-    pub target: Option<EntranceView>,
+    pub entrances: Vec<EntranceView>,
     pub completed_islands: Vec<i32>,
     pub islands: Vec<IslandPoseView>,
 }
@@ -145,7 +149,8 @@ pub struct Session<'a> {
     entries: &'a CampaignEntries,
     histories: Vec<Vec<Direction>>,
     overworld_histories: Option<Vec<Vec<Direction>>>,
-    solved: usize,
+    completed: Vec<usize>,
+    active: Option<usize>,
     overworld: Option<Game3d<'a>>,
     game: Option<Game3d<'a>>,
 }
@@ -161,7 +166,8 @@ impl<'a> Session<'a> {
             entries,
             histories,
             overworld_histories,
-            solved: 0,
+            completed: Vec::new(),
+            active: None,
             overworld,
             game: None,
         })
@@ -178,18 +184,21 @@ impl<'a> Session<'a> {
         }
         match record.schema.as_str() {
             "sausage-session-v1" if record.overworld_histories.is_none() => {
+                let completed = (0..record.solved).collect::<Vec<_>>();
+                let active = (record.solved < entries.levels.len()).then_some(record.solved);
                 let mut session = Self {
                     campaign,
                     entries,
                     histories: record.histories,
                     overworld_histories: None,
-                    solved: record.solved,
+                    completed,
+                    active,
                     overworld: None,
                     game: None,
                 };
                 session.validate_solved_histories()?;
-                if session.solved < entries.levels.len() {
-                    session.game = Some(session.replay_level(session.solved)?);
+                if let Some(index) = session.active {
+                    session.game = Some(session.replay_level(index)?);
                 }
                 Ok(session)
             }
@@ -200,32 +209,72 @@ impl<'a> Session<'a> {
                 if map_histories.len() != entries.levels.len() + 1 {
                     return Err("saved session has invalid overworld dimensions".to_owned());
                 }
+                let completed = (0..record.solved).collect::<Vec<_>>();
+                let active = record.in_level.unwrap_or(false).then_some(record.solved);
                 let mut session = Self {
                     campaign,
                     entries,
                     histories: record.histories,
                     overworld_histories: Some(map_histories),
-                    solved: record.solved,
+                    completed,
+                    active,
                     overworld: None,
                     game: None,
                 };
                 session.rebuild_overworld()?;
-                if record.in_level.unwrap_or(false) {
-                    if session.solved == entries.levels.len() {
+                if let Some(index) = session.active {
+                    if index == entries.levels.len() {
                         return Err("completed campaign cannot be saved inside a level".to_owned());
                     }
                     let state = prepare_level_entry(
                         campaign,
-                        &entries.levels[session.solved],
+                        &entries.levels[index],
                         session.overworld.as_mut().expect("restored map exists"),
                     )?;
                     session.game = Some(replay_entry_state(
                         campaign,
-                        &entries.levels[session.solved],
+                        &entries.levels[index],
                         &state,
-                        &session.histories[session.solved],
+                        &session.histories[index],
                     )?);
                 }
+                Ok(session)
+            }
+            "sausage-session-v3" => {
+                let map_histories = record
+                    .overworld_histories
+                    .ok_or_else(|| "v3 saved session is missing overworld histories".to_owned())?;
+                if map_histories.len() != entries.levels.len() + 1 {
+                    return Err("saved session has invalid overworld dimensions".to_owned());
+                }
+                let completed = resolve_level_indices(
+                    entries,
+                    record
+                        .completed_levels
+                        .ok_or_else(|| "v3 saved session is missing completed levels".to_owned())?,
+                )?;
+                if completed.len() != record.solved {
+                    return Err("saved session score does not match completed levels".to_owned());
+                }
+                let active = record
+                    .active_level
+                    .map(|id| resolve_level_index(entries, &id))
+                    .transpose()?;
+                if active.is_some_and(|index| completed.contains(&index)) {
+                    return Err("saved session has an already completed active level".to_owned());
+                }
+                let mut session = Self {
+                    campaign,
+                    entries,
+                    histories: record.histories,
+                    overworld_histories: Some(map_histories),
+                    completed,
+                    active,
+                    overworld: None,
+                    game: None,
+                };
+                session.rebuild_overworld()?;
+                session.rebuild_active_level()?;
                 Ok(session)
             }
             schema => Err(format!("unknown session schema {schema:?}")),
@@ -235,18 +284,27 @@ impl<'a> Session<'a> {
     pub fn record(&self) -> SessionRecord {
         SessionRecord {
             schema: if self.overworld_histories.is_some() {
-                "sausage-session-v2"
+                "sausage-session-v3"
             } else {
                 "sausage-session-v1"
             }
             .to_owned(),
-            solved: self.solved,
+            solved: self.completed.len(),
             histories: self.histories.clone(),
             overworld_histories: self.overworld_histories.clone(),
             in_level: self
                 .overworld_histories
                 .as_ref()
                 .map(|_| self.game.is_some()),
+            completed_levels: self.overworld_histories.as_ref().map(|_| {
+                self.completed
+                    .iter()
+                    .map(|index| self.entries.levels[*index].id.clone())
+                    .collect()
+            }),
+            active_level: self
+                .active
+                .map(|index| self.entries.levels[index].id.clone()),
         }
     }
 
@@ -260,49 +318,40 @@ impl<'a> Session<'a> {
 
     fn snapshot_with_map(&self, include_map: bool) -> Result<GameSnapshot, String> {
         let total = self.entries.levels.len();
+        let solved = self.completed.len();
         let campaign = CampaignStatus {
             id: CAMPAIGN_ID,
-            score: self.solved,
-            solved: self.solved,
+            score: solved,
+            solved,
             total,
-            complete: self.solved == total,
+            complete: solved == total,
         };
         if let Some(game) = &self.game {
-            let entry = &self.entries.levels[self.solved];
+            let index = self
+                .active
+                .ok_or_else(|| "active game has no level index".to_owned())?;
+            let entry = &self.entries.levels[index];
             let level = LevelStatus {
                 ordinal: entry.ordinal,
                 id: entry.id.clone(),
                 title: level_title(self.campaign, &entry.id)?,
                 status: if game.won() { "cooked" } else { "in_progress" }.to_owned(),
-                actions: self.histories[self.solved].len(),
+                actions: self.histories[index].len(),
                 tile_set: level_tile_set(game, &entry.id),
             };
             return snapshot_from_game(game, campaign, level);
         }
         if let Some(overworld) = &self.overworld {
-            let level = self
+            let entrances = self
                 .entries
                 .levels
-                .get(self.solved)
-                .map(|entry| -> Result<LevelStatus, String> {
-                    Ok(LevelStatus {
-                        ordinal: entry.ordinal,
-                        id: entry.id.clone(),
-                        title: level_title(self.campaign, &entry.id)?,
-                        status: "available".to_owned(),
-                        actions: self.histories[self.solved].len(),
-                        tile_set: entry_tile_set(entry),
-                    })
-                })
-                .transpose()?;
+                .iter()
+                .enumerate()
+                .filter(|(index, _)| !self.completed.contains(index))
+                .map(|(_, entry)| entrance_view(self.campaign, &overworld.world, entry))
+                .collect::<Result<Vec<_>, _>>()?;
             let (player, entities, tiles) = project_overworld(&overworld.world)?;
             let bounds = world_bounds(&overworld.world)?;
-            let target = self
-                .entries
-                .levels
-                .get(self.solved)
-                .map(|entry| entrance_view(self.campaign, &overworld.world, entry))
-                .transpose()?;
             let completed_islands = overworld
                 .world
                 .entities
@@ -313,22 +362,22 @@ impl<'a> Session<'a> {
             return Ok(GameSnapshot {
                 schema: "sausage-state-v2",
                 campaign,
-                status: if self.solved == total {
+                status: if solved == total {
                     "complete"
                 } else {
                     "in_progress"
                 }
                 .to_owned(),
                 mode: "overworld",
-                level,
+                level: None,
                 overworld: Some(OverworldStatus {
                     title: "Land's End".to_owned(),
                     actions: self
                         .overworld_histories
                         .as_ref()
-                        .map_or(0, |histories| histories[self.solved].len()),
+                        .map_or(0, |histories| histories[solved].len()),
                     bounds: bounds.clone(),
-                    target,
+                    entrances,
                     completed_islands,
                     islands: island_poses(&overworld.world),
                 }),
@@ -370,14 +419,12 @@ impl<'a> Session<'a> {
                     ordinal: entry.ordinal,
                     id: entry.id.clone(),
                     title: level_title(self.campaign, &entry.id)?,
-                    status: if index < self.solved {
+                    status: if self.completed.contains(&index) {
                         "solved"
-                    } else if index == self.solved && self.game.is_some() {
+                    } else if self.active == Some(index) {
                         "current"
-                    } else if index == self.solved {
-                        "available"
                     } else {
-                        "locked"
+                        "available"
                     }
                     .to_owned(),
                     actions: self.histories[index].len(),
@@ -397,7 +444,9 @@ impl<'a> Session<'a> {
         let mut solved_levels = Vec::new();
         for direction in directions {
             if let Some(game) = self.game.as_mut() {
-                let index = self.solved;
+                let index = self
+                    .active
+                    .ok_or_else(|| "active game has no level index".to_owned())?;
                 let did_move = game.step(*direction)?;
                 self.histories[index].push(*direction);
                 accepted.push(did_move);
@@ -413,7 +462,8 @@ impl<'a> Session<'a> {
                         &self.entries.levels[index].id,
                     )?;
                     solved_levels.push(self.entries.levels[index].id.clone());
-                    self.solved += 1;
+                    self.completed.push(index);
+                    self.active = None;
                     if let Some(overworld) = self.overworld.as_mut() {
                         apply_completion(
                             self.campaign,
@@ -422,14 +472,20 @@ impl<'a> Session<'a> {
                             index,
                             &exit_player,
                             &island_deltas,
+                            &self.completed,
                         )?;
                         self.game = None;
                     } else {
-                        self.game = self
-                            .entries
-                            .levels
-                            .get(self.solved)
-                            .map(|entry| Game3d::from_state(self.campaign, &entry.state))
+                        let next = (0..self.entries.levels.len())
+                            .find(|candidate| !self.completed.contains(candidate));
+                        self.active = next;
+                        self.game = next
+                            .map(|candidate| {
+                                Game3d::from_state(
+                                    self.campaign,
+                                    &self.entries.levels[candidate].state,
+                                )
+                            })
                             .transpose()?;
                     }
                     break;
@@ -443,15 +499,11 @@ impl<'a> Session<'a> {
             let did_move = overworld.step(*direction)?;
             self.overworld_histories
                 .as_mut()
-                .expect("overworld session has map histories")[self.solved]
-                .push(*direction);
+                .expect("overworld session has map histories")[self.completed.len()]
+            .push(*direction);
             accepted.push(did_move);
-            if let Some(entry) = self.entries.levels.get(self.solved)
-                && at_entrance(self.campaign, overworld, entry)?
-            {
-                entered_levels.push(entry.id.clone());
-                let state = prepare_level_entry(self.campaign, entry, overworld)?;
-                self.game = Some(Game3d::from_state(self.campaign, &state)?);
+            if let Some(id) = self.enter_level_at_current_position()? {
+                entered_levels.push(id);
                 break;
             }
         }
@@ -474,26 +526,19 @@ impl<'a> Session<'a> {
         }
         let mut undone = 0;
         for _ in 0..count {
-            if self.game.is_some() && self.histories[self.solved].pop().is_some() {
+            if let Some(index) = self.active
+                && self.histories[index].pop().is_some()
+            {
                 self.rebuild_overworld()?;
-                let state = prepare_level_entry(
-                    self.campaign,
-                    &self.entries.levels[self.solved],
-                    self.overworld.as_mut().expect("rebuilt map exists"),
-                )?;
-                self.game = Some(replay_entry_state(
-                    self.campaign,
-                    &self.entries.levels[self.solved],
-                    &state,
-                    &self.histories[self.solved],
-                )?);
+                self.rebuild_active_level()?;
                 undone += 1;
                 continue;
             }
             if self.game.is_some() {
                 self.game = None;
+                self.active = None;
             }
-            if self.overworld_histories.as_mut().expect("map histories")[self.solved]
+            if self.overworld_histories.as_mut().expect("map histories")[self.completed.len()]
                 .pop()
                 .is_some()
             {
@@ -501,28 +546,15 @@ impl<'a> Session<'a> {
                 undone += 1;
                 continue;
             }
-            if self.solved == 0 {
+            let Some(index) = self.completed.pop() else {
                 break;
-            }
-            self.solved -= 1;
-            if self.histories[self.solved].pop().is_none() {
-                return Err(format!(
-                    "solved level {} has no action to undo",
-                    self.solved + 1
-                ));
+            };
+            self.active = Some(index);
+            if self.histories[index].pop().is_none() {
+                return Err(format!("solved level {} has no action to undo", index + 1));
             }
             self.rebuild_overworld()?;
-            let state = prepare_level_entry(
-                self.campaign,
-                &self.entries.levels[self.solved],
-                self.overworld.as_mut().expect("rebuilt map exists"),
-            )?;
-            self.game = Some(replay_entry_state(
-                self.campaign,
-                &self.entries.levels[self.solved],
-                &state,
-                &self.histories[self.solved],
-            )?);
+            self.rebuild_active_level()?;
             undone += 1;
         }
         Ok(undone)
@@ -530,34 +562,29 @@ impl<'a> Session<'a> {
 
     pub fn restart(&mut self) -> Result<(), String> {
         if self.overworld_histories.is_none() {
-            if self.solved == self.entries.levels.len() {
+            let Some(index) = self.active else {
                 return Err("campaign is already complete".to_owned());
-            }
-            self.histories[self.solved].clear();
+            };
+            self.histories[index].clear();
             self.game = Some(Game3d::from_state(
                 self.campaign,
-                &self.entries.levels[self.solved].state,
+                &self.entries.levels[index].state,
             )?);
             return Ok(());
         }
-        if self.game.is_some() {
-            self.histories[self.solved].clear();
+        if let Some(index) = self.active {
+            self.histories[index].clear();
             self.rebuild_overworld()?;
-            let state = prepare_level_entry(
-                self.campaign,
-                &self.entries.levels[self.solved],
-                self.overworld.as_mut().expect("rebuilt map exists"),
-            )?;
-            self.game = Some(Game3d::from_state(self.campaign, &state)?);
+            self.rebuild_active_level()?;
         } else {
-            self.overworld_histories.as_mut().expect("map histories")[self.solved].clear();
+            self.overworld_histories.as_mut().expect("map histories")[self.completed.len()].clear();
             self.rebuild_overworld()?;
         }
         Ok(())
     }
 
     fn validate_solved_histories(&self) -> Result<(), String> {
-        for index in 0..self.solved {
+        for index in self.completed.iter().copied() {
             let game = self.replay_level(index)?;
             if !game.can_exit() {
                 return Err(format!(
@@ -569,23 +596,49 @@ impl<'a> Session<'a> {
         Ok(())
     }
 
+    fn enter_level_at_current_position(&mut self) -> Result<Option<String>, String> {
+        let overworld = self
+            .overworld
+            .as_ref()
+            .ok_or_else(|| "campaign has no overworld".to_owned())?;
+        let mut entrance = None;
+        for (index, entry) in self.entries.levels.iter().enumerate() {
+            if !self.completed.contains(&index) && at_entrance(self.campaign, overworld, entry)? {
+                entrance = Some(index);
+                break;
+            }
+        }
+        let Some(index) = entrance else {
+            return Ok(None);
+        };
+        let entry = &self.entries.levels[index];
+        let state = prepare_level_entry(
+            self.campaign,
+            entry,
+            self.overworld.as_mut().expect("overworld still exists"),
+        )?;
+        self.active = Some(index);
+        self.game = Some(Game3d::from_state(self.campaign, &state)?);
+        Ok(Some(entry.id.clone()))
+    }
+
     fn rebuild_overworld(&mut self) -> Result<(), String> {
         let histories = self
             .overworld_histories
             .as_ref()
             .ok_or_else(|| "legacy session has no overworld".to_owned())?;
         let mut overworld = initial_overworld(self.campaign)?;
-        for (index, map_history) in histories.iter().enumerate().take(self.solved + 1) {
+        for (segment, map_history) in histories.iter().enumerate().take(self.completed.len() + 1) {
             for (action, direction) in map_history.iter().copied().enumerate() {
                 overworld.step(direction).map_err(|error| {
                     format!(
                         "overworld segment {} action {}: {error}",
-                        index + 1,
+                        segment + 1,
                         action + 1
                     )
                 })?;
             }
-            if index < self.solved {
+            if let Some(index) = self.completed.get(segment).copied() {
                 let state = prepare_level_entry(
                     self.campaign,
                     &self.entries.levels[index],
@@ -613,6 +666,7 @@ impl<'a> Session<'a> {
                     index,
                     exit_player,
                     &island_deltas,
+                    &self.completed[..=segment],
                 )?;
             }
         }
@@ -620,25 +674,48 @@ impl<'a> Session<'a> {
         Ok(())
     }
 
+    fn rebuild_active_level(&mut self) -> Result<(), String> {
+        let Some(index) = self.active else {
+            self.game = None;
+            return Ok(());
+        };
+        let state = prepare_level_entry(
+            self.campaign,
+            &self.entries.levels[index],
+            self.overworld.as_mut().expect("rebuilt map exists"),
+        )?;
+        self.game = Some(replay_entry_state(
+            self.campaign,
+            &self.entries.levels[index],
+            &state,
+            &self.histories[index],
+        )?);
+        Ok(())
+    }
+
     fn undo_legacy(&mut self, count: usize) -> Result<usize, String> {
         let mut undone = 0;
         for _ in 0..count {
-            if self.solved == self.entries.levels.len() || self.histories[self.solved].is_empty() {
-                if self.solved == 0 {
+            let current = self.active.or_else(|| self.completed.last().copied());
+            let Some(index) = current else {
+                break;
+            };
+            if self.active.is_none() || self.histories[index].is_empty() {
+                if self.completed.is_empty() {
                     break;
                 }
-                self.solved -= 1;
+                self.active = self.completed.pop();
             }
-            if self.histories[self.solved].pop().is_none() {
+            let index = self.active.expect("legacy active level");
+            if self.histories[index].pop().is_none() {
                 break;
             }
             undone += 1;
         }
-        self.game = if self.solved < self.entries.levels.len() {
-            Some(self.replay_level(self.solved)?)
-        } else {
-            None
-        };
+        self.game = self
+            .active
+            .map(|index| self.replay_level(index))
+            .transpose()?;
         Ok(undone)
     }
 
@@ -655,6 +732,29 @@ impl<'a> Session<'a> {
         }
         Ok(game)
     }
+}
+
+fn resolve_level_index(entries: &CampaignEntries, id: &str) -> Result<usize, String> {
+    entries
+        .levels
+        .iter()
+        .position(|entry| entry.id == id)
+        .ok_or_else(|| format!("saved session references unknown level {id:?}"))
+}
+
+fn resolve_level_indices(
+    entries: &CampaignEntries,
+    ids: Vec<String>,
+) -> Result<Vec<usize>, String> {
+    let mut indices = Vec::with_capacity(ids.len());
+    for id in ids {
+        let index = resolve_level_index(entries, &id)?;
+        if indices.contains(&index) {
+            return Err(format!("saved session repeats completed level {id:?}"));
+        }
+        indices.push(index);
+    }
+    Ok(indices)
 }
 
 type WorldProjection = (Option<EntityView>, Vec<EntityView>, Vec<TileView>);
@@ -868,6 +968,7 @@ fn apply_completion(
     index: usize,
     exit_player: &Entity,
     island_deltas: &[(String, Coord)],
+    completion_order: &[usize],
 ) -> Result<(), String> {
     let player_id = overworld.world.player_id();
     let map_player = overworld
@@ -888,8 +989,12 @@ fn apply_completion(
             .iter_mut()
             .find(|entity| entity.entity_type == EntityType::Island && entity.data == *name)
             .ok_or_else(|| format!("overworld has no island {name:?}"))?;
-        island.pos = island.pos + *delta;
+        island.pos.x += delta.x;
+        island.pos.y += delta.y;
     }
+    let previous_checkpoint = index
+        .checked_sub(1)
+        .map(|previous| &entries.levels[previous].overworld);
     for island in overworld
         .world
         .entities
@@ -902,21 +1007,29 @@ fn apply_completion(
             .iter()
             .find(|entity| entity.entity_type == EntityType::Island && entity.data == island.data)
             .ok_or_else(|| format!("overworld checkpoint lost island {:?}", island.data))?;
-        island.pos.z = checkpoint.pos.z;
+        let previous_z = previous_checkpoint
+            .and_then(|state| {
+                state.entities.iter().find(|entity| {
+                    entity.entity_type == EntityType::Island && entity.data == island.data
+                })
+            })
+            .map_or(checkpoint.pos.z, |entity| entity.pos.z);
+        island.pos.z += checkpoint.pos.z - previous_z;
     }
     let checkpoint_player = entries.levels[index]
         .overworld
         .player()
         .ok_or_else(|| format!("overworld checkpoint {} has no player", index + 1))?;
+    let player_z_adjustment = checkpoint_player.pos.z - exit_player.pos.z;
     overworld
         .world
         .entity_mut(player_id)
         .expect("overworld player still exists")
         .pos
-        .z = checkpoint_player.pos.z;
-    let completed = entries.levels[..=index]
+        .z += player_z_adjustment;
+    let completed = completion_order
         .iter()
-        .map(|entry| puzzle_root(&entry.id))
+        .map(|completed_index| puzzle_root(&entries.levels[*completed_index].id))
         .collect::<HashSet<_>>();
     for temple in campaign.temples.iter().filter(|temple| {
         temple
@@ -1368,12 +1481,85 @@ mod tests {
         let map = session.observer_snapshot().expect("observer snapshot");
 
         assert_eq!(snapshot.mode, "overworld");
-        assert_eq!(snapshot.level.expect("target").title, "Lachrymose Head");
+        assert!(snapshot.level.is_none());
+        assert_eq!(snapshot.overworld.expect("overworld").entrances.len(), 86);
         assert!(snapshot.tiles.len() < 2_000);
         let map = map.overworld_map.expect("map");
         assert_eq!(map.entrances.len(), 86);
         assert_eq!(map.islands.len(), 205);
         assert_eq!(map.tiles.len(), 16_261);
+    }
+
+    #[test]
+    fn any_reached_unsolved_entrance_can_be_completed_and_restored() {
+        let (campaign, entries, oracle) = inputs();
+        let index = 1;
+        let mut session = Session::new(&campaign, &entries).expect("session");
+        let entrance = entrance_view(
+            &campaign,
+            &session.overworld.as_ref().expect("overworld").world,
+            &entries.levels[index],
+        )
+        .expect("second entrance");
+        let world = &mut session.overworld.as_mut().expect("overworld").world;
+        let player = world
+            .entity_mut(world.player_id())
+            .expect("overworld player");
+        player.pos = entrance.pos;
+        player.direction = entrance.direction;
+
+        assert_eq!(
+            session
+                .enter_level_at_current_position()
+                .expect("enter arbitrary level"),
+            Some(entries.levels[index].id.clone())
+        );
+        assert_eq!(session.active, Some(index));
+        assert_eq!(
+            session
+                .snapshot()
+                .expect("puzzle")
+                .level
+                .expect("level")
+                .ordinal,
+            index + 1
+        );
+        let solved = session
+            .move_many(&oracle.segments[index].replay.directions)
+            .expect("solve arbitrary level");
+        assert_eq!(solved.solved_levels, [entries.levels[index].id.as_str()]);
+        assert_eq!(session.completed, [index]);
+        assert_eq!(session.levels().expect("levels")[0].status, "available");
+        assert_eq!(session.levels().expect("levels")[index].status, "solved");
+
+        let mut restored =
+            Session::restore(&campaign, &entries, session.record()).expect("restore");
+        assert_eq!(restored.completed, [index]);
+        assert_eq!(
+            restored
+                .snapshot()
+                .expect("restored map")
+                .overworld
+                .expect("overworld")
+                .entrances
+                .len(),
+            85
+        );
+        assert_eq!(restored.undo(1).expect("undo arbitrary completion"), 1);
+        assert!(restored.completed.is_empty());
+        assert_eq!(restored.active, Some(index));
+        let resumed = Session::restore(&campaign, &entries, restored.record())
+            .expect("restore arbitrary active level");
+        assert_eq!(resumed.active, Some(index));
+        assert_eq!(
+            resumed
+                .snapshot()
+                .expect("resumed puzzle")
+                .level
+                .expect("level")
+                .ordinal,
+            index + 1
+        );
     }
 
     #[test]
@@ -1494,7 +1680,7 @@ mod tests {
                 session.overworld.as_ref().and_then(|game| entrance_view(
                     &campaign,
                     &game.world,
-                    &entries.levels[session.solved]
+                    &entries.levels[index]
                 )
                 .ok()),
                 session.overworld.as_ref().map(|game| game

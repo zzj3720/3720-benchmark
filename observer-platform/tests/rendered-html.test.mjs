@@ -141,7 +141,10 @@ test("implements a real multi-run scoreboard and drill-down", async () => {
   assert.match(sausageScene, /new THREE\.PerspectiveCamera\(60/);
   assert.match(sausageScene, /addEntrances\(this\.root, state\)/);
   assert.match(sausageScene, /state\.mode === "overworld"/);
+  assert.match(sausageScene, /orientForward\(group, entrance\.direction\)/);
+  assert.match(sausageScene, /new THREE\.ConeGeometry\(0\.2, 0\.38, 4\)/);
   assert.match(sausageSceneState, /state\.overworld_map/);
+  assert.match(sausage, /ALL ENTRANCES · ARROWS SHOW FACING/);
   assert.match(sausageSceneState, /tile\.variant === -1/);
   assert.match(page, /withSharedGameState/);
   assert.match(paraboxStyles, /\.parabox-cell\s*\{[\s\S]*?box-shadow: none/);

@@ -279,29 +279,39 @@ function addEntrances(root: THREE.Group, state: SausageSceneState) {
     const group = new THREE.Group();
     group.name = `entrance-${entrance.ordinal}`;
     group.position.copy(worldPosition(entrance.pos));
-    const color = entrance.status === "target"
-      ? 0xffd15c
-      : entrance.status === "complete"
-        ? 0x8bdc78
-        : 0x566b70;
+    orientForward(group, entrance.direction);
+    const available = entrance.status === "available";
+    const color = available ? 0xffd15c : 0x8bdc78;
     const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(entrance.status === "target" ? 0.28 : 0.18, 0.045, 6, 18),
+      new THREE.TorusGeometry(available ? 0.28 : 0.18, available ? 0.06 : 0.045, 6, 18),
       new THREE.MeshStandardMaterial({
         color,
         emissive: color,
-        emissiveIntensity: entrance.status === "target" ? 0.85 : 0.14,
+        emissiveIntensity: available ? 0.62 : 0.14,
         roughness: 0.62,
       }),
     );
     ring.rotation.x = -Math.PI / 2;
     ring.position.y = 0.06;
     group.add(ring);
-    if (entrance.status === "target") {
+    if (available) {
+      const arrowMaterial = new THREE.MeshStandardMaterial({
+        color,
+        emissive: color,
+        emissiveIntensity: 0.7,
+        roughness: 0.55,
+      });
+      const shaft = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.055, 0.62), arrowMaterial);
+      shaft.position.set(0, 0.11, 0.18);
+      const head = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.38, 4), arrowMaterial);
+      head.rotation.x = Math.PI / 2;
+      head.position.set(0, 0.11, 0.55);
+      group.add(shaft, head);
       const beacon = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.025, 0.025, 1.7, 6),
-        new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.74 }),
+        new THREE.CylinderGeometry(0.025, 0.025, 1.4, 6),
+        new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.55 }),
       );
-      beacon.position.y = 0.88;
+      beacon.position.y = 0.75;
       group.add(beacon);
     }
     root.add(group);

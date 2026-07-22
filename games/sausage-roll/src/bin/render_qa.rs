@@ -138,11 +138,7 @@ fn features(state: &GameSnapshot) -> Features {
         .max()
         .expect("sample should have visible terrain");
     Features {
-        tile_set: state
-            .level
-            .as_ref()
-            .map(|level| level.tile_set)
-            .expect("sample should have an active level"),
+        tile_set: state.level.as_ref().map_or(0, |level| level.tile_set),
         tiles: tiles.len(),
         height_span: max_z - min_z + 1,
         sausages: state

@@ -22,8 +22,9 @@ export type SceneEntrance = {
   ordinal: number;
   title: string;
   pos: Coord3;
+  direction: string;
   islandId: number;
-  status: "complete" | "target" | "locked";
+  status: "complete" | "available";
 };
 export type SausageSceneState = {
   mode: string;
@@ -114,8 +115,6 @@ export function readSceneState(state: GameState): SausageSceneState {
         ...tile,
         pos: translated(tile.pos, initialIslands.get(tile.sourceId), currentIslands.get(tile.sourceId)),
       }));
-    const target = asRecord(overworld?.target);
-    const targetIsland = asNumber(target?.island_id, -1);
     entrances = (Array.isArray(map.entrances) ? map.entrances : []).flatMap((value) => {
       const entrance = asRecord(value);
       if (!entrance) return [];
@@ -124,8 +123,9 @@ export function readSceneState(state: GameState): SausageSceneState {
         ordinal: asNumber(entrance.ordinal),
         title: asString(entrance.title),
         pos: translated(coord(entrance.pos), initialIslands.get(islandId), currentIslands.get(islandId)),
+        direction: asString(entrance.direction, "none"),
         islandId,
-        status: completed.has(islandId) ? "complete" : islandId === targetIsland ? "target" : "locked",
+        status: completed.has(islandId) ? "complete" : "available",
       }];
     });
   }
@@ -133,7 +133,7 @@ export function readSceneState(state: GameState): SausageSceneState {
   const exit = asRecord(state.exit);
   return {
     mode,
-    levelKey: `${mode}:${asNumber(level?.ordinal)}:${asString(level?.id)}`,
+    levelKey: `${mode}:${asNumber(asRecord(state.campaign)?.solved)}:${asNumber(level?.ordinal)}:${asString(level?.id)}`,
     tileSet: Math.max(0, Math.min(4, asNumber(level?.tile_set))),
     entities,
     tiles,

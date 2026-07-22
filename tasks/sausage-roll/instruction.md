@@ -30,14 +30,13 @@ sausage status
 sausage submit
 ```
 
-The session starts on the continuous **Land's End overworld**. Walk to the
-reported next entrance before solving its puzzle; after solving it, play resumes
-at that puzzle's exit on the same persistent map. The 86 levels form one strict
-curriculum. `levels` reports earlier levels as `solved`, the next one as
-`available` on the map or `current` inside it, and later levels as `locked`.
-`undo` can cross map/puzzle boundaries. `restart` resets the current map route
-or current puzzle. `submit` reports the current integer score but does not end
-the task.
+The session starts on the continuous **Land's End overworld**. All unfinished
+entrances are available: choose one, walk to it, and solve its puzzle. After
+solving it, play resumes at that puzzle's exit on the same persistent map.
+`levels` reports completed levels as `solved`, the entered puzzle as `current`,
+and every other unfinished level as `available`. `undo` can cross map/puzzle
+boundaries. `restart` resets the current map route or current puzzle. `submit`
+reports the current integer score but does not end the task.
 
 Every command returns one JSON object with this envelope:
 
@@ -51,9 +50,10 @@ Every command returns one JSON object with this envelope:
 ```
 
 The current world is a three-dimensional integer grid. `data.mode` is
-`overworld` or `puzzle`. On the overworld, `data.overworld.target` reports the
-next entrance's absolute position and required facing, while `data.tiles` is a
-player-centered view of the persistent map. Coordinates use
+`overworld` or `puzzle`. On the overworld, `data.overworld.entrances` reports
+every unfinished entrance's level id, absolute position, and required facing;
+the array does not recommend an order. `data.tiles` is a player-centered view
+of the persistent map. Coordinates use
 `x` west/east, `y` north/south, and `z` down/up. `data.player`,
 `data.entities`, and `data.tiles` contain explicit coordinates. Each entity
 reports:
@@ -68,9 +68,9 @@ Multiple elevations may share the same `x,y`, so always account for `z`.
 
 Core rules:
 
-- On the overworld, reach the target position in its required direction while
-  holding the fork to enter. Island movement and reward sausages persist across
-  puzzles.
+- On the overworld, reach any unfinished entrance position in its required
+  direction while holding the fork to enter. Island movement and reward
+  sausages persist across puzzles.
 - The player occupies a body cell and, while holding the fork, the cell
   immediately in front of the reported direction.
 - Walking forward/backward translates the player. Walking sideways turns the

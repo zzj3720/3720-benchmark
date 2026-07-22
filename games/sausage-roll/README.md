@@ -40,11 +40,12 @@ for each puzzle. The model-facing `Session` uses those states plus the map
 snapshot and post-puzzle map checkpoints; the direction guide remains isolated
 from runtime code and is used only for compatibility tests.
 
-The model-facing session starts on the traversable overworld. It must walk to
-the next entrance, face it, solve the puzzle, and then continues from the
-original puzzle exit on the same persistent map. The saved map snapshot is
-normalized to the campaign's untouched player and zero-progress metadata at
-load time; it does not reveal puzzle solutions.
+The model-facing session starts on the traversable overworld. Every unfinished
+puzzle entrance is available: the model chooses one, walks to its absolute
+position, faces the required direction, and enters it. After solving the
+puzzle, play continues from that puzzle's original exit on the same persistent
+map. The saved map snapshot is normalized to the campaign's untouched player
+and zero-progress metadata at load time; it does not reveal puzzle solutions.
 
 Observer snapshots expose a player-centered live projection and one reusable
 full-map description. The frontend applies current island transforms and
