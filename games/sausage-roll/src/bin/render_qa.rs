@@ -1,7 +1,8 @@
 use serde::Serialize;
 
 use sausage_terminal::{
-    Campaign, CampaignEntries, EntityType, GameSnapshot, OracleCampaign, data_root, replay_snapshot,
+    Campaign, CampaignEntries, EntityType, GameSnapshot, OracleCampaign, Replay, Session,
+    data_root, replay_snapshot,
 };
 
 const SAMPLE_COUNT: usize = 64;
@@ -53,52 +54,66 @@ fn main() {
         .validate_against(&campaign)
         .expect("walkthrough should cover the campaign");
 
-    let total_actions = oracle
+    let puzzle_actions = oracle
         .segments
         .iter()
         .map(|segment| segment.replay.directions.len())
-        .sum();
-    let samples = (0..SAMPLE_COUNT)
-        .map(|sample_index| {
-            let level_index = sample_index * (entries.levels.len() - 1) / (SAMPLE_COUNT - 1);
-            let entry = &entries.levels[level_index];
-            let segment = &oracle.segments[level_index];
-            assert_eq!(entry.id, segment.id);
-            let total_steps = segment.replay.directions.len();
-            let phase = sample_index % 5;
-            let step = if phase == 4 {
-                total_steps
-            } else {
-                total_steps.saturating_sub(1) * phase / 4
-            };
-            let state = replay_snapshot(
-                &campaign,
-                entry,
-                entries.levels.len(),
-                &segment.replay.directions[..step],
-            )
-            .unwrap_or_else(|error| panic!("{} step {step}: {error}", entry.id));
-            let features = features(&state);
-            Sample {
-                reference: format!("{:02}-{}", entry.ordinal, entry.id),
-                title: state
-                    .level
-                    .as_ref()
-                    .expect("sample should have an active level")
-                    .title
-                    .clone(),
-                area: area_name(features.tile_set),
-                step,
-                total_steps,
-                features,
-                state,
-            }
-        })
-        .collect();
+        .sum::<usize>();
+    let complete_replay = Replay::load(root.join("oracle").join("all.dem"))
+        .expect("complete walkthrough should load");
+    let mut samples = Vec::with_capacity(SAMPLE_COUNT);
+    let overworld = Session::new(&campaign, &entries)
+        .expect("overworld should load")
+        .observer_snapshot()
+        .expect("overworld should project");
+    samples.push(Sample {
+        reference: "00-overworld".to_owned(),
+        title: "Land's End".to_owned(),
+        area: "world",
+        step: 0,
+        total_steps: complete_replay.directions.len() - puzzle_actions,
+        features: features(&overworld),
+        state: overworld,
+    });
+    samples.extend((0..SAMPLE_COUNT - 1).map(|sample_index| {
+        let level_index = sample_index * (entries.levels.len() - 1) / (SAMPLE_COUNT - 2);
+        let entry = &entries.levels[level_index];
+        let segment = &oracle.segments[level_index];
+        assert_eq!(entry.id, segment.id);
+        let total_steps = segment.replay.directions.len();
+        let phase = sample_index % 5;
+        let step = if phase == 4 {
+            total_steps
+        } else {
+            total_steps.saturating_sub(1) * phase / 4
+        };
+        let state = replay_snapshot(
+            &campaign,
+            entry,
+            entries.levels.len(),
+            &segment.replay.directions[..step],
+        )
+        .unwrap_or_else(|error| panic!("{} step {step}: {error}", entry.id));
+        let features = features(&state);
+        Sample {
+            reference: format!("{:02}-{}", entry.ordinal, entry.id),
+            title: state
+                .level
+                .as_ref()
+                .expect("sample should have an active level")
+                .title
+                .clone(),
+            area: area_name(features.tile_set),
+            step,
+            total_steps,
+            features,
+            state,
+        }
+    }));
     let gallery = Gallery {
         schema: "sausage-render-qa-v1",
         source_levels: entries.levels.len(),
-        source_actions: total_actions,
+        source_actions: complete_replay.directions.len(),
         samples,
     };
     println!(
@@ -108,14 +123,16 @@ fn main() {
 }
 
 fn features(state: &GameSnapshot) -> Features {
-    let min_z = state
-        .tiles
+    let tiles = state
+        .overworld_map
+        .as_ref()
+        .map_or(state.tiles.as_slice(), |map| map.tiles.as_slice());
+    let min_z = tiles
         .iter()
         .map(|tile| tile.pos.z)
         .min()
         .expect("sample should have visible terrain");
-    let max_z = state
-        .tiles
+    let max_z = tiles
         .iter()
         .map(|tile| tile.pos.z)
         .max()
@@ -126,7 +143,7 @@ fn features(state: &GameSnapshot) -> Features {
             .as_ref()
             .map(|level| level.tile_set)
             .expect("sample should have an active level"),
-        tiles: state.tiles.len(),
+        tiles: tiles.len(),
         height_span: max_z - min_z + 1,
         sausages: state
             .entities
@@ -139,16 +156,8 @@ fn features(state: &GameSnapshot) -> Features {
             .flat_map(|entity| entity.cooked_faces.into_iter().flatten())
             .filter(|face| *face != 0)
             .count(),
-        grills: state
-            .tiles
-            .iter()
-            .filter(|tile| tile.kind == "grill")
-            .count(),
-        ladders: state
-            .tiles
-            .iter()
-            .filter(|tile| tile.kind == "ladder")
-            .count(),
+        grills: tiles.iter().filter(|tile| tile.kind == "grill").count(),
+        ladders: tiles.iter().filter(|tile| tile.kind == "ladder").count(),
         detached_fork: state
             .entities
             .iter()

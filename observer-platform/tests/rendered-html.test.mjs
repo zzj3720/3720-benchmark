@@ -68,6 +68,10 @@ test("implements a real multi-run scoreboard and drill-down", async () => {
     new URL("../../games/sausage-roll/observer/scene.ts", import.meta.url),
     "utf8",
   );
+  const sausageSceneState = await readFile(
+    new URL("../../games/sausage-roll/observer/scene-state.ts", import.meta.url),
+    "utf8",
+  );
   const qaGalleryHtml = await readFile(new URL("../qa-gallery.html", import.meta.url), "utf8");
   const qaGallery = await readFile(new URL("../qa-gallery-entry.tsx", import.meta.url), "utf8");
   const qaGalleryStyles = await readFile(new URL("../qa-gallery.css", import.meta.url), "utf8");
@@ -135,6 +139,11 @@ test("implements a real multi-run scoreboard and drill-down", async () => {
   assert.doesNotMatch(sausage, /changedEntityIds|previousState/);
   assert.doesNotMatch(sausageScene, /changedIds|emissiveIntensity: changed/);
   assert.match(sausageScene, /new THREE\.PerspectiveCamera\(60/);
+  assert.match(sausageScene, /addEntrances\(this\.root, state\)/);
+  assert.match(sausageScene, /state\.mode === "overworld"/);
+  assert.match(sausageSceneState, /state\.overworld_map/);
+  assert.match(sausageSceneState, /tile\.variant === -1/);
+  assert.match(page, /withSharedGameState/);
   assert.match(paraboxStyles, /\.parabox-cell\s*\{[\s\S]*?box-shadow: none/);
   assert.match(qaGalleryHtml, /src="\/qa-gallery-entry\.tsx"/);
   assert.doesNotMatch(qaGalleryHtml, /src="\/qa-gallery\.tsx"/);

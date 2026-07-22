@@ -17,6 +17,29 @@ SPEC.loader.exec_module(gateway)
 
 
 class LiveGatewayTests(unittest.TestCase):
+    def test_standalone_sausage_discovery_uses_a_lightweight_snapshot(self):
+        class Response:
+            def read(self):
+                return b'{"events":[]}'
+
+        with tempfile.TemporaryDirectory() as directory:
+            repository = gateway.LiveRepository(
+                Path(directory),
+                standalone_sausage_origin="http://127.0.0.1:4733",
+            )
+            with mock.patch.object(
+                gateway.urllib.request,
+                "urlopen",
+                return_value=Response(),
+            ) as urlopen:
+                sources = repository._standalone_sausage([])
+
+        self.assertEqual(len(sources), 1)
+        urlopen.assert_called_once_with(
+            "http://127.0.0.1:4733/v1/observe/snapshot?include_map=0",
+            timeout=1,
+        )
+
     def test_standalone_sausage_detail_uses_the_configured_origin(self):
         payload = {
             "events": [
@@ -55,6 +78,40 @@ class LiveGatewayTests(unittest.TestCase):
         urlopen.assert_called_once_with(
             "http://127.0.0.1:4733/v1/observe/events?after=0&limit=1000&wait_ms=0",
             timeout=2,
+        )
+
+    def test_sausage_detail_reuses_the_static_overworld_map(self):
+        static_map = {"tiles": [{"source_id": 10}], "entrances": []}
+        events = [
+            {
+                "schema": "benchmark-observer-event-v1",
+                "sequence": 1,
+                "timestamp_ms": 1000,
+                "state": {"mode": "overworld", "overworld_map": static_map},
+            },
+            {
+                "schema": "benchmark-observer-event-v1",
+                "sequence": 2,
+                "timestamp_ms": 2000,
+                "state": {"mode": "overworld", "campaign": {"score": 1, "total": 86}},
+            },
+        ]
+        source = gateway.RunSource(
+            run_id="sausage-run",
+            job_name="sausage-run",
+            task_id="sausage-roll",
+            trial_name="trial",
+            config={},
+            active=False,
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            repository = gateway.LiveRepository(Path(directory), standalone_sausage_origin=None)
+            with mock.patch.object(repository, "_events", return_value=events):
+                detail = repository._summarize(source, include_detail=True)
+
+        self.assertEqual(detail["state"]["overworld_map"], static_map)
+        self.assertTrue(
+            all("overworld_map" not in event["state"] for event in detail["events"])
         )
 
     def test_parabox_private_scene_is_merged_only_into_live_projection(self):

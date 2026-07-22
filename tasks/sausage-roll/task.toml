@@ -11,7 +11,7 @@ artifacts = [
 
 [task]
 name = "3720/sausage-roll"
-description = "Maximize the integer score by solving the complete 86-puzzle Stephen's Sausage Roll campaign"
+description = "Maximize the integer score by traversing the overworld and solving the complete 86-puzzle Stephen's Sausage Roll campaign"
 keywords = ["game-reasoning", "spatial-planning", "curriculum", "3d-physics"]
 
 [[task.authors]]
@@ -21,9 +21,9 @@ name = "3720"
 author_name = "3720"
 author_email = "17165520+zzj3720@users.noreply.github.com"
 author_organization = "3720"
-difficulty_explanation = "The complete 86-puzzle campaign requires long-horizon spatial planning across pushing, rolling, four-face cooking, fork attachment, gravity, moving islands, ladders, pivots, stacks, and three-dimensional passive forces. A strict original order makes the same session retain and compose mechanics learned over the full campaign."
-solution_explanation = "Inspect each three-dimensional puzzle state, move the player to cook every face of every sausage exactly once, return to the exit while holding the fork, and continue through all 86 levels."
-verification_explanation = "A separate Rust verifier initializes solution-free entry states and replays every audited command through an isolated clean-room rules engine, comparing the exact API response at each step. Each completed puzzle contributes one integer point from 0 to 86."
+difficulty_explanation = "The complete overworld and 86-puzzle campaign require long-horizon spatial planning across navigation, pushing, rolling, four-face cooking, fork attachment, gravity, moving islands, ladders, pivots, stacks, and three-dimensional passive forces. A strict original order makes the same persistent session retain and compose mechanics learned over the full campaign."
+solution_explanation = "Navigate the persistent overworld to each required entrance, inspect each three-dimensional puzzle state, cook every face of every sausage exactly once, return to the exit while holding the fork, and continue through all 86 levels."
+verification_explanation = "A separate Rust verifier initializes the solution-free persistent campaign and replays every audited command through an isolated clean-room rules engine, comparing the exact API response at each step. Each completed puzzle contributes one integer point from 0 to 86."
 relevant_experience = "Designed and implemented deterministic agent evaluation environments and terminal tasks."
 category = "game-reasoning"
 tags = ["spatial-planning", "curriculum", "3d-physics", "terminal-game"]

@@ -22,6 +22,8 @@ export function SausageState({ state }: { state: GameState }) {
   const scene = useMemo(() => readSceneState(state), [state]);
   latestRef.current = scene;
   const level = asRecord(state.level);
+  const overworld = asRecord(state.overworld);
+  const mapMode = scene.mode === "overworld";
   const sausages = scene.entities.filter((entity) => entity.kind === "sausage");
 
   useEffect(() => {
@@ -57,20 +59,22 @@ export function SausageState({ state }: { state: GameState }) {
     <div className="sausage-state">
       <header className="sausage-scene-header">
         <div>
-          <span>PUZZLE {asNumber(level?.ordinal) || "—"}</span>
-          <strong>{asString(level?.title, "Campaign complete")}</strong>
+          <span>{mapMode ? "OVERWORLD" : `PUZZLE ${asNumber(level?.ordinal) || "—"}`}</span>
+          <strong>{mapMode ? `${asString(overworld?.title, "Land's End")} · ${asString(level?.title, "Campaign complete")}` : asString(level?.title, "Campaign complete")}</strong>
         </div>
         <dl>
-          <div><dt>MOVE</dt><dd>{asNumber(level?.actions)}</dd></div>
+          <div><dt>MOVE</dt><dd>{asNumber(mapMode ? overworld?.actions : level?.actions)}</dd></div>
           <div><dt>HEIGHT</dt><dd>{scene.tiles.length ? Math.max(...scene.tiles.map((tile) => tile.pos.z)) - Math.min(...scene.tiles.map((tile) => tile.pos.z)) + 1 : 0}</dd></div>
           <div><dt>FORK</dt><dd>{scene.entities.some((entity) => entity.kind === "fork") ? "LOOSE" : "HELD"}</dd></div>
-          <div className={state.exit_ready ? "ready" : "locked"}><dt>EXIT</dt><dd>{state.exit_ready ? "READY" : "LOCKED"}</dd></div>
+          {mapMode
+            ? <div className="ready"><dt>TARGET</dt><dd>{asNumber(level?.ordinal) || "DONE"}</dd></div>
+            : <div className={state.exit_ready ? "ready" : "locked"}><dt>EXIT</dt><dd>{state.exit_ready ? "READY" : "LOCKED"}</dd></div>}
         </dl>
       </header>
       <div className="sausage-stage" data-tile-set={scene.tileSet}>
         <canvas ref={canvasRef} aria-label={`${asString(level?.title, "Sausage Roll")} 的三维关卡状态`} />
         {renderError ? <div className="sausage-render-error" role="alert">3D renderer unavailable: {renderError}</div> : null}
-        <span className="sausage-environment">{TILE_SET_NAMES[scene.tileSet] ?? "GREEN"} / CLEAN GEOMETRY</span>
+        <span className="sausage-environment">{mapMode ? "LAND'S END / FULL CAMPAIGN" : `${TILE_SET_NAMES[scene.tileSet] ?? "GREEN"} / CLEAN GEOMETRY`}</span>
         <div className="sausage-view-controls" aria-label="三维视角控制">
           <button type="button" onClick={() => runtimeRef.current?.focusPlayer()}>FOLLOW PLAYER</button>
           <button type="button" onClick={() => runtimeRef.current?.showOverview()}>FULL MAP</button>

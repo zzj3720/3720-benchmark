@@ -135,6 +135,15 @@ function actionLabel(action?: Record<string, Json> | null) {
   return asString(action?.command, "STATE").toUpperCase();
 }
 
+function withSharedGameState(
+  game: GameId,
+  state: Record<string, Json>,
+  latest: Record<string, Json>,
+) {
+  if (game !== "sausage" || state.overworld_map || !latest.overworld_map) return state;
+  return { ...state, overworld_map: latest.overworld_map };
+}
+
 export default function Home() {
   const [runs, setRuns] = useState<RunSummary[]>([]);
   const [selectedGame, setSelectedGame] = useState<GameId>("parabox");
@@ -457,8 +466,14 @@ function RunDetails({
 
   if (!run) return <EmptyState title="正在接入测试" body="等待权威 sidecar 状态。" />;
   const detail = run as RunDetail;
-  const state = activeEvent?.state ?? detail.state ?? {};
-  const previousState = previousEvent?.state ?? null;
+  const state = withSharedGameState(
+    run.game,
+    activeEvent?.state ?? detail.state ?? {},
+    detail.state ?? {},
+  );
+  const previousState = previousEvent?.state
+    ? withSharedGameState(run.game, previousEvent.state, detail.state ?? {})
+    : null;
   const eventDescription = activeEvent
     ? describeGameEvent(run.game, activeEvent, previousEvent)
     : null;

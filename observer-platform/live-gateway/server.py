@@ -508,11 +508,20 @@ class LiveRepository:
         try:
             snapshot = json.loads(
                 urllib.request.urlopen(
-                    f"{self.standalone_sausage_origin}/v1/observe/snapshot", timeout=1
+                    f"{self.standalone_sausage_origin}/v1/observe/snapshot?include_map=0",
+                    timeout=1,
                 ).read()
             )
         except (OSError, ValueError):
             return []
+        snapshot_events = snapshot.get("events")
+        started_at = (
+            snapshot_events[0].get("timestamp_ms")
+            if isinstance(snapshot_events, list)
+            and snapshot_events
+            and isinstance(snapshot_events[0], dict)
+            else None
+        )
         return [
             RunSource(
                 run_id="sausage-sidecar-only",
@@ -529,7 +538,7 @@ class LiveRepository:
                     ]
                 },
                 active=True,
-                started_at=snapshot.get("events", [{}])[0].get("timestamp_ms"),
+                started_at=started_at,
             )
         ]
 
@@ -607,6 +616,19 @@ class LiveRepository:
             normalized[-1] if normalized else {},
         )
         state = latest.get("state") if isinstance(latest.get("state"), dict) else {}
+        overworld_map = None
+        if source.task_id == "sausage-roll" and state:
+            overworld_map = next(
+                (
+                    event_state["overworld_map"]
+                    for event in reversed(normalized)
+                    if isinstance((event_state := event.get("state")), dict)
+                    and isinstance(event_state.get("overworld_map"), dict)
+                ),
+                None,
+            )
+            if overworld_map is not None:
+                state = {**state, "overworld_map": overworld_map}
         if source.task_id == "parabox-intro" and not state:
             reference = str(latest.get("selected") or "")
             score = int(latest.get("score") or 0)
@@ -655,10 +677,25 @@ class LiveRepository:
             "score_history": history,
         }
         if include_detail:
+            detail_events = normalized[-120:]
+            if overworld_map is not None:
+                detail_events = [
+                    {
+                        **event,
+                        "state": {
+                            key: value
+                            for key, value in event["state"].items()
+                            if key != "overworld_map"
+                        },
+                    }
+                    if isinstance(event.get("state"), dict)
+                    else event
+                    for event in detail_events
+                ]
             result.update(
                 {
                     "state": state,
-                    "events": normalized[-120:],
+                    "events": detail_events,
                     "agent_activity": self._agent_activity(source),
                     "agent_experience": self._agent_experience(source),
                 }
@@ -1104,8 +1141,16 @@ def main() -> None:
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--host", default=os.environ.get("LIVE_GATEWAY_HOST", "127.0.0.1"))
     parser.add_argument("--port", type=int, default=int(os.environ.get("LIVE_GATEWAY_PORT", "3740")))
+    parser.add_argument(
+        "--sausage-origin",
+        default=os.environ.get("SAUSAGE_OBSERVER_ORIGIN", "http://127.0.0.1:3733"),
+    )
     args = parser.parse_args()
-    Handler.repository = LiveRepository(args.root.resolve(), watch=True)
+    Handler.repository = LiveRepository(
+        args.root.resolve(),
+        standalone_sausage_origin=args.sausage_origin,
+        watch=True,
+    )
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     print(f"3720 live gateway listening on http://{args.host}:{args.port}", flush=True)
     server.serve_forever()

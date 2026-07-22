@@ -33,7 +33,8 @@ pub use oracle::{
 pub use physics::{Animation, Fraction, Movement, MovementKind, Occupancy};
 pub use replay::Replay;
 pub use session::{
-    CAMPAIGN_ID, CampaignStatus, EntityView, ExitView, GameSnapshot, LevelStatus, MoveResult,
-    Session, SessionRecord, TileView, replay_snapshot,
+    BoundsView, CAMPAIGN_ID, CampaignStatus, EntityView, EntranceView, ExitView, GameSnapshot,
+    LevelStatus, MoveResult, OverworldMapView, OverworldStatus, Session, SessionRecord, TileView,
+    replay_snapshot,
 };
 pub use world::PhysicsWorld;

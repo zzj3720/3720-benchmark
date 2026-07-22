@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{self, BufReader, Read};
 use std::path::Path;
 
@@ -56,15 +56,26 @@ pub struct Campaign {
     pub island_masks: HashMap<String, IslandMask>,
     pub projection_compatibilities: HashMap<String, HashMap<String, ProjectionCompatibility>>,
     pub merged_state_source: String,
+    pub overworld_snapshot_source: String,
     pub island_state_sources: HashMap<String, String>,
 }
 
 impl Campaign {
     pub fn load_gzip(path: impl AsRef<Path>) -> Result<Self, String> {
-        let file = File::open(path.as_ref())
-            .map_err(|error| format!("could not open {}: {error}", path.as_ref().display()))?;
+        let path = path.as_ref();
+        let file = File::open(path)
+            .map_err(|error| format!("could not open {}: {error}", path.display()))?;
         let decoder = GzDecoder::new(BufReader::new(file));
-        Self::read(decoder)
+        let mut campaign = Self::read(decoder)?;
+        let snapshot_path = path.with_file_name("overworld.sav");
+        campaign.overworld_snapshot_source =
+            fs::read_to_string(&snapshot_path).map_err(|error| {
+                format!(
+                    "could not open authoritative overworld snapshot {}: {error}",
+                    snapshot_path.display()
+                )
+            })?;
+        Ok(campaign)
     }
 
     pub fn read(reader: impl Read) -> Result<Self, String> {
@@ -195,12 +206,54 @@ impl Campaign {
             island_masks,
             projection_compatibilities,
             merged_state_source,
+            overworld_snapshot_source: String::new(),
             island_state_sources,
         })
     }
 
     pub fn merged_state(&self) -> Result<GameState, String> {
         GameState::parse(&self.merged_state_source)
+    }
+
+    pub fn initial_overworld_state(&self) -> Result<GameState, String> {
+        if self.overworld_snapshot_source.is_empty() {
+            return Err("campaign has no authoritative overworld snapshot".to_owned());
+        }
+        let mut initial = self.merged_state()?;
+        let snapshot = GameState::parse(&self.overworld_snapshot_source)?;
+        if !snapshot.overworld
+            || snapshot.level_completed != ["level47"]
+            || !snapshot.world_sausages_issued.is_empty()
+            || snapshot.entities.len() != initial.entities.len()
+        {
+            return Err("authoritative overworld snapshot has unexpected provenance".to_owned());
+        }
+        let saved = snapshot
+            .entities
+            .iter()
+            .map(|entity| (entity.id, entity))
+            .collect::<HashMap<_, _>>();
+        for entity in initial
+            .entities
+            .iter_mut()
+            .filter(|entity| entity.entity_type == crate::EntityType::Island)
+        {
+            let settled = saved
+                .get(&entity.id)
+                .ok_or_else(|| format!("overworld snapshot is missing island {}", entity.id))?;
+            if settled.entity_type != entity.entity_type
+                || settled.data != entity.data
+                || settled.pos.x != entity.pos.x
+                || settled.pos.y != entity.pos.y
+            {
+                return Err(format!(
+                    "overworld snapshot island {} does not match the owned campaign",
+                    entity.id
+                ));
+            }
+            entity.pos.z = settled.pos.z;
+        }
+        Ok(initial)
     }
 
     pub fn island_state(&self, name: &str) -> Result<GameState, String> {

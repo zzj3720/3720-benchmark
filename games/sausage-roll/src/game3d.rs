@@ -33,47 +33,73 @@ pub struct Game3d<'a> {
 
 impl<'a> Game3d<'a> {
     pub fn from_state(campaign: &'a Campaign, state: &GameState) -> Result<Self, String> {
-        state
+        let player = state
             .player()
             .ok_or_else(|| "state has no player".to_owned())?;
-        let entry = campaign
-            .player_positions
-            .get(&state.push_target_level)
-            .ok_or_else(|| {
-                format!(
-                    "puzzle {:?} has no campaign entry position",
-                    state.push_target_level
-                )
-            })?;
-        let active_island = state
-            .entities
-            .iter()
-            .find(|entity| {
-                entity.entity_type == EntityType::Island && entity.data == state.push_target_level
-            })
-            .ok_or_else(|| format!("puzzle {:?} has no active island", state.push_target_level))?;
-        let exit_pos = entry.pos + active_island.pos;
-        let player_has_fork = state.fork().is_none();
-        let exit_attachment = state
-            .entities
-            .iter()
-            .find(|entity| {
-                entity.entity_type == EntityType::Sausage
-                    && entity
-                        .footprint(player_has_fork)
-                        .contains(&(exit_pos + Direction::Down))
-            })
-            .map(|entity| entity.id);
+        let (exit_pos, exit_direction, exit_attachment) = if state.overworld {
+            (player.pos, player.direction, None)
+        } else {
+            let entry = campaign
+                .player_positions
+                .get(&state.push_target_level)
+                .ok_or_else(|| {
+                    format!(
+                        "puzzle {:?} has no campaign entry position",
+                        state.push_target_level
+                    )
+                })?;
+            let active_island = state
+                .entities
+                .iter()
+                .find(|entity| {
+                    entity.entity_type == EntityType::Island
+                        && entity.data == state.push_target_level
+                })
+                .ok_or_else(|| {
+                    format!("puzzle {:?} has no active island", state.push_target_level)
+                })?;
+            let exit_pos = entry.pos + active_island.pos;
+            let player_has_fork = state.fork().is_none();
+            let exit_attachment = state
+                .entities
+                .iter()
+                .find(|entity| {
+                    entity.entity_type == EntityType::Sausage
+                        && entity
+                            .footprint(player_has_fork)
+                            .contains(&(exit_pos + Direction::Down))
+                })
+                .map(|entity| entity.id);
+            (exit_pos, entry.direction, exit_attachment)
+        };
         Ok(Self {
             world: PhysicsWorld::from_state(campaign, state)?,
             overworld: state.overworld,
             push_target_level: state.push_target_level.clone(),
             exit_pos,
-            exit_direction: entry.direction,
+            exit_direction,
             exit_up: true,
             exit_attachment,
             last_direction: Direction::None,
         })
+    }
+
+    pub fn enter_overworld_level(&mut self, level_id: &str) -> Result<(), String> {
+        if !self.overworld {
+            return Err("game is not on the overworld".to_owned());
+        }
+        let target = self
+            .world
+            .entities
+            .iter()
+            .find(|entity| entity.entity_type == EntityType::Island && entity.data == level_id)
+            .map(|entity| entity.id)
+            .ok_or_else(|| format!("overworld has no island {level_id:?}"))?;
+        self.world
+            .entity_mut(target)
+            .expect("target island exists")
+            .cook_data = 1;
+        Ok(())
     }
 
     pub fn won(&self) -> bool {
@@ -254,7 +280,7 @@ impl<'a> Game3d<'a> {
                 self.passive_force_sweep()?;
                 continue;
             }
-            if self.bbq_at(player.pos + Direction::Down)?.0 != Direction::None {
+            if !self.overworld && self.bbq_at(player.pos + Direction::Down)?.0 != Direction::None {
                 let retreat = if self.last_direction.is_horizontal() {
                     self.last_direction.inverse()
                 } else {

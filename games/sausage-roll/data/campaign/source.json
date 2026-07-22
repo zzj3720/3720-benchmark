@@ -13,5 +13,9 @@
   "checked_in_gzip_sha256": "a498f4bce9ebbf7825c261fe1ecb1b312f8adc07c3efb54ab8fd6bdd0005b694",
   "entry_archive_sha256": "e9abac37fcfc492cbd04ebabaa784cad7e81f14e84f39776b7b5658d8473611e",
   "entry_archive_contents": "86 solution-free original-engine states captured immediately after entering each puzzle",
+  "overworld_snapshot_sha256": "25567bba1f0beea8cd357db090f0a9dcae0d87c8b705150df5767236b7d95205",
+  "overworld_snapshot_contents": "original-engine overworld state immediately after the first puzzle, normalized to zero progress at load time",
+  "overworld_checkpoint_archive_sha256": "e19b84df5f9e4d5c46e9a55b5dad19ade317f728bd6b10f69699e363627e22a0",
+  "overworld_checkpoint_archive_contents": "86 original-engine post-puzzle overworld states used for authoritative transition heights",
   "puzzle_count": 86
 }

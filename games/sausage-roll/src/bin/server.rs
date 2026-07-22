@@ -133,11 +133,16 @@ fn handle(mut request: Request, app: &Arc<App>) -> Result<(), String> {
     }
     if request.method() == &Method::Get && path == "/v1/observe/snapshot" {
         let inner = app.inner.lock().map_err(|_| "state lock poisoned")?;
+        let include_map = parameter_u64(&query_parameters(query), "include_map", 1)? != 0;
         let body = json!({
             "schema": "benchmark-observer-snapshot-v1",
             "task": task_identity(),
             "latest_sequence": inner.sequence,
-            "state": inner.session.snapshot()?,
+            "state": if include_map {
+                inner.session.observer_snapshot()?
+            } else {
+                inner.session.snapshot()?
+            },
         });
         drop(inner);
         return respond(request, StatusCode(200), body);
@@ -249,6 +254,17 @@ fn handle(mut request: Request, app: &Arc<App>) -> Result<(), String> {
 
 fn record_lifecycle(app: &Arc<App>, event_type: &str) -> Result<(), String> {
     let mut inner = app.inner.lock().map_err(|_| "state lock poisoned")?;
+    let has_shared_map = inner.events.iter().any(|event| {
+        event
+            .get("state")
+            .and_then(|state| state.get("overworld_map"))
+            .is_some_and(|map| !map.is_null())
+    });
+    let state = if has_shared_map {
+        inner.session.snapshot()?
+    } else {
+        inner.session.observer_snapshot()?
+    };
     inner.sequence += 1;
     let event = json!({
         "schema": EVENT_SCHEMA,
@@ -257,7 +273,7 @@ fn record_lifecycle(app: &Arc<App>, event_type: &str) -> Result<(), String> {
         "task": task_identity(),
         "type": event_type,
         "action": Value::Null,
-        "state": inner.session.snapshot()?,
+        "state": state,
         "result": {"ok": true},
     });
     append_json_line(&app.event_path, &event)?;

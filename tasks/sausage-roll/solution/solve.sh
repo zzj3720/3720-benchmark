@@ -4,4 +4,4 @@
 
 set -euo pipefail
 
-python3 "$(dirname "$0")/solve.py" "$(dirname "$0")/segments.tar.gz"
+python3 "$(dirname "$0")/solve.py" "$(dirname "$0")/all.dem"

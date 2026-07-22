@@ -4,11 +4,16 @@ This directory is the source of truth for the complete Stephen's Sausage Roll
 benchmark game, including its Rust terminal rules adaptation and locally owned
 data under `data/`.
 
-The implementation has three independent inputs:
+The implementation combines these owned inputs and clean-room components:
 
 - `data/campaign/merged_binary.gz` is the complete
   86-puzzle campaign extracted
   from a locally owned Steam installation;
+- `data/campaign/overworld.sav` is an original-engine map snapshot used to
+  recover the settled 205-island overworld layout;
+- `data/campaign/overworld.tar.gz` contains the 86 post-puzzle map snapshots
+  used to restore the original transition heights while preserving simulated
+  horizontal island movement;
 - `src/` is a clean-room Rust rules engine and parser;
 - `data/oracle/all.dem` is the public full-game
   direction replay used only for
@@ -24,14 +29,27 @@ Current compatibility status:
   through all 86 puzzles;
 - one unified clean-room Rust engine exactly replays all 86 puzzle segments,
   all 11,769 actions, and all 11,683 non-final original-engine checkpoints;
+- the persistent overworld exactly replays all 4,592 between-puzzle actions,
+  including world-sausage rewards, stacked transfers, and moving island groups;
 - covered mechanics include pushing, turning, rolling, cooking, grill retreat,
   fork attachment, gravity, ladders, pivots, stacks, moving islands, exit
   attachment, and general three-dimensional passive forces.
 
-`data/campaign/entries.tar.gz` contains one
-solution-free original entry state for each puzzle. The model-facing `Session`
-loads only that archive and the owned campaign; the direction guide and
-original-engine checkpoints are never required by runtime code.
+`data/campaign/entries.tar.gz` contains one solution-free original entry state
+for each puzzle. The model-facing `Session` uses those states plus the map
+snapshot and post-puzzle map checkpoints; the direction guide remains isolated
+from runtime code and is used only for compatibility tests.
+
+The model-facing session starts on the traversable overworld. It must walk to
+the next entrance, face it, solve the puzzle, and then continues from the
+original puzzle exit on the same persistent map. The saved map snapshot is
+normalized to the campaign's untouched player and zero-progress metadata at
+load time; it does not reveal puzzle solutions.
+
+Observer snapshots expose a player-centered live projection and one reusable
+full-map description. The frontend applies current island transforms and
+completion masks to that shared map, so event rows stay small while the live
+view can switch between following the player and the full 205-island world.
 
 The packaged Harbor task gives the Agent only a thin terminal HTTP client. The
 sidecar owns the Rust engine, campaign state, append-only command audit, and

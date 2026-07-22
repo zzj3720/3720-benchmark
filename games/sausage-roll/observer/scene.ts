@@ -68,40 +68,47 @@ function material(color: number, roughness = 0.82) {
   return new THREE.MeshStandardMaterial({ color, roughness, metalness: 0.02 });
 }
 
-function addTerrain(root: THREE.Group, state: SausageSceneState, palette: (typeof PALETTES)[number]) {
+function addTerrain(root: THREE.Group, state: SausageSceneState) {
   const solidTiles = state.tiles.filter((tile) => tile.kind !== "spectral_sausage");
-  const cube = new THREE.BoxGeometry(1, 1, 1);
-  const side = material(palette.side);
-  const top = material(palette.top);
-  const bottom = material(palette.bottom);
-  const terrain = new THREE.InstancedMesh(cube, [side, side, top, bottom, side, side], solidTiles.length);
-  terrain.name = "terrain";
-  terrain.receiveShadow = true;
-  const matrix = new THREE.Matrix4();
-  solidTiles.forEach((tile, index) => {
-    matrix.makeTranslation(...worldPosition(tile.pos, true).toArray());
-    terrain.setMatrixAt(index, matrix);
-  });
-  terrain.instanceMatrix.needsUpdate = true;
-  root.add(terrain);
-
-  const topLines: number[] = [];
-  for (const tile of solidTiles) {
-    const { x, y, z } = worldPosition(tile.pos, true);
-    const h = y + 0.501;
-    topLines.push(
-      x - 0.5, h, z - 0.5, x + 0.5, h, z - 0.5,
-      x + 0.5, h, z - 0.5, x + 0.5, h, z + 0.5,
-      x + 0.5, h, z + 0.5, x - 0.5, h, z + 0.5,
-      x - 0.5, h, z + 0.5, x - 0.5, h, z - 0.5,
+  for (const tileSet of new Set(solidTiles.map((tile) => tile.tileSet))) {
+    const palette = PALETTES[tileSet] ?? PALETTES[0];
+    const tiles = solidTiles.filter((tile) => tile.tileSet === tileSet);
+    const side = material(palette.side);
+    const top = material(palette.top);
+    const bottom = material(palette.bottom);
+    const terrain = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      [side, side, top, bottom, side, side],
+      tiles.length,
     );
+    terrain.name = `terrain-${tileSet}`;
+    terrain.receiveShadow = true;
+    const matrix = new THREE.Matrix4();
+    tiles.forEach((tile, index) => {
+      matrix.makeTranslation(...worldPosition(tile.pos, true).toArray());
+      terrain.setMatrixAt(index, matrix);
+    });
+    terrain.instanceMatrix.needsUpdate = true;
+    root.add(terrain);
+
+    const topLines: number[] = [];
+    for (const tile of tiles) {
+      const { x, y, z } = worldPosition(tile.pos, true);
+      const h = y + 0.501;
+      topLines.push(
+        x - 0.5, h, z - 0.5, x + 0.5, h, z - 0.5,
+        x + 0.5, h, z - 0.5, x + 0.5, h, z + 0.5,
+        x + 0.5, h, z + 0.5, x - 0.5, h, z + 0.5,
+        x - 0.5, h, z + 0.5, x - 0.5, h, z - 0.5,
+      );
+    }
+    const lineGeometry = new THREE.BufferGeometry();
+    lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(topLines, 3));
+    root.add(new THREE.LineSegments(
+      lineGeometry,
+      new THREE.LineBasicMaterial({ color: palette.grid, transparent: true, opacity: 0.38 }),
+    ));
   }
-  const lineGeometry = new THREE.BufferGeometry();
-  lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(topLines, 3));
-  root.add(new THREE.LineSegments(
-    lineGeometry,
-    new THREE.LineBasicMaterial({ color: palette.grid, transparent: true, opacity: 0.44 }),
-  ));
 
   for (const tile of state.tiles) {
     if (tile.kind === "grill") addGrill(root, tile);
@@ -267,6 +274,40 @@ function addExit(root: THREE.Group, exit: NonNullable<SausageSceneState["exit"]>
   root.add(group);
 }
 
+function addEntrances(root: THREE.Group, state: SausageSceneState) {
+  for (const entrance of state.entrances) {
+    const group = new THREE.Group();
+    group.name = `entrance-${entrance.ordinal}`;
+    group.position.copy(worldPosition(entrance.pos));
+    const color = entrance.status === "target"
+      ? 0xffd15c
+      : entrance.status === "complete"
+        ? 0x8bdc78
+        : 0x566b70;
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(entrance.status === "target" ? 0.28 : 0.18, 0.045, 6, 18),
+      new THREE.MeshStandardMaterial({
+        color,
+        emissive: color,
+        emissiveIntensity: entrance.status === "target" ? 0.85 : 0.14,
+        roughness: 0.62,
+      }),
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = 0.06;
+    group.add(ring);
+    if (entrance.status === "target") {
+      const beacon = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.025, 0.025, 1.7, 6),
+        new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.74 }),
+      );
+      beacon.position.y = 0.88;
+      group.add(beacon);
+    }
+    root.add(group);
+  }
+}
+
 function dispose(root: THREE.Object3D) {
   root.traverse((object) => {
     if (!(object instanceof THREE.Mesh || object instanceof THREE.LineSegments)) return;
@@ -299,7 +340,7 @@ export class SausageScene {
     this.controls.enableZoom = true;
     this.controls.screenSpacePanning = true;
     this.controls.minDistance = 3;
-    this.controls.maxDistance = 220;
+    this.controls.maxDistance = 500;
     this.controls.minPolarAngle = 0.12;
     this.controls.maxPolarAngle = Math.PI * 0.49;
     this.controls.addEventListener("change", () => this.render());
@@ -317,8 +358,13 @@ export class SausageScene {
     this.root = new THREE.Group();
     const palette = PALETTES[state.tileSet] ?? PALETTES[0];
     this.scene.background = new THREE.Color(palette.fog);
-    this.scene.fog = new THREE.Fog(palette.fog, 28, 80);
-    addTerrain(this.root, state, palette);
+    const points = scenePoints(state);
+    const size = points.length
+      ? new THREE.Box3().setFromPoints(points).getSize(new THREE.Vector3())
+      : new THREE.Vector3();
+    const span = Math.max(size.x, size.z);
+    this.scene.fog = new THREE.Fog(palette.fog, Math.max(28, span * 0.55), Math.max(80, span * 1.8));
+    addTerrain(this.root, state);
     for (const entity of state.entities) {
       if (entity.kind === "player") addPlayer(this.root, entity);
       else if (entity.kind === "sausage") addSausage(this.root, entity);
@@ -326,12 +372,18 @@ export class SausageScene {
       else if (entity.kind === "fork") addDetachedFork(this.root, entity);
     }
     if (state.exit) addExit(this.root, state.exit);
+    if (state.mode === "overworld") addEntrances(this.root, state);
     this.addWorldFloor(state, palette);
     this.addLights(state);
     this.scene.add(this.root);
     if (!previous || previous.levelKey !== state.levelKey) {
-      this.view = "player";
-      this.focusPlayer();
+      if (state.mode === "overworld") {
+        this.view = "overview";
+        this.showOverview();
+      } else {
+        this.view = "player";
+        this.focusPlayer();
+      }
     } else if (this.view === "player") {
       this.followPlayer(previous, state);
     }

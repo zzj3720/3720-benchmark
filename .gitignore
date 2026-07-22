@@ -22,11 +22,18 @@ task-proposal-results/
 # be redistributed without the copyright holder's permission.
 /games/sausage-roll/data/campaign/merged_binary.gz
 /games/sausage-roll/data/campaign/entries.tar.gz
+/games/sausage-roll/data/campaign/overworld.sav
+/games/sausage-roll/data/campaign/overworld.tar.gz
 /games/sausage-roll/data/oracle/all.dem
 /games/sausage-roll/data/oracle/segments.tar.gz
 /tasks/sausage-roll/environment/game/campaign/merged_binary.gz
 /tasks/sausage-roll/environment/game/campaign/entries.tar.gz
+/tasks/sausage-roll/environment/game/campaign/overworld.sav
+/tasks/sausage-roll/environment/game/campaign/overworld.tar.gz
 /tasks/sausage-roll/tests/campaign/merged_binary.gz
 /tasks/sausage-roll/tests/campaign/entries.tar.gz
+/tasks/sausage-roll/tests/campaign/overworld.sav
+/tasks/sausage-roll/tests/campaign/overworld.tar.gz
 /tasks/sausage-roll/solution/segments.tar.gz
+/tasks/sausage-roll/solution/all.dem
 /observer-platform/public/sausage-render-qa-64.json

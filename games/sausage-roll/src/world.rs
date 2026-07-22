@@ -90,21 +90,53 @@ impl<'a> PhysicsWorld<'a> {
         Ok(id)
     }
 
+    pub fn insert_entity(&mut self, mut entity: Entity) -> Result<i32, String> {
+        if entity.entity_type == EntityType::Fork {
+            return self.insert_fork(entity);
+        }
+        if entity.id < 0 {
+            entity.id = self
+                .entities
+                .iter()
+                .map(|candidate| candidate.id)
+                .max()
+                .unwrap_or(0)
+                + 1;
+        }
+        if self.entity_indices.contains_key(&entity.id) {
+            return Err(format!("duplicate entity id {}", entity.id));
+        }
+        let id = entity.id;
+        self.entity_indices.insert(id, self.entities.len());
+        self.entities.push(entity);
+        Ok(id)
+    }
+
     pub fn remove_fork(&mut self) -> Result<Entity, String> {
         let id = self
             .fork_id
             .take()
             .ok_or_else(|| "world has no detached fork".to_owned())?;
+        self.remove_entity(id)
+    }
+
+    pub fn remove_entity(&mut self, id: i32) -> Result<Entity, String> {
+        if id == self.player_id {
+            return Err("cannot remove the player".to_owned());
+        }
+        if self.fork_id == Some(id) {
+            self.fork_id = None;
+        }
         self.movements.remove(&id);
         let index = self
             .entity_indices
             .remove(&id)
-            .ok_or_else(|| format!("fork {id} has no entity index"))?;
-        let fork = self.entities.swap_remove(index);
+            .ok_or_else(|| format!("entity {id} has no entity index"))?;
+        let entity = self.entities.swap_remove(index);
         if let Some(swapped) = self.entities.get(index) {
             self.entity_indices.insert(swapped.id, index);
         }
-        Ok(fork)
+        Ok(entity)
     }
 
     pub fn entity(&self, id: i32) -> Option<&Entity> {

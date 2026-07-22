@@ -37,12 +37,18 @@ for destination in environment/game/campaign tests/campaign; do
     "$data_dir/campaign/entries.tar.gz" \
     "$task_dir/$destination/entries.tar.gz"
   install -m 644 \
+    "$data_dir/campaign/overworld.sav" \
+    "$task_dir/$destination/overworld.sav"
+  install -m 644 \
+    "$data_dir/campaign/overworld.tar.gz" \
+    "$task_dir/$destination/overworld.tar.gz"
+  install -m 644 \
     "$data_dir/campaign/source.json" \
     "$task_dir/$destination/source.json"
 done
 
 install -m 644 \
-  "$data_dir/oracle/segments.tar.gz" \
-  "$task_dir/solution/segments.tar.gz"
+  "$data_dir/oracle/all.dem" \
+  "$task_dir/solution/all.dem"
 
 echo "Packaged sausage-roll for linux/amd64 and linux/arm64"
