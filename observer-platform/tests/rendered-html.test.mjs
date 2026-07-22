@@ -121,6 +121,11 @@ test("implements a real multi-run scoreboard and drill-down", async () => {
   assert.doesNotMatch(paraboxStyles, /parabox-focus-space[^}]*drop-shadow/);
   assert.match(sausage, /import\("\.\/scene"\)/);
   assert.match(sausage, /每根香肠的四面状态/);
+  assert.match(sausage, /FOLLOW PLAYER/);
+  assert.match(sausage, /FULL MAP/);
+  assert.match(sausageScene, /OrbitControls/);
+  assert.match(sausageScene, /activityPoints\(this\.state\)/);
+  assert.match(sausageScene, /this\.camera\.position\.add\(delta\)/);
   assert.match(sausageScene, /CapsuleGeometry\(0\.36, 1\.08/);
   assert.match(sausageScene, /terrainTop\(tile\.pos\)/);
   assert.match(sausageScene, /entity\.cells\.length > 1/);

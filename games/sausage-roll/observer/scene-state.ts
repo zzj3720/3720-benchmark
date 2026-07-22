@@ -16,6 +16,7 @@ export type SceneTile = {
   direction: string;
 };
 export type SausageSceneState = {
+  levelKey: string;
   tileSet: number;
   entities: SceneEntity[];
   tiles: SceneTile[];
@@ -56,6 +57,7 @@ export function readSceneState(state: GameState): SausageSceneState {
   });
   const exit = asRecord(state.exit);
   return {
+    levelKey: `${asNumber(level?.ordinal)}:${asString(level?.id)}`,
     tileSet: Math.max(0, Math.min(4, asNumber(level?.tile_set))),
     entities,
     tiles,

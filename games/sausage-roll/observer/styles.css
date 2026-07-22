@@ -58,6 +58,7 @@
 
 .sausage-stage {
   position: relative;
+  container-type: inline-size;
   min-height: 340px;
   background: #526c77;
 }
@@ -66,6 +67,7 @@
   width: 100%;
   height: 100%;
   display: block;
+  touch-action: none;
 }
 
 .sausage-environment {
@@ -77,6 +79,53 @@
   background: rgba(9, 13, 13, 0.72);
   color: rgba(255,255,255,0.78);
   pointer-events: none;
+}
+
+.sausage-view-controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+}
+
+.sausage-view-controls button {
+  padding: 7px 8px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(9, 13, 13, 0.72);
+  color: rgba(255,255,255,0.78);
+  font: 800 8px/1.25 var(--font-geist-mono), monospace;
+  letter-spacing: 0.07em;
+  cursor: pointer;
+}
+
+.sausage-view-controls button:hover,
+.sausage-view-controls button:focus-visible {
+  border-color: #a7ff78;
+  color: #eaffdd;
+  outline: none;
+}
+
+.sausage-view-hint {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  padding: 5px 7px;
+  background: rgba(9, 13, 13, 0.66);
+  color: rgba(255,255,255,0.58);
+  font: 700 7px/1.2 var(--font-geist-mono), monospace;
+  letter-spacing: 0.06em;
+  pointer-events: none;
+}
+
+@container (max-width: 390px) {
+  .sausage-view-controls {
+    top: 46px;
+  }
+
+  .sausage-view-hint {
+    display: none;
+  }
 }
 
 .sausage-render-error {
@@ -167,4 +216,5 @@
   .sausage-scene-header { align-items: flex-start; }
   .sausage-scene-header dl { display: grid; grid-template-columns: repeat(2, auto); gap: 8px 14px; }
   .sausage-stage { min-height: 300px; }
+  .sausage-view-hint { display: none; }
 }

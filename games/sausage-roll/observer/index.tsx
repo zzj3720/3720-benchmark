@@ -88,6 +88,11 @@ export function SausageState({ state, previousState }: { state: GameState; previ
         <canvas ref={canvasRef} aria-label={`${asString(level?.title, "Sausage Roll")} 的三维关卡状态`} />
         {renderError ? <div className="sausage-render-error" role="alert">3D renderer unavailable: {renderError}</div> : null}
         <span className="sausage-environment">{TILE_SET_NAMES[scene.tileSet] ?? "GREEN"} / CLEAN GEOMETRY</span>
+        <div className="sausage-view-controls" aria-label="三维视角控制">
+          <button type="button" onClick={() => runtimeRef.current?.focusPlayer()}>FOLLOW PLAYER</button>
+          <button type="button" onClick={() => runtimeRef.current?.showOverview()}>FULL MAP</button>
+        </div>
+        <span className="sausage-view-hint">DRAG ORBIT · SHIFT+DRAG PAN · WHEEL ZOOM</span>
       </div>
       <footer className="sausage-legend">
         <div className="cook-key" aria-label="烤制状态图例">

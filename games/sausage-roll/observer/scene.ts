@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 import type { Coord3, SausageSceneState, SceneEntity, SceneTile } from "./scene-state";
 
@@ -19,6 +20,29 @@ const COOK_COLORS = [
 
 function worldPosition(pos: Coord3, terrain = false) {
   return new THREE.Vector3(pos.x + 0.5, pos.z + (terrain ? 0.5 : 0), -pos.y - 0.5);
+}
+
+function scenePoints(state: SausageSceneState) {
+  return [
+    ...state.tiles.map((tile) => worldPosition(tile.pos, true)),
+    ...state.entities.map((entity) => worldPosition(entity.pos)),
+  ];
+}
+
+function playerPoint(state: SausageSceneState) {
+  const player = state.entities.find((entity) => entity.kind === "player");
+  return player ? worldPosition(player.pos).add(new THREE.Vector3(0, 0.72, 0)) : null;
+}
+
+function activityPoints(state: SausageSceneState) {
+  const player = playerPoint(state);
+  if (!player) return scenePoints(state);
+  const nearby = scenePoints(state).filter((point) => {
+    const horizontal = Math.hypot(point.x - player.x, point.z - player.z);
+    return horizontal <= 7 && Math.abs(point.y - player.y) <= 5;
+  });
+  nearby.push(player);
+  return nearby;
 }
 
 function terrainTop(pos: Coord3) {
@@ -258,9 +282,11 @@ export class SausageScene {
   private readonly renderer: THREE.WebGLRenderer;
   private readonly scene = new THREE.Scene();
   private readonly camera = new THREE.PerspectiveCamera(60, 1, 0.1, 500);
+  private readonly controls: OrbitControls;
   private readonly resizeObserver: ResizeObserver;
   private root = new THREE.Group();
   private state: SausageSceneState | null = null;
+  private view: "player" | "overview" = "player";
 
   constructor(private readonly canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
@@ -268,6 +294,17 @@ export class SausageScene {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
+    this.controls = new OrbitControls(this.camera, canvas);
+    this.controls.enableDamping = false;
+    this.controls.enablePan = true;
+    this.controls.enableRotate = true;
+    this.controls.enableZoom = true;
+    this.controls.screenSpacePanning = true;
+    this.controls.minDistance = 3;
+    this.controls.maxDistance = 220;
+    this.controls.minPolarAngle = 0.12;
+    this.controls.maxPolarAngle = Math.PI * 0.49;
+    this.controls.addEventListener("change", () => this.render());
     this.scene.add(this.root);
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(canvas);
@@ -275,6 +312,7 @@ export class SausageScene {
   }
 
   update(state: SausageSceneState, changedIds: Set<number>) {
+    const previous = this.state;
     this.state = state;
     this.scene.remove(this.root);
     dispose(this.root);
@@ -291,8 +329,28 @@ export class SausageScene {
     }
     if (state.exit) addExit(this.root, state.exit);
     this.addWorldFloor(state, palette);
+    this.addLights(state);
     this.scene.add(this.root);
-    this.frame(state);
+    if (!previous || previous.levelKey !== state.levelKey) {
+      this.view = "player";
+      this.focusPlayer();
+    } else if (this.view === "player") {
+      this.followPlayer(previous, state);
+    }
+    this.render();
+  }
+
+  focusPlayer() {
+    if (!this.state) return;
+    this.view = "player";
+    this.frame(activityPoints(this.state), playerPoint(this.state));
+    this.render();
+  }
+
+  showOverview() {
+    if (!this.state) return;
+    this.view = "overview";
+    this.frame(scenePoints(this.state));
     this.render();
   }
 
@@ -319,11 +377,41 @@ export class SausageScene {
     this.root.add(grid);
   }
 
-  private frame(state: SausageSceneState, addLights = true) {
-    const points = [
-      ...state.tiles.map((tile) => worldPosition(tile.pos, true)),
-      ...state.entities.map((entity) => worldPosition(entity.pos)),
-    ];
+  private addLights(state: SausageSceneState) {
+    const points = scenePoints(state);
+    if (!points.length) return;
+    const bounds = new THREE.Box3().setFromPoints(points);
+    const center = bounds.getCenter(new THREE.Vector3());
+    const size = bounds.getSize(new THREE.Vector3());
+    const hemisphere = new THREE.HemisphereLight(0xe9f4ff, 0x35403d, 2.15);
+    this.root.add(hemisphere);
+    const sun = new THREE.DirectionalLight(0xfff0cf, 3.1);
+    sun.position.copy(center).add(new THREE.Vector3(-8, 16, -10));
+    sun.target.position.copy(center);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(1024, 1024);
+    const shadowSpan = Math.max(size.x, size.z, 10) * 0.72;
+    sun.shadow.camera.left = -shadowSpan;
+    sun.shadow.camera.right = shadowSpan;
+    sun.shadow.camera.top = shadowSpan;
+    sun.shadow.camera.bottom = -shadowSpan;
+    this.root.add(sun.target, sun);
+  }
+
+  private followPlayer(previous: SausageSceneState, state: SausageSceneState) {
+    const before = playerPoint(previous);
+    const after = playerPoint(state);
+    if (!before || !after) {
+      this.focusPlayer();
+      return;
+    }
+    const delta = after.sub(before);
+    this.camera.position.add(delta);
+    this.controls.target.add(delta);
+    this.controls.update();
+  }
+
+  private frame(points: THREE.Vector3[], anchor?: THREE.Vector3 | null) {
     if (!points.length) return;
     const bounds = new THREE.Box3().setFromPoints(points);
     bounds.expandByScalar(1.4);
@@ -337,27 +425,16 @@ export class SausageScene {
       size.y * 1.35,
       6,
     ) * 1.32;
-    const target = center.clone().add(new THREE.Vector3(0, Math.min(1.2, size.y * 0.12), 0));
+    const target = anchor
+      ? anchor.clone().lerp(center, 0.24)
+      : center.clone().add(new THREE.Vector3(0, Math.min(1.2, size.y * 0.12), 0));
     this.camera.position.copy(target).add(new THREE.Vector3(0, distance * 0.93, -distance * 0.38));
     this.camera.lookAt(target);
     this.camera.near = Math.max(0.1, distance / 120);
     this.camera.far = Math.max(120, distance * 8);
     this.camera.updateProjectionMatrix();
-
-    if (addLights) {
-      const hemisphere = new THREE.HemisphereLight(0xe9f4ff, 0x35403d, 2.15);
-      this.root.add(hemisphere);
-      const sun = new THREE.DirectionalLight(0xfff0cf, 3.1);
-      sun.position.copy(target).add(new THREE.Vector3(-8, 16, -10));
-      sun.castShadow = true;
-      sun.shadow.mapSize.set(1024, 1024);
-      const shadowSpan = Math.max(size.x, size.z, 10) * 0.72;
-      sun.shadow.camera.left = -shadowSpan;
-      sun.shadow.camera.right = shadowSpan;
-      sun.shadow.camera.top = shadowSpan;
-      sun.shadow.camera.bottom = -shadowSpan;
-      this.root.add(sun);
-    }
+    this.controls.target.copy(target);
+    this.controls.update();
   }
 
   private resize() {
@@ -366,7 +443,6 @@ export class SausageScene {
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
-    if (this.state) this.frame(this.state, false);
     this.render();
   }
 
@@ -376,6 +452,7 @@ export class SausageScene {
 
   destroy() {
     this.resizeObserver.disconnect();
+    this.controls.dispose();
     dispose(this.root);
     this.renderer.dispose();
     this.state = null;
