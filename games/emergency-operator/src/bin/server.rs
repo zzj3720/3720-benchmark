@@ -84,7 +84,10 @@ fn main() {
 
 fn serve() -> Result<(), String> {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let campaign_path = env_path("OPERATOR_CAMPAIGN", root.join("data/campaign/pilot.json"));
+    let campaign_path = env_path(
+        "OPERATOR_CAMPAIGN",
+        root.join("data/campaign/911-career.json"),
+    );
     let audit_path = env_path(
         "OPERATOR_AUDIT",
         PathBuf::from("/var/lib/operator/audit.jsonl"),

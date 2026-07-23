@@ -4,7 +4,8 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
-pub const CAMPAIGN_SCHEMA: &str = "emergency-operator-campaign-v1";
+pub const CAMPAIGN_SCHEMA: &str = "emergency-operator-campaign-v2";
+const DEFAULT_CHANCE_WEIGHT: u32 = 330;
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -12,6 +13,30 @@ pub enum Role {
     Police,
     Fire,
     Medical,
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum EventKind {
+    #[default]
+    Phone,
+    Report,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SceneKind {
+    Criminal,
+    Suspect,
+    Injured,
+    Dead,
+    Fire,
+    Tech,
+    Work,
+    Timer,
+    Witness,
+    Passerby,
+    Deco,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -36,60 +61,107 @@ pub struct UnitDefinition {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub struct RequirementDefinition {
-    pub role: Role,
-    pub work_ms: u64,
-}
-
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct IncidentDefinition {
     pub id: String,
     pub title: String,
     pub location: Point,
-    pub health_milli: i64,
-    pub health_decay_milli_per_minute: i64,
     pub base_score: i64,
-    pub requirements: Vec<RequirementDefinition>,
+    pub elements: Vec<SceneElementDefinition>,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub struct DialogueChoice {
+pub struct SceneElementDefinition {
     pub id: String,
+    pub label: String,
+    pub kind: SceneKind,
+    #[serde(default = "default_true")]
+    pub active: bool,
+    #[serde(default)]
+    pub role: Option<Role>,
+    #[serde(default)]
+    pub health_milli: Option<i64>,
+    #[serde(default)]
+    pub health_decay_milli_per_minute: i64,
+    #[serde(default)]
+    pub work_ms: u64,
+    #[serde(default)]
+    pub work_growth_ms_per_minute: i64,
+    #[serde(default)]
+    pub blocked_by: Option<String>,
+    #[serde(default)]
+    pub weapon: Option<String>,
+    #[serde(default)]
+    pub fight_risk_milli: i64,
+    #[serde(default)]
+    pub prison_chance_milli: i64,
+    #[serde(default)]
+    pub bill: Option<i64>,
+    #[serde(default)]
+    pub timer_ms: Option<u64>,
+    #[serde(default)]
+    pub actions: Vec<String>,
+    #[serde(default)]
+    pub aar: Vec<String>,
+}
+
+const fn default_true() -> bool {
+    true
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct DialogueNode {
+    pub id: String,
+    pub operator: bool,
     pub text: String,
     #[serde(default)]
-    pub next: Option<String>,
+    pub answers: Vec<String>,
+    #[serde(default = "default_chance_weight")]
+    pub chance_weight: u32,
     #[serde(default)]
-    pub reveal_incident: bool,
+    pub actions: Vec<String>,
     #[serde(default)]
-    pub health_decay_delta_milli_per_minute: i64,
-    #[serde(default)]
-    pub score_delta: i64,
+    pub aar: Vec<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub struct DialogueStage {
-    pub id: String,
-    pub caller: String,
-    pub choices: Vec<DialogueChoice>,
+const fn default_chance_weight() -> u32 {
+    DEFAULT_CHANCE_WEIGHT
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct CallDefinition {
     pub id: String,
     pub caller: String,
+    #[serde(default)]
+    pub kind: EventKind,
+    #[serde(default)]
+    pub duty_id: Option<String>,
     pub arrival_ms: u64,
     pub answer_window_ms: u64,
     pub conversation_window_ms: u64,
     pub initial_stage: String,
-    pub stages: Vec<DialogueStage>,
+    #[serde(default)]
+    pub nodes: Vec<DialogueNode>,
+    #[serde(default)]
+    pub disabled_nodes: Vec<String>,
     #[serde(default)]
     pub incident: Option<IncidentDefinition>,
 }
 
 impl CallDefinition {
-    pub fn stage(&self, id: &str) -> Option<&DialogueStage> {
-        self.stages.iter().find(|stage| stage.id == id)
+    pub fn node(&self, id: &str) -> Option<&DialogueNode> {
+        self.nodes.iter().find(|node| node.id == id)
     }
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct DutyDefinition {
+    pub id: String,
+    pub chapter: u32,
+    pub number: u32,
+    pub city: String,
+    pub map_id: String,
+    pub start_ms: u64,
+    pub end_ms: u64,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -97,6 +169,8 @@ pub struct ShiftDefinition {
     pub id: String,
     pub title: String,
     pub duration_ms: u64,
+    #[serde(default)]
+    pub duties: Vec<DutyDefinition>,
     pub units: Vec<UnitDefinition>,
     pub calls: Vec<CallDefinition>,
 }
@@ -106,8 +180,14 @@ pub struct Campaign {
     pub schema: String,
     pub id: String,
     pub title: String,
+    #[serde(default = "default_seed")]
+    pub seed: u64,
     pub max_score: i64,
     pub shift: ShiftDefinition,
+}
+
+const fn default_seed() -> u64 {
+    0x9110_3720
 }
 
 impl Campaign {
@@ -146,49 +226,80 @@ impl Campaign {
 
         let mut call_ids = HashSet::new();
         let mut incident_ids = HashSet::new();
+        let mut duty_ids = HashSet::new();
+        let mut previous_duty_end = 0;
+        for duty in &self.shift.duties {
+            if !duty_ids.insert(duty.id.as_str())
+                || duty.id.is_empty()
+                || duty.city.is_empty()
+                || duty.map_id.is_empty()
+                || duty.start_ms != previous_duty_end
+                || duty.start_ms >= duty.end_ms
+                || duty.end_ms > self.shift.duration_ms
+            {
+                return Err(format!("duty {:?} has invalid boundaries", duty.id));
+            }
+            previous_duty_end = duty.end_ms;
+        }
+        if !self.shift.duties.is_empty() && previous_duty_end != self.shift.duration_ms {
+            return Err("duties do not cover the full shift".to_owned());
+        }
         for call in &self.shift.calls {
             if !call_ids.insert(&call.id) {
                 return Err(format!("duplicate call id {:?}", call.id));
             }
-            if call.arrival_ms >= self.shift.duration_ms
-                || call.answer_window_ms == 0
-                || call.conversation_window_ms == 0
-            {
+            if call.arrival_ms >= self.shift.duration_ms {
                 return Err(format!("call {:?} has invalid timing", call.id));
             }
-            let stage_ids = call
-                .stages
-                .iter()
-                .map(|stage| stage.id.as_str())
-                .collect::<HashSet<_>>();
-            if stage_ids.len() != call.stages.len()
-                || !stage_ids.contains(call.initial_stage.as_str())
-            {
-                return Err(format!("call {:?} has invalid dialogue stages", call.id));
-            }
-            for stage in &call.stages {
-                if stage.choices.is_empty() {
-                    return Err(format!(
-                        "call {:?} stage {:?} has no choices",
-                        call.id, stage.id
-                    ));
+            if let Some(duty_id) = &call.duty_id {
+                let duty = self
+                    .shift
+                    .duties
+                    .iter()
+                    .find(|duty| &duty.id == duty_id)
+                    .ok_or_else(|| format!("call {:?} has an unknown duty", call.id))?;
+                if call.arrival_ms < duty.start_ms || call.arrival_ms >= duty.end_ms {
+                    return Err(format!("call {:?} falls outside its duty", call.id));
                 }
-                let mut choices = HashSet::new();
-                for choice in &stage.choices {
-                    if !choices.insert(&choice.id) {
+            }
+            if call.kind == EventKind::Report {
+                if call.incident.is_none() || !call.nodes.is_empty() {
+                    return Err(format!("report {:?} has invalid content", call.id));
+                }
+            } else if call.answer_window_ms == 0 || call.conversation_window_ms == 0 {
+                return Err(format!("call {:?} has invalid timing", call.id));
+            } else {
+                let node_ids = call
+                    .nodes
+                    .iter()
+                    .map(|node| node.id.as_str())
+                    .collect::<HashSet<_>>();
+                if node_ids.len() != call.nodes.len()
+                    || !node_ids.contains(call.initial_stage.as_str())
+                {
+                    return Err(format!("call {:?} has an invalid dialogue graph", call.id));
+                }
+                for node in &call.nodes {
+                    if node.chance_weight == 0 {
                         return Err(format!(
-                            "call {:?} stage {:?} has duplicate choice {:?}",
-                            call.id, stage.id, choice.id
+                            "call {:?} node {:?} has zero chance weight",
+                            call.id, node.id
                         ));
                     }
-                    if choice
-                        .next
-                        .as_deref()
-                        .is_some_and(|next| !stage_ids.contains(next))
-                    {
+                    for answer in &node.answers {
+                        if answer != "back" && !node_ids.contains(answer.as_str()) {
+                            return Err(format!(
+                                "call {:?} node {:?} points to unknown answer {:?}",
+                                call.id, node.id, answer
+                            ));
+                        }
+                    }
+                }
+                for disabled in &call.disabled_nodes {
+                    if !node_ids.contains(disabled.as_str()) {
                         return Err(format!(
-                            "call {:?} choice {:?} points to an unknown stage",
-                            call.id, choice.id
+                            "call {:?} disables unknown node {:?}",
+                            call.id, disabled
                         ));
                     }
                 }
@@ -197,24 +308,37 @@ impl Campaign {
                 if !incident_ids.insert(&incident.id) {
                     return Err(format!("duplicate incident id {:?}", incident.id));
                 }
-                if incident.health_milli <= 0 || incident.health_decay_milli_per_minute < 0 {
-                    return Err(format!("incident {:?} has invalid health", incident.id));
+                if incident.elements.is_empty() {
+                    return Err(format!("incident {:?} has no scene elements", incident.id));
                 }
-                if incident.requirements.is_empty() {
-                    return Err(format!("incident {:?} has no requirements", incident.id));
+                let element_ids = incident
+                    .elements
+                    .iter()
+                    .map(|element| element.id.as_str())
+                    .collect::<HashSet<_>>();
+                if element_ids.len() != incident.elements.len() {
+                    return Err(format!("incident {:?} has duplicate elements", incident.id));
                 }
-                let mut requirement_roles = HashSet::new();
-                for requirement in &incident.requirements {
-                    if requirement.work_ms == 0 || !roles.contains(&requirement.role) {
+                for element in &incident.elements {
+                    if element.id.is_empty()
+                        || element.label.is_empty()
+                        || (element.kind != SceneKind::Dead
+                            && element.health_milli.is_some_and(|health| health <= 0))
+                        || element.health_decay_milli_per_minute < 0
+                        || element.work_growth_ms_per_minute < 0
+                        || element
+                            .blocked_by
+                            .as_deref()
+                            .is_some_and(|blocker| !element_ids.contains(blocker))
+                        || (element.work_ms > 0 && element.role.is_none())
+                        || (element.kind == SceneKind::Timer
+                            && element.timer_ms.is_none_or(|time| time == 0))
+                        || (element.kind != SceneKind::Timer && element.timer_ms.is_some())
+                        || element.role.is_some_and(|role| !roles.contains(&role))
+                    {
                         return Err(format!(
-                            "incident {:?} has an unsupported requirement",
-                            incident.id
-                        ));
-                    }
-                    if !requirement_roles.insert(requirement.role) {
-                        return Err(format!(
-                            "incident {:?} has duplicate requirement role {:?}",
-                            incident.id, requirement.role
+                            "incident {:?} has invalid scene element {:?}",
+                            incident.id, element.id
                         ));
                     }
                 }
@@ -235,5 +359,24 @@ mod tests {
             Campaign::load(root.join("data/campaign/pilot.json")).expect("pilot campaign");
         assert_eq!(campaign.shift.calls.len(), 3);
         assert_eq!(campaign.shift.units.len(), 5);
+    }
+
+    #[test]
+    fn imported_base_career_is_valid() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let campaign = Campaign::load(root.join("data/campaign/911-career.json"))
+            .expect("compiled 911 Operator career");
+        assert_eq!(campaign.shift.duties.len(), 14);
+        assert_eq!(campaign.shift.calls.len(), 102);
+        assert_eq!(campaign.max_score, 34_405);
+        assert_eq!(
+            campaign
+                .shift
+                .calls
+                .iter()
+                .map(|call| call.nodes.len())
+                .sum::<usize>(),
+            2_722
+        );
     }
 }

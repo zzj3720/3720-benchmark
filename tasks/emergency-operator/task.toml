@@ -20,13 +20,13 @@ name = "3720"
 author_name = "3720"
 author_email = "17165520+zzj3720@users.noreply.github.com"
 author_organization = "3720"
-difficulty_explanation = "The Agent must handle overlapping calls, remember future arrivals, choose dialogue under evolving health pressure, and allocate scarce police, fire, and medical units. A monotonic 25-minute wall clock continues during reasoning, while the API permits only one immediate action per request and alarms can wake the Agent but cannot act for it."
-solution_explanation = "Answer each call, elicit its hidden location, choose the safest instruction, dispatch the required free units, and use reminder-only alarms to return near later call arrivals and incident completions."
-verification_explanation = "The live sidecar timestamps each atomic command from its monotonic clock. A separate Rust verifier advances a clean pure engine to every audited elapsed millisecond, requires exact API-response equality, then advances to the frozen shift deadline and reports an integer score from 0 to 660."
+difficulty_explanation = "Across a 155.5-minute five-chapter career, the Agent must handle overlapping phone calls and CAD reports, retain facts from branching dialogue, react to scene timers, and allocate six scarce police, fire, and medical units. The monotonic wall clock continues during reasoning, while the API permits only one immediate action per request and alarms can wake the Agent but cannot act for it."
+solution_explanation = "Continuously triage ringing calls and new CAD reports, elicit hidden locations, choose safe instructions, dispatch units according to live role-specific work and health pressure, and use reminder-only alarms to revisit arrivals and scene transitions."
+verification_explanation = "The live sidecar timestamps each atomic command from its monotonic clock. A separate Rust verifier advances a clean pure engine to every audited elapsed millisecond, requires exact API-response equality, then advances to the frozen 9,330,000 ms deadline and reports an integer score bounded by the generated 34,405-point ceiling."
 relevant_experience = "Designed and implemented deterministic agent evaluation environments and terminal tasks."
 category = "game-reasoning"
 tags = ["time-planning", "real-time", "scheduling", "resource-management", "working-memory", "terminal-game"]
-expert_time_estimate_hours = 0.5
+expert_time_estimate_hours = 3.0
 
 [verifier]
 environment_mode = "separate"
@@ -35,7 +35,7 @@ network_mode = "allowlist"
 allowed_hosts = []
 
 [agent]
-timeout_sec = 7200.0
+timeout_sec = 14400.0
 network_mode = "allowlist"
 allowed_hosts = []
 

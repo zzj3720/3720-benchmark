@@ -1,6 +1,10 @@
+use std::collections::{BTreeMap, HashSet};
+
 use serde::Serialize;
 
-use crate::campaign::{CallDefinition, Campaign, Point, Role};
+use crate::campaign::{
+    CallDefinition, Campaign, EventKind, IncidentDefinition, Point, Role, SceneKind,
+};
 
 pub const STATE_SCHEMA: &str = "emergency-operator-state-v1";
 
@@ -21,6 +25,12 @@ struct CallRuntime {
     current_stage: Option<String>,
     answer_deadline_ms: u64,
     conversation_deadline_ms: Option<u64>,
+    disabled_nodes: HashSet<String>,
+    history: Vec<String>,
+    opinion_milli: i64,
+    ignore_opinion_milli: Option<i64>,
+    aar: Vec<String>,
+    facts: BTreeMap<String, String>,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
@@ -33,20 +43,35 @@ enum IncidentPhase {
 }
 
 #[derive(Clone, Debug)]
-struct RequirementRuntime {
-    role: Role,
+struct SceneElementRuntime {
+    id: String,
+    label: String,
+    kind: SceneKind,
+    active: bool,
+    role: Option<Role>,
+    health_milli: Option<i64>,
+    health_decay_milli_per_minute: i64,
+    health_remainder: i64,
     remaining_work_ms: u64,
     total_work_ms: u64,
+    work_growth_ms_per_minute: i64,
+    work_remainder: i64,
+    blocked_by: Option<String>,
+    weapon: Option<String>,
+    fight_risk_milli: i64,
+    prison_chance_milli: i64,
+    bill: Option<i64>,
+    remaining_timer_ms: Option<u64>,
+    actions: Vec<String>,
+    aar: Vec<String>,
+    completed: bool,
 }
 
 #[derive(Clone, Debug)]
 struct IncidentRuntime {
     call_index: usize,
     phase: IncidentPhase,
-    health_milli: i64,
-    health_decay_milli_per_minute: i64,
-    health_remainder: i64,
-    requirements: Vec<RequirementRuntime>,
+    elements: Vec<SceneElementRuntime>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -97,11 +122,29 @@ pub struct ShiftView {
     pub elapsed_ms: u64,
     pub duration_ms: u64,
     pub remaining_ms: u64,
+    pub duty: Option<DutyView>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+pub struct DutyView {
+    pub id: String,
+    pub chapter: u32,
+    pub number: u32,
+    pub city: String,
+    pub map_id: String,
+    pub elapsed_ms: u64,
+    pub remaining_ms: u64,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
 pub struct ChoiceView {
     pub id: String,
+    pub text: String,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+pub struct TranscriptView {
+    pub speaker: &'static str,
     pub text: String,
 }
 
@@ -114,6 +157,10 @@ pub struct CallView {
     pub conversation_deadline_ms: Option<u64>,
     pub caller_text: Option<String>,
     pub choices: Vec<ChoiceView>,
+    pub transcript: Vec<TranscriptView>,
+    pub opinion_milli: i64,
+    pub after_action_report: Vec<String>,
+    pub facts: BTreeMap<String, String>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
@@ -132,6 +179,26 @@ pub struct IncidentView {
     pub health_milli: i64,
     pub health_decay_milli_per_minute: i64,
     pub requirements: Vec<RequirementView>,
+    pub elements: Vec<SceneElementView>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+pub struct SceneElementView {
+    pub id: String,
+    pub label: String,
+    pub kind: SceneKind,
+    pub active: bool,
+    pub role: Option<Role>,
+    pub health_milli: Option<i64>,
+    pub health_decay_milli_per_minute: i64,
+    pub remaining_work_ms: u64,
+    pub total_work_ms: u64,
+    pub blocked_by: Option<String>,
+    pub weapon: Option<String>,
+    pub fight_risk_milli: i64,
+    pub prison_chance_milli: i64,
+    pub bill: Option<i64>,
+    pub remaining_timer_ms: Option<u64>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
@@ -142,6 +209,7 @@ pub struct UnitView {
     pub status: String,
     pub incident: Option<String>,
     pub eta_ms: Option<u64>,
+    pub location: Point,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
@@ -175,6 +243,7 @@ pub struct Session<'a> {
     incidents: Vec<IncidentRuntime>,
     units: Vec<UnitPhase>,
     alarms: Vec<AlarmRuntime>,
+    rng_state: u64,
 }
 
 impl<'a> Session<'a> {
@@ -188,6 +257,12 @@ impl<'a> Session<'a> {
                 current_stage: None,
                 answer_deadline_ms: call.arrival_ms.saturating_add(call.answer_window_ms),
                 conversation_deadline_ms: None,
+                disabled_nodes: call.disabled_nodes.iter().cloned().collect(),
+                history: Vec::new(),
+                opinion_milli: 0,
+                ignore_opinion_milli: None,
+                aar: Vec::new(),
+                facts: BTreeMap::new(),
             })
             .collect();
         let incidents = campaign
@@ -199,18 +274,7 @@ impl<'a> Session<'a> {
                 call.incident.as_ref().map(|incident| IncidentRuntime {
                     call_index,
                     phase: IncidentPhase::Hidden,
-                    health_milli: incident.health_milli,
-                    health_decay_milli_per_minute: incident.health_decay_milli_per_minute,
-                    health_remainder: 0,
-                    requirements: incident
-                        .requirements
-                        .iter()
-                        .map(|requirement| RequirementRuntime {
-                            role: requirement.role,
-                            remaining_work_ms: requirement.work_ms,
-                            total_work_ms: requirement.work_ms,
-                        })
-                        .collect(),
+                    elements: runtime_elements(incident),
                 })
             })
             .collect();
@@ -224,6 +288,7 @@ impl<'a> Session<'a> {
             incidents,
             units,
             alarms: Vec::new(),
+            rng_state: campaign.seed.max(1),
         }
     }
 
@@ -292,48 +357,378 @@ impl<'a> Session<'a> {
             return Err(format!("call {call_id:?} is not ringing"));
         }
         call.phase = CallPhase::Active;
-        call.current_stage = Some(definition.initial_stage.clone());
         call.conversation_deadline_ms = Some(conversation_deadline_ms);
+        call.current_stage = None;
+        call.history.clear();
+        let initial = definition.initial_stage.clone();
+        self.enter_graph_node(index, initial)?;
         Ok(())
     }
 
     pub fn say(&mut self, call_id: &str, choice_id: &str) -> Result<(), String> {
         self.require_running()?;
         let call_index = self.call_index(call_id)?;
-        let call = &self.calls[call_index];
-        if call.phase != CallPhase::Active {
-            return Err(format!("call {call_id:?} is not active"));
-        }
-        let stage_id = call
-            .current_stage
-            .as_deref()
-            .ok_or_else(|| format!("call {call_id:?} has no active dialogue stage"))?;
-        let choice = self.campaign.shift.calls[call_index]
-            .stage(stage_id)
-            .and_then(|stage| stage.choices.iter().find(|choice| choice.id == choice_id))
-            .cloned()
-            .ok_or_else(|| format!("choice {choice_id:?} is not available"))?;
+        self.say_graph(call_index, choice_id)
+    }
 
-        self.score += choice.score_delta;
+    fn say_graph(&mut self, call_index: usize, choice_id: &str) -> Result<(), String> {
+        if self.calls[call_index].phase != CallPhase::Active {
+            let id = &self.campaign.shift.calls[call_index].id;
+            return Err(format!("call {id:?} is not active"));
+        }
+        let current = self.calls[call_index]
+            .current_stage
+            .clone()
+            .ok_or_else(|| "active graph call has no current node".to_owned())?;
+        let available = self.graph_answers(call_index, &current)?;
+        if !available.iter().any(|answer| answer == choice_id) {
+            return Err(format!("choice {choice_id:?} is not available"));
+        }
+        self.enter_graph_node(call_index, choice_id.to_owned())
+    }
+
+    fn enter_graph_node(&mut self, call_index: usize, mut node_id: String) -> Result<(), String> {
+        let definition = &self.campaign.shift.calls[call_index];
+        let limit = definition.nodes.len().saturating_mul(3).max(1);
+        for _ in 0..limit {
+            let node = self.campaign.shift.calls[call_index]
+                .node(&node_id)
+                .cloned()
+                .ok_or_else(|| format!("unknown dialogue node {node_id:?}"))?;
+            if self.calls[call_index].disabled_nodes.contains(&node.id) {
+                return Err(format!("dialogue node {:?} is disabled", node.id));
+            }
+            if node.operator {
+                self.calls[call_index]
+                    .disabled_nodes
+                    .insert(node.id.clone());
+            }
+            self.calls[call_index].history.push(node.id.clone());
+            self.calls[call_index].current_stage = Some(node.id.clone());
+            self.apply_graph_actions(call_index, &node.actions)?;
+            self.calls[call_index].aar.extend(node.aar);
+            if self.calls[call_index].phase != CallPhase::Active {
+                return Ok(());
+            }
+            if !node.operator {
+                if self.graph_answers(call_index, &node.id)?.is_empty() {
+                    self.complete_call(call_index);
+                }
+                return Ok(());
+            }
+
+            let answers = node
+                .answers
+                .iter()
+                .filter(|answer| {
+                    answer.as_str() != "back"
+                        && !self.calls[call_index]
+                            .disabled_nodes
+                            .contains(answer.as_str())
+                })
+                .filter_map(|answer| {
+                    self.campaign.shift.calls[call_index]
+                        .node(answer)
+                        .map(|target| (target.id.clone(), target.chance_weight))
+                })
+                .collect::<Vec<_>>();
+            let Some(next) = self.weighted_answer(&answers) else {
+                self.complete_call(call_index);
+                return Ok(());
+            };
+            node_id = next;
+        }
+        Err("dialogue graph exceeded its automatic traversal limit".to_owned())
+    }
+
+    fn graph_answers(&self, call_index: usize, node_id: &str) -> Result<Vec<String>, String> {
+        self.graph_answers_before(call_index, node_id, self.calls[call_index].history.len())
+    }
+
+    fn graph_answers_before(
+        &self,
+        call_index: usize,
+        node_id: &str,
+        before: usize,
+    ) -> Result<Vec<String>, String> {
+        let definition = &self.campaign.shift.calls[call_index];
+        let node = definition
+            .node(node_id)
+            .ok_or_else(|| format!("unknown dialogue node {node_id:?}"))?;
+        let history = &self.calls[call_index].history;
+        let current_position = history[..before.min(history.len())]
+            .iter()
+            .rposition(|visited| visited == node_id)
+            .unwrap_or(before.min(history.len()));
+        let mut answers = Vec::new();
+        for answer in &node.answers {
+            if answer == "back" {
+                if let Some(previous_position) =
+                    history[..current_position].iter().rposition(|visited| {
+                        definition
+                            .node(visited)
+                            .is_some_and(|previous| !previous.operator)
+                    })
+                {
+                    let previous_caller = &history[previous_position];
+                    for nested in self.graph_answers_before(
+                        call_index,
+                        previous_caller,
+                        previous_position + 1,
+                    )? {
+                        if !answers.contains(&nested) {
+                            answers.push(nested);
+                        }
+                    }
+                }
+            } else if !self.calls[call_index]
+                .disabled_nodes
+                .contains(answer.as_str())
+            {
+                answers.push(answer.clone());
+            }
+        }
+        Ok(answers)
+    }
+
+    fn weighted_answer(&mut self, answers: &[(String, u32)]) -> Option<String> {
+        let total = answers
+            .iter()
+            .fold(0_u64, |sum, (_, weight)| sum.saturating_add(*weight as u64));
+        if total == 0 {
+            return None;
+        }
+        self.rng_state ^= self.rng_state << 13;
+        self.rng_state ^= self.rng_state >> 7;
+        self.rng_state ^= self.rng_state << 17;
+        let pick = self.rng_state % total;
+        let mut cursor = 0_u64;
+        answers.iter().find_map(|(id, weight)| {
+            cursor = cursor.saturating_add(*weight as u64);
+            (pick < cursor).then(|| id.clone())
+        })
+    }
+
+    fn apply_graph_actions(&mut self, call_index: usize, actions: &[String]) -> Result<(), String> {
+        for raw in actions {
+            for action in raw.split(';') {
+                let action = action
+                    .chars()
+                    .filter(|character| !character.is_whitespace())
+                    .collect::<String>()
+                    .to_ascii_lowercase();
+                if action.is_empty() {
+                    continue;
+                }
+                if action == "actionhangup" {
+                    self.complete_call(call_index);
+                    continue;
+                }
+                if action == "actionsetlocation" {
+                    self.reveal_incident(call_index);
+                    continue;
+                }
+                if let Some((node, assignment)) = action.split_once("->") {
+                    if let Some((field, value)) = assignment.split_once('=')
+                        && matches!(field, "active" | "isactive" | "action")
+                    {
+                        let active = parse_bool(value)?;
+                        if self.campaign.shift.calls[call_index].node(node).is_some() {
+                            if active {
+                                self.calls[call_index].disabled_nodes.remove(node);
+                            } else {
+                                self.calls[call_index]
+                                    .disabled_nodes
+                                    .insert(node.to_owned());
+                            }
+                        }
+                    }
+                    continue;
+                }
+                if let Some(assignment) = action.strip_prefix("opinioneffect") {
+                    let old = self.calls[call_index].opinion_milli;
+                    let next = apply_number(old, assignment, 1_000)?;
+                    self.calls[call_index].opinion_milli = next;
+                    self.score += (next - old) / 100;
+                    continue;
+                }
+                if let Some(assignment) = action.strip_prefix("onignore") {
+                    let old = self.calls[call_index].ignore_opinion_milli.unwrap_or(0);
+                    self.calls[call_index].ignore_opinion_milli =
+                        Some(apply_number(old, assignment, 1_000)?);
+                    continue;
+                }
+                if let Some(assignment) = action.strip_prefix("score") {
+                    self.score = apply_number(self.score, assignment, 1)?;
+                    continue;
+                }
+                if let Some(assignment) = action.strip_prefix("addcash") {
+                    self.score = apply_number(self.score, assignment, 1)?;
+                    continue;
+                }
+                if let Some((element, property)) = action.split_once('.') {
+                    self.apply_incident_property(call_index, element, property)?;
+                    continue;
+                }
+                if let Some((element, kind)) = action.split_once('=')
+                    && let Some(kind) = parse_scene_kind(kind)
+                {
+                    self.change_scene_kind(call_index, element, kind);
+                    continue;
+                }
+                if let Some((key, value)) = action.split_once('=') {
+                    self.calls[call_index]
+                        .facts
+                        .insert(key.to_owned(), value.to_owned());
+                }
+            }
+        }
+        Ok(())
+    }
+
+    fn apply_incident_property(
+        &mut self,
+        call_index: usize,
+        element_id: &str,
+        property: &str,
+    ) -> Result<(), String> {
+        let Some(incident_index) = self.incident_for_call(call_index) else {
+            return Ok(());
+        };
+        let field_end = property.find(['=', '+', '-']).unwrap_or(property.len());
+        let field = &property[..field_end];
+        let elements = &mut self.incidents[incident_index].elements;
+        let exact = elements.iter().position(|element| element.id == element_id);
+        let health_element = || {
+            exact.or_else(|| {
+                elements
+                    .iter()
+                    .position(|element| element.health_milli.is_some())
+            })
+        };
+        match field {
+            "hp" => {
+                if let Some(index) = health_element() {
+                    let old = elements[index].health_milli.unwrap_or(100_000);
+                    elements[index].health_milli =
+                        Some(apply_number(old, &property[field_end..], 1_000)?.clamp(0, 100_000));
+                }
+            }
+            "hpchange" | "chchange" => {
+                if let Some(index) = health_element() {
+                    let current = -elements[index].health_decay_milli_per_minute;
+                    let change = apply_number(current, &property[field_end..], 60_000)?;
+                    elements[index].health_decay_milli_per_minute = (-change).max(0);
+                }
+            }
+            "healthdecay" => {
+                if let Some(index) = health_element() {
+                    let current = elements[index].health_decay_milli_per_minute;
+                    elements[index].health_decay_milli_per_minute =
+                        apply_number(current, &property[field_end..], 1)?.max(0);
+                }
+            }
+            "isactive" => {
+                if let Some(index) = exact {
+                    elements[index].active = parse_bool(&property[field_end + 1..])?;
+                    if elements[index].active
+                        && self.incidents[incident_index].phase == IncidentPhase::Resolved
+                    {
+                        self.incidents[incident_index].phase = IncidentPhase::Reported;
+                    }
+                }
+            }
+            "work" => {
+                if let Some(index) = exact {
+                    let next = apply_number(
+                        elements[index].remaining_work_ms as i64,
+                        &property[field_end..],
+                        1_000,
+                    )?
+                    .max(0) as u64;
+                    elements[index].remaining_work_ms = next;
+                    elements[index].total_work_ms = elements[index].total_work_ms.max(next);
+                    if next > 0 {
+                        elements[index].completed = false;
+                    }
+                }
+            }
+            "workchange" => {
+                if let Some(index) = exact {
+                    elements[index].work_growth_ms_per_minute = apply_number(
+                        elements[index].work_growth_ms_per_minute,
+                        &property[field_end..],
+                        60_000,
+                    )?
+                    .max(0);
+                }
+            }
+            "weapon" => {
+                if let Some(index) = exact {
+                    elements[index].weapon = property[field_end + 1..]
+                        .split_once('=')
+                        .map(|(_, value)| value.to_owned())
+                        .or_else(|| Some(property[field_end + 1..].to_owned()));
+                }
+            }
+            "fightrisk" => {
+                if let Some(index) = exact {
+                    elements[index].fight_risk_milli = apply_number(
+                        elements[index].fight_risk_milli,
+                        &property[field_end..],
+                        1_000,
+                    )?;
+                }
+            }
+            "prisonchance" => {
+                if let Some(index) = exact {
+                    elements[index].prison_chance_milli = apply_number(
+                        elements[index].prison_chance_milli,
+                        &property[field_end..],
+                        1_000,
+                    )?;
+                }
+            }
+            "bill" => {
+                if let Some(index) = exact {
+                    let old = elements[index].bill.unwrap_or(0);
+                    elements[index].bill =
+                        Some(apply_number(old, &property[field_end..], 1)?.max(0));
+                }
+            }
+            _ => {}
+        }
+        Ok(())
+    }
+
+    fn change_scene_kind(&mut self, call_index: usize, element_id: &str, kind: SceneKind) {
+        let Some(incident_index) = self.incident_for_call(call_index) else {
+            return;
+        };
+        if let Some(element) = self.incidents[incident_index]
+            .elements
+            .iter_mut()
+            .find(|element| element.id == element_id)
+        {
+            element.kind = kind;
+            element.role = role_for_scene(kind);
+        }
+    }
+
+    fn reveal_incident(&mut self, call_index: usize) {
         if let Some(incident_index) = self.incident_for_call(call_index) {
             let incident = &mut self.incidents[incident_index];
-            incident.health_decay_milli_per_minute = (incident.health_decay_milli_per_minute
-                + choice.health_decay_delta_milli_per_minute)
-                .max(0);
-            if choice.reveal_incident && incident.phase == IncidentPhase::Hidden {
+            if incident.phase == IncidentPhase::Hidden {
                 incident.phase = IncidentPhase::Reported;
             }
         }
+    }
 
+    fn complete_call(&mut self, call_index: usize) {
         let call = &mut self.calls[call_index];
-        if let Some(next) = choice.next {
-            call.current_stage = Some(next);
-        } else {
-            call.phase = CallPhase::Completed;
-            call.current_stage = None;
-            call.conversation_deadline_ms = None;
-        }
-        Ok(())
+        call.phase = CallPhase::Completed;
+        call.current_stage = None;
+        call.conversation_deadline_ms = None;
     }
 
     pub fn dispatch(&mut self, unit_id: &str, incident_id: &str) -> Result<u64, String> {
@@ -438,8 +833,9 @@ impl<'a> Session<'a> {
             .calls
             .iter()
             .zip(&self.calls)
-            .filter(|(_, runtime)| runtime.phase != CallPhase::Scheduled)
-            .map(|(definition, runtime)| self.call_view(definition, runtime))
+            .enumerate()
+            .filter(|(_, (_, runtime))| runtime.phase != CallPhase::Scheduled)
+            .map(|(index, (definition, runtime))| self.call_view(index, definition, runtime))
             .collect();
         let incidents = self
             .incidents
@@ -478,6 +874,21 @@ impl<'a> Session<'a> {
                 elapsed_ms: self.elapsed_ms,
                 duration_ms: self.duration_ms(),
                 remaining_ms: self.duration_ms().saturating_sub(self.elapsed_ms),
+                duty: self
+                    .campaign
+                    .shift
+                    .duties
+                    .iter()
+                    .find(|duty| self.elapsed_ms >= duty.start_ms && self.elapsed_ms < duty.end_ms)
+                    .map(|duty| DutyView {
+                        id: duty.id.clone(),
+                        chapter: duty.chapter,
+                        number: duty.number,
+                        city: duty.city.clone(),
+                        map_id: duty.map_id.clone(),
+                        elapsed_ms: self.elapsed_ms.saturating_sub(duty.start_ms),
+                        remaining_ms: duty.end_ms.saturating_sub(self.elapsed_ms),
+                    }),
             },
             active_call: self
                 .calls
@@ -602,20 +1013,43 @@ impl<'a> Session<'a> {
             ) {
                 continue;
             }
-            if incident.health_decay_milli_per_minute > 0 {
-                let numerator = incident
-                    .health_milli
-                    .saturating_mul(60_000)
-                    .saturating_sub(incident.health_remainder)
-                    .max(1) as u64;
-                let rate = incident.health_decay_milli_per_minute as u64;
-                let delta = numerator.saturating_add(rate - 1) / rate;
-                next = next.min(self.elapsed_ms.saturating_add(delta));
+            for element in incident
+                .elements
+                .iter()
+                .filter(|element| element.active && element.kind != SceneKind::Dead)
+            {
+                if let Some(remaining) = element.remaining_timer_ms
+                    && remaining > 0
+                {
+                    next = next.min(self.elapsed_ms.saturating_add(remaining));
+                }
+                if let Some(health) = element.health_milli
+                    && element.health_decay_milli_per_minute > 0
+                {
+                    let numerator = health
+                        .saturating_mul(60_000)
+                        .saturating_sub(element.health_remainder)
+                        .max(1) as u64;
+                    let rate = element.health_decay_milli_per_minute as u64;
+                    let delta = numerator.saturating_add(rate - 1) / rate;
+                    next = next.min(self.elapsed_ms.saturating_add(delta));
+                }
             }
-            for requirement in &incident.requirements {
-                let workers = self.workers(incident_index, requirement.role);
-                if workers > 0 && requirement.remaining_work_ms > 0 {
-                    let delta = requirement.remaining_work_ms.saturating_add(workers - 1) / workers;
+            for role in [Role::Police, Role::Fire, Role::Medical] {
+                let workers = self.workers(incident_index, role);
+                let remaining = incident
+                    .elements
+                    .iter()
+                    .filter(|element| {
+                        element.active
+                            && element.role == Some(role)
+                            && scene_element_unblocked(incident, element)
+                    })
+                    .fold(0_u64, |sum, element| {
+                        sum.saturating_add(element.remaining_work_ms)
+                    });
+                if workers > 0 && remaining > 0 {
+                    let delta = remaining.saturating_add(workers - 1) / workers;
                     next = next.min(self.elapsed_ms.saturating_add(delta));
                 }
             }
@@ -634,27 +1068,60 @@ impl<'a> Session<'a> {
             ) {
                 continue;
             }
-            let roles = self.incidents[incident_index]
-                .requirements
-                .iter()
-                .map(|requirement| requirement.role)
-                .collect::<Vec<_>>();
-            let workers = roles
-                .iter()
-                .map(|role| self.workers(incident_index, *role))
-                .collect::<Vec<_>>();
+            let workers = [
+                (Role::Police, self.workers(incident_index, Role::Police)),
+                (Role::Fire, self.workers(incident_index, Role::Fire)),
+                (Role::Medical, self.workers(incident_index, Role::Medical)),
+            ];
             let incident = &mut self.incidents[incident_index];
-            let decay = incident
-                .health_decay_milli_per_minute
-                .saturating_mul(delta_ms as i64)
-                .saturating_add(incident.health_remainder);
-            incident.health_milli -= decay / 60_000;
-            incident.health_remainder = decay % 60_000;
-
-            for (requirement, workers) in incident.requirements.iter_mut().zip(workers) {
-                requirement.remaining_work_ms = requirement
-                    .remaining_work_ms
-                    .saturating_sub(delta_ms.saturating_mul(workers));
+            for element in incident
+                .elements
+                .iter_mut()
+                .filter(|element| element.active)
+            {
+                if let Some(remaining) = &mut element.remaining_timer_ms {
+                    *remaining = remaining.saturating_sub(delta_ms);
+                }
+                if let Some(health) = &mut element.health_milli {
+                    let decay = element
+                        .health_decay_milli_per_minute
+                        .saturating_mul(delta_ms as i64)
+                        .saturating_add(element.health_remainder);
+                    *health -= decay / 60_000;
+                    element.health_remainder = decay % 60_000;
+                }
+                let growth = element
+                    .work_growth_ms_per_minute
+                    .saturating_mul(delta_ms as i64)
+                    .saturating_add(element.work_remainder);
+                let work_delta = (growth / 60_000).max(0) as u64;
+                element.work_remainder = growth % 60_000;
+                element.remaining_work_ms = element.remaining_work_ms.saturating_add(work_delta);
+                element.total_work_ms = element.total_work_ms.saturating_add(work_delta);
+            }
+            let blocked = incident
+                .elements
+                .iter()
+                .filter(|element| element.active && element.remaining_work_ms > 0)
+                .map(|element| element.id.clone())
+                .collect::<HashSet<_>>();
+            for (role, worker_count) in workers {
+                let mut capacity = delta_ms.saturating_mul(worker_count);
+                for element in incident.elements.iter_mut().filter(|element| {
+                    element.active
+                        && element.role == Some(role)
+                        && element
+                            .blocked_by
+                            .as_ref()
+                            .is_none_or(|blocker| !blocked.contains(blocker))
+                }) {
+                    let applied = capacity.min(element.remaining_work_ms);
+                    element.remaining_work_ms -= applied;
+                    capacity -= applied;
+                    if capacity == 0 {
+                        break;
+                    }
+                }
             }
         }
     }
@@ -671,10 +1138,24 @@ impl<'a> Session<'a> {
     }
 
     fn process_due(&mut self) {
-        for (definition, runtime) in self.campaign.shift.calls.iter().zip(&mut self.calls) {
-            if runtime.phase == CallPhase::Scheduled && definition.arrival_ms <= self.elapsed_ms {
-                runtime.phase = CallPhase::Ringing;
+        for (index, definition) in self.campaign.shift.calls.iter().enumerate() {
+            let incident_index = self
+                .incidents
+                .iter()
+                .position(|incident| incident.call_index == index);
+            if self.calls[index].phase == CallPhase::Scheduled
+                && definition.arrival_ms <= self.elapsed_ms
+            {
+                if definition.kind == EventKind::Report {
+                    self.calls[index].phase = CallPhase::Completed;
+                    if let Some(incident_index) = incident_index {
+                        self.incidents[incident_index].phase = IncidentPhase::Reported;
+                    }
+                } else {
+                    self.calls[index].phase = CallPhase::Ringing;
+                }
             }
+            let runtime = &mut self.calls[index];
             if runtime.phase == CallPhase::Ringing && runtime.answer_deadline_ms <= self.elapsed_ms
             {
                 runtime.phase = CallPhase::Missed;
@@ -687,6 +1168,9 @@ impl<'a> Session<'a> {
                 runtime.phase = CallPhase::Dropped;
                 runtime.current_stage = None;
                 runtime.conversation_deadline_ms = None;
+                if let Some(opinion) = runtime.ignore_opinion_milli.take() {
+                    self.score += opinion / 100;
+                }
             }
         }
         for phase in &mut self.units {
@@ -709,6 +1193,8 @@ impl<'a> Session<'a> {
             }
         }
 
+        self.process_scene_completions();
+
         let mut terminal_incidents = Vec::new();
         for (index, incident) in self.incidents.iter_mut().enumerate() {
             if matches!(
@@ -717,21 +1203,32 @@ impl<'a> Session<'a> {
             ) {
                 continue;
             }
-            if incident.health_milli <= 0 {
-                incident.health_milli = 0;
+            let failed = incident.elements.iter().any(|element| {
+                element.active
+                    && element.kind != SceneKind::Dead
+                    && element.health_milli.is_some_and(|health| health <= 0)
+            });
+            let resolved = incident.phase == IncidentPhase::Reported
+                && incident.elements.iter().all(|element| {
+                    !element.active
+                        || ((element.role.is_none() || element.remaining_work_ms == 0)
+                            && (element.remaining_timer_ms.is_none() || element.completed))
+                });
+            if failed {
+                for element in &mut incident.elements {
+                    if element.health_milli.is_some_and(|health| health < 0) {
+                        element.health_milli = Some(0);
+                    }
+                }
                 incident.phase = IncidentPhase::Lost;
                 terminal_incidents.push(index);
-            } else if incident
-                .requirements
-                .iter()
-                .all(|requirement| requirement.remaining_work_ms == 0)
-            {
+            } else if resolved {
                 incident.phase = IncidentPhase::Resolved;
                 let definition = self.campaign.shift.calls[incident.call_index]
                     .incident
                     .as_ref()
                     .expect("runtime incident has definition");
-                self.score += definition.base_score + incident.health_milli / 1_000;
+                self.score += definition.base_score + incident_health(incident) / 1_000;
                 terminal_incidents.push(index);
             }
         }
@@ -771,24 +1268,75 @@ impl<'a> Session<'a> {
         }
     }
 
-    fn call_view(&self, definition: &CallDefinition, runtime: &CallRuntime) -> CallView {
+    fn process_scene_completions(&mut self) {
+        loop {
+            let pending =
+                self.incidents
+                    .iter()
+                    .enumerate()
+                    .find_map(|(incident_index, incident)| {
+                        if matches!(
+                            incident.phase,
+                            IncidentPhase::Resolved | IncidentPhase::Lost
+                        ) || self.calls[incident.call_index].phase == CallPhase::Scheduled
+                        {
+                            return None;
+                        }
+                        incident
+                            .elements
+                            .iter()
+                            .enumerate()
+                            .find(|(_, element)| {
+                                element.active
+                                    && !element.completed
+                                    && (element.remaining_timer_ms == Some(0)
+                                        || (element.total_work_ms > 0
+                                            && element.remaining_work_ms == 0))
+                            })
+                            .map(|(element_index, _)| {
+                                (incident_index, element_index, incident.call_index)
+                            })
+                    });
+            let Some((incident_index, element_index, call_index)) = pending else {
+                break;
+            };
+            let element = &mut self.incidents[incident_index].elements[element_index];
+            element.completed = true;
+            if element.remaining_timer_ms.is_some() {
+                element.active = false;
+            }
+            let actions = element.actions.clone();
+            let aar = element.aar.clone();
+            self.calls[call_index].aar.extend(aar);
+            self.apply_graph_actions(call_index, &actions)
+                .expect("validated scene completion actions");
+        }
+    }
+
+    fn call_view(
+        &self,
+        call_index: usize,
+        definition: &CallDefinition,
+        runtime: &CallRuntime,
+    ) -> CallView {
         let (caller_text, choices) = if runtime.phase == CallPhase::Active {
             runtime
                 .current_stage
                 .as_deref()
-                .and_then(|id| definition.stage(id))
-                .map(|stage| {
-                    (
-                        Some(stage.caller.clone()),
-                        stage
-                            .choices
-                            .iter()
-                            .map(|choice| ChoiceView {
-                                id: choice.id.clone(),
-                                text: choice.text.clone(),
+                .and_then(|id| definition.node(id).map(|node| (id, node)))
+                .map(|(id, node)| {
+                    let choices = self
+                        .graph_answers(call_index, id)
+                        .unwrap_or_default()
+                        .into_iter()
+                        .filter_map(|answer| {
+                            definition.node(&answer).map(|target| ChoiceView {
+                                id: target.id.clone(),
+                                text: button_text(&target.text),
                             })
-                            .collect(),
-                    )
+                        })
+                        .collect();
+                    (Some(conversation_text(&node.text)), choices)
                 })
                 .unwrap_or((None, Vec::new()))
         } else {
@@ -803,6 +1351,18 @@ impl<'a> Session<'a> {
             conversation_deadline_ms: runtime.conversation_deadline_ms,
             caller_text,
             choices,
+            transcript: runtime
+                .history
+                .iter()
+                .filter_map(|id| definition.node(id))
+                .map(|node| TranscriptView {
+                    speaker: if node.operator { "operator" } else { "caller" },
+                    text: conversation_text(&node.text),
+                })
+                .collect(),
+            opinion_milli: runtime.opinion_milli,
+            after_action_report: runtime.aar.clone(),
+            facts: runtime.facts.clone(),
         }
     }
 
@@ -811,20 +1371,58 @@ impl<'a> Session<'a> {
             .incident
             .as_ref()
             .expect("runtime incident has definition");
+        let requirements = [Role::Police, Role::Fire, Role::Medical]
+            .into_iter()
+            .filter_map(|role| {
+                let elements = runtime
+                    .elements
+                    .iter()
+                    .filter(|element| element.active && element.role == Some(role))
+                    .collect::<Vec<_>>();
+                (!elements.is_empty()).then(|| RequirementView {
+                    role,
+                    remaining_work_ms: elements.iter().fold(0_u64, |sum, element| {
+                        sum.saturating_add(element.remaining_work_ms)
+                    }),
+                    total_work_ms: elements.iter().fold(0_u64, |sum, element| {
+                        sum.saturating_add(element.total_work_ms)
+                    }),
+                })
+            })
+            .collect();
         IncidentView {
             id: definition.id.clone(),
             title: definition.title.clone(),
             status: enum_name(runtime.phase),
             location: definition.location,
-            health_milli: runtime.health_milli,
-            health_decay_milli_per_minute: runtime.health_decay_milli_per_minute,
-            requirements: runtime
-                .requirements
+            health_milli: incident_health(runtime),
+            health_decay_milli_per_minute: runtime
+                .elements
                 .iter()
-                .map(|requirement| RequirementView {
-                    role: requirement.role,
-                    remaining_work_ms: requirement.remaining_work_ms,
-                    total_work_ms: requirement.total_work_ms,
+                .filter(|element| element.active)
+                .map(|element| element.health_decay_milli_per_minute)
+                .max()
+                .unwrap_or(0),
+            requirements,
+            elements: runtime
+                .elements
+                .iter()
+                .map(|element| SceneElementView {
+                    id: element.id.clone(),
+                    label: element.label.clone(),
+                    kind: element.kind,
+                    active: element.active,
+                    role: element.role,
+                    health_milli: element.health_milli,
+                    health_decay_milli_per_minute: element.health_decay_milli_per_minute,
+                    remaining_work_ms: element.remaining_work_ms,
+                    total_work_ms: element.total_work_ms,
+                    blocked_by: element.blocked_by.clone(),
+                    weapon: element.weapon.clone(),
+                    fight_risk_milli: element.fight_risk_milli,
+                    prison_chance_milli: element.prison_chance_milli,
+                    bill: element.bill,
+                    remaining_timer_ms: element.remaining_timer_ms,
                 })
                 .collect(),
         }
@@ -864,6 +1462,18 @@ impl<'a> Session<'a> {
             status: status.to_owned(),
             incident,
             eta_ms,
+            location: match phase {
+                UnitPhase::EnRoute { incident_index, .. }
+                | UnitPhase::OnScene { incident_index } => {
+                    let call_index = self.incidents[*incident_index].call_index;
+                    self.campaign.shift.calls[call_index]
+                        .incident
+                        .as_ref()
+                        .expect("runtime incident has definition")
+                        .location
+                }
+                _ => definition.base,
+            },
         }
     }
 
@@ -874,6 +1484,82 @@ impl<'a> Session<'a> {
             .expect("runtime incident has definition")
             .id
             .clone()
+    }
+}
+
+fn runtime_elements(incident: &IncidentDefinition) -> Vec<SceneElementRuntime> {
+    incident
+        .elements
+        .iter()
+        .map(|element| SceneElementRuntime {
+            id: element.id.clone(),
+            label: element.label.clone(),
+            kind: element.kind,
+            active: element.active,
+            role: element.role,
+            health_milli: element.health_milli,
+            health_decay_milli_per_minute: element.health_decay_milli_per_minute,
+            health_remainder: 0,
+            remaining_work_ms: element.work_ms,
+            total_work_ms: element.work_ms,
+            work_growth_ms_per_minute: element.work_growth_ms_per_minute,
+            work_remainder: 0,
+            blocked_by: element.blocked_by.clone(),
+            weapon: element.weapon.clone(),
+            fight_risk_milli: element.fight_risk_milli,
+            prison_chance_milli: element.prison_chance_milli,
+            bill: element.bill,
+            remaining_timer_ms: element.timer_ms,
+            actions: element.actions.clone(),
+            aar: element.aar.clone(),
+            completed: element.timer_ms.is_none() && element.work_ms == 0,
+        })
+        .collect()
+}
+
+fn incident_health(incident: &IncidentRuntime) -> i64 {
+    incident
+        .elements
+        .iter()
+        .filter(|element| element.active && element.kind != SceneKind::Dead)
+        .filter_map(|element| element.health_milli)
+        .min()
+        .unwrap_or(100_000)
+}
+
+fn scene_element_unblocked(incident: &IncidentRuntime, element: &SceneElementRuntime) -> bool {
+    element.blocked_by.as_ref().is_none_or(|blocker| {
+        incident
+            .elements
+            .iter()
+            .find(|candidate| &candidate.id == blocker)
+            .is_none_or(|candidate| !candidate.active || candidate.remaining_work_ms == 0)
+    })
+}
+
+const fn role_for_scene(kind: SceneKind) -> Option<Role> {
+    match kind {
+        SceneKind::Criminal | SceneKind::Suspect => Some(Role::Police),
+        SceneKind::Injured => Some(Role::Medical),
+        SceneKind::Fire | SceneKind::Tech | SceneKind::Work => Some(Role::Fire),
+        _ => None,
+    }
+}
+
+fn parse_scene_kind(value: &str) -> Option<SceneKind> {
+    match value {
+        "criminal" => Some(SceneKind::Criminal),
+        "suspect" => Some(SceneKind::Suspect),
+        "injured" | "injuried" => Some(SceneKind::Injured),
+        "dead" => Some(SceneKind::Dead),
+        "fire" => Some(SceneKind::Fire),
+        "tech" => Some(SceneKind::Tech),
+        "work" => Some(SceneKind::Work),
+        "timer" => Some(SceneKind::Timer),
+        "witness" => Some(SceneKind::Witness),
+        "passerby" => Some(SceneKind::Passerby),
+        "deco" => Some(SceneKind::Deco),
+        _ => None,
     }
 }
 
@@ -894,15 +1580,178 @@ fn alarm_view(alarm: &AlarmRuntime) -> AlarmView {
     }
 }
 
+fn button_text(text: &str) -> String {
+    text.find('{')
+        .and_then(|start| {
+            text[start + 1..]
+                .find('}')
+                .map(|end| &text[start + 1..start + 1 + end])
+        })
+        .map_or_else(|| conversation_text(text), |label| label.to_owned())
+}
+
+fn conversation_text(text: &str) -> String {
+    let mut output = String::with_capacity(text.len());
+    let mut inside_label = false;
+    for character in text.chars() {
+        match character {
+            '{' => inside_label = true,
+            '}' if inside_label => inside_label = false,
+            _ if !inside_label => output.push(character),
+            _ => {}
+        }
+    }
+    output.trim().to_owned()
+}
+
+fn parse_bool(value: &str) -> Result<bool, String> {
+    match value {
+        "true" => Ok(true),
+        "false" => Ok(false),
+        _ => Err(format!("invalid boolean value {value:?}")),
+    }
+}
+
+fn apply_number(current: i64, assignment: &str, scale: i64) -> Result<i64, String> {
+    let (operation, raw) = if let Some(value) = assignment.strip_prefix("+=") {
+        ("add", value)
+    } else if let Some(value) = assignment.strip_prefix("-=") {
+        ("subtract", value)
+    } else if let Some(value) = assignment.strip_prefix('=') {
+        ("set", value)
+    } else {
+        return Err(format!("invalid numeric assignment {assignment:?}"));
+    };
+    let value = raw
+        .parse::<f64>()
+        .map_err(|_| format!("invalid numeric value {raw:?}"))?;
+    if !value.is_finite() {
+        return Err(format!("non-finite numeric value {raw:?}"));
+    }
+    let scaled = (value * scale as f64).round();
+    if scaled < i64::MIN as f64 || scaled > i64::MAX as f64 {
+        return Err(format!("numeric value {raw:?} is out of range"));
+    }
+    let scaled = scaled as i64;
+    Ok(match operation {
+        "add" => current.saturating_add(scaled),
+        "subtract" => current.saturating_sub(scaled),
+        _ => scaled,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use std::path::Path;
 
+    use serde_json::json;
+
     use super::*;
+    use crate::campaign::CAMPAIGN_SCHEMA;
 
     fn campaign() -> Campaign {
         Campaign::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("data/campaign/pilot.json"))
             .expect("campaign")
+    }
+
+    fn graph_campaign() -> Campaign {
+        let campaign: Campaign = serde_json::from_value(json!({
+            "schema": CAMPAIGN_SCHEMA,
+            "id": "graph-test",
+            "title": "Graph test",
+            "seed": 1,
+            "max_score": 100,
+            "shift": {
+                "id": "graph",
+                "title": "Graph",
+                "duration_ms": 600_000,
+                "units": [{
+                    "id": "medic",
+                    "label": "Medic",
+                    "role": "medical",
+                    "base": {"x": 0, "y": 0},
+                    "speed_cells_per_minute": 1
+                }],
+                "calls": [{
+                    "id": "call",
+                    "caller": "Caller",
+                    "arrival_ms": 0,
+                    "answer_window_ms": 60_000,
+                    "conversation_window_ms": 300_000,
+                    "initial_stage": "1",
+                    "disabled_nodes": ["hidden"],
+                    "nodes": [
+                        {
+                            "id": "1",
+                            "operator": true,
+                            "text": "911",
+                            "answers": ["2"]
+                        },
+                        {
+                            "id": "2",
+                            "operator": false,
+                            "text": "Help",
+                            "answers": ["location", "unlock"]
+                        },
+                        {
+                            "id": "location",
+                            "operator": true,
+                            "text": "{WHERE?} Where are you?",
+                            "answers": ["done"],
+                            "actions": ["actionSetLocation"]
+                        },
+                        {
+                            "id": "unlock",
+                            "operator": true,
+                            "text": "{DETAILS} Tell me more",
+                            "answers": ["3"],
+                            "actions": ["hidden -> active = true"]
+                        },
+                        {
+                            "id": "3",
+                            "operator": false,
+                            "text": "There is an injured person",
+                            "answers": ["hidden", "back"]
+                        },
+                        {
+                            "id": "hidden",
+                            "operator": true,
+                            "text": "{FIRST AID} Give first aid",
+                            "answers": ["done"],
+                            "actions": [
+                                "actionSetLocation; opinionEffect += 1.5; victim.hpChange = -0.5; victim.bill = 2000; speed = 50; dir = N"
+                            ],
+                            "aar": ["first-aid"]
+                        },
+                        {
+                            "id": "done",
+                            "operator": false,
+                            "text": "Thank you",
+                            "actions": ["actionHangup"]
+                        }
+                    ],
+                    "incident": {
+                        "id": "incident",
+                        "title": "Injury",
+                        "location": {"x": 1, "y": 1},
+                        "base_score": 10,
+                        "elements": [{
+                            "id": "victim",
+                            "label": "Patient",
+                            "kind": "injured",
+                            "active": true,
+                            "role": "medical",
+                            "health_milli": 100_000,
+                            "health_decay_milli_per_minute": 0,
+                            "work_ms": 60_000
+                        }]
+                    }
+                }]
+            }
+        }))
+        .expect("graph campaign syntax");
+        campaign.validate().expect("graph campaign");
+        campaign
     }
 
     #[test]
@@ -979,5 +1828,220 @@ mod tests {
         session.start().expect("start");
         assert_eq!(session.final_score(), 0);
         assert_eq!(session.snapshot().shift.status, "complete");
+    }
+
+    #[test]
+    fn graph_dialogue_matches_original_option_and_action_semantics() {
+        let campaign = graph_campaign();
+        let mut session = Session::new(&campaign);
+        session.start().expect("start");
+        session.answer("call").expect("answer");
+
+        let call = &session.snapshot().calls[0];
+        assert_eq!(call.caller_text.as_deref(), Some("Help"));
+        assert_eq!(
+            call.choices
+                .iter()
+                .map(|choice| (choice.id.as_str(), choice.text.as_str()))
+                .collect::<Vec<_>>(),
+            vec![("location", "WHERE?"), ("unlock", "DETAILS")]
+        );
+
+        session.say("call", "unlock").expect("unlock details");
+        let call = &session.snapshot().calls[0];
+        assert_eq!(
+            call.caller_text.as_deref(),
+            Some("There is an injured person")
+        );
+        assert_eq!(
+            call.choices
+                .iter()
+                .map(|choice| choice.id.as_str())
+                .collect::<Vec<_>>(),
+            vec!["hidden", "location"]
+        );
+        assert!(session.say("call", "unlock").is_err());
+
+        session.say("call", "hidden").expect("give first aid");
+        let snapshot = session.snapshot();
+        assert_eq!(snapshot.calls[0].status, "completed");
+        assert_eq!(snapshot.campaign.score, 15);
+        assert_eq!(snapshot.incidents[0].status, "reported");
+        assert_eq!(snapshot.incidents[0].health_decay_milli_per_minute, 30_000);
+        assert_eq!(
+            snapshot.incidents[0].elements[0].health_decay_milli_per_minute,
+            30_000
+        );
+        assert_eq!(snapshot.incidents[0].elements[0].bill, Some(2_000));
+        assert_eq!(
+            snapshot.calls[0].facts.get("speed").map(String::as_str),
+            Some("50")
+        );
+        assert_eq!(
+            snapshot.calls[0].facts.get("dir").map(String::as_str),
+            Some("n")
+        );
+        assert_eq!(session.calls[0].aar, vec!["first-aid"]);
+    }
+
+    #[test]
+    fn every_imported_career_call_can_enter_its_dialogue_graph() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let campaign = Campaign::load(root.join("data/campaign/911-career.json"))
+            .expect("compiled 911 Operator career");
+        for (index, definition) in campaign.shift.calls.iter().enumerate() {
+            if definition.kind == EventKind::Report {
+                continue;
+            }
+            let mut session = Session::new(&campaign);
+            session.start().expect("start");
+            session
+                .advance_to(definition.arrival_ms)
+                .expect("advance to call");
+            session
+                .answer(&definition.id)
+                .unwrap_or_else(|error| panic!("call {} failed: {error}", definition.id));
+            if session.calls[index].phase == CallPhase::Active {
+                let node = definition
+                    .node(
+                        session.calls[index]
+                            .current_stage
+                            .as_deref()
+                            .expect("active call node"),
+                    )
+                    .expect("known active call node");
+                assert!(
+                    !node.operator,
+                    "{} stopped on an operator node",
+                    definition.id
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn imported_duties_publish_reports_without_automating_a_response() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let campaign = Campaign::load(root.join("data/campaign/911-career.json"))
+            .expect("compiled 911 Operator career");
+        let first_report = campaign
+            .shift
+            .calls
+            .iter()
+            .find(|event| event.kind == EventKind::Report)
+            .expect("generated report");
+        let mut session = Session::new(&campaign);
+        session.start().expect("start");
+        session
+            .advance_to(first_report.arrival_ms)
+            .expect("advance to report");
+        let snapshot = session.snapshot();
+        let duty = snapshot.shift.duty.expect("active duty");
+        assert_eq!(duty.city, "Kapolei");
+        assert!(snapshot.incidents.iter().any(|incident| {
+            incident.id == first_report.incident.as_ref().expect("report incident").id
+                && incident.status == "reported"
+        }));
+        assert!(snapshot.units.iter().all(|unit| unit.status == "idle"));
+    }
+
+    #[test]
+    fn imported_scene_timers_and_completion_actions_follow_the_world_clock() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let campaign = Campaign::load(root.join("data/campaign/911-career.json"))
+            .expect("compiled 911 Operator career");
+        let call_id = "chapter-1-duty-1-call-2-81";
+        let call_index = campaign
+            .shift
+            .calls
+            .iter()
+            .position(|call| call.id == call_id)
+            .expect("small car fire call");
+        let incident_index = Session::new(&campaign)
+            .incidents
+            .iter()
+            .position(|incident| incident.call_index == call_index)
+            .expect("small car fire incident");
+
+        let mut expired = Session::new(&campaign);
+        expired.start().expect("start");
+        expired.advance_to(180_000).expect("expire smoke timer");
+        let caller = expired.incidents[incident_index]
+            .elements
+            .iter()
+            .find(|element| element.id == "caller")
+            .expect("caller element");
+        let smoke = expired.incidents[incident_index]
+            .elements
+            .iter()
+            .find(|element| element.id == "smoke")
+            .expect("smoke timer");
+        assert_eq!(caller.health_milli, Some(80_000));
+        assert!(!smoke.active);
+        assert!(smoke.completed);
+        assert_eq!(expired.score, -20);
+        assert!(
+            expired.calls[call_index]
+                .aar
+                .iter()
+                .any(|line| line.contains("poisoned by smoke"))
+        );
+
+        let mut extinguished = Session::new(&campaign);
+        extinguished.start().expect("start");
+        extinguished.advance_to(120_000).expect("fire call arrival");
+        extinguished.incidents[incident_index].phase = IncidentPhase::Reported;
+        let fire_unit = campaign
+            .shift
+            .units
+            .iter()
+            .position(|unit| unit.role == Role::Fire)
+            .expect("fire unit");
+        extinguished.units[fire_unit] = UnitPhase::OnScene { incident_index };
+        extinguished
+            .advance_to(180_000)
+            .expect("extinguish before smoke timer");
+        let smoke = extinguished.incidents[incident_index]
+            .elements
+            .iter()
+            .find(|element| element.id == "smoke")
+            .expect("smoke timer");
+        assert!(!smoke.active);
+        assert!(!smoke.completed);
+        assert!(
+            extinguished.calls[call_index]
+                .aar
+                .iter()
+                .any(|line| line.contains("fire was extinguished"))
+        );
+        assert!(
+            !extinguished.calls[call_index]
+                .aar
+                .iter()
+                .any(|line| line.contains("poisoned by smoke"))
+        );
+    }
+
+    #[test]
+    fn packaged_oracle_opening_path_is_a_positive_full_campaign_replay() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let campaign = Campaign::load(root.join("data/campaign/911-career.json"))
+            .expect("compiled 911 Operator career");
+        let call = "chapter-1-duty-1-call-1-97";
+        let incident = "chapter-1-duty-1-call-1-97-incident";
+        let mut session = Session::new(&campaign);
+        session.start().expect("start");
+        session.advance_to(30_000).expect("first call arrival");
+        session.answer(call).expect("answer first call");
+        for choice in ["3", "address", "7c", "7e", "9", "11", "13", "20", "17"] {
+            session
+                .say(call, choice)
+                .unwrap_or_else(|error| panic!("choice {choice}: {error}"));
+        }
+        assert_eq!(session.snapshot().calls[0].status, "completed");
+        session
+            .dispatch("medical-1", incident)
+            .expect("dispatch medic");
+        assert!(session.final_score() > 0);
     }
 }

@@ -1,8 +1,10 @@
 {
   "schema": "benchmark-source-provenance-v1",
-  "campaign": "emergency-operator-pilot-v1",
-  "origin": "Original benchmark fixture authored for 3720-benchmark",
-  "copyrighted_game_data": false,
-  "inspiration": "Emergency-call triage and resource-dispatch games",
-  "notes": "This pilot contains no 911 Operator dialogue, map, audio, or other proprietary asset. It validates the real-time protocol before any separately authorized import from an owned installation."
+  "campaign": "911-operator-base-career-v1",
+  "origin": "Deterministic gameplay-only extraction from a locally owned Steam installation",
+  "copyrighted_game_data": true,
+  "source_title": "911 Operator",
+  "steam_app_id": "503560",
+  "build_id": "7533741",
+  "notes": "Includes English dialogue, scene rules, report definitions, career duty layout, and road graphs. Excludes audio, images, UI, models, non-English localization, saves, and account data."
 }

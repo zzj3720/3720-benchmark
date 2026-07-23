@@ -1,7 +1,8 @@
 {
-  "schema": "emergency-operator-campaign-v1",
-  "id": "emergency-operator-pilot-v1",
+  "schema": "emergency-operator-campaign-v2",
+  "id": "emergency-operator-pilot-v2",
   "title": "Harbor County Night Shift",
+  "seed": 152044080,
   "max_score": 660,
   "shift": {
     "id": "night-1",
@@ -52,52 +53,65 @@
         "answer_window_ms": 300000,
         "conversation_window_ms": 600000,
         "initial_stage": "opening",
-        "stages": [
+        "nodes": [
           {
             "id": "opening",
-            "caller": "My coworker cut his arm on a sheet of metal. There is a lot of blood.",
-            "choices": [
-              {
-                "id": "address",
-                "text": "Tell me exactly where you are.",
-                "next": "instruction",
-                "reveal_incident": true
-              },
-              {
-                "id": "dismiss",
-                "text": "Drive him to a clinic yourself.",
-                "score_delta": -20
-              }
-            ]
+            "operator": false,
+            "text": "My coworker cut his arm on a sheet of metal. There is a lot of blood.",
+            "answers": ["address", "dismiss"]
+          },
+          {
+            "id": "address",
+            "operator": true,
+            "text": "{LOCATION} Tell me exactly where you are.",
+            "answers": ["instruction"],
+            "actions": ["actionSetLocation"]
+          },
+          {
+            "id": "dismiss",
+            "operator": true,
+            "text": "{DISMISS} Drive him to a clinic yourself.",
+            "actions": ["score -= 20; actionHangup"]
           },
           {
             "id": "instruction",
-            "caller": "Warehouse 14, four blocks east and two north of dispatch. What should I do?",
-            "choices": [
-              {
-                "id": "pressure",
-                "text": "Apply firm direct pressure and keep him still.",
-                "health_decay_delta_milli_per_minute": -3000,
-                "score_delta": 15
-              },
-              {
-                "id": "wash",
-                "text": "Keep washing the wound until help arrives.",
-                "health_decay_delta_milli_per_minute": 2000,
-                "score_delta": -10
-              }
-            ]
+            "operator": false,
+            "text": "Warehouse 14, four blocks east and two north of dispatch. What should I do?",
+            "answers": ["pressure", "wash"]
+          },
+          {
+            "id": "pressure",
+            "operator": true,
+            "text": "{DIRECT PRESSURE} Apply firm direct pressure and keep him still.",
+            "actions": ["subject.healthDecay -= 3000; score += 15; actionHangup"]
+          },
+          {
+            "id": "wash",
+            "operator": true,
+            "text": "{WASH WOUND} Keep washing the wound until help arrives.",
+            "actions": ["subject.healthDecay += 2000; score -= 10; actionHangup"]
           }
         ],
         "incident": {
           "id": "bleeding-worker",
           "title": "Severe bleeding at Warehouse 14",
           "location": { "x": 4, "y": 2 },
-          "health_milli": 100000,
-          "health_decay_milli_per_minute": 4000,
           "base_score": 100,
-          "requirements": [
-            { "role": "medical", "work_ms": 240000 }
+          "elements": [
+            {
+              "id": "subject",
+              "label": "Bleeding worker",
+              "kind": "injured",
+              "health_milli": 100000,
+              "health_decay_milli_per_minute": 4000
+            },
+            {
+              "id": "medical-response",
+              "label": "Treat the worker",
+              "kind": "injured",
+              "role": "medical",
+              "work_ms": 240000
+            }
           ]
         }
       },
@@ -108,54 +122,72 @@
         "answer_window_ms": 300000,
         "conversation_window_ms": 600000,
         "initial_stage": "opening",
-        "stages": [
+        "nodes": [
           {
             "id": "opening",
-            "caller": "Smoke is pouring from the apartment below me and someone may still be inside.",
-            "choices": [
-              {
-                "id": "location",
-                "text": "Give me the building location first.",
-                "next": "safety",
-                "reveal_incident": true
-              },
-              {
-                "id": "investigate",
-                "text": "Go downstairs and see whether anyone is inside.",
-                "health_decay_delta_milli_per_minute": 5000,
-                "score_delta": -20
-              }
-            ]
+            "operator": false,
+            "text": "Smoke is pouring from the apartment below me and someone may still be inside.",
+            "answers": ["location", "investigate"]
+          },
+          {
+            "id": "location",
+            "operator": true,
+            "text": "{LOCATION} Give me the building location first.",
+            "answers": ["safety"],
+            "actions": ["actionSetLocation"]
+          },
+          {
+            "id": "investigate",
+            "operator": true,
+            "text": "{INVESTIGATE} Go downstairs and see whether anyone is inside.",
+            "actions": ["subject.healthDecay += 5000; score -= 20; actionHangup"]
           },
           {
             "id": "safety",
-            "caller": "Eight east, five north. The hallway is filling with smoke.",
-            "choices": [
-              {
-                "id": "evacuate",
-                "text": "Leave by the clear stairwell, warn others, and stay outside.",
-                "health_decay_delta_milli_per_minute": -2500,
-                "score_delta": 10
-              },
-              {
-                "id": "wait",
-                "text": "Wait in the hallway for firefighters.",
-                "health_decay_delta_milli_per_minute": 3000,
-                "score_delta": -10
-              }
-            ]
+            "operator": false,
+            "text": "Eight east, five north. The hallway is filling with smoke.",
+            "answers": ["evacuate", "wait"]
+          },
+          {
+            "id": "evacuate",
+            "operator": true,
+            "text": "{EVACUATE} Leave by the clear stairwell, warn others, and stay outside.",
+            "actions": ["subject.healthDecay -= 2500; score += 10; actionHangup"]
+          },
+          {
+            "id": "wait",
+            "operator": true,
+            "text": "{WAIT} Wait in the hallway for firefighters.",
+            "actions": ["subject.healthDecay += 3000; score -= 10; actionHangup"]
           }
         ],
         "incident": {
           "id": "apartment-fire",
           "title": "Occupied apartment fire",
           "location": { "x": 8, "y": 5 },
-          "health_milli": 100000,
-          "health_decay_milli_per_minute": 6000,
           "base_score": 150,
-          "requirements": [
-            { "role": "fire", "work_ms": 300000 },
-            { "role": "medical", "work_ms": 120000 }
+          "elements": [
+            {
+              "id": "subject",
+              "label": "Trapped resident",
+              "kind": "injured",
+              "health_milli": 100000,
+              "health_decay_milli_per_minute": 6000
+            },
+            {
+              "id": "fire-response",
+              "label": "Extinguish the apartment fire",
+              "kind": "fire",
+              "role": "fire",
+              "work_ms": 300000
+            },
+            {
+              "id": "medical-response",
+              "label": "Treat smoke exposure",
+              "kind": "injured",
+              "role": "medical",
+              "work_ms": 120000
+            }
           ]
         }
       },
@@ -166,53 +198,65 @@
         "answer_window_ms": 300000,
         "conversation_window_ms": 480000,
         "initial_stage": "opening",
-        "stages": [
+        "nodes": [
           {
             "id": "opening",
-            "caller": "Someone is trying the back doors of every closed shop on Market Row.",
-            "choices": [
-              {
-                "id": "where",
-                "text": "Which block are they on, and can you stay out of sight?",
-                "next": "description",
-                "reveal_incident": true
-              },
-              {
-                "id": "confront",
-                "text": "Confront them and ask what they are doing.",
-                "health_decay_delta_milli_per_minute": 4000,
-                "score_delta": -15
-              }
-            ]
+            "operator": false,
+            "text": "Someone is trying the back doors of every closed shop on Market Row.",
+            "answers": ["where", "confront"]
+          },
+          {
+            "id": "where",
+            "operator": true,
+            "text": "{LOCATION} Which block are they on, and can you stay out of sight?",
+            "answers": ["description"],
+            "actions": ["actionSetLocation"]
+          },
+          {
+            "id": "confront",
+            "operator": true,
+            "text": "{CONFRONT} Confront them and ask what they are doing.",
+            "actions": ["subject.healthDecay += 4000; score -= 15; actionHangup"]
           },
           {
             "id": "description",
-            "caller": "Three west and six north. I am watching from an upstairs window.",
-            "choices": [
-              {
-                "id": "observe",
-                "text": "Stay hidden, note their clothing, and keep the line free.",
-                "health_decay_delta_milli_per_minute": -1500,
-                "score_delta": 5
-              },
-              {
-                "id": "follow",
-                "text": "Follow them so officers do not lose them.",
-                "health_decay_delta_milli_per_minute": 3000,
-                "score_delta": -10
-              }
-            ]
+            "operator": false,
+            "text": "Three west and six north. I am watching from an upstairs window.",
+            "answers": ["observe", "follow"]
+          },
+          {
+            "id": "observe",
+            "operator": true,
+            "text": "{OBSERVE} Stay hidden, note their clothing, and keep the line free.",
+            "actions": ["subject.healthDecay -= 1500; score += 5; actionHangup"]
+          },
+          {
+            "id": "follow",
+            "operator": true,
+            "text": "{FOLLOW} Follow them so officers do not lose them.",
+            "actions": ["subject.healthDecay += 3000; score -= 10; actionHangup"]
           }
         ],
         "incident": {
           "id": "market-burglary",
           "title": "Burglary in progress on Market Row",
           "location": { "x": -3, "y": 6 },
-          "health_milli": 100000,
-          "health_decay_milli_per_minute": 3000,
           "base_score": 80,
-          "requirements": [
-            { "role": "police", "work_ms": 180000 }
+          "elements": [
+            {
+              "id": "subject",
+              "label": "Witness",
+              "kind": "witness",
+              "health_milli": 100000,
+              "health_decay_milli_per_minute": 3000
+            },
+            {
+              "id": "police-response",
+              "label": "Apprehend the suspect",
+              "kind": "suspect",
+              "role": "police",
+              "work_ms": 180000
+            }
           ]
         }
       }

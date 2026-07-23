@@ -41,5 +41,6 @@ next-env.d.ts
 /outputs/
 /work/
 /public/parabox-render-qa-64.json
+/public/operator-render-qa.json
 __pycache__/
 *.pyc

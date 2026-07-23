@@ -1,7 +1,8 @@
 {
-  "schema": "emergency-operator-campaign-v1",
-  "id": "emergency-operator-live-test-v1",
+  "schema": "emergency-operator-campaign-v2",
+  "id": "emergency-operator-live-test-v2",
   "title": "Live HTTP Test",
+  "seed": 1,
   "max_score": 120,
   "shift": {
     "id": "fast",
@@ -24,29 +25,34 @@
         "answer_window_ms": 2500,
         "conversation_window_ms": 2500,
         "initial_stage": "opening",
-        "stages": [
+        "nodes": [
           {
             "id": "opening",
-            "caller": "A test patient needs a medic at dispatch.",
-            "choices": [
-              {
-                "id": "locate",
-                "text": "Confirm the location and send help.",
-                "reveal_incident": true,
-                "score_delta": 10
-              }
-            ]
+            "operator": false,
+            "text": "A test patient needs a medic at dispatch.",
+            "answers": ["locate"]
+          },
+          {
+            "id": "locate",
+            "operator": true,
+            "text": "{CONFIRM LOCATION} Confirm the location and send help.",
+            "actions": ["actionSetLocation; score += 10; actionHangup"]
           }
         ],
         "incident": {
           "id": "patient",
           "title": "Test patient",
           "location": { "x": 0, "y": 0 },
-          "health_milli": 100000,
-          "health_decay_milli_per_minute": 0,
           "base_score": 10,
-          "requirements": [
-            { "role": "medical", "work_ms": 100 }
+          "elements": [
+            {
+              "id": "medical-response",
+              "label": "Treat the patient",
+              "kind": "injured",
+              "role": "medical",
+              "health_milli": 100000,
+              "work_ms": 100
+            }
           ]
         }
       }

@@ -30,9 +30,10 @@ done
 
 for destination in environment/game/campaign tests/campaign; do
   install -d "$task_dir/$destination"
+  rm -f "$task_dir/$destination/pilot.json"
   install -m 644 \
-    "$data_dir/campaign/pilot.json" \
-    "$task_dir/$destination/pilot.json"
+    "$data_dir/campaign/911-career.json" \
+    "$task_dir/$destination/911-career.json"
   install -m 644 \
     "$data_dir/campaign/source.json" \
     "$task_dir/$destination/source.json"

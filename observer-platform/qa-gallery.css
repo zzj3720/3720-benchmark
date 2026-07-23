@@ -111,6 +111,14 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.operator-qa .qa-gallery {
+  grid-template-columns: 1fr;
+}
+
+.operator-qa .qa-card {
+  min-width: 0;
+}
+
 .sausage-qa .qa-card > header { min-height: 72px; }
 .qa-render .sausage-state { min-height: 0; grid-template-rows: 250px; }
 .qa-render .sausage-scene-header,
