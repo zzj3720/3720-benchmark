@@ -406,7 +406,6 @@ export function ParaboxState({
 }) {
   const space = asRecord(state.space);
   const map = spaceMap(state);
-  const path = spacePath(state);
   const scene = observerScene(state);
   if (!map.length) {
     return (
@@ -420,30 +419,6 @@ export function ParaboxState({
   const height = asNumber(space?.height, map.length);
   return (
     <div className="parabox-state">
-      <header className="parabox-space-header">
-        <div>
-          <span>CONTAINER PATH</span>
-          <nav aria-label="当前容器路径">
-            {path.map((part, index) => (
-              <span key={`${part}-${index}`}>
-                {index > 0 && <i aria-hidden="true">›</i>}
-                <b>
-                  {part === "root"
-                    ? "ROOT"
-                    : part === "…cycle…"
-                      ? "CYCLE"
-                      : part.replace("box:", "BOX ")}
-                </b>
-              </span>
-            ))}
-          </nav>
-        </div>
-        <div className="parabox-depth">
-          <span>{scene ? "完整场景" : "旧事件"}</span>
-          <strong>{Math.max(0, path.length - 1)}</strong>
-        </div>
-      </header>
-
       <div className={`parabox-stage ${scene ? "recursive" : "legacy"}`}>
         {scene ? (() => {
           const focus = scene.spaces.get(scene.focusSpace);
@@ -505,12 +480,6 @@ export function ParaboxState({
         )}
       </div>
 
-      <footer className="parabox-legend" aria-label="场景图例">
-        <span><i data-legend="player" />玩家</span>
-        <span><i data-legend="box" />递归盒子（内部为真实子空间）</span>
-        <span><i data-legend="box-goal" />盒子目标</span>
-        <span><i data-legend="player-goal" />玩家目标</span>
-      </footer>
     </div>
   );
 }
@@ -600,5 +569,12 @@ export default {
   id: "parabox",
   meta: { label: "Patrick’s Parabox", short: "PARABOX", accent: "#52c8ff" },
   State: ParaboxState,
+  stateContext: (state: GameState) => {
+    const path = spacePath(state);
+    if (!path.length) return null;
+    return path
+      .map((part) => part === "root" ? "ROOT" : part === "…cycle…" ? "CYCLE" : part.replace("box:", "BOX "))
+      .join(" › ");
+  },
   describeEvent: describeParaboxEvent,
 } satisfies GameObserverModule;

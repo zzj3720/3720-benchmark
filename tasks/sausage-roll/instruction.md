@@ -51,9 +51,10 @@ Every command returns one JSON object with this envelope:
 
 The current world is a three-dimensional integer grid. `data.mode` is
 `overworld` or `puzzle`. On the overworld, `data.overworld.entrances` reports
-every unfinished entrance's level id, absolute position, and required facing;
-the array does not recommend an order. `data.tiles` is a player-centered view
-of the persistent map. Coordinates use
+unfinished entrances currently near the player, with their level id, absolute
+position, and required facing. Explore to discover other entrances; the array
+does not recommend an order. `data.tiles` is a compact player-centered view of
+the persistent map. Coordinates use
 `x` west/east, `y` north/south, and `z` down/up. `data.player`,
 `data.entities`, and `data.tiles` contain explicit coordinates. Each entity
 reports:

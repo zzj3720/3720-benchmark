@@ -78,11 +78,11 @@ done
 Run the reference and no-op agents:
 
 ```bash
-HARBOR_TELEMETRY=off harbor run \
+HARBOR_TELEMETRY=off tools/observer/harbor-run \
   --path "tasks/<task-name>" \
   --agent oracle
 
-HARBOR_TELEMETRY=off harbor run \
+HARBOR_TELEMETRY=off tools/observer/harbor-run \
   --path "tasks/<task-name>" \
   --agent nop
 ```

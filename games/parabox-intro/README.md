@@ -33,6 +33,17 @@ projection of the visible recursive world for human live rendering. It links
 the focused space to its real parent cell and real child spaces, but remains a
 private host artifact: the Agent command response and common sidecar observer
 relay intentionally continue to expose only the existing model-facing state.
+For batched moves and undos, the same authoritative engine execution captures
+one complete observer state per instruction. Those frames stay inside the same
+JSONL operation as a `gzip+base64` instruction trace; the live gateway expands
+only the detail window, avoiding a second simulation and large raw logs. An
+operation with an instruction trace does not repeat its final state outside the
+compressed trace.
+
+Historical observer streams are frozen under the local
+`.harbor/live-archive`. New runs write compressed instruction traces directly
+to the shared Rust run journal, so the live gateway needs neither a second
+simulation nor a historical backfill pass.
 
 For local development:
 

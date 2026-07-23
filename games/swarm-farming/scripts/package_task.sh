@@ -54,6 +54,10 @@ for architecture in amd64 arm64; do
   install -m 755 \
     "$relay_staging/linux_$architecture/$architecture/observer-relay" \
     "$task_dir/environment/game/bin/$architecture/observer-relay"
+  install -d "$task_dir/environment/bin/$architecture"
+  install -m 755 \
+    "$source_dir/swarm" \
+    "$task_dir/environment/bin/$architecture/swarm"
 done
 
 for destination in environment/game tests; do

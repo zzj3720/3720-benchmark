@@ -51,9 +51,6 @@ function Gallery() {
   const [error, setError] = useState("");
   const [page, setPage] = useState(0);
   useEffect(() => {
-    setSamples([]);
-    setError("");
-    setPage(0);
     const file = game === "sausage" ? "/sausage-render-qa-64.json" : "/parabox-render-qa-64.json";
     fetch(file, { cache: "no-store" })
       .then((response) => {
@@ -71,6 +68,9 @@ function Gallery() {
 
   function choose(next: Game) {
     window.history.replaceState(null, "", next === "sausage" ? "?game=sausage" : "?game=parabox");
+    setSamples([]);
+    setError("");
+    setPage(0);
     setGame(next);
   }
 

@@ -327,13 +327,37 @@ function dispose(root: THREE.Object3D) {
   });
 }
 
+function staticSignature(state: SausageSceneState) {
+  let hash = 2166136261;
+  const mix = (value: number | string) => {
+    const text = String(value);
+    for (let index = 0; index < text.length; index += 1) {
+      hash ^= text.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+  };
+  mix(state.levelKey);
+  mix(state.tileSet);
+  for (const tile of state.tiles) {
+    mix(tile.pos.x); mix(tile.pos.y); mix(tile.pos.z);
+    mix(tile.kind); mix(tile.direction); mix(tile.tileSet); mix(tile.variant);
+  }
+  for (const entrance of state.entrances) {
+    mix(entrance.ordinal); mix(entrance.pos.x); mix(entrance.pos.y); mix(entrance.pos.z);
+    mix(entrance.direction); mix(entrance.status);
+  }
+  return `${state.levelKey}:${hash >>> 0}`;
+}
+
 export class SausageScene {
   private readonly renderer: THREE.WebGLRenderer;
   private readonly scene = new THREE.Scene();
   private readonly camera = new THREE.PerspectiveCamera(60, 1, 0.1, 500);
   private readonly controls: OrbitControls;
   private readonly resizeObserver: ResizeObserver;
-  private root = new THREE.Group();
+  private staticRoot = new THREE.Group();
+  private dynamicRoot = new THREE.Group();
+  private staticKey = "";
   private state: SausageSceneState | null = null;
   private view: "player" | "overview" = "player";
 
@@ -354,7 +378,7 @@ export class SausageScene {
     this.controls.minPolarAngle = 0.12;
     this.controls.maxPolarAngle = Math.PI * 0.49;
     this.controls.addEventListener("change", () => this.render());
-    this.scene.add(this.root);
+    this.scene.add(this.staticRoot, this.dynamicRoot);
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(canvas);
     this.resize();
@@ -363,29 +387,37 @@ export class SausageScene {
   update(state: SausageSceneState) {
     const previous = this.state;
     this.state = state;
-    this.scene.remove(this.root);
-    dispose(this.root);
-    this.root = new THREE.Group();
     const palette = PALETTES[state.tileSet] ?? PALETTES[0];
-    this.scene.background = new THREE.Color(palette.fog);
-    const points = scenePoints(state);
-    const size = points.length
-      ? new THREE.Box3().setFromPoints(points).getSize(new THREE.Vector3())
-      : new THREE.Vector3();
-    const span = Math.max(size.x, size.z);
-    this.scene.fog = new THREE.Fog(palette.fog, Math.max(28, span * 0.55), Math.max(80, span * 1.8));
-    addTerrain(this.root, state);
-    for (const entity of state.entities) {
-      if (entity.kind === "player") addPlayer(this.root, entity);
-      else if (entity.kind === "sausage") addSausage(this.root, entity);
-      else if (entity.kind === "spectral_sausage") addSausage(this.root, entity, true);
-      else if (entity.kind === "fork") addDetachedFork(this.root, entity);
+    const nextStaticKey = staticSignature(state);
+    if (nextStaticKey !== this.staticKey) {
+      this.staticKey = nextStaticKey;
+      this.scene.remove(this.staticRoot);
+      dispose(this.staticRoot);
+      this.staticRoot = new THREE.Group();
+      this.scene.background = new THREE.Color(palette.fog);
+      const points = state.tiles.map((tile) => worldPosition(tile.pos, true));
+      const size = points.length
+        ? new THREE.Box3().setFromPoints(points).getSize(new THREE.Vector3())
+        : new THREE.Vector3();
+      const span = Math.max(size.x, size.z);
+      this.scene.fog = new THREE.Fog(palette.fog, Math.max(28, span * 0.55), Math.max(80, span * 1.8));
+      addTerrain(this.staticRoot, state);
+      if (state.mode === "overworld") addEntrances(this.staticRoot, state);
+      this.addWorldFloor(this.staticRoot, state, palette);
+      this.addLights(this.staticRoot, state);
+      this.scene.add(this.staticRoot);
     }
-    if (state.exit) addExit(this.root, state.exit);
-    if (state.mode === "overworld") addEntrances(this.root, state);
-    this.addWorldFloor(state, palette);
-    this.addLights(state);
-    this.scene.add(this.root);
+    this.scene.remove(this.dynamicRoot);
+    dispose(this.dynamicRoot);
+    this.dynamicRoot = new THREE.Group();
+    for (const entity of state.entities) {
+      if (entity.kind === "player") addPlayer(this.dynamicRoot, entity);
+      else if (entity.kind === "sausage") addSausage(this.dynamicRoot, entity);
+      else if (entity.kind === "spectral_sausage") addSausage(this.dynamicRoot, entity, true);
+      else if (entity.kind === "fork") addDetachedFork(this.dynamicRoot, entity);
+    }
+    if (state.exit) addExit(this.dynamicRoot, state.exit);
+    this.scene.add(this.dynamicRoot);
     if (!previous || previous.levelKey !== state.levelKey) {
       if (state.mode === "overworld") {
         this.view = "overview";
@@ -414,7 +446,7 @@ export class SausageScene {
     this.render();
   }
 
-  private addWorldFloor(state: SausageSceneState, palette: (typeof PALETTES)[number]) {
+  private addWorldFloor(root: THREE.Group, state: SausageSceneState, palette: (typeof PALETTES)[number]) {
     const points = state.tiles.map((tile) => worldPosition(tile.pos, true));
     if (!points.length) return;
     const minY = Math.min(...points.map((point) => point.y - 0.5));
@@ -427,24 +459,24 @@ export class SausageScene {
     floor.rotation.x = -Math.PI / 2;
     floor.position.set((box.min.x + box.max.x) / 2, minY - 0.04, (box.min.z + box.max.z) / 2);
     floor.receiveShadow = true;
-    this.root.add(floor);
+    root.add(floor);
     const grid = new THREE.GridHelper(size, Math.max(8, Math.round(size)), palette.grid, palette.grid);
     grid.position.copy(floor.position);
     grid.position.y += 0.006;
     const gridMaterial = grid.material as THREE.LineBasicMaterial;
     gridMaterial.transparent = true;
     gridMaterial.opacity = 0.12;
-    this.root.add(grid);
+    root.add(grid);
   }
 
-  private addLights(state: SausageSceneState) {
-    const points = scenePoints(state);
+  private addLights(root: THREE.Group, state: SausageSceneState) {
+    const points = state.tiles.map((tile) => worldPosition(tile.pos, true));
     if (!points.length) return;
     const bounds = new THREE.Box3().setFromPoints(points);
     const center = bounds.getCenter(new THREE.Vector3());
     const size = bounds.getSize(new THREE.Vector3());
     const hemisphere = new THREE.HemisphereLight(0xe9f4ff, 0x35403d, 2.15);
-    this.root.add(hemisphere);
+    root.add(hemisphere);
     const sun = new THREE.DirectionalLight(0xfff0cf, 3.1);
     sun.position.copy(center).add(new THREE.Vector3(-8, 16, -10));
     sun.target.position.copy(center);
@@ -455,7 +487,7 @@ export class SausageScene {
     sun.shadow.camera.right = shadowSpan;
     sun.shadow.camera.top = shadowSpan;
     sun.shadow.camera.bottom = -shadowSpan;
-    this.root.add(sun.target, sun);
+    root.add(sun.target, sun);
   }
 
   private followPlayer(previous: SausageSceneState, state: SausageSceneState) {
@@ -513,7 +545,8 @@ export class SausageScene {
   destroy() {
     this.resizeObserver.disconnect();
     this.controls.dispose();
-    dispose(this.root);
+    dispose(this.staticRoot);
+    dispose(this.dynamicRoot);
     this.renderer.dispose();
     this.state = null;
   }

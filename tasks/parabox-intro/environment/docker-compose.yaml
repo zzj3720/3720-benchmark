@@ -3,11 +3,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    depends_on:
-      - game
 
   game:
     build:
       context: ./game
       dockerfile: Dockerfile
     init: true
+    volumes_from:
+      - main

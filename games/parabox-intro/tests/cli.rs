@@ -8,6 +8,9 @@ use std::sync::Mutex;
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use base64::Engine as _;
+use base64::engine::general_purpose::STANDARD as BASE64;
+use flate2::read::GzDecoder;
 use parabox_terminal::state::State;
 use serde_json::{Value, json};
 
@@ -174,6 +177,7 @@ fn cli_scores_each_solved_level_and_serializes_concurrent_calls() {
     assert!(has_event(&batch, "level_solved", "a1"));
     assert_eq!(batch["data"]["score_delta"], 1);
     assert_eq!(batch["data"]["score"], 1);
+    assert!(batch.get("steps").is_none());
 
     wait_for_cooldown();
     let mut args = vec!["move"];
@@ -247,6 +251,32 @@ fn cli_scores_each_solved_level_and_serializes_concurrent_calls() {
             .is_some_and(|spaces| !spaces.is_empty())
     );
     assert!(events[0]["scene"]["spaces"][0]["map"][0].is_string());
+    let first_move = events
+        .iter()
+        .find(|event| event["command"] == "move" && event["score_before"] == 0)
+        .unwrap();
+    let trace = &first_move["instruction_trace"];
+    assert_eq!(trace["encoding"], "gzip+base64");
+    assert_eq!(trace["count"], FIRST_LEVEL.len());
+    let compressed = BASE64.decode(trace["data"].as_str().unwrap()).unwrap();
+    let mut decoder = GzDecoder::new(compressed.as_slice());
+    let mut decoded = Vec::new();
+    decoder.read_to_end(&mut decoded).unwrap();
+    assert_eq!(trace["uncompressed_bytes"], decoded.len());
+    let steps: Vec<Value> = serde_json::from_slice(&decoded).unwrap();
+    assert_eq!(steps.len(), FIRST_LEVEL.len());
+    assert_eq!(steps[0]["action"]["direction"], "up");
+    assert_eq!(steps.last().unwrap()["score_delta"], 1);
+    assert!(
+        steps
+            .iter()
+            .all(|step| step["state"]["space"]["map"].is_array())
+    );
+    assert!(
+        steps.iter().all(|step| {
+            step["state"]["observer_scene"]["schema"] == "parabox-observer-scene-v1"
+        })
+    );
     assert!(events.iter().any(|event| {
         event["type"] == "request"
             && event["command"] == "move"

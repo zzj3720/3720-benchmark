@@ -1,7 +1,10 @@
+import { memo } from "react";
+
 import operator from "../../games/emergency-operator/observer";
 import kitchen from "../../games/kitchen-terminal/observer";
 import parabox from "../../games/parabox-intro/observer";
 import sausage from "../../games/sausage-roll/observer";
+import sokoban from "../../games/sokoban/observer";
 import swarm from "../../games/swarm-farming/observer";
 
 import {
@@ -16,6 +19,7 @@ export const GAME_OBSERVERS = {
   parabox,
   swarm,
   sausage,
+  sokoban,
   operator,
   kitchen,
 } as const;
@@ -26,7 +30,7 @@ export const GAME_META = Object.fromEntries(
   GAME_IDS.map((id) => [id, GAME_OBSERVERS[id].meta]),
 ) as { [Game in GameId]: (typeof GAME_OBSERVERS)[Game]["meta"] };
 
-export function GameState({
+export const GameState = memo(function GameState({
   game,
   state,
   previousState,
@@ -37,6 +41,11 @@ export function GameState({
 }) {
   const StateView = GAME_OBSERVERS[game].State;
   return <StateView state={state} previousState={previousState} />;
+});
+
+export function gameStateContext(game: GameId, state: State) {
+  const observer = GAME_OBSERVERS[game] as GameObserverModule;
+  return observer.stateContext?.(state) ?? null;
 }
 
 export function describeGameEvent(

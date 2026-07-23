@@ -21,6 +21,10 @@ for architecture in amd64 arm64; do
   install -m 755 \
     "$source_dir/operator-server" \
     "$task_dir/environment/game/bin/$architecture/operator-server"
+  install -d "$task_dir/environment/bin/$architecture"
+  install -m 755 \
+    "$source_dir/operator" \
+    "$task_dir/environment/bin/$architecture/operator"
 
   install -d "$task_dir/tests/bin/$architecture"
   install -m 755 \

@@ -34,7 +34,7 @@ status=0
 launch() {
   local name=$1
   shift
-  harbor run \
+  tools/observer/harbor-run \
     -p tasks/parabox-intro \
     --jobs-dir .harbor/jobs \
     --job-name "$name" \

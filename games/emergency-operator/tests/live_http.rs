@@ -25,12 +25,15 @@ fn live_clock_alarm_observer_and_offline_replay_use_the_public_http_surface() {
     fs::create_dir_all(&run_dir).expect("create test run directory");
     let audit = run_dir.join("audit.jsonl");
     let events = run_dir.join("events.jsonl");
+    let recorder_inbox = run_dir.join("game-inbox.jsonl");
+    fs::File::create(&recorder_inbox).expect("create recorder inbox");
     let port = unused_port();
     let address = format!("127.0.0.1:{port}");
     let child = Command::new(env!("CARGO_BIN_EXE_operator-server"))
         .env("OPERATOR_CAMPAIGN", &campaign)
         .env("OPERATOR_AUDIT", &audit)
         .env("OPERATOR_EVENTS", &events)
+        .env("BENCHMARK_OBSERVER_INBOX", &recorder_inbox)
         .env("OPERATOR_LISTEN_ADDR", &address)
         .stdout(Stdio::null())
         .stderr(Stdio::piped())
@@ -38,6 +41,21 @@ fn live_clock_alarm_observer_and_offline_replay_use_the_public_http_surface() {
         .expect("start operator server");
     let mut server = ServerGuard(child);
     wait_until_healthy(port, &mut server);
+
+    let client = Command::new(env!("CARGO_BIN_EXE_operator"))
+        .arg("status")
+        .env("OPERATOR_URL", format!("http://127.0.0.1:{port}"))
+        .output()
+        .expect("run packaged client surface");
+    assert!(
+        client.status.success(),
+        "client failed: {}",
+        String::from_utf8_lossy(&client.stderr)
+    );
+    assert_eq!(
+        serde_json::from_slice::<Value>(&client.stdout).expect("client JSON")["ok"],
+        true
+    );
 
     let (headers, rejection) = raw_request(
         port,
@@ -100,6 +118,16 @@ fn live_clock_alarm_observer_and_offline_replay_use_the_public_http_surface() {
     assert_eq!(submit["data"]["score"], 120);
 
     drop(server);
+    assert!(
+        fs::read(&events)
+            .expect("read legacy observer events")
+            .is_empty()
+    );
+    assert!(
+        !fs::read(&recorder_inbox)
+            .expect("read recorder events")
+            .is_empty()
+    );
     let verified = Command::new(env!("CARGO_BIN_EXE_operator-verifier"))
         .arg(&campaign)
         .arg(&audit)
@@ -218,5 +246,5 @@ fn assert_success(output: Output) {
         stdout.contains("score: 120"),
         "unexpected verifier output: {stdout}"
     );
-    assert!(stdout.contains("verified: 7 commands"));
+    assert!(stdout.contains("verified: 8 commands"));
 }
