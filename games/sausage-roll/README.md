@@ -51,12 +51,21 @@ Observer snapshots expose a player-centered live projection and one reusable
 full-map description. The frontend applies current island transforms and
 completion masks to that shared map, so event rows stay small while the live
 view can switch between following the player and the full 205-island world.
+The first observer lifecycle record stores that map once as a gzip-compressed
+asset; subsequent dynamic states and per-instruction replay frames do not
+repeat it. The public gateway assigns the decoded asset a content hash, and the
+browser caches it independently from live state and selected replay segments.
 
 The packaged Harbor task gives the Agent only a thin terminal HTTP client. The
 sidecar owns the Rust engine, campaign state, append-only command audit, and
 observer event stream. A separate verifier starts from the same solution-free
 entries and accepts a score only after every audited command reproduces the
 exact recorded API response.
+
+For replay, a batched `move` or `undo` records the complete observer state after
+each instruction from that same authoritative execution. The frames are stored
+inside the operation's JSONL record as a `gzip+base64` instruction trace; they
+are not returned to the Agent and are not maintained as a second timeline.
 
 Run the current parser and provenance checks with:
 
@@ -66,6 +75,16 @@ cargo run --manifest-path games/sausage-roll/Cargo.toml \
   --bin sausage-inspect
 cargo run --manifest-path games/sausage-roll/Cargo.toml \
   --bin sausage-walkthrough
+```
+
+Package original-engine post-puzzle saves in campaign order with the Rust
+importer:
+
+```bash
+cargo run --release --manifest-path games/sausage-roll/Cargo.toml \
+  --bin sausage-import-overworld -- \
+  games/sausage-roll/data/campaign/entries.tar.gz /path/to/saves \
+  games/sausage-roll/data/campaign/overworld.tar.gz <run-prefix>
 ```
 
 Build the self-contained Linux task artifacts with:

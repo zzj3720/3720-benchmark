@@ -21,6 +21,14 @@ for architecture in amd64 arm64; do
   install -m 755 \
     "$source_dir/sausage-server" \
     "$task_dir/environment/game/bin/$architecture/sausage-server"
+  install -d "$task_dir/environment/bin/$architecture"
+  install -m 755 \
+    "$source_dir/sausage" \
+    "$task_dir/environment/bin/$architecture/sausage"
+  install -d "$task_dir/solution/bin/$architecture"
+  install -m 755 \
+    "$source_dir/sausage-solve" \
+    "$task_dir/solution/bin/$architecture/sausage-solve"
 
   install -d "$task_dir/tests/bin/$architecture"
   install -m 755 \

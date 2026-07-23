@@ -23,6 +23,10 @@ path = "src/bin/server.rs"
 name = "operator-verifier"
 path = "src/bin/verifier.rs"
 
+[[bin]]
+name = "operator"
+path = "src/bin/client.rs"
+
 [profile.release]
 strip = true
 lto = true

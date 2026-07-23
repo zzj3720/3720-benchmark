@@ -20,7 +20,15 @@ RUN git clone --filter=blob:none https://github.com/swarm-game/swarm.git /opt/sw
 WORKDIR /opt/adapter
 COPY games/swarm-farming/swarm-harbor.cabal games/swarm-farming/cabal.project games/swarm-farming/LICENSE ./
 
-RUN cabal update \
+# Hackage's signed mirror list still names the retired dream.io mirror. Fetch
+# the index directly over TLS; the Swarm source is pinned and verified above,
+# and the resulting task artifacts are frozen after the acceptance tests.
+RUN cabal user-config init --force \
+    && sed -i \
+        -e 's|url: http://hackage.haskell.org/|url: https://hackage.haskell.org/|' \
+        -e 's|  -- secure: True|  secure: False|' \
+        /root/.config/cabal/config \
+    && cabal update \
     && cabal build --only-dependencies exe:swarm-harbor
 
 COPY games/swarm-farming/app ./app
@@ -30,9 +38,17 @@ RUN cabal build exe:swarm-harbor \
     && cp "$(cabal list-bin exe:swarm-harbor)" /out/swarm-harbor \
     && strip /out/swarm-harbor
 
+FROM rust:1.96-slim-bookworm AS client
+
+WORKDIR /build
+COPY games/swarm-farming/client/Cargo.toml games/swarm-farming/client/Cargo.lock ./
+COPY games/swarm-farming/client/src/ src/
+RUN cargo build --release --locked --bin swarm
+
 FROM scratch AS package
 
 COPY --from=build /out/swarm-harbor /swarm-harbor
+COPY --from=client /build/target/release/swarm /swarm
 COPY --from=build /opt/swarm/LICENSE /licenses/swarm-LICENSE
 COPY games/swarm-farming/LICENSE /licenses/swarm-harbor-LICENSE
 COPY --from=build /opt/swarm/data/*.txt /data/

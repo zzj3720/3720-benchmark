@@ -45,8 +45,9 @@ import Swarm.Language.Syntax (sType)
 import Swarm.Language.Value (emptyEnv)
 import Swarm.Log (logToText)
 import Swarm.Util.Yaml (parseJSONE')
-import System.Environment (getArgs)
+import System.Environment (getArgs, lookupEnv)
 import System.Exit (die, exitFailure)
+import System.IO.Error (isDoesNotExistError, tryIOError)
 import Text.Read (readMaybe)
 
 apiVersion :: Text
@@ -163,6 +164,16 @@ serve config port = do
           , "initial_state" .= snapshot config game
           ]
   LBS.writeFile (configAudit config) $ encode header <> "\n"
+  appendRecorderEvent $
+    object
+      [ "schema" .= ("benchmark-observer-event-v1" :: Text)
+      , "sequence" .= (0 :: Int)
+      , "type" .= ("sidecar_started" :: Text)
+      , "command" .= ("baseline" :: Text)
+      , "response" .= object ["data" .= snapshot config game]
+      , "score" .= scoreFor (configDeadline config) game
+      , "score_delta" .= (0 :: Int)
+      ]
   state <- newMVar $ ServerState game 0
   putStrLn $ "swarm-harbor listening on port " <> show port
   Warp.runSettings
@@ -181,6 +192,20 @@ application config state request respond = do
           record = AuditRecord sequenceNumber command result
           newState = ServerState newGame sequenceNumber
       LBS.appendFile (configAudit config) $ encode record <> "\n"
+      appendRecorderEvent $
+        object
+          [ "schema" .= ("benchmark-observer-event-v1" :: Text)
+          , "sequence" .= sequenceNumber
+          , "type" .= ("request" :: Text)
+          , "command" .= commandName command
+          , "argument" .= commandArgument command
+          , "response" .= result
+          , "score" .= scoreFor (configDeadline config) newGame
+          , "score_delta"
+              .= ( scoreFor (configDeadline config) newGame
+                     - scoreFor (configDeadline config) (serverGame restored)
+                 )
+          ]
       pure (newState, result)
   respond $
     responseLBS
@@ -345,6 +370,16 @@ inventorySummary inventory =
 
 takeLast :: Int -> [a] -> [a]
 takeLast count = reverse . take count . reverse
+
+appendRecorderEvent :: Value -> IO ()
+appendRecorderEvent value = do
+  configured <- lookupEnv "BENCHMARK_OBSERVER_INBOX"
+  let path = fromMaybe "/logs/artifacts/observer/game-inbox.jsonl" configured
+  result <- tryIOError $ LBS.appendFile path $ encode value <> "\n"
+  case result of
+    Right () -> pure ()
+    Left err | isDoesNotExistError err -> pure ()
+    Left err -> ioError err
 
 scoreFor :: Int64 -> GameState -> Int64
 scoreFor deadline game =

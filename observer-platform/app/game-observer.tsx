@@ -2,6 +2,14 @@ import type { ComponentType } from "react";
 
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 export type GameState = Record<string, Json>;
+export type ObserverStep = {
+  index: number;
+  action?: Record<string, Json> | null;
+  state?: GameState | null;
+  result?: Record<string, Json> | null;
+  score?: number;
+  score_delta?: number;
+};
 export type ObserverEvent = {
   sequence: number;
   timestamp_ms?: number | null;
@@ -11,6 +19,7 @@ export type ObserverEvent = {
   result?: Record<string, Json> | null;
   score?: number;
   score_delta?: number;
+  steps?: ObserverStep[];
 };
 export type EventDescription = {
   label: string;
@@ -27,6 +36,7 @@ export type GameObserverModule<Game extends string = string> = {
     accent: string;
   };
   State: ComponentType<{ state: GameState; previousState?: GameState | null }>;
+  stateContext?: (state: GameState) => string | null;
   describeEvent?: (event: ObserverEvent, previous?: ObserverEvent | null) => EventDescription;
 };
 

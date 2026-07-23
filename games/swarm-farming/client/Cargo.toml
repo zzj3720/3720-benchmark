@@ -1,0 +1,16 @@
+[package]
+name = "swarm-client"
+version = "0.1.0"
+edition = "2024"
+license = "UNLICENSED"
+publish = false
+
+[[bin]]
+name = "swarm"
+path = "src/main.rs"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+panic = "abort"

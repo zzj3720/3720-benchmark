@@ -16,6 +16,7 @@ task-proposal-results/
 /results/sessions/*
 !/results/sessions/README.md
 /results/recoveries/
+/run-journals/
 
 # Locally owned Stephen's Sausage Roll data and derived walkthrough fixtures.
 # The clean-room engine and packaging code are tracked; these assets must not

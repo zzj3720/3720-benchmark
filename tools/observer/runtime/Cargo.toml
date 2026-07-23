@@ -1,0 +1,44 @@
+[package]
+name = "benchmark-observer-runtime"
+version = "0.1.0"
+edition = "2024"
+license = "UNLICENSED"
+publish = false
+
+[dependencies]
+axum = { version = "0.8", features = ["http1", "json", "tokio"] }
+base64 = "0.22"
+chrono = { version = "0.4", default-features = false, features = ["std"] }
+flate2 = "1"
+futures-util = "0.3"
+fs2 = "0.4"
+notify = "8"
+regex = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+tokio = { version = "1", features = ["macros", "net", "rt-multi-thread", "signal", "sync", "time"] }
+tokio-stream = { version = "0.1", features = ["sync"] }
+walkdir = "2"
+
+[[bin]]
+name = "run-recorder"
+path = "src/main.rs"
+
+[[bin]]
+name = "replay-projector"
+path = "src/replay_main.rs"
+
+[[bin]]
+name = "live-gateway"
+path = "src/gateway_main.rs"
+
+[[bin]]
+name = "run-audit"
+path = "src/audit_main.rs"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+panic = "abort"

@@ -1,0 +1,41 @@
+{
+  "schema": "sokoban-source-v1",
+  "imported_on": "2026-07-23",
+  "source_index": "https://sokoban-game.com/packs",
+  "sources": [
+    {
+      "id": "novoban",
+      "title": "Novoban",
+      "url": "https://sokoban-game.com/packs/novoban/download",
+      "format": "Sokoban Levels Collection (SLC)",
+      "sha256": "ceeecd0dca849d455c487ad6c6375d49479a2c45ea0306007257986bbc48e9e9",
+      "level_count": 50
+    },
+    {
+      "id": "microban",
+      "title": "Microban",
+      "url": "https://sokoban-game.com/packs/microban/download",
+      "format": "Sokoban Levels Collection (SLC)",
+      "sha256": "6506781b2a0d0de99e686c6c98e95540a1004251356ad263cccf1932dc1e9fb2",
+      "level_count": 155
+    },
+    {
+      "id": "sasquatch",
+      "title": "Sasquatch",
+      "url": "https://sokoban-game.com/packs/sasquatch/download",
+      "format": "Sokoban Levels Collection (SLC)",
+      "sha256": "c21742f1bafdd574df09a07a64825d67b8039fac3c25247252963eb2b4131324",
+      "level_count": 50
+    },
+    {
+      "id": "sasquatch-iii",
+      "title": "Sasquatch III",
+      "url": "https://sokoban-game.com/packs/sasquatch-iii/download",
+      "format": "Sokoban Levels Collection (SLC)",
+      "sha256": "5fe67fb573ab010e5083bd7a4e5cd382da4596f47ed7de23174221bc4d471582",
+      "level_count": 50
+    }
+  ],
+  "ordering": "Pack order defines benchmark difficulty; level order within each pack is preserved exactly.",
+  "notes": "The benchmark uses the original puzzle layouts and replaces presentation, controls, scoring, and progression with its own implementation."
+}

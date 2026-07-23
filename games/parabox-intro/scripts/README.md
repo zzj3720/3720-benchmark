@@ -14,6 +14,14 @@ The script deliberately does not upload, download, or discover game copies. It
 pins the inspected Steam build and records source hashes without recording the
 Steam owner's account ID.
 
+The public direction walkthrough importer is Rust:
+
+```bash
+cargo run --release --manifest-path games/parabox-intro/Cargo.toml \
+  --bin parabox-import-walkthrough -- \
+  --output games/parabox-intro/data/oracle/oracle.tsv
+```
+
 After extraction, package the tested game into the self-contained Harbor task:
 
 ```bash

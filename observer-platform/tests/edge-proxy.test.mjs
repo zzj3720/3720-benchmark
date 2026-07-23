@@ -13,18 +13,20 @@ test("edge proxy forwards only read requests to the tunnel origin", async () => 
 
   try {
     const response = await worker.fetch(
-      new Request("https://live.benchmark.3720.org/observe/sausage/v1/observe/snapshot"),
+      new Request("https://live.benchmark.3720.org/observe/sausage/v1/observe/snapshot", {
+        headers: { "accept-encoding": "gzip" },
+      }),
     );
     assert.equal(await response.text(), "ok");
-    assert.equal(response.headers.get("content-length"), "2");
-    assert.equal(response.headers.has("content-encoding"), false);
+    assert.equal(response.headers.has("content-length"), false);
+    assert.equal(response.headers.get("content-encoding"), "gzip");
     assert.equal(
       forwarded.url,
       "https://benchmark-live-origin.3720.org/observe/sausage/v1/observe/snapshot",
     );
     assert.equal(forwarded.init.method, "GET");
     assert.equal(forwarded.init.headers.get("x-forwarded-host"), "live.benchmark.3720.org");
-    assert.equal(forwarded.init.headers.has("accept-encoding"), false);
+    assert.equal(forwarded.init.headers.get("accept-encoding"), "gzip");
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -35,6 +37,29 @@ test("edge proxy forwards only read requests to the tunnel origin", async () => 
     }),
   );
   assert.equal(rejected.status, 405);
+});
+
+test("edge proxy sends live JSON endpoints directly to the gateway", async () => {
+  const originalFetch = globalThis.fetch;
+  let forwarded;
+  globalThis.fetch = async (input) => {
+    forwarded = input.toString();
+    return Response.json({ run: { id: "abc" } });
+  };
+
+  try {
+    const response = await worker.fetch(
+      new Request("https://live.benchmark.3720.org/api/live/v1/runs/abc?replay_attempt=3"),
+    );
+    assert.equal(
+      forwarded,
+      "https://benchmark-live-origin.3720.org/v1/runs/abc?replay_attempt=3",
+    );
+    assert.equal(response.headers.get("cache-control"), "no-store");
+    assert.equal((await response.json()).run.id, "abc");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test("edge proxy streams live subscriptions without buffering", async () => {
@@ -60,5 +85,47 @@ test("edge proxy streams live subscriptions without buffering", async () => {
     assert.equal(await response.text(), 'data: {"runs":[]}\n\n');
   } finally {
     globalThis.fetch = originalFetch;
+  }
+});
+
+test("edge proxy caches HTML at the edge without making browsers retain a stale release", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalCaches = globalThis.caches;
+  let fetched = 0;
+  let stored;
+  const pending = [];
+  globalThis.fetch = async () => {
+    fetched += 1;
+    return new Response("<html>release</html>", {
+      headers: { "content-type": "text/html", "cache-control": "no-store" },
+    });
+  };
+  globalThis.caches = {
+    default: {
+      match: async () => stored?.response.clone(),
+      put: async (key, response) => {
+        stored = { key: key.url, response: response.clone() };
+      },
+    },
+  };
+  const request = new Request("https://live.benchmark.3720.org/", {
+    headers: { accept: "text/html" },
+  });
+  const context = { waitUntil(promise) { pending.push(promise); } };
+
+  try {
+    const first = await worker.fetch(request, {}, context);
+    await Promise.all(pending);
+    const second = await worker.fetch(request, {}, context);
+    assert.equal(await first.text(), "<html>release</html>");
+    assert.equal(await second.text(), "<html>release</html>");
+    assert.equal(fetched, 1);
+    assert.match(stored.key, /__edge=2026-07-22-v5/);
+    assert.equal(stored.response.headers.get("cache-control"), "public, max-age=15, stale-while-revalidate=300");
+    assert.equal(second.headers.get("cache-control"), "public, max-age=0, must-revalidate");
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalCaches === undefined) delete globalThis.caches;
+    else globalThis.caches = originalCaches;
   }
 });

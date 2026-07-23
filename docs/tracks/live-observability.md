@@ -47,6 +47,29 @@ GET /v1/observe/events?after=<sequence>&wait_ms=<bounded wait>
 GET /v1/observe/stream?after=<sequence>    # SSE target
 ```
 
+Observer logs separate three payload classes instead of repeating full game
+state on every action:
+
+- small dynamic state stays on the event;
+- immutable scene data is emitted once in `assets` as `gzip+base64`, then
+  addressed by the gateway with a SHA-256 URL;
+- multi-instruction commands keep a compact index inline and store their
+  replay frames as one compressed instruction trace.
+
+The recorder removes those already-compressed traces, snapshots, and assets
+from the hot JSONL journal and stores them once under
+`.harbor/run-journals/<chain_id>/objects/<sha256>.json.gz`. Journal records keep
+only their content-addressed metadata. The gateway materializes the latest
+state or one selected attempt on demand; listing runs and following live score
+changes never reads every replay object.
+
+The browser never downloads a run's complete replay during live viewing. The
+subscription carries summaries plus the selected run's revision, detail is
+read after that revision changes, immutable assets are cached independently,
+and one attempt replay is fetched only when selected. HTTP gzip is the wire
+compression layer for detail and replay JSON; it does not replace the durable
+per-event trace compression in the sidecar log.
+
 The sidecar receives an opaque `segment_id` from the runtime and sends observer
 events to the recorder with a monotonically increasing `source_sequence`. It
 does not know the model, native session, Harbor job name, parent segment,
@@ -55,10 +78,20 @@ infrastructure attempt counts.
 
 ### 2. Runtime control plane and run recorder
 
-The Harbor adapter or a thin coordinator creates a stable `chain_id` once and
-a new `segment_id` for each trial. One recorder process is the only writer for
-that chain. Runtime lifecycle changes enter it directly; sidecar observer
-events enter through a local ingestion endpoint. It writes both as
+The Harbor adapter creates a stable `chain_id` once and a new `segment_id` for
+each trial. The persistent Rust recorder in `tools/observer/runtime` is the only
+writer for that chain; `tools/observer/run_journal.py` is a thin Harbor hook
+adapter that forwards lifecycle messages over a JSON-lines control pipe.
+Runtime lifecycle changes enter it directly; sidecar observer events enter
+through the trial-scoped `/logs/artifacts/observer/game-inbox.jsonl` transport.
+The recorder follows that file as a long-lived append stream, so new durable
+lines wake ingestion without polling game state. The file remains the recovery
+buffer if the recorder must catch up after interruption.
+The inbox is not a second authority: it is drained idempotently into the same
+journal before Harbor seals the trial, then cleared after environment teardown.
+Recorder-aware sidecars write observer events to the inbox instead of also
+maintaining a second local observer history. Their private scoring audit and
+game state remain separate recovery artifacts. The recorder writes both sources as
 `benchmark-run-event-v1` records:
 
 ```json
@@ -95,15 +128,23 @@ reconstructed by the gateway.
 
 The journal is append-only and uses one total `sequence`. Sidecar ingestion is
 idempotent on `(segment_id, source_sequence)`: a reconnect may resend records,
-but it cannot duplicate them. The sidecar retains its private audit and local
-observer log until the recorder acknowledges the source cursor. Pausing waits
-for that cursor to catch up before sealing a checkpoint. This permits recovery
-from a brief recorder outage without creating two public authorities.
+but it cannot duplicate them. The trial inbox retains unread transport bytes
+until the recorder's final drain, then is truncated; recorder-aware sidecars do
+not also write a local observer history. Their private scoring audit remains a
+separate recovery artifact. This permits recovery from a brief recorder outage
+without creating two public authorities.
 
-The first implementation should be an append-only JSONL journal under ignored
-runtime state, not a database. The current scale does not justify another
-persistence system. A SQLite projection can be added later only if replaying
-the journal becomes measurably expensive.
+The implementation is an append-only JSONL journal under
+`.harbor/run-journals/<chain_id>/journal.jsonl`, not a database. The current
+scale does not justify another persistence system. A SQLite projection can be
+added later only if replaying the journal becomes measurably expensive.
+
+All scored benchmark launches use `tools/observer/harbor-run`. A first segment
+defaults its chain id to the Harbor job name. A continuation sets
+`BENCHMARK_CHAIN_ID` to the existing id while keeping its own new job and trial
+identity. Parallel writers for the same chain are invalid; continuation is a
+sequential append to the sealed prior segment. The recorder holds an exclusive
+process lock for the chain and rejects a second active writer.
 
 ### 3. Live projection plane
 
@@ -115,6 +156,12 @@ GET /v1/runs
 GET /v1/runs/<chain_id>
 GET /v1/subscribe?run_id=<chain_id>
 ```
+
+Attempt frame construction, unchanged-frame removal, and undo/redo elimination
+run in the shared Rust observer runtime. The gateway itself is Rust. Python
+remains only as the thin Harbor plugin interface that starts the recorder and
+for Harbor's Agent implementations; there is no Python replay, projection,
+scoring, or gateway path.
 
 The browser subscribes only to this projection. The gateway is read-only, has
 no game mutation credentials, and does not combine runtime results with game
@@ -182,21 +229,25 @@ manifest.
 
 ## Migration
 
-1. **Compatibility repair:** read direct Harbor artifact parents, legacy
-   recovery job directories, and checkpoint manifests so current runs display
-   correct accumulated time. Keep this code isolated and covered by regression
-   tests.
-2. **Run recorder:** generate `chain_id`/`segment_id`, create the single-writer
+1. **Compatibility repair (complete):** old Harbor jobs were projected once
+   into a content-addressed local archive with corrected accumulated time.
+   Production requests no longer scan or join those artifacts.
+2. **Run recorder (complete for all four packaged games):** generate `chain_id`/`segment_id`, create the single-writer
    journal, stamp lifecycle and sidecar records with effective time, and write
-   versioned checkpoint manifests for every new run. Make the gateway prefer
-   the journal while retaining the legacy reader for old runs.
-3. **Explicit ingestion:** have the runtime register the active sidecar source
-   with the recorder. Remove Docker-name scanning from the normal path.
-4. **Common streaming transport:** add the SSE observer endpoint to the shared
-   relay and direct sidecars; replace recorder `docker exec tail -F` with one
-   registered sidecar subscription per active segment.
-5. **Retire inference:** after existing runs are migrated or archived, remove
-   recovery-path, checkpoint-path, and container-name lineage inference.
+   a versioned run manifest for every new segment. Atomic checkpoint manifests
+   remain part of the continuation workflow rather than the live projection
+   path.
+3. **Explicit ingestion (complete for Parabox, Sausage, Swarm, and Emergency Operator):** Harbor
+   creates a trial manifest and ingestion inbox before environment startup;
+   sidecars inherit that host mount and append their native observer records.
+   The gateway discovers the manifest and journal, not a container name.
+4. **Event-driven ingestion (complete):** recorder-aware sidecars durably append
+   to the trial inbox while the recorder follows its append stream. The browser
+   and gateway use SSE, and neither live path polls game state. A pipe or direct
+   sidecar stream can replace the inbox later without changing the journal.
+5. **Retire inference (complete):** existing runs are archived and the Rust
+   gateway has no recovery-path, checkpoint-path, Docker, or container-name
+   lineage inference.
 
 This sequence fixes correctness before changing transport. It keeps the only
 cross-source composition inside the single writer at production time and

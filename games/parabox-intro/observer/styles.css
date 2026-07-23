@@ -3,62 +3,6 @@
   background: #0a1d32;
 }
 
-.parabox-space-header {
-  min-height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 13px 18px;
-  border-bottom: 1px solid #264765;
-  background: #0d263f;
-}
-
-.parabox-space-header > div > span,
-.parabox-depth span {
-  display: block;
-  color: #82a8c5;
-  font: 800 10px/1 var(--font-geist-mono);
-  letter-spacing: 0.1em;
-}
-
-.parabox-space-header nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-top: 8px;
-}
-
-.parabox-space-header nav span {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.parabox-space-header nav i {
-  color: #6090b3;
-  font-style: normal;
-}
-
-.parabox-space-header nav b {
-  color: #d9f2ff;
-  font: 800 12px/1 var(--font-geist-mono);
-}
-
-.parabox-depth {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  white-space: nowrap;
-}
-
-.parabox-depth strong {
-  color: #091a2b;
-  background: #50d3ff;
-  padding: 8px 10px;
-  font: 900 16px/1 var(--font-geist-mono);
-}
-
 .parabox-stage {
   min-height: 390px;
   position: relative;
@@ -297,36 +241,8 @@
   box-shadow: 0 0 9px #6ec6ff;
 }
 
-.parabox-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 11px 18px;
-  padding: 13px 18px 15px;
-  border-top: 1px solid #264765;
-  background: #0d263f;
-}
-
-.parabox-legend > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #a9c7dc;
-  font-size: 12px;
-}
-
-.parabox-legend i {
-  width: 13px;
-  height: 13px;
-  display: inline-block;
-  background: #e74678;
-}
-
-.parabox-legend i[data-legend="box"] { background: #f2aa3b; box-shadow: inset 0 0 0 3px #95671d; }
-.parabox-legend i[data-legend="box-goal"] { background: transparent; border: 2px solid #88c7ed; }
-.parabox-legend i[data-legend="player-goal"] { background: transparent; border: 2px solid #88c7ed; border-radius: 50%; }
 @media (max-width: 620px) {
   .parabox-state { min-height: 0; }
-  .parabox-space-header { align-items: flex-start; }
   .parabox-stage { min-height: 280px; padding: 18px; }
   .parabox-grid { width: 100%; }
   .parabox-box-face,

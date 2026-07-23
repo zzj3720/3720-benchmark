@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -eu
+
+repo_root=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
+cd "$repo_root"
+
+export PYTHONPATH="$repo_root${PYTHONPATH:+:$PYTHONPATH}"
+recorder_manifest="$repo_root/tools/observer/runtime/Cargo.toml"
+cargo build --quiet --release --manifest-path "$recorder_manifest" --bin run-recorder
+export BENCHMARK_RUN_RECORDER="$repo_root/tools/observer/runtime/target/release/run-recorder"
+
+set -- "$@" --plugin tools.observer.run_journal:RunJournalPlugin
+if [ -n "${BENCHMARK_CHAIN_ID:-}" ]; then
+  set -- "$@" --plugin-kwarg "chain_id=$BENCHMARK_CHAIN_ID"
+fi
+
+exec harbor run "$@"

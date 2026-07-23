@@ -31,6 +31,7 @@ struct App {
     changed: Condvar,
     audit_path: PathBuf,
     event_path: PathBuf,
+    recorder_inbox_path: PathBuf,
     campaign_hash: String,
 }
 
@@ -96,6 +97,10 @@ fn serve() -> Result<(), String> {
         "OPERATOR_EVENTS",
         PathBuf::from("/var/lib/operator/events.jsonl"),
     );
+    let recorder_inbox_path = env_path(
+        "BENCHMARK_OBSERVER_INBOX",
+        PathBuf::from("/logs/artifacts/observer/game-inbox.jsonl"),
+    );
     ensure_parent(&audit_path)?;
     ensure_parent(&event_path)?;
     let campaign_hash = sha256_file(&campaign_path)?;
@@ -112,6 +117,7 @@ fn serve() -> Result<(), String> {
         changed: Condvar::new(),
         audit_path,
         event_path,
+        recorder_inbox_path,
         campaign_hash,
     });
     record_lifecycle(&app, "sidecar_started")?;
@@ -353,7 +359,7 @@ fn record_command(
         "score": score,
         "score_delta": score - previous_score,
     });
-    append_json_line(&app.event_path, &event)?;
+    append_observer_event(app, &event)?;
     inner.events.push(event);
     inner.last_observer_elapsed_ms = Some(elapsed_ms);
     Ok(())
@@ -374,7 +380,7 @@ fn record_lifecycle(app: &Arc<App>, event_type: &str) -> Result<(), String> {
         "score": 0,
         "score_delta": 0,
     });
-    append_json_line(&app.event_path, &event)?;
+    append_observer_event(app, &event)?;
     inner.events.push(event);
     Ok(())
 }
@@ -420,7 +426,7 @@ fn publish_clock(app: &Arc<App>) -> Result<(), String> {
         "score": score,
         "score_delta": score - previous_score,
     });
-    append_json_line(&app.event_path, &event)?;
+    append_observer_event(app, &event)?;
     inner.events.push(event);
     inner.last_observer_elapsed_ms = Some(elapsed_ms);
     drop(inner);
@@ -553,6 +559,15 @@ fn append_json_line(path: &Path, value: &Value) -> Result<(), String> {
         .map_err(|error| format!("could not write {}: {error}", path.display()))
 }
 
+fn append_observer_event(app: &App, value: &Value) -> Result<(), String> {
+    let path = if app.recorder_inbox_path.exists() {
+        &app.recorder_inbox_path
+    } else {
+        &app.event_path
+    };
+    append_json_line(path, value)
+}
+
 fn sha256_file(path: &Path) -> Result<String, String> {
     let bytes =
         fs::read(path).map_err(|error| format!("could not read {}: {error}", path.display()))?;
@@ -573,6 +588,7 @@ fn respond(request: Request, status: StatusCode, body: Value) -> Result<(), Stri
     request
         .respond(
             Response::from_data(bytes)
+                .with_chunked_threshold(usize::MAX)
                 .with_status_code(status)
                 .with_header(
                     Header::from_bytes("Content-Type", "application/json; charset=utf-8")

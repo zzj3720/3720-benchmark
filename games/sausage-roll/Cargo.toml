@@ -10,6 +10,7 @@ name = "sausage_terminal"
 path = "src/lib.rs"
 
 [dependencies]
+base64 = "0.22"
 flate2 = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -35,6 +36,18 @@ path = "src/bin/verifier.rs"
 [[bin]]
 name = "sausage-render-qa"
 path = "src/bin/render_qa.rs"
+
+[[bin]]
+name = "sausage"
+path = "src/bin/client.rs"
+
+[[bin]]
+name = "sausage-solve"
+path = "src/bin/solve.rs"
+
+[[bin]]
+name = "sausage-import-overworld"
+path = "src/bin/import_overworld.rs"
 
 [profile.release]
 strip = true

@@ -9,6 +9,7 @@ use crate::{
 
 pub const CAMPAIGN_ID: &str = "stephens-sausage-roll-complete";
 const MAP_VIEW_RADIUS: i32 = 14;
+const AGENT_MAP_VIEW_RADIUS: i32 = 6;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SessionRecord {
@@ -309,14 +310,23 @@ impl<'a> Session<'a> {
     }
 
     pub fn snapshot(&self) -> Result<GameSnapshot, String> {
-        self.snapshot_with_map(false)
+        self.snapshot_with_map(false, MAP_VIEW_RADIUS, true)
+    }
+
+    pub fn agent_snapshot(&self) -> Result<GameSnapshot, String> {
+        self.snapshot_with_map(false, AGENT_MAP_VIEW_RADIUS, false)
     }
 
     pub fn observer_snapshot(&self) -> Result<GameSnapshot, String> {
-        self.snapshot_with_map(true)
+        self.snapshot_with_map(true, MAP_VIEW_RADIUS, true)
     }
 
-    fn snapshot_with_map(&self, include_map: bool) -> Result<GameSnapshot, String> {
+    fn snapshot_with_map(
+        &self,
+        include_map: bool,
+        view_radius: i32,
+        include_global_details: bool,
+    ) -> Result<GameSnapshot, String> {
         let total = self.entries.levels.len();
         let solved = self.completed.len();
         let campaign = CampaignStatus {
@@ -342,7 +352,12 @@ impl<'a> Session<'a> {
             return snapshot_from_game(game, campaign, level);
         }
         if let Some(overworld) = &self.overworld {
-            let entrances = self
+            let center = overworld
+                .world
+                .entity(overworld.world.player_id())
+                .ok_or_else(|| "player disappeared".to_owned())?
+                .pos;
+            let mut entrances = self
                 .entries
                 .levels
                 .iter()
@@ -350,15 +365,27 @@ impl<'a> Session<'a> {
                 .filter(|(index, _)| !self.completed.contains(index))
                 .map(|(_, entry)| entrance_view(self.campaign, &overworld.world, entry))
                 .collect::<Result<Vec<_>, _>>()?;
-            let (player, entities, tiles) = project_overworld(&overworld.world)?;
+            if !include_global_details {
+                entrances.retain(|entrance| nearby(entrance.pos, center, view_radius + 2));
+            }
+            let (player, entities, tiles) = project_overworld(&overworld.world, view_radius)?;
             let bounds = world_bounds(&overworld.world)?;
-            let completed_islands = overworld
+            let visible_islands = tiles
+                .iter()
+                .map(|tile| tile.source_id)
+                .collect::<HashSet<_>>();
+            let mut completed_islands = overworld
                 .world
                 .entities
                 .iter()
                 .filter(|entity| entity.entity_type == EntityType::Island && entity.cook_data != 0)
                 .map(|entity| entity.id)
-                .collect();
+                .collect::<Vec<_>>();
+            let mut islands = island_poses(&overworld.world);
+            if !include_global_details {
+                completed_islands.retain(|id| visible_islands.contains(id));
+                islands.retain(|island| visible_islands.contains(&island.id));
+            }
             return Ok(GameSnapshot {
                 schema: "sausage-state-v2",
                 campaign,
@@ -379,7 +406,7 @@ impl<'a> Session<'a> {
                     bounds: bounds.clone(),
                     entrances,
                     completed_islands,
-                    islands: island_poses(&overworld.world),
+                    islands,
                 }),
                 overworld_map: include_map
                     .then(|| overworld_map(self.campaign, self.entries))
@@ -435,6 +462,22 @@ impl<'a> Session<'a> {
     }
 
     pub fn move_many(&mut self, directions: &[Direction]) -> Result<MoveResult, String> {
+        self.move_many_with_snapshots(directions, false)
+            .map(|(result, _)| result)
+    }
+
+    pub(crate) fn move_many_observed(
+        &mut self,
+        directions: &[Direction],
+    ) -> Result<(MoveResult, Vec<GameSnapshot>), String> {
+        self.move_many_with_snapshots(directions, true)
+    }
+
+    fn move_many_with_snapshots(
+        &mut self,
+        directions: &[Direction],
+        capture_snapshots: bool,
+    ) -> Result<(MoveResult, Vec<GameSnapshot>), String> {
         if directions.is_empty() {
             return Err("move requires at least one direction".to_owned());
         }
@@ -442,7 +485,9 @@ impl<'a> Session<'a> {
         let mut accepted = Vec::new();
         let mut entered_levels = Vec::new();
         let mut solved_levels = Vec::new();
+        let mut snapshots = Vec::new();
         for direction in directions {
+            let mut stop = false;
             if let Some(game) = self.game.as_mut() {
                 let index = self
                     .active
@@ -488,6 +533,12 @@ impl<'a> Session<'a> {
                             })
                             .transpose()?;
                     }
+                    stop = true;
+                }
+                if capture_snapshots {
+                    snapshots.push(self.snapshot()?);
+                }
+                if stop {
                     break;
                 }
                 continue;
@@ -504,60 +555,104 @@ impl<'a> Session<'a> {
             accepted.push(did_move);
             if let Some(id) = self.enter_level_at_current_position()? {
                 entered_levels.push(id);
+                stop = true;
+            }
+            if capture_snapshots {
+                snapshots.push(self.snapshot()?);
+            }
+            if stop {
                 break;
             }
         }
-        Ok(MoveResult {
-            requested,
-            applied: accepted.len(),
-            accepted,
-            entered_levels,
-            solved_levels,
-            snapshot: self.snapshot()?,
-        })
+        Ok((
+            MoveResult {
+                requested,
+                applied: accepted.len(),
+                accepted,
+                entered_levels,
+                solved_levels,
+                snapshot: self.agent_snapshot()?,
+            },
+            snapshots,
+        ))
     }
 
     pub fn undo(&mut self, count: usize) -> Result<usize, String> {
+        self.undo_with_snapshots(count, false)
+            .map(|(undone, _)| undone)
+    }
+
+    pub(crate) fn undo_observed(
+        &mut self,
+        count: usize,
+    ) -> Result<(usize, Vec<GameSnapshot>), String> {
+        self.undo_with_snapshots(count, true)
+    }
+
+    fn undo_with_snapshots(
+        &mut self,
+        count: usize,
+        capture_snapshots: bool,
+    ) -> Result<(usize, Vec<GameSnapshot>), String> {
         if count == 0 {
             return Err("undo count must be positive".to_owned());
         }
         if self.overworld_histories.is_none() {
-            return self.undo_legacy(count);
+            let mut undone = 0;
+            let mut snapshots = Vec::new();
+            for _ in 0..count {
+                let step = self.undo_legacy(1)?;
+                if step == 0 {
+                    break;
+                }
+                undone += step;
+                if capture_snapshots {
+                    snapshots.push(self.snapshot()?);
+                }
+            }
+            return Ok((undone, snapshots));
         }
         let mut undone = 0;
+        let mut snapshots = Vec::new();
         for _ in 0..count {
-            if let Some(index) = self.active
+            let did_undo = if let Some(index) = self.active
                 && self.histories[index].pop().is_some()
             {
                 self.rebuild_overworld()?;
                 self.rebuild_active_level()?;
-                undone += 1;
-                continue;
-            }
-            if self.game.is_some() {
-                self.game = None;
-                self.active = None;
-            }
-            if self.overworld_histories.as_mut().expect("map histories")[self.completed.len()]
-                .pop()
-                .is_some()
-            {
-                self.rebuild_overworld()?;
-                undone += 1;
-                continue;
-            }
-            let Some(index) = self.completed.pop() else {
-                break;
+                true
+            } else {
+                if self.game.is_some() {
+                    self.game = None;
+                    self.active = None;
+                }
+                if self.overworld_histories.as_mut().expect("map histories")[self.completed.len()]
+                    .pop()
+                    .is_some()
+                {
+                    self.rebuild_overworld()?;
+                    true
+                } else if let Some(index) = self.completed.pop() {
+                    self.active = Some(index);
+                    if self.histories[index].pop().is_none() {
+                        return Err(format!("solved level {} has no action to undo", index + 1));
+                    }
+                    self.rebuild_overworld()?;
+                    self.rebuild_active_level()?;
+                    true
+                } else {
+                    false
+                }
             };
-            self.active = Some(index);
-            if self.histories[index].pop().is_none() {
-                return Err(format!("solved level {} has no action to undo", index + 1));
+            if !did_undo {
+                break;
             }
-            self.rebuild_overworld()?;
-            self.rebuild_active_level()?;
             undone += 1;
+            if capture_snapshots {
+                snapshots.push(self.snapshot()?);
+            }
         }
-        Ok(undone)
+        Ok((undone, snapshots))
     }
 
     pub fn restart(&mut self) -> Result<(), String> {
@@ -1182,14 +1277,17 @@ fn project_puzzle(world: &PhysicsWorld<'_>, level_id: &str) -> Result<WorldProje
     project(world, relevant_tiles, visible)
 }
 
-fn project_overworld(world: &PhysicsWorld<'_>) -> Result<WorldProjection, String> {
+fn project_overworld(
+    world: &PhysicsWorld<'_>,
+    view_radius: i32,
+) -> Result<WorldProjection, String> {
     let player = world
         .entity(world.player_id())
         .ok_or_else(|| "player disappeared".to_owned())?;
     let center = player.pos;
     let visible = |pos: Coord| {
-        (pos.x - center.x).abs() <= MAP_VIEW_RADIUS
-            && (pos.y - center.y).abs() <= MAP_VIEW_RADIUS
+        (pos.x - center.x).abs() <= view_radius
+            && (pos.y - center.y).abs() <= view_radius
             && (pos.z - center.z).abs() <= 12
     };
     let islands = world
@@ -1208,6 +1306,12 @@ fn project_overworld(world: &PhysicsWorld<'_>) -> Result<WorldProjection, String
         })
         .collect::<Result<Vec<_>, String>>()?;
     project(world, islands, visible)
+}
+
+fn nearby(pos: Coord, center: Coord, radius: i32) -> bool {
+    (pos.x - center.x).abs() <= radius
+        && (pos.y - center.y).abs() <= radius
+        && (pos.z - center.z).abs() <= 12
 }
 
 fn project(

@@ -7,8 +7,9 @@
   },
   "scripts": {
     "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext dev",
-    "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
+    "build": "rm -rf dist && WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
+    "publish:local": "scripts/publish-local.sh",
     "qa:parabox:data": "cargo run --quiet --manifest-path ../games/parabox-intro/Cargo.toml --bin render-qa -- ../games/parabox-intro/data/campaign > public/parabox-render-qa-64.json",
     "qa:sausage:data": "cargo run --release --quiet --manifest-path ../games/sausage-roll/Cargo.toml --bin sausage-render-qa > public/sausage-render-qa-64.json",
     "qa:operator:data": "cargo run --quiet --manifest-path ../games/emergency-operator/Cargo.toml --bin render-qa > public/operator-render-qa.json",
@@ -17,7 +18,10 @@
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
+    "@radix-ui/react-scroll-area": "^1.2.15",
+    "@radix-ui/react-toggle": "^1.1.15",
     "drizzle-orm": "0.45.2",
+    "lucide-react": "^1.25.0",
     "next": "16.2.6",
     "react": "19.2.6",
     "react-dom": "19.2.6",

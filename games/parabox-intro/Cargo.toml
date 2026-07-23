@@ -10,6 +10,9 @@ name = "parabox_terminal"
 path = "src/lib.rs"
 
 [dependencies]
+base64 = "0.22"
+flate2 = "1"
+regex = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
@@ -24,6 +27,10 @@ path = "src/main.rs"
 [[bin]]
 name = "parabox-verifier"
 path = "src/bin/verifier.rs"
+
+[[bin]]
+name = "parabox-import-walkthrough"
+path = "src/bin/import_walkthrough.rs"
 
 [profile.release]
 strip = true

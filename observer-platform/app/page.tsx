@@ -1,12 +1,28 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import * as ScrollArea from "@radix-ui/react-scroll-area";
+import * as Toggle from "@radix-ui/react-toggle";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  CircleSlash2,
+  Map as MapIcon,
+  Pause,
+  Play,
+  Radio,
+  Rewind,
+  type LucideIcon,
+} from "lucide-react";
+import { useEffect, useMemo, useState, type ButtonHTMLAttributes } from "react";
 
 import {
   GAME_IDS,
   GAME_META,
   GameState,
   describeGameEvent,
+  gameStateContext,
   type GameId,
 } from "./game-registry";
 import {
@@ -33,6 +49,11 @@ type RunSummary = {
   effort: string;
   live: boolean;
   status: string;
+  termination: {
+    kind: "live" | "resumable" | "agent_stopped" | "completed" | "stopped" | "no_agent";
+    resumable: boolean;
+    reason?: string | null;
+  };
   sidecar_only: boolean;
   score: number;
   total: number;
@@ -41,18 +62,19 @@ type RunSummary = {
   finished_at?: number | null;
   last_activity_at?: number | null;
   last_score_at?: number | null;
+  last_score_elapsed_ms?: number | null;
   consumed_ms?: number;
   observed_at?: number;
   latest_sequence: number;
   latest_action?: Record<string, Json> | null;
   latest_result?: Record<string, Json> | null;
-  score_history: ScorePoint[];
+  score_history?: ScorePoint[];
 };
 
 type RunDetail = RunSummary & {
   state: Record<string, Json>;
-  events: ObserverEvent[];
-  agent_activity: { timestamp?: string | null; text: string }[];
+  asset_refs?: Record<string, ObserverAssetReference>;
+  replay_groups: ReplayGroupSummary[];
   agent_experience: {
     updated_at?: number | null;
     source_count: number;
@@ -62,6 +84,63 @@ type RunDetail = RunSummary & {
     rejected: string[];
     solved: string[];
   };
+};
+
+type ReplayFrame = {
+  key: string;
+  event: ObserverEvent;
+  operation_sequence: number;
+  operation_timestamp_ms?: number | null;
+  operation_action: Record<string, Json>;
+  instruction_index: number;
+  instruction_count: number;
+  operation_size: number;
+  has_instruction_trace: boolean;
+};
+
+type ReplayOperation = {
+  sequence: number;
+  timestamp_ms?: number | null;
+  action: Record<string, Json>;
+  first_frame_key: string;
+  last_frame_key: string;
+  frame_count: number;
+  score_delta: number;
+};
+
+type ReplayAttemptSummary = {
+  id: number;
+  successful: boolean;
+  score?: number | null;
+};
+
+type ReplayGroupSummary = {
+  kind: "level" | "overworld";
+  reference: string;
+  title?: string | null;
+  score?: number | null;
+  attempts: ReplayAttemptSummary[];
+};
+
+type LoadedAttemptReplay = {
+  attempt_id: number;
+  kind: "level" | "overworld";
+  reference?: string | null;
+  title?: string | null;
+  score: number;
+  successful: boolean;
+  asset_refs?: Record<string, ObserverAssetReference>;
+  frames: ReplayFrame[];
+  operations: ReplayOperation[];
+  activity: { timestamp_ms: number; text: string }[];
+  skipped_unchanged: number;
+  eliminated_history_frames: number;
+};
+
+type ObserverAssetReference = {
+  id: string;
+  media_type: string;
+  bytes: number;
 };
 
 const SERIES_COLORS = [
@@ -74,14 +153,6 @@ const SERIES_COLORS = [
   "#62e5ba",
   "#86a8ff",
 ];
-
-function timeAgo(timestamp?: number | null, now = Date.now()) {
-  if (!timestamp) return "无记录";
-  const seconds = Math.max(0, Math.round((now - timestamp) / 1000));
-  if (seconds < 60) return `${seconds}s 前`;
-  if (seconds < 3600) return `${Math.round(seconds / 60)}m 前`;
-  return `${(seconds / 3600).toFixed(1)}h 前`;
-}
 
 function clockTime(timestamp?: number | null) {
   if (!timestamp) return "—";
@@ -100,9 +171,10 @@ function taskDuration(run: RunSummary, now: number) {
     const liveTail = run.live ? Math.max(0, now - (run.observed_at ?? now)) : 0;
     return run.consumed_ms + liveTail;
   }
-  const elapsed = run.score_history.map((point) => point.elapsed_ms ?? 0);
+  const history = run.score_history ?? [];
+  const elapsed = history.map((point) => point.elapsed_ms ?? 0);
   if (elapsed.some((value) => value > 0)) return Math.max(...elapsed);
-  const timestamps = run.score_history.map((point) => point.timestamp_ms);
+  const timestamps = history.map((point) => point.timestamp_ms);
   const startedAt = Math.min(run.started_at ?? Number.POSITIVE_INFINITY, ...timestamps);
   if (!Number.isFinite(startedAt)) return 0;
   const lastHistoryAt = timestamps[timestamps.length - 1] ?? startedAt;
@@ -115,9 +187,15 @@ function durationLabel(durationMs: number, axisMaxMs = durationMs) {
   return `${(durationMs / (60 * 60 * 1000)).toFixed(1)}h`;
 }
 
+function noScoreDuration(run: RunSummary, now: number) {
+  if (typeof run.last_score_elapsed_ms !== "number") return null;
+  return Math.max(0, taskDuration(run, now) - run.last_score_elapsed_ms);
+}
+
 function scoreTimeline(run: RunSummary, now: number): ElapsedScorePoint[] {
-  const source = run.score_history.length
-    ? run.score_history
+  const history = run.score_history ?? [];
+  const source = history.length
+    ? history
     : [{ timestamp_ms: run.started_at ?? now, score: run.score }];
   const startedAt = Math.min(run.started_at ?? Number.POSITIVE_INFINITY, source[0].timestamp_ms);
   const points = source.map((point) => ({
@@ -131,8 +209,49 @@ function scoreTimeline(run: RunSummary, now: number): ElapsedScorePoint[] {
     : points;
 }
 
+const RUN_STATUS = {
+  live: { label: "LIVE", className: "live" },
+  resumable: { label: "STOP · 可续跑", className: "resumable" },
+  agent_stopped: { label: "STOP · AGENT 主动", className: "agent-stopped" },
+  completed: { label: "DONE", className: "completed" },
+  stopped: { label: "STOP", className: "finished" },
+  no_agent: { label: "NO AGENT", className: "waiting" },
+} as const;
+
+function runStatus(run: RunSummary) {
+  return RUN_STATUS[run.termination?.kind ?? (run.live ? "live" : "stopped")];
+}
+
+function WallClock() {
+  const [timestamp, setTimestamp] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = window.setInterval(() => setTimestamp(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+  return (
+    <time>
+      {new Intl.DateTimeFormat("zh-CN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      }).format(timestamp)}
+    </time>
+  );
+}
+
 function actionLabel(action?: Record<string, Json> | null) {
-  return asString(action?.command, "STATE").toUpperCase();
+  const command = asString(action?.command, "STATE").toUpperCase();
+  const direction = asString(action?.direction, "");
+  return direction ? `${command} ${direction.toUpperCase()}` : command;
+}
+
+function instructionLabel(frame: ReplayFrame) {
+  if (frame.has_instruction_trace && frame.operation_size > 1) {
+    return `${frame.instruction_index} / ${frame.instruction_count}`;
+  }
+  if (!frame.has_instruction_trace && frame.operation_size > 1) return "整组";
+  return "单个";
 }
 
 function withSharedGameState(
@@ -144,6 +263,27 @@ function withSharedGameState(
   return { ...state, overworld_map: latest.overworld_map };
 }
 
+function gatewayUrl(path: string) {
+  const local = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+  const origin = import.meta.env.VITE_LIVE_GATEWAY_ORIGIN ?? "http://127.0.0.1:3740";
+  return new URL(local ? `${origin}${path}` : `/api/live${path}`, window.location.origin);
+}
+
+async function hydrateRunAssets(detail: RunDetail) {
+  const entries = Object.entries(detail.asset_refs ?? {});
+  if (!entries.length) return detail;
+  const assets = await Promise.all(
+    entries.map(async ([name, reference]) => {
+      const response = await fetch(gatewayUrl(`/v1/assets/${reference.id}`), {
+        cache: "force-cache",
+      });
+      if (!response.ok) throw new Error(`asset ${reference.id}: HTTP ${response.status}`);
+      return [name, await response.json()] as const;
+    }),
+  );
+  return { ...detail, state: { ...detail.state, ...Object.fromEntries(assets) } };
+}
+
 export default function Home() {
   const [runs, setRuns] = useState<RunSummary[]>([]);
   const [selectedGame, setSelectedGame] = useState<GameId>("parabox");
@@ -151,13 +291,7 @@ export default function Home() {
   const [detail, setDetail] = useState<RunDetail | null>(null);
   const [connection, setConnection] = useState<"connecting" | "live" | "offline">("connecting");
   const [paused, setPaused] = useState(false);
-  const [now, setNow] = useState(0);
-
-  useEffect(() => {
-    queueMicrotask(() => setNow(Date.now()));
-    const timer = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
+  const [snapshotNow, setSnapshotNow] = useState(() => Date.now());
 
   useEffect(() => {
     const fromUrl = new URL(window.location.href).searchParams.get("run");
@@ -166,43 +300,61 @@ export default function Home() {
 
   useEffect(() => {
     if (paused) return;
-    const local = ["localhost", "127.0.0.1"].includes(window.location.hostname);
-    const gatewayOrigin = import.meta.env.VITE_LIVE_GATEWAY_ORIGIN ?? "http://127.0.0.1:3740";
-    const url = new URL(
-      local ? `${gatewayOrigin}/v1/subscribe` : "/api/live/subscribe",
-      window.location.origin,
-    );
+    const url = gatewayUrl("/v1/subscribe");
     if (selectedId) url.searchParams.set("run_id", selectedId);
     const subscription = new EventSource(url);
+    let cancelled = false;
+    let loadedRevision = -1;
+    let loadingRevision = -1;
+    async function loadDetail(observedAt: number, revision: number) {
+      if (!selectedId || revision === loadedRevision || revision === loadingRevision) return;
+      loadingRevision = revision;
+      try {
+        const response = await fetch(gatewayUrl(`/v1/runs/${encodeURIComponent(selectedId)}`), {
+          cache: "no-store",
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const payload = await response.json() as { run: RunDetail };
+        const hydrated = await hydrateRunAssets(payload.run);
+        if (!cancelled) {
+          loadedRevision = revision;
+          setDetail({ ...hydrated, observed_at: observedAt });
+        }
+      } catch {
+        if (!cancelled) setConnection("offline");
+      } finally {
+        if (loadingRevision === revision) loadingRevision = -1;
+      }
+    }
     subscription.onopen = () => setConnection("live");
     subscription.onerror = () => setConnection("offline");
     subscription.onmessage = (event) => {
       try {
         const payload = JSON.parse(event.data) as {
           generated_at?: number;
+          revision?: number;
           runs?: RunSummary[];
-          run?: RunDetail | null;
         };
         const observedAt = payload.generated_at ?? Date.now();
+        setSnapshotNow(observedAt);
         const next = Array.isArray(payload.runs)
           ? payload.runs.map((run) => ({ ...run, observed_at: observedAt }))
           : [];
         setRuns(next);
-        setDetail(
-          selectedId && payload.run
-            ? { ...payload.run, observed_at: observedAt }
-            : null,
-        );
         setConnection("live");
         if (selectedId) {
           const selected = next.find((run) => run.id === selectedId);
           if (selected) setSelectedGame(selected.game);
+          void loadDetail(observedAt, payload.revision ?? selected?.latest_sequence ?? 0);
         }
       } catch {
         setConnection("offline");
       }
     };
-    return () => subscription.close();
+    return () => {
+      cancelled = true;
+      subscription.close();
+    };
   }, [selectedId, paused]);
 
   const grouped = useMemo(
@@ -217,7 +369,6 @@ export default function Home() {
   );
   const visibleRuns = grouped[selectedGame];
   const liveCount = runs.filter((run) => run.live).length;
-
   function selectRun(run: RunSummary) {
     setDetail(null);
     setSelectedId(run.id);
@@ -256,16 +407,7 @@ export default function Home() {
               : connection.toUpperCase()}
         </div>
         <div className="top-actions">
-          <time>
-            {now
-              ? new Intl.DateTimeFormat("zh-CN", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                  hour12: false,
-                }).format(now)
-              : "--:--:--"}
-          </time>
+          <WallClock />
           <button onClick={() => setPaused((value) => !value)}>{paused ? "继续" : "暂停"}</button>
         </div>
       </header>
@@ -297,9 +439,7 @@ export default function Home() {
                     onClick={() => selectRun(run)}
                     aria-pressed={selectedId === run.id}
                   >
-                    <span
-                      className={`run-dot ${run.live ? "live" : run.sidecar_only ? "waiting" : "finished"}`}
-                    />
+                    <span className={`run-dot ${runStatus(run).className}`} />
                     <span className="model-copy">
                       <strong>{run.model}</strong>
                       <small>{run.objective}</small>
@@ -317,12 +457,13 @@ export default function Home() {
       <section className="content">
         {selectedId ? (
           <RunDetails
+            key={selectedId}
             run={detail ?? runs.find((run) => run.id === selectedId) ?? null}
-            now={now}
+            now={snapshotNow}
             onBack={() => showDashboard(selectedGame)}
           />
         ) : (
-          <GameDashboard game={selectedGame} runs={visibleRuns} now={now} onSelect={selectRun} />
+          <GameDashboard game={selectedGame} runs={visibleRuns} now={snapshotNow} onSelect={selectRun} />
         )}
       </section>
     </main>
@@ -371,35 +512,42 @@ function GameDashboard({
       </section>
 
       <section className="run-grid">
-        {runs.map((run, index) => (
-          <button
-            className="run-card"
-            key={run.id}
-            onClick={() => onSelect(run)}
-            style={
-              { "--series": SERIES_COLORS[index % SERIES_COLORS.length] } as React.CSSProperties
-            }
-          >
-            <div className="run-card-top">
-              <span
-                className={`status-badge ${run.live ? "live" : run.sidecar_only ? "waiting" : "finished"}`}
-              >
-                {run.live ? "LIVE" : run.sidecar_only ? "NO AGENT" : "FINAL"}
-              </span>
-              <span>{run.effort.toUpperCase()}</span>
-            </div>
-            <h2>{run.model}</h2>
-            <div className="score-block">
-              <strong>{run.score}</strong>
-              <span>/ {run.total || "—"}</span>
-            </div>
-            <p>{run.objective}</p>
-            <div className="run-card-meta">
-              <span>活动 {timeAgo(run.last_activity_at, now)}</span>
-              <span>得分 {timeAgo(run.last_score_at, now)}</span>
-            </div>
-          </button>
-        ))}
+        {runs.map((run, index) => {
+          const elapsed = taskDuration(run, now);
+          const scoreSilence = noScoreDuration(run, now);
+          const status = runStatus(run);
+          return (
+            <button
+              className="run-card"
+              key={run.id}
+              onClick={() => onSelect(run)}
+              style={
+                { "--series": SERIES_COLORS[index % SERIES_COLORS.length] } as React.CSSProperties
+              }
+            >
+              <div className="run-card-top">
+                <span className={`status-badge ${status.className}`}>
+                  {status.label}
+                </span>
+              </div>
+              <h2 className="model-title">
+                {run.model}
+                <span>{run.effort.toUpperCase()}</span>
+              </h2>
+              <div className="score-block">
+                <strong>{run.score}</strong>
+                <span>/ {run.total || "—"}</span>
+              </div>
+              <p>{run.objective}</p>
+              <div className="run-card-meta">
+                <span>运行 {durationLabel(elapsed)}</span>
+                <span>
+                  未得分 {scoreSilence === null ? "全程" : durationLabel(scoreSilence)}
+                </span>
+              </div>
+            </button>
+          );
+        })}
         {!runs.length && (
           <EmptyState
             title="尚无真实运行"
@@ -421,50 +569,57 @@ function RunDetails({
   onBack: () => void;
 }) {
   const runDetail = run as RunDetail | null;
-  const events = runDetail?.events ?? [];
-  const [cursorSequence, setCursorSequence] = useState<number | null>(null);
+  const [attemptReplay, setAttemptReplay] = useState<LoadedAttemptReplay | null>(null);
+  const [attemptReplayLoading, setAttemptReplayLoading] = useState(false);
+  const [pendingAttemptReplay, setPendingAttemptReplay] = useState<number | null>(null);
+  const [attemptReplayError, setAttemptReplayError] = useState("");
+  const [skipFailedAttempts, setSkipFailedAttempts] = useState(false);
+  const frames = useMemo(() => attemptReplay?.frames ?? [], [attemptReplay]);
+  const [cursorKey, setCursorKey] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
 
   useEffect(() => {
-    setCursorSequence(null);
-    setPlaying(false);
-  }, [run?.id]);
-
-  useEffect(() => {
     if (
-      cursorSequence !== null &&
-      events.length > 0 &&
-      !events.some((event) => event.sequence === cursorSequence)
+      cursorKey !== null &&
+      frames.length > 0 &&
+      !frames.some((frame) => frame.key === cursorKey)
     ) {
       queueMicrotask(() => {
-        setCursorSequence(null);
+        setCursorKey(null);
         setPlaying(false);
       });
     }
-  }, [cursorSequence, events]);
+  }, [cursorKey, frames]);
 
-  const cursorIndex = cursorSequence === null
-    ? events.length - 1
-    : events.findIndex((event) => event.sequence === cursorSequence);
-  const activeIndex = cursorIndex < 0 ? events.length - 1 : cursorIndex;
-  const activeEvent = events[activeIndex] ?? null;
-  const previousEvent = activeIndex > 0 ? events[activeIndex - 1] : null;
-  const isLatest = activeIndex >= events.length - 1;
-  const followingLive = cursorSequence === null;
+  const cursorIndex = cursorKey === null
+    ? frames.length - 1
+    : frames.findIndex((frame) => frame.key === cursorKey);
+  const activeIndex = cursorIndex < 0 ? frames.length - 1 : cursorIndex;
+  const activeFrame = frames[activeIndex] ?? null;
+  const activeEvent = activeFrame?.event ?? null;
+  const previousEvent = activeIndex > 0 ? frames[activeIndex - 1].event : null;
+  const isLatest = activeIndex >= frames.length - 1;
+  const followingLive = attemptReplay === null;
+  const failedAttempts = (runDetail?.replay_groups ?? []).reduce(
+    (total, group) => total + (group.kind === "level" ? group.attempts.filter((attempt) => !attempt.successful).length : 0),
+    0,
+  );
 
   useEffect(() => {
-    if (!playing || !events.length || isLatest) {
+    if (!playing || !frames.length || isLatest) {
       if (playing && isLatest) queueMicrotask(() => setPlaying(false));
       return;
     }
     const timer = window.setTimeout(() => {
-      setCursorSequence(events[activeIndex + 1]?.sequence ?? null);
-    }, 900 / speed);
+      setCursorKey(frames[activeIndex + 1]?.key ?? null);
+    }, 450 / speed);
     return () => window.clearTimeout(timer);
-  }, [activeIndex, events, isLatest, playing, speed]);
+  }, [activeIndex, frames, isLatest, playing, speed]);
 
-  if (!run) return <EmptyState title="正在接入测试" body="等待权威 sidecar 状态。" />;
+  if (!run || !("state" in run)) {
+    return <EmptyState title="正在接入测试" body="等待权威 sidecar 状态。" />;
+  }
   const detail = run as RunDetail;
   const state = withSharedGameState(
     run.game,
@@ -474,14 +629,23 @@ function RunDetails({
   const previousState = previousEvent?.state
     ? withSharedGameState(run.game, previousEvent.state, detail.state ?? {})
     : null;
-  const eventDescription = activeEvent
-    ? describeGameEvent(run.game, activeEvent, previousEvent)
-    : null;
   const meta = GAME_META[run.game];
+  const selectedAttempt = (detail.replay_groups ?? [])
+    .flatMap((group) => group.attempts.map((attempt, index) => ({ group, attempt, index })))
+    .find(({ attempt }) => attempt.id === attemptReplay?.attempt_id);
+  const environmentTitle = selectedAttempt
+    ? selectedAttempt.group.kind === "overworld"
+      ? `${selectedAttempt.group.title ?? "Land's End"} / 大地图`
+      : `${selectedAttempt.group.reference} / ${selectedAttempt.group.title ?? "未命名关卡"}`
+    : run.objective;
+  const environmentContext = gameStateContext(run.game, state);
+  const elapsed = taskDuration(run, now);
+  const scoreSilence = noScoreDuration(run, now);
+  const status = runStatus(run);
 
   function moveCursor(index: number) {
-    const bounded = Math.max(0, Math.min(events.length - 1, index));
-    setCursorSequence(events[bounded]?.sequence ?? null);
+    const bounded = Math.max(0, Math.min(frames.length - 1, index));
+    setCursorKey(frames[bounded]?.key ?? null);
     setPlaying(false);
   }
 
@@ -490,14 +654,46 @@ function RunDetails({
       setPlaying(false);
       return;
     }
-    if (!events.length) return;
-    if (isLatest) setCursorSequence(events[0].sequence);
+    if (!frames.length) return;
+    if (isLatest) setCursorKey(frames[0].key);
     setPlaying(true);
   }
 
   function followLive() {
-    setCursorSequence(null);
+    setAttemptReplay(null);
+    setPendingAttemptReplay(null);
+    setCursorKey(null);
     setPlaying(false);
+  }
+
+  async function loadAttemptReplay(attemptId: number) {
+    if (!runDetail) return;
+    if (attemptReplay?.attempt_id === attemptId) {
+      setCursorKey(frames[0]?.key ?? null);
+      setPlaying(frames.length > 1);
+      return;
+    }
+    setCursorKey(null);
+    setPlaying(false);
+    setAttemptReplayLoading(true);
+    setPendingAttemptReplay(attemptId);
+    setAttemptReplayError("");
+    try {
+      const path = `/v1/runs/${encodeURIComponent(runDetail.id)}`;
+      const url = gatewayUrl(path);
+      url.searchParams.set("replay_attempt", String(attemptId));
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const payload = await response.json() as LoadedAttemptReplay & { schema: string };
+      setCursorKey(payload.frames[0]?.key ?? null);
+      setPlaying(payload.frames.length > 1);
+      setAttemptReplay(payload);
+    } catch {
+      setAttemptReplayError("尝试回放加载失败");
+    } finally {
+      setAttemptReplayLoading(false);
+      setPendingAttemptReplay(null);
+    }
   }
 
   return (
@@ -508,10 +704,11 @@ function RunDetails({
         </button>
         <div className="detail-title-row">
           <div>
-            <p className="eyebrow">
-              {run.task} / {run.effort.toUpperCase()}
-            </p>
-            <h1>{run.model}</h1>
+            <p className="eyebrow">{run.task}</p>
+            <h1 className="model-title">
+              {run.model}
+              <span>{run.effort.toUpperCase()}</span>
+            </h1>
             <p className="page-subtitle">{run.objective}</p>
           </div>
           <div className="score-hero">
@@ -521,13 +718,12 @@ function RunDetails({
           </div>
         </div>
         <div className="detail-strip">
-          <span
-            className={`status-badge ${run.live ? "live" : run.sidecar_only ? "waiting" : "finished"}`}
-          >
-            {run.live ? "LIVE" : run.sidecar_only ? "SIDECAR ONLY" : "FINISHED"}
+          <span className={`status-badge ${status.className}`}>
+            {status.label}
           </span>
-          <span>最近活动 {timeAgo(run.last_activity_at, now)}</span>
-          <span>最近得分 {timeAgo(run.last_score_at, now)}</span>
+          {run.termination?.reason && <span>{run.termination.reason}</span>}
+          <span>累计运行 {durationLabel(elapsed)}</span>
+          <span>未得分 {scoreSilence === null ? "全程" : durationLabel(scoreSilence)}</span>
           <span>SEQ {run.latest_sequence}</span>
           <span>{run.agent}</span>
         </div>
@@ -535,47 +731,34 @@ function RunDetails({
 
       <section className="detail-grid">
         <div className="environment-card">
-          <div className="section-title">
-            <div>
-              <span>{cursorSequence === null ? "AUTHORITATIVE LIVE STATE" : "AUTHORITATIVE REPLAY"}</span>
-              <strong>{cursorSequence === null ? "当前环境" : `回放事件 #${activeEvent?.sequence}`}</strong>
-            </div>
-            <small>{isLatest ? "最新状态" : `窗口内第 ${activeIndex + 1} / ${events.length} 步`}</small>
+          <div className="section-title environment-title">
+            <strong>{environmentTitle}</strong>
+            {environmentContext && <small>{environmentContext}</small>}
           </div>
           <GameState game={run.game} state={state} previousState={previousState} />
-        </div>
-        <div className={`operation-card ${eventDescription?.tone ?? "neutral"}`}>
-          <div className="section-title">
-            <div>
-              <span>{eventDescription?.label ?? "WAITING FOR EVENT"}</span>
-              <strong>{eventDescription?.title ?? "等待权威事件"}</strong>
-            </div>
-            <small>{activeEvent ? clockTime(activeEvent.timestamp_ms) : "—"}</small>
-          </div>
-          <div className="operation-summary">
-            <p>{eventDescription?.detail ?? "Sidecar 尚未产生可回放状态。"}</p>
-            <dl>
-              <div><dt>事件</dt><dd>#{activeEvent?.sequence ?? "—"}</dd></div>
-              <div><dt>命令</dt><dd>{actionLabel(activeEvent?.action)}</dd></div>
-              <div><dt>得分</dt><dd>{activeEvent?.score ?? run.score}</dd></div>
-              <div><dt>结果</dt><dd>{activeEvent?.result?.ok === false ? "未生效" : "已记录"}</dd></div>
-            </dl>
-          </div>
+          <ReplayTimeline
+            frames={frames}
+            activeIndex={activeIndex}
+            isLatest={isLatest}
+            followingLive={followingLive}
+            playing={playing}
+            speed={speed}
+            failedAttempts={failedAttempts}
+            skipFailedAttempts={skipFailedAttempts}
+            replayGroups={runDetail?.replay_groups ?? []}
+            selectedAttemptReplay={pendingAttemptReplay ?? attemptReplay?.attempt_id ?? null}
+            attemptReplayLoading={attemptReplayLoading}
+            pendingAttemptReplay={pendingAttemptReplay}
+            attemptReplayError={attemptReplayError}
+            onMove={moveCursor}
+            onTogglePlayback={togglePlayback}
+            onSpeed={setSpeed}
+            onFollowLive={followLive}
+            onSkipFailedAttempts={setSkipFailedAttempts}
+            onAttemptReplay={loadAttemptReplay}
+          />
         </div>
       </section>
-
-      <ReplayTimeline
-        events={events}
-        activeIndex={activeIndex}
-        isLatest={isLatest}
-        followingLive={followingLive}
-        playing={playing}
-        speed={speed}
-        onMove={moveCursor}
-        onTogglePlayback={togglePlayback}
-        onSpeed={setSpeed}
-        onFollowLive={followLive}
-      />
 
       <ExperiencePanel experience={detail.agent_experience} />
 
@@ -594,30 +777,23 @@ function RunDetails({
         <div className="activity-card">
           <div className="section-title">
             <div>
-              <span>NATIVE SESSION</span>
-              <strong>Agent 当前活动</strong>
+              <span>ATTEMPT SESSION</span>
+              <strong>此次尝试的 Agent 活动</strong>
             </div>
-            <small>仅展示保存 session 中的可见消息</small>
+            <small>{selectedAttempt ? `${selectedAttempt.group.kind === "overworld" ? "大地图" : selectedAttempt.group.reference} · ${selectedAttempt.group.kind === "overworld" ? "路段" : "尝试"} ${selectedAttempt.index + 1}` : "随回放段按需载入"}</small>
           </div>
           <div className="activity-list">
-            {detail.agent_activity?.length ? (
-              detail.agent_activity
-                .slice()
-                .reverse()
-                .map((item, index) => (
-                  <article key={`${item.timestamp}-${index}`}>
-                    <time>{item.timestamp ? clockTime(Date.parse(item.timestamp)) : "—"}</time>
+            {attemptReplay?.activity.length ? (
+              attemptReplay.activity.map((item, index) => (
+                  <article key={`${item.timestamp_ms}-${index}`}>
+                    <time>{clockTime(item.timestamp_ms)}</time>
                     <p>{item.text}</p>
                   </article>
                 ))
             ) : (
               <EmptyState
-                title="暂无可见消息"
-                body={
-                  run.live
-                    ? "Agent 正在推理，等待下一条可见活动。"
-                    : "该 run 没有保存可展示的近期消息。"
-                }
+                title={attemptReplay ? "此次尝试没有可见消息" : "选择一次尝试"}
+                body={attemptReplay ? "权威 session 在该尝试时间窗内没有保存可展示消息。" : "Agent 活动会和所选尝试一起按需载入，不再展示整段 session。"}
               />
             )}
           </div>
@@ -625,36 +801,56 @@ function RunDetails({
         <div className="event-card">
           <div className="section-title">
             <div>
-              <span>SIDECAR TRACE</span>
-              <strong>最近事件</strong>
+              <span>ATTEMPT OPERATIONS</span>
+              <strong>此次尝试的操作</strong>
             </div>
-            <small>append-only</small>
+            <small>{attemptReplay ? `${attemptReplay.operations.length} 组` : "随尝试按需载入"}</small>
           </div>
           <div className="event-list">
-            {events
-              .slice()
-              .reverse()
-              .slice(0, 35)
-              .map((event) => {
-                const index = events.findIndex((candidate) => candidate.sequence === event.sequence);
+            {attemptReplay?.operations.length ? (
+              attemptReplay.operations.map((operation, operationIndex) => {
+                const frameIndex = frames.findIndex(
+                  (frame) => frame.key === operation.first_frame_key,
+                );
+                const frame = frames.find((candidate) => candidate.key === operation.last_frame_key);
+                const previousOperation = operationIndex > 0
+                  ? attemptReplay.operations[operationIndex - 1]
+                  : null;
+                const previousFrame = previousOperation
+                  ? frames.find((candidate) => candidate.key === previousOperation.last_frame_key)
+                  : null;
+                const event: ObserverEvent = {
+                  ...(frame?.event ?? { sequence: operation.sequence }),
+                  sequence: operation.sequence,
+                  timestamp_ms: operation.timestamp_ms,
+                  action: operation.action,
+                  score_delta: operation.score_delta,
+                };
                 const description = describeGameEvent(
                   run.game,
                   event,
-                  index > 0 ? events[index - 1] : null,
+                  previousFrame?.event ?? null,
                 );
                 return (
                 <button
-                  className={`event-row ${event.sequence === activeEvent?.sequence ? "active" : ""}`}
-                  key={event.sequence}
-                  onClick={() => moveCursor(index)}
-                  aria-current={event.sequence === activeEvent?.sequence ? "step" : undefined}
+                  className={`event-row ${operation.sequence === activeFrame?.operation_sequence ? "active" : ""}`}
+                  key={operation.sequence}
+                  onClick={() => frameIndex >= 0 && moveCursor(frameIndex)}
+                  disabled={frameIndex < 0}
+                  aria-current={operation.sequence === activeFrame?.operation_sequence ? "step" : undefined}
                 >
-                  <time>{clockTime(event.timestamp_ms)}</time>
+                  <time>{clockTime(operation.timestamp_ms)}</time>
                   <strong>{description.title}</strong>
-                  <span>{event.score_delta ? `+${event.score_delta} 分` : description.label}</span>
-                  <small>#{event.sequence}</small>
+                  <span>{operation.score_delta ? `+${operation.score_delta} 分` : `${operation.frame_count} 帧`}</span>
+                  <small>#{operation.sequence}</small>
                 </button>
-              )})}
+              )})
+            ) : (
+              <EmptyState
+                title={attemptReplay ? "此次尝试没有有效操作" : "选择一次尝试"}
+                body="Sidecar 操作会和所选尝试一起按需载入，不再展示整条事件流。"
+              />
+            )}
           </div>
         </div>
       </section>
@@ -663,97 +859,182 @@ function RunDetails({
 }
 
 function ReplayTimeline({
-  events,
+  frames,
   activeIndex,
   isLatest,
   followingLive,
   playing,
   speed,
+  failedAttempts,
+  skipFailedAttempts,
+  replayGroups,
+  selectedAttemptReplay,
+  attemptReplayLoading,
+  pendingAttemptReplay,
+  attemptReplayError,
   onMove,
   onTogglePlayback,
   onSpeed,
   onFollowLive,
+  onSkipFailedAttempts,
+  onAttemptReplay,
 }: {
-  events: ObserverEvent[];
+  frames: ReplayFrame[];
   activeIndex: number;
   isLatest: boolean;
   followingLive: boolean;
   playing: boolean;
   speed: number;
+  failedAttempts: number;
+  skipFailedAttempts: boolean;
+  replayGroups: ReplayGroupSummary[];
+  selectedAttemptReplay: number | null;
+  attemptReplayLoading: boolean;
+  pendingAttemptReplay: number | null;
+  attemptReplayError: string;
   onMove: (index: number) => void;
   onTogglePlayback: () => void;
   onSpeed: (speed: number) => void;
   onFollowLive: () => void;
+  onSkipFailedAttempts: (enabled: boolean) => void;
+  onAttemptReplay: (attemptId: number) => void;
 }) {
-  const active = events[activeIndex];
-  const scored = events
-    .map((event, index) => ({ event, index }))
-    .filter(({ event }) => (event.score_delta ?? 0) > 0);
+  const active = frames[activeIndex];
+  const previousOperation = frames.findLastIndex(
+    (frame, index) => index < activeIndex && frame.operation_sequence !== active?.operation_sequence,
+  );
+  const nextOperation = frames.findIndex(
+    (frame, index) => index > activeIndex && frame.operation_sequence !== active?.operation_sequence,
+  );
+  const replayAttempts = replayGroups.flatMap((group) =>
+    group.attempts.map((attempt, index) => ({ group, attempt, index })),
+  );
+  const selectedReplay = replayAttempts.find(
+    ({ attempt }) => attempt.id === selectedAttemptReplay,
+  );
   return (
-    <section className="replay-card" aria-label="状态回放时间轴">
-      <div className="replay-heading">
-        <div>
-          <span>REPLAY WINDOW · {events.length} EVENTS</span>
-          <strong>{events.length ? `#${events[0].sequence} — #${events.at(-1)?.sequence}` : "暂无可回放事件"}</strong>
+    <section className="replay-panel" aria-label="状态回放时间轴">
+      {frames.length > 0 && <div className="replay-toolbar">
+        <div className="replay-controls" role="group" aria-label="回放操作">
+          <ReplayIconButton label="跳到最早状态" icon={Rewind} onClick={() => onMove(0)} disabled={!frames.length || activeIndex <= 0} />
+          <ReplayIconButton label="上一组操作" icon={ChevronsLeft} onClick={() => onMove(previousOperation)} disabled={previousOperation < 0} />
+          <ReplayIconButton label="上一条有效指令" icon={ChevronLeft} onClick={() => onMove(activeIndex - 1)} disabled={!frames.length || activeIndex <= 0} />
+          <ReplayIconButton className="play-button" label={playing ? "暂停回放" : "播放回放"} icon={playing ? Pause : Play} onClick={onTogglePlayback} disabled={frames.length < 2} />
+          <ReplayIconButton label="下一条有效指令" icon={ChevronRight} onClick={() => onMove(activeIndex + 1)} disabled={!frames.length || isLatest} />
+          <ReplayIconButton label="下一组操作" icon={ChevronsRight} onClick={() => onMove(nextOperation)} disabled={nextOperation < 0} />
+          <ReplayIconButton label="返回直播" icon={Radio} onClick={onFollowLive} disabled={!frames.length || followingLive} />
+          <Toggle.Root
+            className="replay-icon replay-toggle"
+            aria-label="跳过失败尝试（以重置为分界）"
+            title="跳过失败尝试（以重置为分界）"
+            pressed={skipFailedAttempts}
+            onPressedChange={onSkipFailedAttempts}
+            disabled={!failedAttempts}
+          >
+            <CircleSlash2 aria-hidden="true" size={17} strokeWidth={2} />
+          </Toggle.Root>
+          <label className="compact-select" title="回放速度">
+            <span aria-hidden="true">×</span>
+            <select aria-label="回放速度" value={speed} onChange={(event) => onSpeed(Number(event.target.value))}>
+              <option value={0.5}>0.5</option>
+              <option value={1}>1</option>
+              <option value={2}>2</option>
+              <option value={4}>4</option>
+            </select>
+          </label>
+          <label className="replay-inline-scrubber">
+            <span className="sr-only">选择有效回放画面</span>
+            <input
+              type="range"
+              min="0"
+              max={Math.max(0, frames.length - 1)}
+              value={Math.max(0, activeIndex)}
+              onChange={(event) => onMove(Number(event.target.value))}
+              aria-label="选择有效回放画面"
+            />
+            <b>{active ? `${instructionLabel(active)} · ${actionLabel(active.event.action)}` : "—"}</b>
+          </label>
         </div>
         <div className="replay-status" aria-live="polite">
-          <i className={followingLive ? "live" : "replay"} />
-          {followingLive
-            ? "位于最新状态"
-            : isLatest
-              ? "回看最新事件 · 未跟随"
-              : `回看 ${clockTime(active?.timestamp_ms)}`}
+          <i className={followingLive && selectedAttemptReplay === null ? "live" : "replay"} />
+          {pendingAttemptReplay !== null
+            ? "正在载入尝试回放…"
+            : selectedReplay
+              ? selectedReplay.group.kind === "overworld"
+                ? `正在回放大地图 · 路段 ${selectedReplay.index + 1}`
+                : `正在回放 ${selectedReplay.group.reference} · 尝试 ${selectedReplay.index + 1}`
+              : followingLive
+                ? "位于最新状态"
+                : isLatest
+                  ? "回看最新事件 · 未跟随"
+                  : `回看 ${clockTime(active?.event.timestamp_ms)}`}
         </div>
+      </div>}
+      <div className="score-replay-picker">
+        <ScrollArea.Root className="score-replay-scroll" type="auto">
+          <ScrollArea.Viewport className="score-replay-viewport">
+            <div className="score-replay-list" role="listbox" aria-label="选择回放段">
+              {replayGroups.map((group) => (
+                <section className={`score-replay-level ${group.kind}`} key={group.reference}>
+                  <header>
+                    <strong>{group.kind === "overworld" ? <MapIcon aria-label="大地图" size={14} /> : group.reference}</strong>
+                    <span>{group.title ?? (group.kind === "overworld" ? "Land's End" : "未命名关卡")}</span>
+                    <small>{group.kind === "overworld" ? "大地图" : `${group.score} 分`}</small>
+                  </header>
+                  <div>
+                    {group.attempts
+                      .map((attempt, index) => ({ attempt, index }))
+                      .filter(({ attempt }) => group.kind === "overworld" || !skipFailedAttempts || attempt.successful)
+                      .map(({ attempt, index }) => {
+                      const selected = attempt.id === selectedAttemptReplay;
+                      const loading = attempt.id === pendingAttemptReplay;
+                      return (
+                        <button
+                          type="button"
+                          role="option"
+                          aria-selected={selected}
+                          className={`${selected ? "selected" : ""} ${group.kind === "overworld" ? "map" : attempt.successful ? "scored" : "failed"}`}
+                          key={attempt.id}
+                          title={group.kind === "overworld" ? `${group.title ?? "Land's End"} · 大地图路段 ${index + 1}` : `${group.reference} / ${group.title ?? "未命名关卡"} · 尝试 ${index + 1}${attempt.successful ? ` · 得分 ${attempt.score}` : " · 未得分"}`}
+                          onClick={() => onAttemptReplay(attempt.id)}
+                          disabled={attemptReplayLoading && !loading}
+                        >
+                          <strong>{loading ? "…" : group.kind === "overworld" ? <MapIcon aria-hidden="true" size={15} /> : attempt.successful ? `+${attempt.score}` : "○"}</strong>
+                          <small>{group.kind === "overworld" ? "路段" : "尝试"} {index + 1}</small>
+                        </button>
+                      );
+                      })}
+                  </div>
+                </section>
+              ))}
+              {!replayGroups.length && <span className="score-replay-empty">暂无可回放操作</span>}
+            </div>
+          </ScrollArea.Viewport>
+          <ScrollArea.Scrollbar className="score-replay-scrollbar" orientation="horizontal">
+            <ScrollArea.Thumb className="score-replay-thumb" />
+          </ScrollArea.Scrollbar>
+        </ScrollArea.Root>
       </div>
-      <div className="replay-controls">
-        <button onClick={() => onMove(0)} disabled={!events.length || activeIndex <= 0}>最早</button>
-        <button onClick={() => onMove(activeIndex - 1)} disabled={!events.length || activeIndex <= 0}>上一步</button>
-        <button className="play-button" onClick={onTogglePlayback} disabled={events.length < 2}>
-          {playing ? "暂停回放" : "播放回放"}
-        </button>
-        <button onClick={() => onMove(activeIndex + 1)} disabled={!events.length || isLatest}>下一步</button>
-        <button onClick={onFollowLive} disabled={!events.length || followingLive}>返回直播</button>
-        <label>
-          速度
-          <select value={speed} onChange={(event) => onSpeed(Number(event.target.value))}>
-            <option value={0.5}>0.5×</option>
-            <option value={1}>1×</option>
-            <option value={2}>2×</option>
-            <option value={4}>4×</option>
-          </select>
-        </label>
-        <label>
-          得分事件
-          <select
-            value=""
-            onChange={(event) => event.target.value && onMove(Number(event.target.value))}
-            disabled={!scored.length}
-          >
-            <option value="">跳转…</option>
-            {scored.map(({ event, index }) => (
-              <option value={index} key={event.sequence}>#{event.sequence} · +{event.score_delta}</option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <div className="replay-scrubber">
-        <input
-          type="range"
-          min="0"
-          max={Math.max(0, events.length - 1)}
-          value={Math.max(0, activeIndex)}
-          onChange={(event) => onMove(Number(event.target.value))}
-          disabled={!events.length}
-          aria-label="选择回放事件"
-        />
-        <div>
-          <span>{events[0] ? `#${events[0].sequence}` : "—"}</span>
-          <strong>{active ? `#${active.sequence} · ${actionLabel(active.action)}` : "等待事件"}</strong>
-          <span>{events.at(-1) ? `#${events.at(-1)?.sequence}` : "—"}</span>
-        </div>
-      </div>
-      <p className="replay-note">回放窗口来自 sidecar 最近 120 条完整状态；更早动作仍保留在运行产物中，但不会在此窗口伪装为可逐步回放。</p>
+      {attemptReplayError && <p className="replay-error">{attemptReplayError}</p>}
     </section>
+  );
+}
+
+function ReplayIconButton({
+  label,
+  icon,
+  className = "",
+  ...props
+}: {
+  label: string;
+  icon: LucideIcon;
+  className?: string;
+} & ButtonHTMLAttributes<HTMLButtonElement>) {
+  const Icon = icon;
+  return (
+    <button className={`replay-icon ${className}`} aria-label={label} title={label} {...props}>
+      <Icon aria-hidden="true" size={17} strokeWidth={2} />
+    </button>
   );
 }
 

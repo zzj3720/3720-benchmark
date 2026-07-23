@@ -33,11 +33,13 @@ client. A separate `game` service owns the rules engine, campaign, cooldown,
 action history, and append-only API audit; Harbor collects the sidecar artifacts
 directly for the isolated replay verifier and post-run review.
 
-The sidecar also writes `parabox-events.jsonl`. Every request is recorded with
-an absolute timestamp, command result, cumulative score, score delta, solved
-level references, and selected level. Score-over-time charts can therefore be
-derived from the authoritative environment artifact without parsing
-model-specific session formats.
+The runtime recorder owns the unified observer journal. It commits every
+sidecar request beside runtime lifecycle events with an absolute timestamp,
+cumulative effective Agent time, command result, score delta, solved levels,
+and selected level. Score-over-time charts therefore do not parse or join
+model-specific session formats. Batched moves and undos retain a compressed
+per-instruction trace in the journal's content-addressed object store; it is
+private observation data and is not returned by the Agent API.
 
 Regenerate the packaged artifacts with:
 

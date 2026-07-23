@@ -12,16 +12,20 @@ name = "3720"
 
 [[tasks]]
 name = "3720/parabox-intro"
-digest = "sha256:12579834a970f268d7652d7a7cbe9f0d5d7ffafb00126590490358007f383f8c"
+digest = "sha256:5a63c2d2961f5f76725abd4fa901621bc3e67d7c413a6461f05229d7a49c3ce1"
 
 [[tasks]]
 name = "3720/swarm-farming"
-digest = "sha256:bfc9a0777f9c5f63b953223f85d6a7a0c31ce8824111e9d3cd58acfb76b10819"
+digest = "sha256:f9ec74e7721089ebf1f3bd94ef318867921f7b0deb24cf0899bd451fa7c886d0"
 
 [[tasks]]
 name = "3720/sausage-roll"
-digest = "sha256:5d4b2c72dd4fa69b4f040c768bf226d5dc0eb54731cf2b8119bc9b3fc192e89e"
+digest = "sha256:a8e810ae99547eabf7df3f43571089e9dc9315c92be868f7ed0d9dfe0b45d552"
 
 [[tasks]]
 name = "3720/emergency-operator"
-digest = "sha256:239d0fcac2d68a77489784188f63d4385cf3a5b9bc998f0be601405eba071b76"
+digest = "sha256:f41c727947e63f8f7ef4e891bf345eec40ad1a1d42914d80003268878349a66c"
+
+[[tasks]]
+name = "3720/sokoban"
+digest = "sha256:0e6619a4606360cb14ae2f8cea5fdf73cdb1a7368bb9323c00206d6dcb443e16"

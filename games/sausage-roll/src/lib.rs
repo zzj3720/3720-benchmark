@@ -22,7 +22,7 @@ pub mod replay;
 pub mod session;
 pub mod world;
 
-pub use api::{API_VERSION, Command, MAX_MOVES_PER_REQUEST, execute};
+pub use api::{API_VERSION, Command, MAX_MOVES_PER_REQUEST, execute, execute_observed};
 pub use campaign::Campaign;
 pub use entries::{CampaignEntries, CampaignEntry};
 pub use game3d::Game3d;

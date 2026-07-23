@@ -76,11 +76,11 @@ for check in ci_checks/check-*.sh; do
   bash "$check" "tasks/<task-name>"
 done
 
-HARBOR_TELEMETRY=off harbor run \
+HARBOR_TELEMETRY=off tools/observer/harbor-run \
   --path "tasks/<task-name>" \
   --agent oracle
 
-HARBOR_TELEMETRY=off harbor run \
+HARBOR_TELEMETRY=off tools/observer/harbor-run \
   --path "tasks/<task-name>" \
   --agent nop
 ```
@@ -103,11 +103,12 @@ workflow.
 
 ## Dataset status
 
-The root `dataset.toml` contains four game-reasoning cases: the complete
+The root `dataset.toml` contains five game-reasoning cases: the complete
 364-puzzle `3720/parabox-intro` campaign, the model-controlled-clock
 `3720/swarm-farming` time-planning pilot, and the complete 86-puzzle
 `3720/sausage-roll` three-dimensional spatial-planning campaign, plus the
-continuous-wall-clock `3720/emergency-operator` dispatch shift.
+continuous-wall-clock `3720/emergency-operator` dispatch shift and the
+progressive 305-level `3720/sokoban` classic box-pushing campaign.
 `tasks/hello-world` only verifies the Harbor and CI plumbing and is deliberately
 excluded from benchmark results.
 

@@ -3,7 +3,8 @@
 `observer-platform/` is the public, read-only live console for 3720 game
 benchmarks. It shows real Harbor runs rather than browser fixtures:
 
-- a separate scoreboard for Parabox, Swarm, Sausage, and Emergency Operator;
+- a separate scoreboard for Parabox, Swarm, Sausage, Emergency Operator, and
+  Sokoban;
 - one score-over-effective-agent-time series per model, measured from the
   logical run's first eligible Agent execution window and excluding pauses,
   infrastructure-only attempts, and gaps between continuation segments;
@@ -13,41 +14,42 @@ benchmarks. It shows real Harbor runs rather than browser fixtures:
 - both active trials and the most recent saved result for each game/model.
 
 The browser holds one Server-Sent Events subscription. Selecting a run replaces
-the stream with one that also carries that run's detailed activity:
+the stream with one that carries only that run's revision alongside the compact
+scoreboard:
 
 ```text
 GET /api/live/subscribe
 GET /api/live/subscribe?run_id=<run-id>
 ```
 
-The snapshot endpoints remain available for diagnostics, but the live UI does
-not poll them.
+When the revision changes, the browser reads the selected run detail once.
+Replay frames are loaded only after an attempt is selected. Large immutable
+game data is exposed through content-addressed assets and cached independently,
+so it never rides along with SSE updates or every replay response.
 
-The gateway wakes subscribers from Docker lifecycle events, `tail -F` streams
-for each active game's event log and native Agent session log, and Sausage's
-blocking observer feed. With no source event it sends only an SSE keepalive;
-there is no timed snapshot refresh behind the subscription.
+The Rust gateway wakes subscribers from filesystem notifications on the one
+chain journal. Compressed replay traces and immutable scenes live beside it as
+content-addressed objects and are read only for the latest state or selected
+attempt. Historical runs come from an immutable local archive. With no source
+event it sends only an SSE keepalive; there is no timed snapshot refresh behind
+the subscription and no Docker or Harbor scan on a request.
 
 Emergency Operator publishes read-only clock snapshots once per second after a
 shift starts, so calls, ETAs, incident health, alarms, and score remain live
 while the Agent is waiting. These observer ticks never deliver an alarm or
 enter the scoring audit.
 
-The Vinext route forwards them to the loopback live gateway on port 3740. The
-gateway auto-discovers active Harbor `game` containers, associates them with
-their job/trial directories, and reads their private event logs through Docker.
-This is necessary because Harbor gives each game sidecar the egress container's
-network namespace instead of publishing a host port. Archived results are read
-from both the configured `.harbor/jobs` collection and Harbor's default `jobs`
-directory; the gateway never calls a game mutation endpoint.
+The Vinext route forwards them to the loopback live gateway on port 3740. New
+Harbor runs are launched through `tools/observer/harbor-run`; its recorder
+manifest is the discovery boundary and its journal is the only live source.
+Archived results are served from `.harbor/live-archive`. The gateway never
+calls a game mutation endpoint.
 
 A separately launched Sausage sidecar on port 3733 is also shown, but is marked
 `No agent attached` until a real Harbor Agent run exists. Missing sources are
 shown as unavailable—there is no demo-data fallback.
 
-The current gateway has a legacy compatibility reader for Harbor continuation
-paths and checkpoint manifests. It is not the intended identity model for new
-runs. The target runtime ledger and migration boundary are specified in
+The runtime ledger and migration boundary are specified in
 [`docs/tracks/live-observability.md`](../docs/tracks/live-observability.md).
 
 The production URL is [live.benchmark.3720.org](https://live.benchmark.3720.org).
@@ -56,14 +58,33 @@ origin, and the application route again allowlists only the two live endpoints.
 
 ## Local operation
 
-Node.js 22.13 or newer and Docker are required.
+Node.js 22.13 or newer and Rust are required. Docker is needed only to launch
+benchmark tasks, not to serve the live console.
 
 ```bash
 vp install
-uv run python live-gateway/server.py
+cargo run --release \
+  --manifest-path ../tools/observer/runtime/Cargo.toml \
+  --bin live-gateway -- --root ..
 vp run test
 vp run start
 ```
+
+The host service is published from an immutable, versioned release rather than
+the mutable `dist/` directory. After a successful build and test run, publish
+the current output atomically with:
+
+```bash
+vp run publish:local
+```
+
+The release keeps content-addressed chunks from the previous version so an HTML
+document already cached at the edge cannot reference a file removed during the
+switch. It also installs the release's Rust gateway binary and reloads its
+LaunchAgent definition, so a runtime migration cannot accidentally restart an
+older gateway command. The Cloudflare Worker serves static chunks and observer
+assets from its immutable cache, preserves HTTP compression for JSON, and
+routes the small SSE feed directly to the read-only gateway.
 
 The defaults are:
 

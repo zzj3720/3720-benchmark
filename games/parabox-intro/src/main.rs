@@ -5,6 +5,10 @@ use std::net::{TcpListener, TcpStream};
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use base64::Engine as _;
+use base64::engine::general_purpose::STANDARD as BASE64;
+use flate2::Compression;
+use flate2::write::GzEncoder;
 use parabox_terminal::campaign::{
     CAMPAIGN_ID, LEVELS, area, immediate_successor, level_available, level_index,
 };
@@ -25,7 +29,11 @@ struct Progress {
     current: Option<usize>,
 }
 
-fn replay_campaign(campaign_dir: &Path, state: &State) -> Result<Progress, String> {
+fn replay_campaign_mode(
+    campaign_dir: &Path,
+    state: &State,
+    validate_all_histories: bool,
+) -> Result<Progress, String> {
     let mut solved = vec![false; LEVELS.len()];
     for &index in &state.solved_order {
         if index >= LEVELS.len() || solved[index] {
@@ -42,8 +50,8 @@ fn replay_campaign(campaign_dir: &Path, state: &State) -> Result<Progress, Strin
 
     let mut games = Vec::with_capacity(LEVELS.len());
     for (index, entry) in LEVELS.iter().enumerate() {
-        let should_replay =
-            solved[index] || state.selected == Some(index) || !state.histories[index].is_empty();
+        let should_replay = state.selected == Some(index)
+            || (validate_all_histories && (solved[index] || !state.histories[index].is_empty()));
         if should_replay {
             let mut game = load_level(campaign_dir.join("levels").join(entry.file))?;
             for &action in &state.histories[index] {
@@ -85,6 +93,10 @@ fn replay_campaign(campaign_dir: &Path, state: &State) -> Result<Progress, Strin
         available,
         current: state.selected,
     })
+}
+
+fn replay_campaign(campaign_dir: &Path, state: &State) -> Result<Progress, String> {
+    replay_campaign_mode(campaign_dir, state, true)
 }
 
 fn game_state(progress: &Progress) -> Result<Value, String> {
@@ -165,6 +177,12 @@ fn observer_scene(progress: &Progress) -> Result<Value, String> {
             .observer_scene()?,
     )
     .map_err(|error| format!("failed to serialize observer scene: {error}"))
+}
+
+fn observer_state(progress: &Progress) -> Result<Value, String> {
+    let mut state = game_state(progress)?;
+    state["observer_scene"] = observer_scene(progress)?;
+    Ok(state)
 }
 
 fn level_list(progress: &Progress) -> Value {
@@ -250,7 +268,11 @@ fn append_audit(arguments: &[String], code: i32, timestamp_ms: u64) -> Result<()
 }
 
 fn append_event(record: &Value) -> Result<(), String> {
-    let path = event_path();
+    let inbox = PathBuf::from(
+        env::var("BENCHMARK_OBSERVER_INBOX")
+            .unwrap_or_else(|_| "/logs/artifacts/observer/game-inbox.jsonl".into()),
+    );
+    let path = if inbox.exists() { inbox } else { event_path() };
     let mut file = OpenOptions::new()
         .create(true)
         .append(true)
@@ -259,7 +281,27 @@ fn append_event(record: &Value) -> Result<(), String> {
     serde_json::to_writer(&mut file, record)
         .map_err(|error| format!("failed to append {}: {error}", path.display()))?;
     file.write_all(b"\n")
-        .map_err(|error| format!("failed to append {}: {error}", path.display()))
+        .and_then(|_| file.flush())
+        .map_err(|error| format!("failed to append {}: {error}", path.display()))?;
+    Ok(())
+}
+
+fn encoded_instruction_trace(steps: &[Value]) -> Result<Value, String> {
+    let bytes = serde_json::to_vec(steps)
+        .map_err(|error| format!("failed to serialize instruction trace: {error}"))?;
+    let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+    encoder
+        .write_all(&bytes)
+        .map_err(|error| format!("failed to compress instruction trace: {error}"))?;
+    let compressed = encoder
+        .finish()
+        .map_err(|error| format!("failed to finish instruction trace: {error}"))?;
+    Ok(json!({
+        "encoding": "gzip+base64",
+        "count": steps.len(),
+        "uncompressed_bytes": bytes.len(),
+        "data": BASE64.encode(compressed),
+    }))
 }
 
 fn state_record(record_type: &str, timestamp_ms: u64) -> Result<Value, String> {
@@ -283,6 +325,7 @@ fn append_request_event(
     code: i32,
     response: &Value,
     state_before: &State,
+    observer_steps: &[Value],
     timestamp_ms: u64,
 ) -> Result<(), String> {
     let mut record = state_record("request", timestamp_ms)?;
@@ -298,6 +341,17 @@ fn append_request_event(
     record["code"] = json!(code);
     record["command"] = json!(arguments.first().map(String::as_str).unwrap_or("show"));
     record["argument_count"] = json!(arguments.len().saturating_sub(1));
+    if !observer_steps.is_empty() {
+        record["instruction_trace"] = encoded_instruction_trace(observer_steps)?;
+        record
+            .as_object_mut()
+            .expect("event record is an object")
+            .remove("state");
+        record
+            .as_object_mut()
+            .expect("event record is an object")
+            .remove("scene");
+    }
     record["score_before"] = json!(state_before.solved_order.len());
     record["selected_before"] = json!(state_before.selected.map(|index| LEVELS[index].reference));
     record["score_delta"] = json!(
@@ -307,20 +361,28 @@ fn append_request_event(
             .saturating_sub(state_before.solved_order.len() as u64)
     );
     record["solved_levels"] = json!(solved_levels);
-    if let Some(state) = response.pointer("/data/state") {
+    if observer_steps.is_empty()
+        && let Some(state) = response.pointer("/data/state")
+    {
         record["state"] = state.clone();
     }
     append_event(&record)
 }
 
-fn execute(arguments: &[String]) -> Result<Value, String> {
+fn execute(
+    arguments: &[String],
+    observer_steps: &mut Vec<Value>,
+    enforce_rate_limit: bool,
+) -> Result<Value, String> {
     let campaign_dir = campaign_dir();
     let state_path = state_path();
     let rate_path = api_rate_path();
     let command = arguments.first().map(String::as_str).unwrap_or("show");
-    rate_limit::enforce(&rate_path)?;
+    if enforce_rate_limit {
+        rate_limit::enforce(&rate_path)?;
+    }
     let mut state = State::load(&state_path)?;
-    let mut progress = replay_campaign(&campaign_dir, &state)?;
+    let mut progress = replay_campaign_mode(&campaign_dir, &state, enforce_rate_limit)?;
 
     match command {
         "show" => {
@@ -375,7 +437,7 @@ fn execute(arguments: &[String]) -> Result<Value, String> {
             }
             state.selected = Some(index);
             state.save(&state_path)?;
-            progress = replay_campaign(&campaign_dir, &state)?;
+            progress = replay_campaign_mode(&campaign_dir, &state, enforce_rate_limit)?;
             Ok(json!({"state": game_state(&progress)?}))
         }
         "move" => {
@@ -396,13 +458,15 @@ fn execute(arguments: &[String]) -> Result<Value, String> {
             let action_count = actions.len();
             let mut applied = 0;
             for action in actions {
+                let score_before_step = progress.solved.iter().filter(|&&won| won).count();
                 state.histories[index].push(action);
                 progress.games[index]
                     .as_mut()
                     .ok_or_else(|| "selected level was not loaded".to_string())?
                     .move_player(action);
                 applied += 1;
-                if progress.games[index].as_ref().is_some_and(Game::won) {
+                let solved = progress.games[index].as_ref().is_some_and(Game::won);
+                if solved {
                     state.solved_order.push(index);
                     let mut solved_after = progress.solved.clone();
                     solved_after[index] = true;
@@ -415,7 +479,7 @@ fn execute(arguments: &[String]) -> Result<Value, String> {
                         "score_delta": 1,
                         "score": state.solved_order.len(),
                     }));
-                    progress = replay_campaign(&campaign_dir, &state)?;
+                    progress = replay_campaign_mode(&campaign_dir, &state, enforce_rate_limit)?;
                     for next_index in 0..LEVELS.len() {
                         if !available_before[next_index]
                             && progress.available[next_index]
@@ -435,6 +499,16 @@ fn execute(arguments: &[String]) -> Result<Value, String> {
                             "level": LEVELS[next_index].reference,
                         }));
                     }
+                }
+                let score = progress.solved.iter().filter(|&&won| won).count();
+                observer_steps.push(json!({
+                    "index": applied,
+                    "action": {"command": "move", "direction": action.as_str()},
+                    "state": observer_state(&progress)?,
+                    "score": score,
+                    "score_delta": score.saturating_sub(score_before_step),
+                }));
+                if solved {
                     break;
                 }
             }
@@ -464,10 +538,19 @@ fn execute(arguments: &[String]) -> Result<Value, String> {
                 "no level is selected; use levels and select <reference>".to_string()
             })?;
             let before = state.histories[index].len();
-            state.histories[index].truncate(before.saturating_sub(count));
-            let undone = before - state.histories[index].len();
+            let undone = count.min(before);
+            for step in 0..undone {
+                state.histories[index].pop();
+                progress = replay_campaign_mode(&campaign_dir, &state, enforce_rate_limit)?;
+                observer_steps.push(json!({
+                    "index": step + 1,
+                    "action": {"command": "undo"},
+                    "state": observer_state(&progress)?,
+                    "score": progress.solved.iter().filter(|&&won| won).count(),
+                    "score_delta": 0,
+                }));
+            }
             state.save(&state_path)?;
-            progress = replay_campaign(&campaign_dir, &state)?;
             Ok(json!({"undone": undone, "state": game_state(&progress)?}))
         }
         "restart" => {
@@ -476,7 +559,7 @@ fn execute(arguments: &[String]) -> Result<Value, String> {
             })?;
             state.histories[index].clear();
             state.save(&state_path)?;
-            progress = replay_campaign(&campaign_dir, &state)?;
+            progress = replay_campaign_mode(&campaign_dir, &state, enforce_rate_limit)?;
             Ok(json!({"state": game_state(&progress)?}))
         }
         "inspect" => {
@@ -578,6 +661,7 @@ fn handle(mut stream: TcpStream) -> Result<(), String> {
     });
     let state_before = State::load(&state_path())?;
 
+    let mut observer_steps = Vec::new();
     let (code, response) = if request_too_large {
         (
             2,
@@ -602,7 +686,7 @@ fn handle(mut stream: TcpStream) -> Result<(), String> {
             ),
         )
     } else {
-        match execute(&arguments) {
+        match execute(&arguments, &mut observer_steps, true) {
             Ok(data) => (0, success_response(command, data)),
             Err(error) => {
                 let error_code = if error.starts_with("API rate limit") {
@@ -616,7 +700,14 @@ fn handle(mut stream: TcpStream) -> Result<(), String> {
     };
     let timestamp_ms = timestamp_ms()?;
     append_audit(&arguments, code, timestamp_ms)?;
-    append_request_event(&arguments, code, &response, &state_before, timestamp_ms)?;
+    append_request_event(
+        &arguments,
+        code,
+        &response,
+        &state_before,
+        &observer_steps,
+        timestamp_ms,
+    )?;
     serde_json::to_writer(&mut stream, &response)
         .map_err(|error| format!("failed to serialize API response: {error}"))?;
     stream
@@ -665,8 +756,110 @@ fn serve() -> Result<(), String> {
     Ok(())
 }
 
+fn backfill_audit(path: &Path) -> Result<(), String> {
+    State::new().save(&state_path())?;
+    let file = fs::File::open(path)
+        .map_err(|error| format!("failed to open {}: {error}", path.display()))?;
+    let mut lines = BufReader::new(file).lines();
+    if lines
+        .next()
+        .transpose()
+        .map_err(|error| error.to_string())?
+        .as_deref()
+        != Some(AUDIT_HEADER)
+    {
+        return Err(format!("{} has an invalid audit header", path.display()));
+    }
+    let stdout = std::io::stdout();
+    let mut output = stdout.lock();
+    let initial_state = State::load(&state_path())?;
+    let initial = json!({
+        "timestamp_ms": 0,
+        "code": 0,
+        "command": "baseline",
+        "score": 0,
+        "selected": Value::Null,
+        "state": observer_state(&replay_campaign(&campaign_dir(), &initial_state)?)?,
+    });
+    serde_json::to_writer(&mut output, &initial)
+        .map_err(|error| format!("failed to write backfill baseline: {error}"))?;
+    output
+        .write_all(b"\n")
+        .map_err(|error| format!("failed to write backfill baseline: {error}"))?;
+    for (offset, line) in lines.enumerate() {
+        let line = line.map_err(|error| format!("failed to read {}: {error}", path.display()))?;
+        let mut fields = line.splitn(3, '\t');
+        let timestamp_ms = fields
+            .next()
+            .ok_or_else(|| format!("audit line {} has no timestamp", offset + 2))?
+            .parse::<u64>()
+            .map_err(|_| format!("audit line {} has an invalid timestamp", offset + 2))?;
+        let expected_code = fields
+            .next()
+            .ok_or_else(|| format!("audit line {} has no code", offset + 2))?
+            .parse::<i32>()
+            .map_err(|_| format!("audit line {} has an invalid code", offset + 2))?;
+        let request = fields
+            .next()
+            .ok_or_else(|| format!("audit line {} has no request", offset + 2))?;
+        let arguments = request
+            .split_whitespace()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>();
+        let command = arguments.first().map(String::as_str).unwrap_or("show");
+        let mut observer_steps = Vec::new();
+        if expected_code == 0 && matches!(command, "select" | "move" | "undo" | "restart") {
+            execute(&arguments, &mut observer_steps, false)
+                .map_err(|error| format!("audit line {} no longer replays: {error}", offset + 2))?;
+        }
+        let state = State::load(&state_path())?;
+        let projected_state = if let Some(value) = observer_steps
+            .last()
+            .and_then(|step| step.get("state"))
+            .cloned()
+        {
+            Some(value)
+        } else if expected_code == 0 && matches!(command, "select" | "restart") {
+            Some(observer_state(&replay_campaign_mode(
+                &campaign_dir(),
+                &state,
+                false,
+            )?)?)
+        } else {
+            None
+        };
+        let mut record = json!({
+            "timestamp_ms": timestamp_ms,
+            "code": expected_code,
+            "command": command,
+            "score": state.solved_order.len(),
+            "selected": state.selected.map(|index| LEVELS[index].reference),
+        });
+        if !observer_steps.is_empty() {
+            record["instruction_trace"] = encoded_instruction_trace(&observer_steps)?;
+        }
+        if let Some(projected_state) = projected_state {
+            record["state"] = projected_state;
+        }
+        serde_json::to_writer(&mut output, &record)
+            .map_err(|error| format!("failed to write backfill record: {error}"))?;
+        output
+            .write_all(b"\n")
+            .map_err(|error| format!("failed to write backfill record: {error}"))?;
+    }
+    Ok(())
+}
+
 fn main() {
-    if let Err(error) = serve() {
+    let result = match env::args().nth(1) {
+        Some(flag) if flag == "--backfill-audit" => match env::args_os().nth(2) {
+            Some(path) => backfill_audit(Path::new(&path)),
+            None => Err("--backfill-audit requires an audit path".to_string()),
+        },
+        Some(flag) => Err(format!("unknown server argument: {flag}")),
+        None => serve(),
+    };
+    if let Err(error) = result {
         eprintln!("parabox-server: {error}");
         std::process::exit(2);
     }
