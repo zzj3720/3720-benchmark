@@ -13,6 +13,7 @@
     "qa:parabox:data": "cargo run --quiet --manifest-path ../games/parabox-intro/Cargo.toml --bin render-qa -- ../games/parabox-intro/data/campaign > public/parabox-render-qa-64.json",
     "qa:sausage:data": "cargo run --release --quiet --manifest-path ../games/sausage-roll/Cargo.toml --bin sausage-render-qa > public/sausage-render-qa-64.json",
     "qa:operator:data": "cargo run --quiet --manifest-path ../games/emergency-operator/Cargo.toml --bin render-qa > public/operator-render-qa.json",
+    "qa:kitchen:data": "cargo run --quiet --manifest-path ../games/kitchen-terminal/Cargo.toml --bin kitchen-render-qa > public/kitchen-render-qa.json",
     "test": "npm run build && node --test tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"
