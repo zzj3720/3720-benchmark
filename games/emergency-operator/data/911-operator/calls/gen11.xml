@@ -1,0 +1,108 @@
+<data><conversations>
+<conversation elementProperties="type=generable;" id="gen11" emotions="z�o�one - kradzie�" texten="Robbery" COMMENT="RECORDED">
+ <scene>
+ <witness elementProperties="sex=M;
+type=White;" id="caller" operator="c" emotions="male, 30 yo, calm" texten="Caller" />
+ <criminal elementProperties="isActive = false;
+prisonChance = 1;
+fightRisk = 0.3;" id="robber1" texten="Thief" />
+ <criminal elementProperties="isActive = false;
+prisonChance = 1;
+fightRisk = 0.3;" id="robber2" texten="Thief" />
+ <injuried elementProperties="isActive = false;
+hp = 80; " id="injuriedA" texten="Friend" />
+ <injuried elementProperties="isActive = false;
+hp = 80;
+sex=M;
+type=White;" id="injuriedC" texten="Robbed" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" option2="2b" actionOnEnd="finea-&gt;active=false;
+fineb-&gt;active=false;
+opinionEffect = 3;" addToAAR="story" />
+ <dialogOption id="2" operator="Caller:" emotions="nervous" texten="Hey, there was a robbery!" default="address" option2="when" option3="injured" actionOnEnd="wheny-&gt;active = false;" />
+ <dialogOption id="2b" emotions="very steady" texten="Hello, there was a robbery..." default="address" option2="when" option3="injured" actionOnEnd="wheny-&gt;active = true;" />
+ <dialogOption id="address" operator="Operator:" texten="{WHERE?} Where did it happen?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="Around [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="Around 234 1st street" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="Around 678 5th avenue" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="Around 125 Maple bulevar" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="when" operator="Operator:" texten="{WHEN?} How long ago did this happen?" default="wheny" option2="whenm" option3="whenh" />
+ <dialogOption elementProperties="chance=0.16;" id="wheny" operator="Caller:" texten="Yesterday evening, on my way back home!" default="wheny2" actionOnEnd="injured-&gt;active = false;
+opinionEffect = -1;" addToAAR="unnec" />
+ <dialogOption id="whenm" operator="Caller:" texten="A moment ago!" default="back" option2="injured" option3="way" actionOnEnd="robber1.isActive = true;
+robber2.isActive = true;" />
+ <dialogOption id="whenh" operator="Caller:" texten="A few minutes ago!" default="back" option2="injured" option3="way" actionOnEnd="robber1.isActive = true;
+robber2.isActive = true;" />
+ <dialogOption id="wheny2" operator="Operator:" texten="{IT'S NOT AN EMERGENCY} Sir, the 911 is for immediate emergencies. Not for something that happened in the past." default="wheny3" />
+ <dialogOption id="wheny3" operator="Caller:" texten="But they took my wallet and mobile phone!" default="wheny4" />
+ <dialogOption id="wheny4" operator="Operator:" texten="{TALK TO THE POLICE} Sir, please go to the nearest police station if you would like to report a crime." default="wheny5" />
+ <dialogOption id="wheny5" operator="Caller:" texten="But they... alright, whatever....." actionOnEnd="actionHangup" />
+ <dialogOption id="injured" operator="Operator:" texten="{ARE YOU OKAY?} Do you have any injuries?" default="injured0" option2="injured1" option3="injured2" />
+ <dialogOption id="injured0" operator="Caller:" texten="No, we are fine." default="back" option2="finea" option3="way" actionOnEnd="fineb-&gt;active=true;
+finea-&gt;active=false;" />
+ <dialogOption id="injured1" operator="Caller:" texten="Yes, my friend is injured." default="injuredF" option2="address" option3="back" actionOnEnd="injuriedA.isActive = true;
+wheny-&gt;active = false;
+way1-&gt;active=false;
+way2-&gt;active=false;" />
+ <dialogOption id="injured2" operator="Caller:" texten="Yes, I was hit badly..." default="injuriedS" option2="address" option3="back" actionOnEnd="wheny-&gt;active = false;
+injuriedC.isActive = true;
+caller.isActive = false;
+way1-&gt;active=false;
+way2-&gt;active=false;" />
+ <dialogOption id="injuredF" operator="Operator:" texten="{FRIEND'S INJURIES?}What happened to your friend?" default="injuredF2" />
+ <dialogOption id="injuredF2" operator="Caller:" texten="They knocked him down. He's hurt and having breathing problems." default="injuredF3" />
+ <dialogOption id="injuredF3" operator="Operator:" texten="{DON'T LET HIM MOVE} Ok, just make sure he won't move until an ambulance arrives." default="injuries3" />
+ <dialogOption id="injuries3" operator="Caller:" texten="Sure..." default="weapon" option2="address" option3="way" />
+ <dialogOption id="injuriedS" operator="Operator:" texten="{WHERE WERE YOU HIT?}Where were you hit?" default="injuredS2" COMMENT="OR what's going on with you" />
+ <dialogOption id="injuredS2" operator="Caller:" texten="My head. I'm bleeding!" default="injuredS3" />
+ <dialogOption id="injuredS3" operator="Operator:" texten="{WAIT FOR THE AMBULANCE} Ok, just sit there please until an ambulance arrives." default="injuries3" />
+ <dialogOption id="way" operator="Operator:" texten="{WHERE ARE ATTACKERS?}Are your attackers still in the area?" default="way1" option2="way2" option3="way3" />
+ <dialogOption id="way1" operator="Caller:" texten="They ran away down the road." default="back" option2="dir" actionOnEnd="speed=10;
+injured1-&gt;active=false;
+injured2-&gt;active=false;
+caller.isActive = false;
+address-&gt;active=false;" />
+ <dialogOption id="way2" operator="Caller:" texten="They took a car and drove away." default="back" option2="car" actionOnEnd="speed=50;
+injured1-&gt;active=false;
+injured2-&gt;active=false;
+caller.isActive = false;
+address-&gt;active=false;" />
+ <dialogOption id="way3" operator="Caller:" texten="I have no idea... they ran away somewhere." default="back" option2="fineb" actionOnEnd="finea-&gt;active=true;
+fineb-&gt;active=false;" />
+ <dialogOption id="dir" operator="Operator:" texten="{WHICH DIRECTION?} Do you know which direction they went?" default="dir1" option2="dir2" option3="dir3" />
+ <dialogOption id="dir1" operator="Caller:" texten="I think north..." default="back" actionOnEnd="dir=N;
+actionSetLocation" />
+ <dialogOption id="dir2" operator="Caller:" texten="I think south..." default="back" actionOnEnd="actionSetLocation;
+dir=S;" />
+ <dialogOption id="dir3" operator="Caller:" texten="I think east..." default="back" actionOnEnd="actionSetLocation;
+dir=E;" />
+ <dialogOption id="dir4" operator="Caller:" texten="I think west..." default="back" actionOnEnd="actionSetLocation;
+dir=W;" />
+ <dialogOption id="car" operator="Operator:" texten="{WHAT CAR?} What kind of a car was it?" default="car1" option2="car2" option3="car3" />
+ <dialogOption id="car1" operator="Caller:" texten="A black van, but I don't know the plates." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="car2" operator="Caller:" texten="A white sedan, but I don't know the plates." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="car3" operator="Caller:" texten="A red pickup, but I don't know the plates." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="weapon" operator="Operator:" texten="{ANY WEAPONS?} Did they have any weapons?" default="weapon1" option2="weapon2" option3="weapon3" />
+ <dialogOption id="weapon1" operator="Caller:" texten="No, I think not." default="back" />
+ <dialogOption id="weapon2" operator="Caller:" texten="Yes, a bat and a knife!" default="back" actionOnEnd="robber1.weapon = e_knife;
+robber2.weapon = e_baseball;" />
+ <dialogOption id="weapon3" operator="Caller:" texten="Yeah, a gun!" default="back" actionOnEnd="robber1.weapon = e_pistol;" />
+ <dialogOption id="fineb" operator="Operator:" texten="{NOT EMERGENCY}Ok so you're not injured and the people who robbed you are not in the area right now?" default="fine2" actionOnEnd="robber1.isActive=false;
+robber2.isActive=false;" />
+ <dialogOption id="finea" operator="Operator:" texten="{NOT EMERGENCY}Ok so you're not injured and the people who robbed you have left the area?" default="fine2" actionOnEnd="robber1.isActive=false;
+robber2.isActive=false;" />
+ <dialogOption id="fine2" operator="Caller:" texten="Well yes, but I have been robbed!" default="fine3" option2="end" />
+ <dialogOption id="fine3" operator="Operator:" texten="{TALK TO THE POLICE} Sir, please go to the nearest police office to report a crime, right now there is nothing we can do about it." default="wheny5" actionOnEnd="opinionEffect=-1;" addToAAR="nointer" />
+ <dialogOption id="end" operator="Operator:" texten="{I'LL SEND HELP}Alright sir, we will take care of it, please wait for the emergency services." default="enda" actionOnEnd="opinionEffect=1;" />
+ <dialogOption id="enda" operator="Caller:" texten="Yeah I will!" actionOnEnd="actionHangup" />
+ <dialogOption id="reminder" operator="Caller:" texten="Are you there?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Hello?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="The caller was robbed." />
+ <reportElement id="unnec" texten="The crime was committed yesterday. Sending emergency units wasn't necessary." />
+ <reportElement id="nointer" texten="There was no need for an intervention." />
+ </aar>
+ </conversation>
+</conversations></data>

@@ -1,0 +1,63 @@
+<data><conversations>
+<conversation id="288" texten="Car in a crack" COMMENT="RECORDED">
+ <scene>
+ <passerby elementProperties="sex=M;
+type=AfAm;" id="caller" texten="Caller" COMMENT="261" />
+ <injuried elementProperties="hp = 70;
+isActive=true;
+hpChange=-0.1;
+sex=W;" blockedBy="car" id="injuried1" emotions="woman injuried and traped in car" texten="Trapped woman" />
+ <tech elementProperties="work = 100; icon=OnSitePic_Car" id="car" texten="Car in a crack" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 3;" />
+ <dialogOption id="2" operator="Caller:" emotions="[amused] A guy, speaks with some slang" texten="Whoa, dude, we have a situation here!" default="3" />
+ <dialogOption id="3" operator="Operator:" texten="{WHAT HAPPENED?}Ok, what happened?" default="fell" />
+ <dialogOption id="fell" operator="Caller:" texten="Eeeeerrm... you know, a car fell into the ground!" default="mean" option2="address" option3="inside" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?} Sir, what's your location?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="[[ADDRESS]]" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="It's at Columbus Avenue 246" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="It's at Oak street 135" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="It's at 7th street 89" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="mean" operator="Operator:" texten="{DESCRIBE THE ACCIDENT}Tell me what happened sir?" default="meana" />
+ <dialogOption id="meana" operator="Caller:" emotions="[amused, excited]" texten="After the quake, the road just cracked and kinda split up. And the car just... it just fell there." default="7" option2="help" addToAAR="carinachasm" />
+ <dialogOption id="7" operator="Operator:" texten="{IS THE CAR IN THE CRACK?}So the car is in one of the cracks in the road way?" default="8" />
+ <dialogOption id="8" operator="Caller:" texten="It partially, like, slid into the hole." default="parked" option2="deep" option3="closer" />
+ <dialogOption id="parked" operator="Operator:" texten="{IS THE CAR RUNNING?} Is the car still running?" default="10" />
+ <dialogOption elementProperties="option=address;" id="10" operator="Caller:" texten="No, no... I mean, it was running but lady driving it stopped and turned it off when shaking started. I guess she was just panicked." default="help" option2="deep" option3="closer" />
+ <dialogOption id="deep" operator="Operator:" texten="{HOW DEEP IS IT?} How deep is the hole the car is in?" default="deepa" />
+ <dialogOption elementProperties="option=address;" id="deepa" operator="Caller:" texten="Let me have a look... Well, I don't know, six to eight feet, maybe more." default="parked" option2="help" option3="closer" />
+ <dialogOption id="inside" operator="Operator:" texten="{ANYONE IN THE CAR?}Is there anyone still in the car?" default="insidea" />
+ <dialogOption id="insidea" operator="Caller:" texten="Ummm, Yes, a-a woman." default="back" />
+ <dialogOption id="closer" operator="Operator:" texten="{GET DOWN AND HELP} Sir, if it's safe could you check the vehicle and see if the woman has any injuries." default="16" />
+ <dialogOption elementProperties="option=address;" id="16" operator="Caller:" texten="OK, sure thing... [in distance] Hey hold this . . . . . . . . . pass me my phone! Thanks." default="17" />
+ <dialogOption id="17" operator="Operator:" texten="{CHECK IF DRIVER IS INJURED} Ok, I want you to check the driver and see if she has any injuries." default="20" />
+ <dialogOption id="20" operator="Caller:" emotions="worried" texten="... Ohh man! She's not moving, I can see blood on the airbag . . . . . . . . . The door is blocked, boulder is blocking it dude! Damn rubble is everywhere!" default="smash" option2="checkdoor" option3="askhelp" />
+ <dialogOption id="smash" operator="Operator:" texten="{SMASH THE WINDOW} Sir here is what I want you to do. I want you have to find something heavy and smash the window to help her." default="smashn" option2="smashy" />
+ <dialogOption id="smashn" operator="Caller:" texten="No way! I will get hurt. Send us some help now!" default="address" option2="help" addToAAR="nosmash" />
+ <dialogOption id="smashy" operator="Caller:" emotions="determined, glass break, bustling around" texten="Ok, let's do this!!" default="askhelp3" addToAAR="smash" />
+ <dialogOption id="checkdoor" operator="Operator:" texten="{OPEN OTHER DOOR} Try to open any of the other car doors, maybe one on the other side, and help her." default="checkdoor2" />
+ <dialogOption id="checkdoor2" operator="Caller:" texten="There is so much stuff lying around her, the damn rubble is everywhere." default="checkdoor3" option2="smash" option3="askhelp" />
+ <dialogOption id="checkdoor3" operator="Operator:" texten="{YOU HAVE TO HELP HER!}Sir, please you have to help her." default="checkdoor4" />
+ <dialogOption id="checkdoor4" operator="Caller:" emotions="Shouting and nervous" texten="Ok . . . . . . . . . Damn it!!! The car just moved! Crap I am trapped now!! Help me!" default="checkdoor5" option2="address" actionOnEnd="opinionEffect = 1;" addToAAR="trapped" COMMENT="caller.hp = 100;
+caller.hpchange = -0.1;" />
+ <dialogOption id="checkdoor5" operator="Operator:" texten="{HELP IS ON THE WAY} The emergency services are on the way, there will be there any minute. Keep calm." default="end" />
+ <dialogOption id="help" operator="Operator:" texten="{I'LL SEND HELP} I am sending the emergency services, please wait for them." default="end" />
+ <dialogOption id="end" operator="Caller:" texten="Better be quick, the tremors might start again!" actionOnEnd="actionHangup;" />
+ <dialogOption id="askhelp" operator="Operator:" texten="{ASK OTHERS FOR HELP} Sir, is there anyone around you? Ask someone for help with the boulder blocking the door. Then take out the trapped woman." default="askhelp2" />
+ <dialogOption id="askhelp2" operator="Caller:" emotions="from distance" texten="I will . . . . Hey, Tony! Find someone and get down here. I need help! . . . . . . . . . I will need both hands to move this stuff." default="askhelp3" addToAAR="help" />
+ <dialogOption id="askhelp3" operator="Operator:" texten="{CHECK HER PULSE}Get her out of the car and out the hole on to level ground and check her pulse. If she has no pulse please call 911 again." default="askhelp4" actionOnEnd="car.isActive=false;
+injuried1.hpchange=-0.3;" />
+ <dialogOption id="askhelp4" operator="Caller:" emotions="very fast " texten="Ok, ok, I'll do it." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" emotions="[amused]" texten="Are you there?" />
+ <dialogOption id="reminder2" operator="Caller:" emotions="[amused]" texten="Hello?" />
+ </dialog>
+ <aar>
+ <reportElement id="carinachasm" texten="During earthquake car fell into chasm. Driver was inside a vehicle and unconscious." />
+ <reportElement id="nosmash" texten="Witness refused to break a car window to provide help. Emergency services were deployed." />
+ <reportElement id="smash" texten="Witness smashed the car window and provided help to injured woman." />
+ <reportElement id="trapped" texten="Operator asked the witness to provide help in hazardous environment. This resulted in witness being trapped. Emergency services were deployed rapidly." />
+ <reportElement id="help" texten="Operator provided remote instructions and together with witness and other bystanders they rescued injured woman." />
+ </aar>
+ </conversation>
+</conversations></data>

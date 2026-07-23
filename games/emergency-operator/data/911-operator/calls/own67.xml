@@ -1,0 +1,44 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="own67" texten="Daughter out of control" COMMENT="RECORDED">
+ <scene>
+ <suspect elementProperties="sex=W;
+type=Children;" id="daughter" texten="Arguing daughter" actionOnEnd="opinionEffect = 0;" addToAAR="helped" />
+ <witness elementProperties="sex=W;
+type=White;" id="mother" texten="Stressed mother (caller)" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = -1;" addToAAR="story" />
+ <dialogOption id="2" operator="Caller:" emotions="woman ~50, sad and confused" texten="Good evening, I have a problem with my daughter... She's screaming, breaking things... Completely out of control!" default="hurt" option2="happ" option3="address" />
+ <dialogOption id="hurt" operator="Operator:" texten="{IS SHE HURT?} Is your daughter hurt?" default="hurtn" />
+ <dialogOption id="hurtn" operator="Caller:" texten="No..." default="happ" option2="address" option3="pol" />
+ <dialogOption id="happ" operator="Operator:" texten="{WHAT HAPPENED?} What happened?" default="pull" />
+ <dialogOption elementProperties="option=pol;" id="pull" operator="Caller:" emotions="confused, breaking voice, almost crying" texten="I just can't calm her down! She's pulling my hair! She is almost my height..." default="old" option2="no" option3="shoot" COMMENT="Tutaj poprawka z 'call her down' na 'calm her down'" />
+ <dialogOption id="old" operator="Operator:" texten="{HOW OLD IS SHE?} How old is she?" default="olda" />
+ <dialogOption id="olda" operator="Caller:" texten="14" default="no" option2="shoot" option3="address" />
+ <dialogOption id="shoot" operator="Operator:" texten="{WANT US TO SHOOT HER?} So you want us to come and shoot her?" default="what" addToAAR="complaint" />
+ <dialogOption id="what" operator="Caller:" texten="... What? Excuse me?!" default="sar" />
+ <dialogOption id="sar" operator="Operator:" texten="{IT WAS SARCASM} Erm... it was just sarcasm, sorry Ma'am." default="ina" />
+ <dialogOption id="ina" operator="Caller:" texten="That was very inappropriate! I will file a complaint for that, I assure you sir! Goodbye!" actionOnEnd="actionHangup;
+opinionEffect = -3;
+onIgnore = -4;" COMMENT="Bez 'I pay my taxes', to nie brzmi" />
+ <dialogOption id="no" operator="Operator:" texten="{NOT A 911 SITUATION} Ma'am, it doesn't sound like a 911 situation. Please deal with your daughter yourself or call the education support." default="how" />
+ <dialogOption id="how" operator="Caller:" texten="But how? She breaks everything in her room! Send in someone! I need help!" default="pol" option2="nope" option3="shoot" COMMENT="I need help' Brzmi naturalniej " />
+ <dialogOption id="address" operator="Operator:" texten="{WHERE?} Where do you live?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="We live at [[ADDRESS]]" default="back" option2="pol" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="We live at 112 1st street" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="We live at 246 2nd avenue" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="We live at 389 Pine street" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="pol" operator="Operator:" emotions="resigned" texten="{I'LL SEND THE POLICE} I'll send an officer to check up on her." default="ty" />
+ <dialogOption id="ty" operator="Caller:" emotions="relieved" texten="Thank you, bye..." actionOnEnd="actionHangup; opinionEffect = 1;" />
+ <dialogOption id="nope" operator="Operator:" texten="{NOT AN EMERGENCY} As I said, it's not a case for 911. Goodbye." default="tyi" />
+ <dialogOption id="tyi" operator="Caller:" emotions="ironically" texten="Well... THANK YOU." actionOnEnd="actionHangup; opinionEffect = -1;" addToAAR="complaint" />
+ <dialogOption id="reminder" operator="Caller:" emotions="[distant glass breaking]" texten="Oh, she broke something again..." />
+ <dialogOption id="reminder2" operator="Caller:" texten="Hello?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="A mother couldn't manage to calm her daughter down." />
+ <reportElement id="complaint" texten="The caller filled a complaint on the operator's behavior." />
+ <reportElement id="helped" texten="The teenager was reprimanded by policemen." />
+ </aar>
+ </conversation>
+</conversations></data>

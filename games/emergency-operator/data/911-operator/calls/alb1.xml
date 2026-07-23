@@ -1,0 +1,39 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="alb1" texten="Dead daughter" COMMENT="RECORDED">
+ <scene>
+ <witness elementProperties="sex=M;
+type=White;" id="father" texten="Caller" />
+ <dead elementProperties="sex=W;
+type=White;" id="daughter" texten="Daughter of the caller" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" />
+ <dialogOption id="2" operator="Caller:" texten="Oh my god... Oh my god..." default="wh" option2="address" />
+ <dialogOption id="wh" operator="Operator:" texten="{WHAT'S HAPPENING?}Sir, what's happening there?" default="daugh" />
+ <dialogOption id="daugh" operator="Caller:" emotions="sobbing" texten="My... My daughter..." default="wh2" option2="address" option3="whya" />
+ <dialogOption id="wh2" operator="Operator:" texten="{WHAT HAPPENED TO HER?}What happened to your daughter Sir?" default="dead" />
+ <dialogOption id="dead" operator="Caller:" emotions="with grief" texten="Why did you do that, my little girl... I just found her... She's dead..." default="sure" option2="whya" option3="address" />
+ <dialogOption id="sure" operator="Operator:" texten="{CHECK HER PULSE} Ok, Sir we're gonna get ambulance on a way. Have you checked her pulse?" default="surea" />
+ <dialogOption id="surea" operator="Caller:" texten="Yes... yes there is no pulse... no pulse... she doesn't have a heartbeat, her heart stopped." default="cold" option2="can" option3="address" />
+ <dialogOption id="cold" operator="Operator:" texten="{IS THE BODY COLD?}Is the body completely cold?" default="colda" />
+ <dialogOption id="colda" operator="Caller:" emotions="sobbing" texten="Yes, she's cold and stiff... my baby..." default="can" option2="address" option3="patrol" />
+ <dialogOption id="can" operator="Operator:" texten="{DO YOU KNOW WHAT HAPPENED?}Do you know what happened to her?" default="drugs" actionOnEnd="whya-&gt;active = false;
+wh2-&gt;active = false;" />
+ <dialogOption id="address" operator="Operator:" texten="{WHAT'S THE ADDRESS?} What's the address you're calling from?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" emotions="crying" texten="[[ADDRESS]]" default="wh" option2="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" emotions="crying" texten="2608 Central Avenue" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" emotions="crying" texten="5603 Menaul Boulevard" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" emotions="crying" texten="156 Indian School Road" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="whya" operator="Operator:" texten="{WHAT SHE DID?}Can you tell me what she did?" default="drugs" actionOnEnd="can-&gt;active = false;
+wh2-&gt;active = false;" />
+ <dialogOption id="drugs" operator="Caller:" emotions="angry" texten="Drugs... There are syringes all around her... Someone gave her drugs... And now she's dead..." default="patrol" option2="address" option3="sure" addToAAR="overdose" />
+ <dialogOption id="patrol" operator="Operator:" texten="{I'LL SEND THE POLICE} I'll send a patrol there. Please stay where you are and try not to move or touch anything." default="ok" />
+ <dialogOption id="ok" operator="Caller:" texten="Okay... God..." actionOnEnd="actionHangup" />
+ <dialogOption id="reminder" operator="Caller:" emotions="sobbing" texten="My baby..." />
+ <dialogOption id="reminder2" operator="Caller:" emotions="sobbing" texten="Are you there?" />
+ </dialog>
+ <aar>
+ <reportElement id="overdose" texten="Caller's daughter was found dead. The possible cause of death is drugs overdose. The police have started an investigation." />
+ </aar>
+ </conversation>
+</conversations></data>

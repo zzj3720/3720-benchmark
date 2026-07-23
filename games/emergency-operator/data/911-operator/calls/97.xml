@@ -1,0 +1,50 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="97" texten="Clipped leg" COMMENT="RECORDED">
+ <scene COMMENT="https://www.youtube.com/watch?v=qrZQv0w_O78">
+ <injuried elementProperties="type=White;
+sex=M;
+hp = 70; hpChange = -0.3" id="injuried" texten="Caller" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 4;" />
+ <dialogOption id="2" operator="Caller:" emotions="male, ~25, weak. " texten="Help! I've chopped my leg off..." default="3" addToAAR="story" />
+ <dialogOption id="3" operator="Operator:" texten="{YOU DID WHAT?} You've chopped off your leg?" default="4" COMMENT="doesnt look good in clickable dialog" />
+ <dialogOption id="address" operator="Operator:" texten="{WHERE ARE YOU?} Ok, where are you calling from?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="At [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="At Cooper Avenue 321" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="At Jefferson Street 246" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="At Maple Street 179" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addresdet" operator="Operator:" texten="{HOUSE OR APARTMENT?} Is that a house or an apartment?" default="addresdeta" />
+ <dialogOption id="addresdeta" operator="Caller:" texten="There is a workshop... behind the house... it's open, I'm near the entrance." default="back" option2="3" />
+ <dialogOption operator="Operator:" texten="{I'LL SEND AN AMBULANCE} OK, the ambulance is on the way... Tell me what happened ?" default="4" />
+ <dialogOption id="4" operator="Caller:" emotions="breathing heavily" texten="I helped my cousin in the workshop, pushed wood with my leg and slipped into the press! I can not take it out!" default="5" option2="7c" option3="address" />
+ <dialogOption id="5" operator="Operator:" texten="{IS HE NEARBY?} Is your cousin nearby?" default="6" />
+ <dialogOption id="6" operator="Caller:" texten="No, he went after the goods... he will come back in the evening! There's no one around!" default="7c" option3="address" />
+ <dialogOption id="7" operator="Operator:" texten="{HELP IS ON THE WAY} Keep calm. The ambulance is on the way... it will be there in a few minutes." default="7b" />
+ <dialogOption id="7b" operator="Caller:" texten="Hurry!" default="7c" option2="back" option3="end" />
+ <dialogOption id="7c" operator="Operator:" texten="{TIE SOMETHING AROUND IT} Do you have something to tie around your leg?" default="7d" />
+ <dialogOption id="7d" operator="Caller:" texten="No, just some tools... an axe and a hammer...." default="7e" option3="address" />
+ <dialogOption id="7e" operator="Operator:" texten="{TAKE OFF YOUR SHIRT} Alright, Take off your shirt then..." default="8" />
+ <dialogOption id="8" operator="Caller:" texten="What?" default="9" />
+ <dialogOption id="9" operator="Operator:" texten="{MAKE A TOURNIQUET}Take off your shirt, tear it up if necessary, and firmly tie it around your leg, just above your injury." default="10" actionOnEnd="achiv=lifesaving;" addToAAR="firstaid" />
+ <dialogOption id="10" operator="Caller:" emotions="[pause, busyness, heavy breathing]" texten="Ok . . . . . . . . . . . . . . . . . . . . . . . . . . . done." default="7" option2="11" option3="address" actionOnEnd="injuried.hpChange = -0.1;" />
+ <dialogOption id="11" operator="Operator:" texten="{CALM DOWN} Good. I know this won't be easy but I need you to calmly breathe, relax. The ambulance will arrive soon." default="12" />
+ <dialogOption id="12" operator="Caller:" emotions="weak voice" texten="God... I think I'm passing out...." default="7" option2="7e" option3="13" />
+ <dialogOption id="13" operator="Operator:" texten="{KEEP TALKING TO ME} No you're not... keep talking to me! Tell me, do you have a girlfriend?" default="14" />
+ <dialogOption id="14" operator="Caller:" emotions="weak voice" texten="I have a fiancee... we were going to get married in two months. . . . . . . . . . . . . God, please let it end now..." default="20" option2="7" option3="address" />
+ <dialogOption id="20" operator="Operator:" texten="{YOU'LL BE FINE} You are gonna be fine, I need you to stay awake." default="15" />
+ <dialogOption id="15" operator="Caller:" texten="Please tell her that I loved her. Will you? As if... if I pass away here. Say that I thought about her, I beg you. You promise?" default="16" option2="17" option3="7" />
+ <dialogOption id="16" operator="Operator:" texten="{I DO} Yes, I promise." default="18" />
+ <dialogOption id="17" operator="Operator:" texten="{YOU'LL TELL HER} But you will tell her yourself. The ambulance is almost there." default="18" addToAAR="faint" />
+ <dialogOption id="18" operator="Caller:" emotions="[[Sound of falling phone]]" texten=". . . . . . . . . . . . . . . ." actionOnEnd="actionHangup" />
+ <dialogOption id="end" operator="Operator:" texten="{HANG UP} ..." actionOnEnd="actionHangup" />
+ <dialogOption id="reminder" operator="Caller:" texten="Oh God... it feels terrible..." />
+ <dialogOption id="reminder2" operator="Caller:" texten="Help me...." />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="The caller has cut his leg during working in a workshop." />
+ <reportElement id="faint" texten="The caller fainted, because he lost too much blood." />
+ <reportElement id="firstaid" texten="The operator gave proper first aid instruction." />
+ </aar>
+ </conversation>
+</conversations></data>

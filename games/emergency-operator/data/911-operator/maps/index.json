@@ -1,0 +1,664 @@
+{
+  "maps": [
+    {
+      "id": "107775",
+      "name": "London",
+      "country": "UK",
+      "region": "England",
+      "center": {
+        "lat": 51.5073219,
+        "lon": -0.1276474
+      },
+      "bounds": {
+        "pbottom": 51.466896,
+        "pleft": -0.192595,
+        "pright": -0.0626998,
+        "ptop": 51.547745
+      },
+      "road_level": 4,
+      "nodes": 21473,
+      "connections": 45118,
+      "source_sha256": "1d9167c44b4aaef0f49e259cba02753f425040e54f578d82bec4db7cdd25a4e1",
+      "compressed_sha256": "151700b5284fb1357c0ec869176533c45e937ea38ef030fe0662a99b869db73a",
+      "file": "maps/107775.xml.gz"
+    },
+    {
+      "id": "150921144",
+      "name": "Anchorage",
+      "country": "United States of America",
+      "region": "Alaska",
+      "center": {
+        "lat": 61.2163129,
+        "lon": -149.8948523
+      },
+      "bounds": {
+        "pbottom": 61.175888,
+        "pleft": -149.9788,
+        "pright": -149.8109,
+        "ptop": 61.256737
+      },
+      "road_level": 6,
+      "nodes": 8829,
+      "connections": 19846,
+      "source_sha256": "57b1bcb15855487ae5b06b5c0f29ddc2177bde59779636c8f413c21404bc14e1",
+      "compressed_sha256": "92e1c4a8a6d9d36a8dbbbb481c708ddbb54bef5a582305ff8a7e99679456970a",
+      "file": "maps/150921144.xml.gz"
+    },
+    {
+      "id": "150921582",
+      "name": "Kapolei",
+      "country": "United States of America",
+      "region": "Hawaii",
+      "center": {
+        "lat": 21.3339504,
+        "lon": -158.0771853
+      },
+      "bounds": {
+        "pbottom": 21.293526,
+        "pleft": -158.12059,
+        "pright": -158.03378,
+        "ptop": 21.374374
+      },
+      "road_level": 6,
+      "nodes": 4017,
+      "connections": 8696,
+      "source_sha256": "5b34e64adcc7d0abd5fe04422a70bc9609d175f6359d1ec0c59648e252a6589b",
+      "compressed_sha256": "dddea5aaaedd89fef906d39797d1cbf3252794f7e52d23cca0797f2f93943f67",
+      "file": "maps/150921582.xml.gz"
+    },
+    {
+      "id": "151364049",
+      "name": "Albuquerque",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 35.0841034,
+        "lon": -106.6509851
+      },
+      "bounds": {
+        "pbottom": 35.04368,
+        "pleft": -106.700386,
+        "pright": -106.601585,
+        "ptop": 35.124527
+      },
+      "road_level": 4,
+      "nodes": 6769,
+      "connections": 14416,
+      "source_sha256": "7bae963694420e46f8e598dc5f475a3e806b1b630d996ddbaea5f8f86ce8a30d",
+      "compressed_sha256": "9e01e9fc61f28ada54e3aa2a7369537a3411a7aded4259e9c615e82e1e4ee487",
+      "file": "maps/151364049.xml.gz"
+    },
+    {
+      "id": "151417132",
+      "name": "Hutchinson",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 38.0608444,
+        "lon": -97.9297743
+      },
+      "bounds": {
+        "pbottom": 38.02042,
+        "pleft": -97.98112,
+        "pright": -97.87843,
+        "ptop": 38.10127
+      },
+      "road_level": 6,
+      "nodes": 4469,
+      "connections": 11206,
+      "source_sha256": "ff301c6d455931a1515d35700267f412abee96f216b977b0a30ab46512987a47",
+      "compressed_sha256": "25525ff08ae3644d12ed009a10dd05dd2d4a83da5aec36b0c132db4e950d4b08",
+      "file": "maps/151417132.xml.gz"
+    },
+    {
+      "id": "153388690",
+      "name": "Chicago",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 41.8755546,
+        "lon": -87.6244212
+      },
+      "bounds": {
+        "pbottom": 41.83513,
+        "pleft": -87.67871,
+        "pright": -87.57013,
+        "ptop": 41.915977
+      },
+      "road_level": 4,
+      "nodes": 9622,
+      "connections": 21050,
+      "source_sha256": "3775566d2b29dcc3554aace01a0e7bbee9b3dfb9c3ed0efe14ce76d470f5ccce",
+      "compressed_sha256": "f873e36e5f9e3f78062732694bbfcb2d22b2501448d95b18671e638b692ee8b9",
+      "file": "maps/153388690.xml.gz"
+    },
+    {
+      "id": "1583294719",
+      "name": "Kassel",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 51.3090209,
+        "lon": 9.4762981
+      },
+      "bounds": {
+        "pbottom": 51.268597,
+        "pleft": 9.411632,
+        "pright": 9.540965,
+        "ptop": 51.349445
+      },
+      "road_level": 4,
+      "nodes": 7409,
+      "connections": 15460,
+      "source_sha256": "9356fb907a592909f98ebc7523db6a9b8a92170bc9210c2f5294291b62bad412",
+      "compressed_sha256": "126d1d96e8bb9d43ebc3aaae0476259f4e9d06ac334bd8776314a859c8853b07",
+      "file": "maps/1583294719.xml.gz"
+    },
+    {
+      "id": "158368533",
+      "name": "Washington",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 38.8949549,
+        "lon": -77.0366456
+      },
+      "bounds": {
+        "pbottom": 38.85453,
+        "pleft": -77.088585,
+        "pright": -76.9847,
+        "ptop": 38.93538
+      },
+      "road_level": 4,
+      "nodes": 23771,
+      "connections": 50684,
+      "source_sha256": "bd2ddca129d7b414b89027d6d5fdcc41132440cb05604879430fff8a8b035ede",
+      "compressed_sha256": "b75cbfd853de1073535753cecc4601337ccbdc38c6aa5aed94cdb40544f781c3",
+      "file": "maps/158368533.xml.gz"
+    },
+    {
+      "id": "158809705",
+      "name": "Boston",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 42.3604823,
+        "lon": -71.0595678
+      },
+      "bounds": {
+        "pbottom": 42.320057,
+        "pleft": -71.11427,
+        "pright": -71.00486,
+        "ptop": 42.400906
+      },
+      "road_level": 4,
+      "nodes": 20794,
+      "connections": 43842,
+      "source_sha256": "89c41d9afe7224fb3fec85e960d1386c7f88aa43ab01a105dd41ceae185db8a0",
+      "compressed_sha256": "3535570372dcb43760b8939803639cd9f36612bc372917927a1758046029edaf",
+      "file": "maps/158809705.xml.gz"
+    },
+    {
+      "id": "1601837931",
+      "name": "Praha",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 50.0874654,
+        "lon": 14.4212503
+      },
+      "bounds": {
+        "pbottom": 50.047043,
+        "pleft": 14.358247,
+        "pright": 14.484254,
+        "ptop": 50.127888
+      },
+      "road_level": 4,
+      "nodes": 11755,
+      "connections": 24560,
+      "source_sha256": "b58e1b3fb1226e08747bb3528c64a162e16b548ae511ca4b66e4cb9fd4f11425",
+      "compressed_sha256": "44fa2272d2653c251b49893c7f8cefb71d7e4448f4e5e4e37e99a6eb2af6708f",
+      "file": "maps/1601837931.xml.gz"
+    },
+    {
+      "id": "16173236",
+      "name": "New Delhi",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 28.6138967,
+        "lon": 77.2159562
+      },
+      "bounds": {
+        "pbottom": 28.573473,
+        "pleft": 77.16991,
+        "pright": 77.262,
+        "ptop": 28.654322
+      },
+      "road_level": 4,
+      "nodes": 5368,
+      "connections": 11654,
+      "source_sha256": "5ba7f06ba0513612e5e6f1b3c86d8e0f6218ad874a2fa39d188a43c042307bdf",
+      "compressed_sha256": "11962a13c87bd4b518c4cce95104a3fa6811e3b22101f7289b73cc92005f6123",
+      "file": "maps/16173236.xml.gz"
+    },
+    {
+      "id": "1628207792",
+      "name": "กรุงเทพมหานคร",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 13.7542529,
+        "lon": 100.493087
+      },
+      "bounds": {
+        "pbottom": 13.713829,
+        "pleft": 100.45147,
+        "pright": 100.534706,
+        "ptop": 13.794677
+      },
+      "road_level": 4,
+      "nodes": 6725,
+      "connections": 14494,
+      "source_sha256": "8d7dd1646164f4e274e5a0b95c4d12bde0726469b2548b3d60782dd6d7e6e24e",
+      "compressed_sha256": "64878a8fc9e1c3e2f4541a1b1d759398225e55dabc2ae1222198de16ee23e4ea",
+      "file": "maps/1628207792.xml.gz"
+    },
+    {
+      "id": "1686293227",
+      "name": "Москва",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 55.7506828,
+        "lon": 37.6174976
+      },
+      "bounds": {
+        "pbottom": 55.71026,
+        "pleft": 37.54567,
+        "pright": 37.689327,
+        "ptop": 55.791107
+      },
+      "road_level": 4,
+      "nodes": 16363,
+      "connections": 34406,
+      "source_sha256": "21134c6644c00cd757a51132944b48745c70b9d5b424f97561c93d0f9720af2d",
+      "compressed_sha256": "2a4095a0759c278f4d0701fecf085ff55f6f584da6f1966cfbc24fdabd3cc0e5",
+      "file": "maps/1686293227.xml.gz"
+    },
+    {
+      "id": "1738808199",
+      "name": "Los Angeles",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 34.0543942,
+        "lon": -118.2439409
+      },
+      "bounds": {
+        "pbottom": 34.01397,
+        "pleft": -118.29273,
+        "pright": -118.19515,
+        "ptop": 34.09482
+      },
+      "road_level": 4,
+      "nodes": 13824,
+      "connections": 29330,
+      "source_sha256": "4470a90e040c28d9fad0a16a8f85e7076e3042316500d54603afd6799559420b",
+      "compressed_sha256": "550ab1d992c73a63c4bed51ea99a4b240991a4f6391a7ba81baab28412950ae3",
+      "file": "maps/1738808199.xml.gz"
+    },
+    {
+      "id": "17807753",
+      "name": "Paris",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 48.8566101,
+        "lon": 2.3514992
+      },
+      "bounds": {
+        "pbottom": 48.816185,
+        "pleft": 2.2900589,
+        "pright": 2.4129395,
+        "ptop": 48.897034
+      },
+      "road_level": 4,
+      "nodes": 17560,
+      "connections": 37206,
+      "source_sha256": "c1b751456cf962e979ef6e7ab661c3709131e18a9d413e55b276543bf422271b",
+      "compressed_sha256": "9cbb2868a7869f3689a349c02a3ad476634dfc0bf6d2794b2606353afd7d7292",
+      "file": "maps/17807753.xml.gz"
+    },
+    {
+      "id": "1882099475",
+      "name": "İstanbul",
+      "country": "Türkiye",
+      "region": "Marmara Bölgesi",
+      "center": {
+        "lat": 41.0096334,
+        "lon": 28.9651646
+      },
+      "bounds": {
+        "pbottom": 40.969208,
+        "pleft": 28.911594,
+        "pright": 29.018736,
+        "ptop": 41.050056
+      },
+      "road_level": 4,
+      "nodes": 9570,
+      "connections": 20214,
+      "source_sha256": "2f0554465f018274a8b2ea2c8662272b2a1a9e7e1e4e4f091d6c58af53df8dc5",
+      "compressed_sha256": "a42d3053c08e550f8c6156b31b260076ebd22d535e99829136ee882aab0cd0d7",
+      "file": "maps/1882099475.xml.gz"
+    },
+    {
+      "id": "1912365631",
+      "name": "서울",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 37.5666791,
+        "lon": 126.9782914
+      },
+      "bounds": {
+        "pbottom": 37.526257,
+        "pleft": 126.92729,
+        "pright": 127.02929,
+        "ptop": 37.6071
+      },
+      "road_level": 4,
+      "nodes": 9387,
+      "connections": 19682,
+      "source_sha256": "3e2cdc0137ea4ca179e14b2eb7560f50df860427ad6e55a8cbf0cc572b391308",
+      "compressed_sha256": "a2c2a815ba14af884aeb6271420323a7450e47596dab4466337eea2c47cfca0a",
+      "file": "maps/1912365631.xml.gz"
+    },
+    {
+      "id": "240109189",
+      "name": "Berlin",
+      "country": "Deutschland",
+      "region": "Berlin",
+      "center": {
+        "lat": 52.5170365,
+        "lon": 13.3888599
+      },
+      "bounds": {
+        "pbottom": 52.476612,
+        "pleft": 13.32243,
+        "pright": 13.45529,
+        "ptop": 52.55746
+      },
+      "road_level": 4,
+      "nodes": 14408,
+      "connections": 30694,
+      "source_sha256": "ea37387427a5b6c9480ffba1ab91b56710b08746e01d444acae72c7829a7070d",
+      "compressed_sha256": "a96236e5355e73f5276e1d3f840fb6de4ba27ceff9185dcdc10640b6a8ad6480",
+      "file": "maps/240109189.xml.gz"
+    },
+    {
+      "id": "25248662",
+      "name": "北京市",
+      "country": "中国",
+      "region": "北京市",
+      "center": {
+        "lat": 39.9059631,
+        "lon": 116.391248
+      },
+      "bounds": {
+        "pbottom": 39.86554,
+        "pleft": 116.33855,
+        "pright": 116.44395,
+        "ptop": 39.94639
+      },
+      "road_level": 4,
+      "nodes": 7476,
+      "connections": 16870,
+      "source_sha256": "3647b0416ea0b40c83dc88622f6bad3423ae725c863afcbb5d9966f7a7bc96b4",
+      "compressed_sha256": "204e9a2ce2fb51d9dd09c39e916b98603927b7047e87265b6c216b3e6d8eb24e",
+      "file": "maps/25248662.xml.gz"
+    },
+    {
+      "id": "265018692",
+      "name": "東京",
+      "country": "日本",
+      "region": "東京都",
+      "center": {
+        "lat": 35.6828378,
+        "lon": 139.7589667
+      },
+      "bounds": {
+        "pbottom": 35.642414,
+        "pleft": 139.7092,
+        "pright": 139.80873,
+        "ptop": 35.723263
+      },
+      "road_level": 4,
+      "nodes": 26012,
+      "connections": 55768,
+      "source_sha256": "09914c6d68bd7d7ae687f871e6dc2657a76cc76381e699bca89b66d34e31585f",
+      "compressed_sha256": "161150cf3b78bb2433d81c5bcf5b780d9dbbfb0359be55ae343e58fce13269f9",
+      "file": "maps/265018692.xml.gz"
+    },
+    {
+      "id": "26819236",
+      "name": "San Francisco",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 37.7792808,
+        "lon": -122.4192363
+      },
+      "bounds": {
+        "pbottom": 37.738857,
+        "pleft": -122.47038,
+        "pright": -122.36809,
+        "ptop": 37.819706
+      },
+      "road_level": 4,
+      "nodes": 11898,
+      "connections": 25336,
+      "source_sha256": "aca2932353cce73c2e9d4b9c64a10ba9158536bd4afdf343fee380699d96c0d3",
+      "compressed_sha256": "7c5c2dab7dba7687641de446d8e6808cecb0bc83d5015926247302291dd5a59f",
+      "file": "maps/26819236.xml.gz"
+    },
+    {
+      "id": "2833125787",
+      "name": "香港 Hong Kong",
+      "country": "中国",
+      "region": "HK",
+      "center": {
+        "lat": 22.2793278,
+        "lon": 114.1628131
+      },
+      "bounds": {
+        "pbottom": 22.238903,
+        "pleft": 114.119125,
+        "pright": 114.2065,
+        "ptop": 22.319752
+      },
+      "road_level": 4,
+      "nodes": 12054,
+      "connections": 25524,
+      "source_sha256": "f2bdd078b49ef7c052a666b1893b3fa8bcbf983bc8fd21d96f2e45ad706331f1",
+      "compressed_sha256": "ff86e653a2e903d6cee60bea46f6623b18c1a5b4e27b3bce30f0675f98b9fe0d",
+      "file": "maps/2833125787.xml.gz"
+    },
+    {
+      "id": "30674098",
+      "name": "São Paulo",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": -23.5506507,
+        "lon": -46.6333824
+      },
+      "bounds": {
+        "pbottom": -23.591074,
+        "pleft": -46.67748,
+        "pright": -46.589287,
+        "ptop": -23.510227
+      },
+      "road_level": 4,
+      "nodes": 13883,
+      "connections": 30052,
+      "source_sha256": "a77dd9271b930e381a3042bb5ee5f8085cbf1834f8e2b3363a23b54c6d165822",
+      "compressed_sha256": "f32fe967a1b529caa4f70bb9e11310647ace3312b310758696014fb7765c44d5",
+      "file": "maps/30674098.xml.gz"
+    },
+    {
+      "id": "3182220017",
+      "name": "武山县",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 34.7273221,
+        "lon": 104.9037991
+      },
+      "bounds": {
+        "pbottom": 34.686897,
+        "pleft": 104.854614,
+        "pright": 104.95299,
+        "ptop": 34.767746
+      },
+      "road_level": 6,
+      "nodes": 809,
+      "connections": 1716,
+      "source_sha256": "014fcb91866bad12dedf971d6ac4366932cd12e0a37d2606d24a806bd070d394",
+      "compressed_sha256": "53b108841667e89dc57d627b4f7e869d90abd300a4f84045eb3fdd5ec1468b9c",
+      "file": "maps/3182220017.xml.gz"
+    },
+    {
+      "id": "428339515",
+      "name": "Warszawa",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 52.2319237,
+        "lon": 21.0067265
+      },
+      "bounds": {
+        "pbottom": 52.191498,
+        "pleft": 20.940723,
+        "pright": 21.07273,
+        "ptop": 52.272346
+      },
+      "road_level": 4,
+      "nodes": 14311,
+      "connections": 30220,
+      "source_sha256": "60f2f19da94129bc074b872720ce09f1377a571fab7a686c9e02c61273f5cb5a",
+      "compressed_sha256": "8bd294df4b2342359b6cfa635436e849168ea240fa461b1b1bd49b84b03e153d",
+      "file": "maps/428339515.xml.gz"
+    },
+    {
+      "id": "61785451",
+      "name": "New York",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 40.7305991,
+        "lon": -73.9865812
+      },
+      "bounds": {
+        "pbottom": 40.690174,
+        "pleft": -74.039925,
+        "pright": -73.933235,
+        "ptop": 40.771023
+      },
+      "road_level": 4,
+      "nodes": 11525,
+      "connections": 24704,
+      "source_sha256": "28b3b8bc4a9eff6588ec3d866d53470e21fc690789969e621eb48dccf646bfc3",
+      "compressed_sha256": "a4dcba2a6c0fb93bd6a27e2cc7819328e97d972a719ef89b63933afb46794189",
+      "file": "maps/61785451.xml.gz"
+    },
+    {
+      "id": "62270270",
+      "name": "Ciudad de México",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 19.4325301,
+        "lon": -99.1332102
+      },
+      "bounds": {
+        "pbottom": 19.392105,
+        "pleft": -99.17608,
+        "pright": -99.09035,
+        "ptop": 19.472954
+      },
+      "road_level": 4,
+      "nodes": 13191,
+      "connections": 28980,
+      "source_sha256": "f2da0a846c84f9707755c36a6bf27c9c6d20f7576c94a6c67cef7cd15ff8c803",
+      "compressed_sha256": "0b88420d426d2bdc6235e673c065fea40d21c1a8acecc523a4045e7f6d3dcd67",
+      "file": "maps/62270270.xml.gz"
+    },
+    {
+      "id": "778910398",
+      "name": "上海市",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 31.2253441,
+        "lon": 121.4888922
+      },
+      "bounds": {
+        "pbottom": 31.18492,
+        "pleft": 121.44162,
+        "pright": 121.53616,
+        "ptop": 31.265768
+      },
+      "road_level": 4,
+      "nodes": 12651,
+      "connections": 27512,
+      "source_sha256": "c8b266e58b943786364da25de765c6e7c6d02d72124542b4a8c83a25c4967ee8",
+      "compressed_sha256": "21e129e139bc3e52219428551f782b23c9fddabeb9cc9a0d6715252c06a059bf",
+      "file": "maps/778910398.xml.gz"
+    },
+    {
+      "id": "campaign_detroit",
+      "name": "Detroit",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 42.361812,
+        "lon": -83.105843
+      },
+      "bounds": {
+        "pbottom": 42.32139,
+        "pleft": -83.16055,
+        "pright": -83.05113,
+        "ptop": 42.402237
+      },
+      "road_level": 4,
+      "nodes": 9423,
+      "connections": 19970,
+      "source_sha256": "89c83edc2edda90b9ed73adc9d1962328bcb2bd25de7d170aa5b2f8cf9cc6d9a",
+      "compressed_sha256": "3d7e9a9739a00c946c579a7c9860540663c85abf6387ce45e35b0917c4be74ec",
+      "file": "maps/campaign_detroit.xml.gz"
+    },
+    {
+      "id": "campaign_miami",
+      "name": "Miami",
+      "country": "",
+      "region": "",
+      "center": {
+        "lat": 25.8041,
+        "lon": -80.163
+      },
+      "bounds": {
+        "pbottom": 25.763676,
+        "pleft": -80.2079,
+        "pright": -80.118095,
+        "ptop": 25.844524
+      },
+      "road_level": 4,
+      "nodes": 6007,
+      "connections": 12810,
+      "source_sha256": "da9236fc56f6b64a174d352df388a107a9495cd76b4b61e8cd1ee8f896289fb4",
+      "compressed_sha256": "6ce0218f7b3f2dba6774e2e4fe8be3b43ca04aeec700ef5529b51e3a8dacec4b",
+      "file": "maps/campaign_miami.xml.gz"
+    }
+  ]
+}

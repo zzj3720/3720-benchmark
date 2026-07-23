@@ -1,0 +1,71 @@
+<data><conversations>
+<conversation id="alb2" texten="Concerned wife" COMMENT="RECORDED">
+ <scene>
+ <witness elementProperties="sex=W;
+type=White;
+isActive = true;" id="wife" emotions="white woman, around 50 years old" texten="Caller" />
+ <injuried elementProperties="sex=W;
+type=White;
+isActive = false;
+hp = 90;
+hpchange = -0.05;" id="intoxi" emotions="white woman, around 50 years old" texten="Caller" />
+ <criminal elementProperties="sex=M;
+type=White;
+prisonChance = 1;
+fightRisk = 0;
+isActive = true;" id="hubby" texten="Husband" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="gopol2-&gt;active = false;
+amb-&gt;active = false;" />
+ <dialogOption id="2" operator="Caller:" texten="Uh... Hello. I don't really know how to say it, but..." default="3" addToAAR="story" />
+ <dialogOption id="3" operator="Operator:" texten="Yes?" default="cook" />
+ <dialogOption id="cook" operator="Caller:" texten="I think my husband is a cook." default="cooka" option2="cookb" />
+ <dialogOption id="cooka" operator="Operator:" texten="{WHAT DO YOU MEAN?}I am sorry what do you mean ma'am?" default="drugs" />
+ <dialogOption id="cookb" operator="Operator:" texten="{DON'T YOU LIKE MEN WHO COOK WELL?}I thought women like men who can cook well." default="drugs" />
+ <dialogOption id="drugs" operator="Caller:" emotions="embarrassed" texten="I mean... I think that he makes drugs." default="why" option2="gopol" />
+ <dialogOption id="why" operator="Operator:" texten="{WHY DO YOU THINK SO?} Oh. Why do you think so?" default="weird" actionOnEnd="gopol2-&gt;active = true;" />
+ <dialogOption id="weird" operator="Caller:" emotions="unsure" texten="I found weird containers filled with some stuff in our cellar. They stink pretty bad... I have no idea what it is... My husband's a chemist but why would he need that..." default="evi" option2="check" option3="tv" />
+ <dialogOption id="tv" operator="Operator:" texten="{IT'S NOT A TV SHOW} Ma'am, maybe you've watched too many TV shows." default="serious" />
+ <dialogOption id="serious" operator="Caller:" texten="I'm serious..." default="evi" option2="check" option3="okpol" />
+ <dialogOption id="evi" operator="Operator:" texten="{THAT'S NOT ENOUGH} That's not enough evidence, ma'am." default="kid" />
+ <dialogOption id="kid" operator="Caller:" texten="But he keeps in touch with some kid, I guess it's his former student. I think the police used to keep an eye on him. I'm not sure but it might've been connected to drugs..." default="okpol" option2="husb" option3="check" />
+ <dialogOption id="husb" operator="Operator:" texten="{WHY ARE YOU CALLING?} Why do you call 911 on your husband?" default="unsafe" />
+ <dialogOption id="unsafe" operator="Caller:" emotions="desperate" texten="We don't get along well. And I feel like my home is being observed lately... Some shady guys started to wander around in our neighborhood. I'm scared, I need to protect my son..." default="okpol" option2="check" option3="gopol2" />
+ <dialogOption id="check" operator="Operator:" texten="{CHECK THE CELLAR} Can you check what's inside the vessels? The kind of smells getting out of the containers?" default="high" option2="high2" actionOnEnd="amb-&gt;active = true;
+way-&gt;active = false;" addToAAR="toxic" />
+ <dialogOption id="high" operator="Caller:" emotions="sound of opening some pot in the background, sniffing, amazed voice" texten="Yeah, sure... [pause, coughs] Uhh... It smells funny... Daaaaamn. I need you to send someone here... now...." default="address" option2="way" actionOnEnd="wife.isActive = false;
+intoxi.isActive = true;
+opinionEffect=-2;" />
+ <dialogOption id="high2" operator="Caller:" emotions="sound of opening some pot in the background, sniffing, amazed voice" texten="Yeah, sure... [pause, coughs] Uhh... It smells funny... Daaaaamn. I need you to send someone here... now...." default="drop" actionOnEnd="wife.isActive = false;
+intoxi.isActive = true;
+opinionEffect=-2;" />
+ <dialogOption id="highdragon" operator="Caller:" emotions="sound of opening some pot in the background, sniffing, amazed voice" texten="Yeah, sure... [pause, coughs] Uhh... I got a bit dizzy... Daaaaamn. I need you to send someone here... now.... it's getting very misty in here...." default="address" option2="way" actionOnEnd="wife.isActive = false;
+intoxi.isActive = true;
+opinionEffect=-2;" />
+ <dialogOption id="address" operator="Operator:" texten="{WHAT'S THE ADDRESS?} What's your address?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="[[ADDRESS]]" default="amb" option2="way" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="2608 Central Avenue" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="5603 Menaul Boulevard" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="156 Indian School Road" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="okpol" operator="Operator:" texten="{I'LL SEND THE POLICE} I understand ma'am. I'll send an officer by to check it out. Where are you calling from?" default="addressa0" actionOnEnd="opinionEffect=5;" addToAAR="found" />
+ <dialogOption id="way" operator="Operator:" texten="{I'LL SEND THE POLICE}Ok, the patrol's on the way." default="ty" />
+ <dialogOption id="amb" operator="Operator:" texten="{I'LL SEND POLICE AND AMBULANCE} Hold on there ma'am, I'll send an officer and ambulance to you." default="quick" />
+ <dialogOption id="quick" operator="Caller:" emotions="amazed" texten="Just be quick..." actionOnEnd="actionHangup" />
+ <dialogOption id="gopol" operator="Operator:" texten="{GO TO A POLICE STATION} In that case you should go to the nearest police station and talk to an officer there." default="ty" actionOnEnd="opinionEffect=-1;
+hubby.isActive = false;" addToAAR="wrong" />
+ <dialogOption id="gopol2" operator="Operator:" texten="{GO TO A POLICE STATION} In that case you should go to the nearest police station and talk to an officer there. Bring some photos of the labels that are on the containers ok?" default="ty" actionOnEnd="opinionEffect=-1;
+hubby.isActive = false;" addToAAR="wrong" />
+ <dialogOption id="ty" operator="Caller:" texten="Okay, thank you..." actionOnEnd="actionHangup" />
+ <dialogOption id="drop" operator="Caller:" texten="..." actionOnEnd="actionHangup" />
+ <dialogOption id="reminder" operator="Caller:" texten="Sir?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Hello?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="A woman suspected that her husband was making drugs." />
+ <reportElement id="toxic" texten="The woman got intoxicated by chemical fumes from the vessel." />
+ <reportElement id="found" texten="The policemen found a drug lab in the cellar. The caller's husband confessed and was arrested." />
+ <reportElement id="wrong" texten="It turned out that the caller was right about her husband. He figured out the situation and ran away." />
+ </aar>
+ </conversation>
+</conversations></data>

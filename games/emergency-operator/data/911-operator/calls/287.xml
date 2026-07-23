@@ -1,0 +1,66 @@
+<data><conversations>
+<conversation id="287" texten="Collapsed house" COMMENT="RECORDED">
+ <scene>
+ <passerby elementProperties=" type = AfAm;
+ sex = M;" id="caller" emotions="male 52 yo, breathing heavily, very worried" texten="Caller" />
+ <injuried elementProperties="hp = 45;
+hpChange = -0.1;
+ type = White;
+ sex = W;" id="injuried1" emotions="female 41 yo" texten="Jane Collins" />
+ <dead elementProperties="hp=0;
+ type = Old;
+ sex = W;" id="injuried2" emotions="female 65 l. - dead" texten="Susan Collins" />
+ <injuried elementProperties="hp = 50; hpChange = -0.1;
+ type = Children;
+ sex = W;" blockedBy="gruz" id="injuried3" emotions="girl 9 yo" texten="Rosie Collins" />
+ <injuried elementProperties="hp = 80; hpChange = -0.3;
+ type = Children;
+ sex = W;" blockedBy="gruz" id="injuried4" emotions="little boy 3 yo" texten="Linda Collins" />
+ <tech elementProperties="work = 200;
+icon=OnSitePic_Rubble" id="gruz" texten="Collapsed house" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 6;" />
+ <dialogOption id="2" operator="Caller:" emotions="[trembling, in a weak voice]" texten="Oh God, I've finally gotten through. Send someone over here." default="3" addToAAR="story" />
+ <dialogOption id="3" operator="Operator:" texten="Sir, what's your emergency?" default="4" />
+ <dialogOption id="4" operator="Caller:" emotions="[catches breath]" texten="The Collins', my neighbors' house. . . it's literally fallen apart. . . collapsed. . . I don't know what to do. . ." default="5" option2="9" option3="address" />
+ <dialogOption id="5" operator="Operator:" texten="{IS ANYONE INSIDE?} Were your neighbors inside?" default="6" />
+ <dialogOption id="6" operator="Caller:" texten="I think so..." default="7" option2="15" option3="back" />
+ <dialogOption id="7" operator="Operator:" texten="{ARE YOU SURE?} You think so or they were? This is really important, we have a lot of emergencies." default="8" />
+ <dialogOption id="8" operator="Caller:" emotions="(thinks for a while)" texten="They were. Uhmmm... I saw Jane and Susan for sure, probably with the little kid, I have no idea about the rest of the family." default="9" option2="15" option3="address" />
+ <dialogOption id="9" operator="Operator:" texten="{HOW MANY PEOPLE?} Ok, how many people live in the house?" default="10" />
+ <dialogOption id="10" operator="Caller:" texten="Six, but Ted surely went to work in the morning." default="11" option2="address" />
+ <dialogOption id="11" operator="Operator:" texten="{SO, FIVE PEOPLE?} So if Ted's gone to work there could be five people in the house?" default="12" />
+ <dialogOption id="12" operator="Caller:" emotions="[hesitantly]" texten="Yes." default="13" option2="address" />
+ <dialogOption id="13" operator="Operator:" texten="{WHO LIVES THERE?} So who would be in the house and what are their ages?" default="14" />
+ <dialogOption id="14" operator="Caller:" emotions="[slowly, thinking]" texten="A woman, two children. . . or three, Rose is older though, she's in college. And Su, their grandmother, she's 65." default="15" option2="17" option3="address" />
+ <dialogOption id="15" operator="Operator:" texten="{HAS IT ALL COLLAPSED?} Has the house completely collapsed?" default="16" />
+ <dialogOption id="16" operator="Caller:" texten="Yes, there's only a single wall fragment left." default="17" option2="5" />
+ <dialogOption id="17" operator="Operator:" texten="{CAN YOU HEAR THEM?} Can you hear anything from under the rubble, voices, somebody calling up for help?" default="18" />
+ <dialogOption id="18" operator="Caller:" emotions="[exasperated]" texten="I don't know. I had waited a while after the earthquake stopped. Then I looked out the window and saw that and started calling you immediately." default="19" option2="23" option3="27" />
+ <dialogOption id="19" operator="Operator:" texten="{YOU HAVE TO HELP} Ok, listen, they need you to help." default="20" />
+ <dialogOption id="20" operator="Caller:" texten="Like how?" default="23" option2="21" />
+ <dialogOption id="21" operator="Operator:" texten="{TAKES TIME TO GET THERE} It might take a while before the fire department and ambulance can get there." default="22" />
+ <dialogOption id="22" operator="Caller:" texten="Obviously." default="23" option2="25" option3="address" />
+ <dialogOption id="23" operator="Operator:" texten="{LOOK FOR THEM} What I need you to do is, as soon as we're off this phone call, go over to the collapsed house, but don't walk on the rubble, ok? Maybe you can manage to figure out where the rescuers should start looking for people. Help them find them faster. But if you smell gas stay out of the area." default="24" actionOnEnd="gruz.workChange +=-1;" addToAAR="search" />
+ <dialogOption id="24" operator="Caller:" texten="Okay, got it." default="27" option2="25" />
+ <dialogOption id="25" operator="Operator:" texten="{CALL OTHERS} You can try to get the other neighbors to start removing the rubble." default="26" actionOnEnd="gruz.workChange +=-1;" addToAAR="call" />
+ <dialogOption id="26" operator="Caller:" texten="Okay, anything else?" default="27" option2="23" option3="address" />
+ <dialogOption id="27" operator="Operator:" texten="{WAIT FOR THE SERVICES} Please wait for the fire and ambulance to arrive." default="28" addToAAR="send" />
+ <dialogOption id="28" operator="Caller:" texten="I'll do as you said." actionOnEnd="actionHangup" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?} What's the address for that house?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="Their house is at [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="Their house is at Columbus Avenue 246" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="Their house is at Oak street 135" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="Their house is at 7th street 89" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="reminder" operator="Caller:" texten="Are you there?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="What am I supposed to do?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="A house has collapsed with a family inside." />
+ <reportElement id="call" texten="The emergency unit had easier access to injured people, thanks to neighbors who had started removing a rubble." />
+ <reportElement id="search" texten="The caller found a possible location of the injured people." />
+ <reportElement id="send" texten="The operator decided to send an ambulance and firefighters unit." />
+ </aar>
+ </conversation>
+</conversations></data>

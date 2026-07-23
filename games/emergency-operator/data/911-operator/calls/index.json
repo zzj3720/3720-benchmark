@@ -1,0 +1,909 @@
+{
+  "calls": [
+    {
+      "id": "102",
+      "title": "Bad pizza",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 21,
+      "scene_elements": 1,
+      "scene_types": {
+        "suspect": 1
+      },
+      "source_sha256": "684f143e749c97e9bd94b63c71ac5ea368db316fc6a0a2eb856d1fc07e1063ff",
+      "file_sha256": "86525123eab3ddfbf04d009f2b002065118b481daa982704978efffe03bd664c",
+      "file": "calls/102.xml"
+    },
+    {
+      "id": "107",
+      "title": "Home invade",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 23,
+      "scene_elements": 4,
+      "scene_types": {
+        "criminal": 1,
+        "injured": 2,
+        "witness": 1
+      },
+      "source_sha256": "7007b438bd987e5b7915823aa491f6891c321f73a94948e22ff4dee7c356604b",
+      "file_sha256": "5517d72d649fb2307c2e1937d1ea414ce8fe219570f7cd9a1373ca95fdee29ff",
+      "file": "calls/107.xml"
+    },
+    {
+      "id": "131",
+      "title": "Impaled cyclist",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 44,
+      "scene_elements": 4,
+      "scene_types": {
+        "injuried": 1,
+        "witness": 2,
+        "work": 1
+      },
+      "source_sha256": "158085e9b419cc977f1d826e16a4843e72b4a40812dd8f815906d281a2f6981f",
+      "file_sha256": "a47d55914859832a0d80438ffdb00386bd8bd34d615c9ee32b476c0f61f9e885",
+      "file": "calls/131.xml"
+    },
+    {
+      "id": "287",
+      "title": "Collapsed house",
+      "properties": {},
+      "dialogue_nodes": 35,
+      "scene_elements": 6,
+      "scene_types": {
+        "dead": 1,
+        "injuried": 3,
+        "passerby": 1,
+        "tech": 1
+      },
+      "source_sha256": "acf2c7d27a9b494fdf25066cad0b50d08cc2bd7c733b515ba4543663c25da993",
+      "file_sha256": "d5d5fd61ac2a139c94983b5e2298fbda4e749e591fc10b60cff20b541c532495",
+      "file": "calls/287.xml"
+    },
+    {
+      "id": "288",
+      "title": "Car in a crack",
+      "properties": {},
+      "dialogue_nodes": 39,
+      "scene_elements": 3,
+      "scene_types": {
+        "injuried": 1,
+        "passerby": 1,
+        "tech": 1
+      },
+      "source_sha256": "acc09311fe855c5d9b716957f36fed67c5f053239a8367403697ab154aeebfb4",
+      "file_sha256": "4c6bf931fadc28dddae96430624301007b28e66314ef0441c21d771f5acc077b",
+      "file": "calls/288.xml"
+    },
+    {
+      "id": "289",
+      "title": "Electrocuted",
+      "properties": {},
+      "dialogue_nodes": 39,
+      "scene_elements": 4,
+      "scene_types": {
+        "dead": 2,
+        "injuried": 1,
+        "passerby": 1
+      },
+      "source_sha256": "c69cb1184e12746b7568a67f72883e07e882c7ea0979684e6d1ecbe8d2d8c0eb",
+      "file_sha256": "4f3b9c85aac4360bcf4fe0c387813b496ee95f795b46bb9e797e94323b2165b5",
+      "file": "calls/289.xml"
+    },
+    {
+      "id": "290",
+      "title": "Power cut",
+      "properties": {},
+      "dialogue_nodes": 31,
+      "scene_elements": 4,
+      "scene_types": {
+        "injuried": 1,
+        "passerby": 1,
+        "tech": 1,
+        "timer": 1
+      },
+      "source_sha256": "748b631630668f260b19cbd32b7612c5deee0016c406ee4ce71568caa2cfda11",
+      "file_sha256": "2d6cb91c5c0eb3c342662a7857428944dd329f09f1faaff9a90121dbc0b0c35b",
+      "file": "calls/290.xml"
+    },
+    {
+      "id": "291",
+      "title": "Flooded flat",
+      "properties": {},
+      "dialogue_nodes": 43,
+      "scene_elements": 5,
+      "scene_types": {
+        "injured": 1,
+        "passerby": 1,
+        "timer": 1,
+        "work": 2
+      },
+      "source_sha256": "7743f885e28b9b0745bb42a1145abf8d8523eb3c6e19ff0d0606a6e4ec1defef",
+      "file_sha256": "1e8ae05590f1005ceb945a8fe5e257767ecd9bf772326492f7613f6de38b55be",
+      "file": "calls/291.xml"
+    },
+    {
+      "id": "53",
+      "title": "Undercover pizza",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 27,
+      "scene_elements": 2,
+      "scene_types": {
+        "criminal": 1,
+        "injuried": 1
+      },
+      "source_sha256": "0b3a3b25da1f7286436eae53df5cb1d3280c137ba96bf9a6fd907200d1e29dab",
+      "file_sha256": "84e80b2b18df3f39362b512fd7c5f80dcbd8b71c5600ccc737ad9ac2fcc3ffea",
+      "file": "calls/53.xml"
+    },
+    {
+      "id": "68",
+      "title": "Developer",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 31,
+      "scene_elements": 1,
+      "scene_types": {
+        "suspect": 1
+      },
+      "source_sha256": "899d21f64e819965d65284089cdaa573167adb5758f62710ce67e30c320fc5a4",
+      "file_sha256": "e6f25449269fde8c91c99d5f6bcdb592836b9e760f7416cd966a0556e4da69ab",
+      "file": "calls/68.xml"
+    },
+    {
+      "id": "81",
+      "title": "Small car fire",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 26,
+      "scene_elements": 3,
+      "scene_types": {
+        "fire": 1,
+        "passerby": 1,
+        "timer": 1
+      },
+      "source_sha256": "f280509a7f01a9b6f92e530eec999f2bc7705108f64bf0778027dc2c53b772f9",
+      "file_sha256": "d0b695b5e1fd6b3cf16c22bdd35984d43f614b899adbddff85389d539c0002a3",
+      "file": "calls/81.xml"
+    },
+    {
+      "id": "82a",
+      "title": "Fire at construction site",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 24,
+      "scene_elements": 8,
+      "scene_types": {
+        "fire": 1,
+        "injuried": 5,
+        "timer": 1,
+        "work": 1
+      },
+      "source_sha256": "df792eacdd6365e0bf55c5af4dd329c4b74cb324a5d62c033c8569c23b11a375",
+      "file_sha256": "bf99dc66dbaa660011b37650aa4d5a7e6d16bf680beb5fa90b115d6e792dd072",
+      "file": "calls/82a.xml"
+    },
+    {
+      "id": "89",
+      "title": "Cat in a tree",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 29,
+      "scene_elements": 3,
+      "scene_types": {
+        "injuried": 1,
+        "passerby": 1,
+        "work": 1
+      },
+      "source_sha256": "f42325c5a6efa98a9338309ea9197be700862c799b97959ddc388dfdd117abd8",
+      "file_sha256": "4a5255024d5d570d426f1146f040e126c29317e82a78e1012da0a1f1d05229f7",
+      "file": "calls/89.xml"
+    },
+    {
+      "id": "97",
+      "title": "Clipped leg",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 34,
+      "scene_elements": 1,
+      "scene_types": {
+        "injuried": 1
+      },
+      "source_sha256": "6297fd611a2d07b9e0f2367eb90e85c64c8f87bbbcaf73261a963fe89b743f13",
+      "file_sha256": "e2b12950d68e8f0a44f422e3fc5f3ff028a5e238624493b563ee3e0a5803dfbc",
+      "file": "calls/97.xml"
+    },
+    {
+      "id": "alb1",
+      "title": "Dead daughter",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 22,
+      "scene_elements": 2,
+      "scene_types": {
+        "dead": 1,
+        "witness": 1
+      },
+      "source_sha256": "7480075bc5a5c17b36ed82712ee5b63c7ff16dc99eccacf6cb7cf0bbf54a30cf",
+      "file_sha256": "94b2e0bbebf55b246ca9821414413f32939247276e7b6b56c6deb23dcf82a8f1",
+      "file": "calls/alb1.xml"
+    },
+    {
+      "id": "alb2",
+      "title": "Concerned wife",
+      "properties": {},
+      "dialogue_nodes": 34,
+      "scene_elements": 3,
+      "scene_types": {
+        "criminal": 1,
+        "injuried": 1,
+        "witness": 1
+      },
+      "source_sha256": "5bc7bca872dec4d2f517f27284b208046482fc00cfd192fa2acb501cb53cedc2",
+      "file_sha256": "fb8dc14699fe0ae2f5fd37c03ffff33ff495b40d1854db7817c1d5f8f8d8b4bd",
+      "file": "calls/alb2.xml"
+    },
+    {
+      "id": "alb3",
+      "title": "Plane crash",
+      "properties": {},
+      "dialogue_nodes": 25,
+      "scene_elements": 6,
+      "scene_types": {
+        "dead": 1,
+        "injuried": 3,
+        "tech": 1,
+        "witness": 1
+      },
+      "source_sha256": "e3451b341b8639d82ba9deff797781ba8e4d7e701f5fdf1d5c4ec08a97da6c2f",
+      "file_sha256": "eed1399e0ac80640dbdd10fec4fbb8c194bdccbc36a256cdb7d93aa519e5e9bd",
+      "file": "calls/alb3.xml"
+    },
+    {
+      "id": "alb4",
+      "title": "Car wash row",
+      "properties": {},
+      "dialogue_nodes": 31,
+      "scene_elements": 3,
+      "scene_types": {
+        "suspect": 2,
+        "witness": 1
+      },
+      "source_sha256": "68f5b7b9b309e380fa26381446d4f014c4e429a5973a24c1f8c37da63b242492",
+      "file_sha256": "da00feacd232d7590a64de6a4fd2f011b4cb47f1f057eb9f6a578c9a6f0a174f",
+      "file": "calls/alb4.xml"
+    },
+    {
+      "id": "bribe",
+      "title": "Factory incident",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 38,
+      "scene_elements": 3,
+      "scene_types": {
+        "criminal": 1,
+        "injuried": 1,
+        "suspect": 1
+      },
+      "source_sha256": "0afe5cccdeaed1f5094a51b161ba0355794a846b3953d0666dee086505f8f1e3",
+      "file_sha256": "c3db7190f68f44abb810b8b6a280b3e4b9719cad50e299d8786822fe6917889b",
+      "file": "calls/bribe.xml"
+    },
+    {
+      "id": "ch1",
+      "title": "Prison escape",
+      "properties": {},
+      "dialogue_nodes": 25,
+      "scene_elements": 5,
+      "scene_types": {
+        "criminal": 4,
+        "injuried": 1
+      },
+      "source_sha256": "78071bccb5e5e41ae07164689f87ccc54c785d4c71de258d3d417d626b1699c4",
+      "file_sha256": "093626c58780ef4edaf4d80fdd4828970be764177681773dccd0d72db7ce327e",
+      "file": "calls/ch1.xml"
+    },
+    {
+      "id": "ch4",
+      "title": "Bat in a room",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 27,
+      "scene_elements": 2,
+      "scene_types": {
+        "passerby": 1,
+        "tech": 1
+      },
+      "source_sha256": "0056f08988d2111a6216a0699437eaa733d880c8e02d565a1e55ee767ab8b812",
+      "file_sha256": "a113e774895520607facdfc3e405226cd95f924aeacfa654bb5d2530cd6d9c6b",
+      "file": "calls/ch4.xml"
+    },
+    {
+      "id": "chris",
+      "title": "Trapped under a car",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 16,
+      "scene_elements": 2,
+      "scene_types": {
+        "injuried": 1,
+        "work": 1
+      },
+      "source_sha256": "f40b95331fd12b88f365a3a88fdace676bcbeb767e7f0155cb88eef5114e1b35",
+      "file_sha256": "25cca327f03e5f29ab0df9d9127272fe961251052ffd1b473f0ff72fd2d56c24",
+      "file": "calls/chris.xml"
+    },
+    {
+      "id": "gen10",
+      "title": "Car collision",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 37,
+      "scene_elements": 6,
+      "scene_types": {
+        "criminal": 1,
+        "injuried": 2,
+        "suspect": 1,
+        "work": 2
+      },
+      "source_sha256": "e116677ddbf69626aebfc3d041ec049bbacb02c999ebba39c4c2001a6f8d6625",
+      "file_sha256": "4939198cf386a401c2d1a7b1488e68cee4ff66242d93a9d897e927a03115a97f",
+      "file": "calls/gen10.xml"
+    },
+    {
+      "id": "gen10_3",
+      "title": "Car collision",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 37,
+      "scene_elements": 6,
+      "scene_types": {
+        "criminal": 1,
+        "injuried": 2,
+        "suspect": 1,
+        "work": 2
+      },
+      "source_sha256": "8616ce1cebda9e5b32b1758a4bf0e3f84259b358666e39db71a48ef3ee496102",
+      "file_sha256": "e793f380f5fd635c7b11f551ef0af9495d92981160a2a2201d52a08504491d5c",
+      "file": "calls/gen10_3.xml"
+    },
+    {
+      "id": "gen11",
+      "title": "Robbery",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 52,
+      "scene_elements": 5,
+      "scene_types": {
+        "criminal": 2,
+        "injuried": 2,
+        "witness": 1
+      },
+      "source_sha256": "6bf5537d819e80394a29e878c35064202c2f9538f6d1da56b5594ecc26f3ae92",
+      "file_sha256": "806d0f426731efe4eea97015c16212a2087dc76c09113affe8405ae1ac931b0d",
+      "file": "calls/gen11.xml"
+    },
+    {
+      "id": "gen11_2",
+      "title": "Robbery",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 52,
+      "scene_elements": 5,
+      "scene_types": {
+        "criminal": 2,
+        "injuried": 2,
+        "witness": 1
+      },
+      "source_sha256": "6fea7cd8384d23daa53ea910154625e1d8d9f2fc95aed71eaf52a10a3267fbd3",
+      "file_sha256": "cfc85ff2556a9e3b15f7c1f2e37b7ac06c5a1f0172e0e94181e94628e31aa4cc",
+      "file": "calls/gen11_2.xml"
+    },
+    {
+      "id": "gen12",
+      "title": "Empty call",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 61,
+      "scene_elements": 9,
+      "scene_types": {
+        "criminal": 3,
+        "injuried": 2,
+        "passerby": 2,
+        "witness": 1,
+        "work": 1
+      },
+      "source_sha256": "f9d3aea7d7f4535496d513f03fcff595f5eff144051784b994b4760ffeaedb0c",
+      "file_sha256": "8c3a18e8af5188ac5ef2b16f7cbf282094ccf8ee31452ca97b834f719f40ade7",
+      "file": "calls/gen12.xml"
+    },
+    {
+      "id": "gen13",
+      "title": "Unconscious man",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 68,
+      "scene_elements": 4,
+      "scene_types": {
+        "injuried": 2,
+        "passerby": 1,
+        "suspect": 1
+      },
+      "source_sha256": "f67249fbdab9925bf30b9cc6da98d86df8535d3f3eda91ff6ce9c921b47ba535",
+      "file_sha256": "85dfdad2f534ff8f9d7ee41ba74c241f656cef8b14cc78b9a395a7012ab861f9",
+      "file": "calls/gen13.xml"
+    },
+    {
+      "id": "gen13_2",
+      "title": "Unconscious",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 68,
+      "scene_elements": 4,
+      "scene_types": {
+        "injuried": 2,
+        "passerby": 1,
+        "suspect": 1
+      },
+      "source_sha256": "381f06511ef276b1dd518da3b62afe2987434ed651ab1cd87f64b7ec2c7d7874",
+      "file_sha256": "e01095368aac956d1e5a1c9de586beebea4687dd5217cf59fb46fea9bf3244bd",
+      "file": "calls/gen13_2.xml"
+    },
+    {
+      "id": "gen14",
+      "title": "Kitchen on fire",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 41,
+      "scene_elements": 4,
+      "scene_types": {
+        "fire": 1,
+        "injuried": 2,
+        "passerby": 1
+      },
+      "source_sha256": "a06075204159fbcffab33715f70cd272080a1d74f34e5fb25313c389d5651a35",
+      "file_sha256": "1815ff549013e4d229a95db2f169848b70c4c4b4022f3e17fc41a49d3a9fcb0a",
+      "file": "calls/gen14.xml"
+    },
+    {
+      "id": "gen16",
+      "title": "Stolen car",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 69,
+      "scene_elements": 4,
+      "scene_types": {
+        "criminal": 3,
+        "witness": 1
+      },
+      "source_sha256": "a42427dffeb0067b7c172620a76e2ea34e3b0f61b7c328019533f51f89976591",
+      "file_sha256": "293e9588302f89a944c272d34a0d6de58c18e35668fa85b10723a92aea893977",
+      "file": "calls/gen16.xml"
+    },
+    {
+      "id": "gen18",
+      "title": "Loud neighbors",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 81,
+      "scene_elements": 20,
+      "scene_types": {
+        "criminal": 3,
+        "dead": 1,
+        "injured": 7,
+        "suspect": 3,
+        "witness": 6
+      },
+      "source_sha256": "aabff25b366e0e20bea031868bfbb62655e3f99357aa9457dd064bc890c263d8",
+      "file_sha256": "4410d6cc660cd7f045a96e25e02949a5bb32d1472a1a36cccd1abd4b5217a305",
+      "file": "calls/gen18.xml"
+    },
+    {
+      "id": "gen19",
+      "title": "Stomach ache",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 55,
+      "scene_elements": 1,
+      "scene_types": {
+        "injured": 1
+      },
+      "source_sha256": "8814561155d23373434a831f401eec82d1bb48b68029f02f11ba1d28578645c8",
+      "file_sha256": "c86cb3d81441e69ff607a7821b4e92f97b8a3572d50dd3b81da0f2d620d1d7bb",
+      "file": "calls/gen19.xml"
+    },
+    {
+      "id": "gen20",
+      "title": "Fire",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 56,
+      "scene_elements": 5,
+      "scene_types": {
+        "fire": 2,
+        "injured": 2,
+        "passerby": 1
+      },
+      "source_sha256": "b91612357e941a7087ec88cf64ed9bb5d8c717689b79655135d4f52f1a29d360",
+      "file_sha256": "6ead619260669824193df5729dfecae1fcc7c6dc17f84fda903a61addbc3f863",
+      "file": "calls/gen20.xml"
+    },
+    {
+      "id": "gen20_2",
+      "title": "Fire",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 63,
+      "scene_elements": 7,
+      "scene_types": {
+        "criminal": 2,
+        "fire": 2,
+        "injured": 2,
+        "passerby": 1
+      },
+      "source_sha256": "8604d98583ca234f03bd4a3efb3c7b6a58ef64d2e63f34b0a21a937e7e92e6b6",
+      "file_sha256": "fa56f01b9b55004e122599079e4e64a9dac84002df30d1b6ac776ffd0724378e",
+      "file": "calls/gen20_2.xml"
+    },
+    {
+      "id": "gen21",
+      "title": "Street fight",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 65,
+      "scene_elements": 6,
+      "scene_types": {
+        "criminal": 4,
+        "injured": 1,
+        "witness": 1
+      },
+      "source_sha256": "f178907efc2601c80b9f12c717df6eafa1a8aafa0b51e213f3276bfd07d8af5b",
+      "file_sha256": "ff613fa22b4c83e217893123ce5fbc3bf66b8d8963ab9c78f06d4e8ad2bcc978",
+      "file": "calls/gen21.xml"
+    },
+    {
+      "id": "gen22",
+      "title": "Parking violation",
+      "properties": {
+        "type": "generable"
+      },
+      "dialogue_nodes": 34,
+      "scene_elements": 3,
+      "scene_types": {
+        "criminal": 2,
+        "witness": 1
+      },
+      "source_sha256": "dabe5ef1550b491f3a9c96c62d1bf49a6f16a2e46b935c2af267a11dc307daf8",
+      "file_sha256": "62ebb420949fca6c18c91081a6fab7df0af39646465f59d813c5a4589b8579ff",
+      "file": "calls/gen22.xml"
+    },
+    {
+      "id": "go90",
+      "title": "Childbirth in a traffic jam",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 83,
+      "scene_elements": 3,
+      "scene_types": {
+        "injuried": 2,
+        "passerby": 1
+      },
+      "source_sha256": "77c8aa4c68416172ce210f44cb9ea9f7e6620a54ee38b1136885879ade3bf5fc",
+      "file_sha256": "dccbc96745e1208586f5cfd877557a0c8b71646fe41c281d6ffb47fa36ba805b",
+      "file": "calls/go90.xml"
+    },
+    {
+      "id": "ks300",
+      "title": "Drone attack",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 33,
+      "scene_elements": 3,
+      "scene_types": {
+        "passerby": 1,
+        "suspect": 2
+      },
+      "source_sha256": "022eeb31a0a305034b8eb6fdd953ced536dca596d17bcc3f7504f6576ac19667",
+      "file_sha256": "0d5dc1d400ea0363698db4429b95234cd0cf263c3f3512d9dd9d71cebc28d427",
+      "file": "calls/ks300.xml"
+    },
+    {
+      "id": "ks301",
+      "title": "Bear in a bush",
+      "properties": {},
+      "dialogue_nodes": 48,
+      "scene_elements": 3,
+      "scene_types": {
+        "injured": 1,
+        "tech": 1,
+        "witness": 1
+      },
+      "source_sha256": "da71ab7c75c14065ace2713e6c1c52f976ba5f573d81898ef8aa2cb21d67c9da",
+      "file_sha256": "25af4611a45c4ef42bcf62805900e78f54a758096f504bad1a7eb429627421d8",
+      "file": "calls/ks301.xml"
+    },
+    {
+      "id": "ksold3",
+      "title": "Murdered wife",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 35,
+      "scene_elements": 3,
+      "scene_types": {
+        "criminal": 1,
+        "dead": 2
+      },
+      "source_sha256": "d9478d8560d5bad52d7e80a94b0d40fa1ad8622a427ce1a2406ba388d1c12381",
+      "file_sha256": "d39901f8168fbf26d80e7b47d0c3ee25d3d4847adf1e6878a7a6ef9b57d9daf7",
+      "file": "calls/ksold3.xml"
+    },
+    {
+      "id": "ny1",
+      "title": "Serious fall",
+      "properties": {},
+      "dialogue_nodes": 37,
+      "scene_elements": 6,
+      "scene_types": {
+        "passerby": 4,
+        "suspect": 1,
+        "witness": 1
+      },
+      "source_sha256": "7aeee8beed54f8f8f8bf7b8b013fe5bdc4431bfffad4cabb09312596d4e5269a",
+      "file_sha256": "33a6bc0e8a737eef7a36dcfefafdb491c1c2642f503501a5e1525a375db7d885",
+      "file": "calls/ny1.xml"
+    },
+    {
+      "id": "ny2",
+      "title": "Axe Robbery",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 34,
+      "scene_elements": 2,
+      "scene_types": {
+        "deco": 1,
+        "suspect": 1
+      },
+      "source_sha256": "3ea8dc0966b103624641ad86878b4d98cac8d3f8b4315a6ca82b923ebfe5d714",
+      "file_sha256": "de756868bd644cf5fbc2e1f06547f38de99ca432500ba0cf1289c17c32aa5086",
+      "file": "calls/ny2.xml"
+    },
+    {
+      "id": "ny3",
+      "title": "Sports fans fight",
+      "properties": {},
+      "dialogue_nodes": 31,
+      "scene_elements": 9,
+      "scene_types": {
+        "fire": 1,
+        "injured": 3,
+        "passerby": 2,
+        "suspect": 2,
+        "witness": 1
+      },
+      "source_sha256": "1381ed9953e9ea2491b8180b62a46110ba9fe7589abb23d135680f0abadd7658",
+      "file_sha256": "32fe3771bee68aa96ff3f9e8c39256503df7e73064055b302eab0b379a9b33bc",
+      "file": "calls/ny3.xml"
+    },
+    {
+      "id": "own24",
+      "title": "Child found",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 24,
+      "scene_elements": 3,
+      "scene_types": {
+        "injuried": 1,
+        "passerby": 1,
+        "work": 1
+      },
+      "source_sha256": "ce2e9a96880589357c76786081109791e01a3dd65ae4ae0bbc7069ba65d0c426",
+      "file_sha256": "d282338cce2d6ce848e3a7cb25531d7aa27416e0cb2be913b822d7e0385d6b12",
+      "file": "calls/own24.xml"
+    },
+    {
+      "id": "own67",
+      "title": "Daughter out of control",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 25,
+      "scene_elements": 2,
+      "scene_types": {
+        "suspect": 1,
+        "witness": 1
+      },
+      "source_sha256": "ac2d211cf0ae5ecaeb0a22728ca51bd81c5afd1277e97d529905e2afb49513a5",
+      "file_sha256": "ae445b1c2e5a97e0457f7a8b314209467a9169d87960396790f13496899de2bd",
+      "file": "calls/own67.xml"
+    },
+    {
+      "id": "own79",
+      "title": "Mathematical problem",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 49,
+      "scene_elements": 2,
+      "scene_types": {
+        "passerby": 1,
+        "witness": 1
+      },
+      "source_sha256": "af4c52927f4e867da0bd4fd672eabfda0d4cff44d468912c31e5a99efed5715b",
+      "file_sha256": "69b5252934033d500f6ca4878e06916c517e98dab316b7a398ef410498af8ddc",
+      "file": "calls/own79.xml"
+    },
+    {
+      "id": "steve",
+      "title": "Singer",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 19,
+      "scene_elements": 1,
+      "scene_types": {
+        "suspect": 1
+      },
+      "source_sha256": "0f9310a6d0f621ebd7900dcf502bf5d0e660fa9d8d4424279e6e1ee59110746c",
+      "file_sha256": "e8ad540419c66b1a1be70708b68efec0fc9b17a44d1f191ed220c4baf9d2632a",
+      "file": "calls/steve.xml"
+    },
+    {
+      "id": "wa1",
+      "title": "Run over dog",
+      "properties": {},
+      "dialogue_nodes": 31,
+      "scene_elements": 3,
+      "scene_types": {
+        "dead": 1,
+        "injuried": 1,
+        "passerby": 1
+      },
+      "source_sha256": "0939a183cbfb3890343ed53790e6b5e255887bd1a382eac908674e427725493a",
+      "file_sha256": "04231562cd11c5046692dc53120603a25333deb12e30a19fa868da12c59eee77",
+      "file": "calls/wa1.xml"
+    },
+    {
+      "id": "wa2",
+      "title": "Letter with poison",
+      "properties": {},
+      "dialogue_nodes": 53,
+      "scene_elements": 7,
+      "scene_types": {
+        "criminal": 1,
+        "injuried": 5,
+        "tech": 1
+      },
+      "source_sha256": "ff5c61c3cd794544342f86f3a6a00bacce08d4fc11a1e3c37ba6fa33f6bccf4c",
+      "file_sha256": "950115508f95c662226da8f3c2802e66a64b8e8562c056749acbdab46b4e1a26",
+      "file": "calls/wa2.xml"
+    },
+    {
+      "id": "wa3",
+      "title": "Suicide senator",
+      "properties": {},
+      "dialogue_nodes": 42,
+      "scene_elements": 2,
+      "scene_types": {
+        "dead": 1,
+        "witness": 1
+      },
+      "source_sha256": "dd781f77a6022c084c18cc44eab7e933ac83ce5f57c03d1425b74e46ac19f19e",
+      "file_sha256": "6b6a9cf1cbbef5afb3909967d83fa2e570e03ef4b1955ad83d702eb3b4219202",
+      "file": "calls/wa3.xml"
+    },
+    {
+      "id": "wa_b1",
+      "title": "Blown up car",
+      "properties": {},
+      "dialogue_nodes": 8,
+      "scene_elements": 2,
+      "scene_types": {
+        "fire": 1,
+        "tech": 1
+      },
+      "source_sha256": "c9b22a22adc050f3ec34e54fed945d5badff6802429159dc6a890e9d65a74346",
+      "file_sha256": "ceda0197b71ce7c22323ae29b34f60f073fb4d5b55fdd2904b48ca0f2e70ce50",
+      "file": "calls/wa_b1.xml"
+    },
+    {
+      "id": "wa_b2",
+      "title": "Possible bomb",
+      "properties": {},
+      "dialogue_nodes": 10,
+      "scene_elements": 8,
+      "scene_types": {
+        "fire": 1,
+        "passerby": 3,
+        "tech": 2,
+        "timer": 1,
+        "work": 1
+      },
+      "source_sha256": "2264d5c399dc0fba838a110539f5d61169f7ed39ca73449900cd674679a0e8a0",
+      "file_sha256": "30cb3a8d40b9c259c9f6075142e14c15c9694db0c8f3b4257ab2e521f701bcac",
+      "file": "calls/wa_b2.xml"
+    },
+    {
+      "id": "wa_b3",
+      "title": "Possible bomb",
+      "properties": {},
+      "dialogue_nodes": 49,
+      "scene_elements": 11,
+      "scene_types": {
+        "injured": 1,
+        "passerby": 5,
+        "tech": 2,
+        "timer": 1,
+        "witness": 1,
+        "work": 1
+      },
+      "source_sha256": "de30d8857f6fcb5b628f6338ab60e860b3e1ad1fdb3f484ad037a39eb9e85aea",
+      "file_sha256": "f3bbe2549857d5b752ed174ec84442b0e3e7e86b40a9d597825b3c8d4952fc0b",
+      "file": "calls/wa_b3.xml"
+    },
+    {
+      "id": "wa_b4",
+      "title": "Bomber",
+      "properties": {},
+      "dialogue_nodes": 32,
+      "scene_elements": 2,
+      "scene_types": {
+        "criminal": 1,
+        "witness": 1
+      },
+      "source_sha256": "cd21f7362bfa2ef2d93044c584c905c22f24cfe7e2c9266b3c8046c43cc6b0c1",
+      "file_sha256": "b76edd892cb19c5d3cfe32c5a3b2edb083adcd59dadbda241dc4117d4054f027",
+      "file": "calls/wa_b4.xml"
+    },
+    {
+      "id": "xmas",
+      "title": "Christmas call",
+      "properties": {
+        "type": "generableonce"
+      },
+      "dialogue_nodes": 13,
+      "scene_elements": 11,
+      "scene_types": {
+        "timer": 1,
+        "witness": 10
+      },
+      "source_sha256": "84c1b1f50f5270d5c4389d37aef770794c5de13a4240007c50bfac4caa225b7d",
+      "file_sha256": "b03f5b0292f2322dfa4c2f923cc31ae69eb7ba466aaa2360c4a5853f1db8bb66",
+      "file": "calls/xmas.xml"
+    }
+  ]
+}

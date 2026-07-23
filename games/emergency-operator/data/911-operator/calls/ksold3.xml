@@ -1,0 +1,55 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="ksold3" texten="Murdered wife">
+ <scene>
+ <criminal elementProperties="sex=M;
+fightRisk=0.7; prisonChance=1; weapon = e_pistol;" id="caller" operator="Caller:" emotions="man, 40-50 y.o." texten="Caller" />
+ <dead elementProperties="sex=W;" id="wife" texten="Murdered wife" />
+ <dead elementProperties="isActive=false; sex=M;" id="deadcaller" texten="Dead caller" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="unfair-&gt;active=false;" />
+ <dialogOption elementProperties="option=victim" id="2" operator="Caller:" emotions="abnormally calm, cold, resigned" texten="A murder has been committed." default="who" option2="how" option3="address" actionOnEnd="opinionEffect = 4;" addToAAR="story" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?} Where did this happen?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="At [[ADDRESS]]." default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="23 Rosemary Road" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="425 Downtown Alley" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="235 Rotten Street" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="name" operator="Operator:" texten="{WHAT'S YOUR NAME?} What's your name, sir?" default="name1" option2="name2" option3="name3" />
+ <dialogOption id="name1" operator="Caller:" texten="Arthur Baker." default="back" />
+ <dialogOption id="name2" operator="Caller:" texten="Adam Green." default="back" />
+ <dialogOption id="name3" operator="Caller:" texten="Robert Novak." default="back" />
+ <dialogOption id="who" operator="Operator:" texten="{WHO'S THE MURDERER?} Who's the murderer?" default="iam" />
+ <dialogOption id="iam" operator="Caller:" texten="I am..." default="how" option2="victim" option3="address" />
+ <dialogOption id="how" operator="Operator:" texten="{HOW DID IT HAPPEN?} How did it happen?" default="how1" />
+ <dialogOption id="how1" operator="Caller:" texten="It was a.... we had an argument... It was self-defense." default="sd" option2="victim" />
+ <dialogOption id="sd" operator="Operator:" texten="{SELF-DEFENSE?} What do you mean by self-defense?" default="knife" />
+ <dialogOption id="knife" operator="Caller:" texten="She had a knife..." default="victim" option2="weapon" option3="address" actionOnEnd="unfair-&gt;active=true;" />
+ <dialogOption id="victim" operator="Operator:" texten="{WHO'S THE VICTIM?} Who is the victim?" default="wife" />
+ <dialogOption elementProperties="option=how" id="wife" operator="Caller:" texten="It's my wife. Could you send a police here?" default="weapon" option2="sendp" option3="sure" />
+ <dialogOption id="weapon" operator="Operator:" texten="{DO YOU HAVE A WEAPON?} Do you have a weapon?" default="weapon1" />
+ <dialogOption elementProperties="option=sendp" id="weapon1" operator="Caller:" texten="Yes, I have a gun." default="gunaway" option2="unfair" option3="address" />
+ <dialogOption id="gunaway" operator="Operator:" texten="{PUT IT AWAY} You're gonna need to put the gun away." default="gunaway1" actionOnEnd="opinionEffect+=1;" />
+ <dialogOption id="gunaway1" operator="Caller:" emotions="[sound of putting a gun on table]" texten="Yes... I'll... I'll put it on the table... I'm nowhere near the gun." default="sendp" option2="address" actionOnEnd="caller.fightRisk=0;" />
+ <dialogOption id="sure" operator="Operator:" texten="{YOU SURE SHE'S DEAD?} Are you sure your wife is dead?" default="sure1" />
+ <dialogOption id="sure1" operator="Caller:" texten="Yes... yes, I'm sure." default="breathing" option2="sendp" option3="weapon" />
+ <dialogOption id="breathing" operator="Operator:" texten="{IS SHE BREATHING?} Can you check if she breathing?" default="nocalm" />
+ <dialogOption id="nocalm" operator="Caller:" emotions="still cold" texten="I told you. She is dead! I shot her in a head..." default="sendp" option3="address" actionOnEnd="deadcaller.isActive=true;
+caller.isActive=false;" addToAAR="suicide" />
+ <dialogOption id="sendp" operator="Operator:" texten="{WAIT FOR THE POLICE} Sir, stay where you are and wait for the police, okay? They'll take care of this." default="end" />
+ <dialogOption id="end" operator="Caller:" texten="Okay, I'll wait. Thank you..." actionOnEnd="actionHangup;" />
+ <dialogOption id="unfair" operator="Operator:" emotions="a bit accusingly, denunciatory" texten="{IT WASN'T SELF-DEFENSE} She had a knife and you used a gun? That clearly wasn't a self-defense." default="unfair1" />
+ <dialogOption id="unfair1" operator="Caller: " emotions="still abnormally calm, but with pain in a voice" texten="She came at me with a knife. I didn't have a choice... I just did it... I wasn't thinking.." default="always" option2="sendp" option3="address" />
+ <dialogOption id="always" operator="Operator:" emotions="a bit accusingly, denunciatory" texten="{DON'T EXPLAIN YOURSELF} There is always a choice." default="always1" actionOnEnd="opinionEffect=-4;
+onIgnore=-5;
+deadcaller.isActive=true;
+caller.isActive=false;" addToAAR="suicide" />
+ <dialogOption id="always1" operator="Caller:" emotions="silence then hang up" texten=". . . . . . . . . . . . . . . . . . . . . . ." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Just send them." />
+ <dialogOption id="reminder2" operator="Caller:" emotions="begging, resigned" texten="What now?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="The caller has admitted to murdering his wife." />
+ <reportElement id="suicide" texten="The caller committed a suicide after a conversation with 911 operator. Some of operator's questions may have provoked him to do it." />
+ </aar>
+ </conversation>
+</conversations></data>

@@ -1,0 +1,1161 @@
+<data><conversations>
+ <conversation id="bos1incident" textpl="Śmiertelny postrzał" texten="Fatal gunshot wound" >
+ <scene >
+ <dead elementProperties="sex=M; type=AfAm;" id="blackdead" textpl="Ciało czarnoskórego mężczyzny" texten="Danny Rond" />
+ <passerby elementProperties="sex=M; type = White;" id="policeman" operator="Caller:" textpl="oficer Williams" texten="Officer Williams" />
+ <criminal elementProperties="isActive=false; sex=M; fightRisk= 0; prisonChance = 0.5; type = White; hat=1;" id="policeman2" operator="Caller:" textpl="oficer Williams" texten="Officer Williams" COMMENT="potrzebne zdjęcie w czapce policyjnej, musi być biały, można się lekko wzorować na prawdziwym
+https://www.youtube.com/watch?v=YVVmn14NnII"/>
+ </scene>
+ <dialog >
+ <dialogOption id="1" operator="Caller:" emotions="Typical american cop, 25-35 y.o., stressed" textpl="Tu oficer Williams, numer odznaki 258. Mam tu sytuację." texten="INCOMING TRANSMISSION . . . This is Officer Williams, badge number 258, I've got a situation here." default="2" actionOnEnd="hang->active=false;" addToAAR="story" />
+ <dialogOption id="2" operator="Operator:" textpl="Tu dyspozytor, co się stało?" texten="This is dispatch. What happened 258?" default="3" actionOnEnd="opinionEffect = 10;" />
+ <dialogOption id="3" operator="Caller:" emotions="stressed" textpl="Zastrzeliłem człowieka, przyślijcie ambulans na [[ADDRESS]]." texten="I shot a man, send an ambulance to [[ADDRESS]]." default="desc" option2="ambu" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="desc" operator="Operator:" texten="{HOW DID IT HAPPEN?} Understood 258, how exactly did it happen?" default="shoot" />
+ <dialogOption id="shoot" operator="Caller:" emotions="Second sentence with moment of hesitation;
+Third sentence with guilt, maybe a bit quieter than previous" textpl="Miałem zgłoszenie. Podejrzany... Podejrzany nie zatrzymał się na wezwanie...! Zastrzeliłem tego chłopaka!" texten="I got a call. The suspect... The suspect didn't stop when I told him to! I shot the kid!" default="breathing" option2="who" option3="doing" />
+ <dialogOption id="breathing" operator="Operator:" textpl="{ODDYCHA?} Czy on oddycha?" texten="{IS HE BREATHING?} Understood 258, is the suspect breathing?" default="dead" />
+ <dialogOption id="doing" operator="Operator:" textpl="{CO DOKŁADNIE ZROBIŁ?} Potrzebuję opisu całego zdarzenia. Co się stało, kiedy dotarłeś na miejsce zgłoszenia?" texten="{WHAT EXACTLY DID HE DO?} I need you to walk me through how things unfolded. What happened when you arrived at the scene?" default="next1" />
+ <dialogOption id="who" operator="Operator:" textpl="{KOGO ZASTRZELIŁEŚ?} Kogo zastrzeliłeś?" texten="{WHO DID YOU SHOOT?} Do you have an ID on the suspect?" default="danny" />
+ <dialogOption id="danny" operator="Caller:" emotions="stressed, but remain professional" textpl="Danny Rond. Takie prawo jazdy przy nim znalazłem. Młody, czarnoskóry, średniego wzrostu, bez znaków szczególnych. Próbował ukraść auto." texten="Danny Rond. At least that's what the driver's license I found on him said. Young, black, average height, no distinguishing features. He was trying to steal a car." default="doing" option2="howknow" />
+ <dialogOption id="howknow" operator="Operator:" textpl="{SKĄD TO WIESZ?} Na jakiej podstawie to stwierdziłeś?" texten="{ARE YOU SURE?} Are you sure he was trying to steal a car?" default="nearcar" />
+ <dialogOption id="nearcar" operator="Caller:" emotions="at first explain himself
+last sentence rather speking to himself than operator, quieter, resigned" textpl="Majstrował coś przy zamku. Wcześniej miałem zgłoszenie o kradzieży w okolicy. No i nie mógł być niewinny, skoro zaczął uciekać... Cholera, nie chciałem go zabić..." texten="He was trying to jimmy the lock. Earlier I'd received a call about a theft in the area. And he started to run when he saw me, so he couldn't have been innocent... Shit, I didn't wanna kill him..." default="next" COMMENT="za lekko?"/>
+ <dialogOption id="next" operator="Operator:" textpl="Spokojnie, opowiedz wszystko po kolei. Co dalej?" texten="Williams, you need to calm down. What happened next?" default="next1" />
+ <dialogOption elementProperties="option=pistol;
+option=hang" id="next1" operator="Caller:" emotions="sounds tired;
+last sentence after a pause, painfully" textpl="Kombinował coś przy aucie, kazałem mu podnieść ręce i odejść na bok. On spojrzał na mnie i zaczął uciekać. Potem zobaczyłem, że sięga do kurtki, uznałem, że może mieć broń. No i strzeliłem. . . . . Przyślij tu kogoś." texten="He was trying to jimmy the car, I told him to put his hands on his head and step away from the vehicle. He looked at me and took off. Then I saw him reach inside his jacket, so I assumed he was carrying a gun. So I fired a shot... Send someone quick." default="ambu" option2="ambpol" option3="runorstay" />
+ <dialogOption id="runorstay" operator="Operator:" textpl="{PODWAŻ OPIS ZDARZENIA} Sięgnął do kurtki biegnąc?" texten="{THAT'S IMPOSSIBLE} 258, you saw him reach into his jacket as he was running from you?" default="turn" actionOnEnd="opinionEffect +=1;" />
+ <dialogOption id="pistol" operator="Operator:" textpl="{BROŃ?} Czy podejrzany faktycznie miał broń?" texten="{GUN?} 258, did you locate a gun on the suspect?" default="nopistol" />
+ <dialogOption id="turn" operator="Caller:" emotions="first hesitation, after that false confidence" textpl="Nie. . . W pewnym momencie zatrzymał się i zawrócił w moją stronę." texten="No... at one point he stopped and turned my way." default="back" addToAAR="noweapon" />
+ <dialogOption id="nopistol" operator="Caller:" emotions="long pause, painfully" textpl=". . . . . . . . . . . Nie." texten=". . . . . . . . . . .No." default="back" option2="notfair" />
+ <dialogOption id="notfair" operator="Operator:" emotions="accusingly" textpl="{STRZELIŁEŚ DO NIEUZBROJONEGO?} Czyli wystrzeliłeś do nieuzbrojonego człowieka?" texten="{SHOT UNARMED MAN?} So it's possible you shot an unarmed man?" default="notfair1" />
+ <dialogOption elementProperties="option=hang" id="notfair1" operator="Caller:" emotions="angry" textpl="Myślałem że sięga po broń! Byłeś kiedyś w takiej sytuacji?! Łatwo ci oceniać zza biurka! Gdybyś wiedział jak tu patrzą na białego glinę mówiłbyś inaczej. Wyślij już tę karetkę!" texten="I thought he was reaching for a gun! You ever been in a situation like that? It's easy for you to pass judgement from behind a desk! If you knew how they look at white cops around here, you'd change your tone. Now send that ambulance already!" default="ambu" option2="ambpol" />
+ <dialogOption elementProperties="option=who;
+option=hang;" id="dead" operator="Caller:" emotions="emphatically" textpl="Nie. Mówiłem już, że go zastrzeliłem." texten="No. I already said I shot him." default="cpr" option2="ambu" option3="noambu" addToAAR="deadly" />
+ <dialogOption id="cpr" operator="Operator:" textpl="{WYKONAŁEŚ MASAŻ SERCA?} Czy próbowałeś wykonać masaż serca?" texten="{PERFORM CPR} Have you started CPR on him?" default="cprno" />
+ <dialogOption elementProperties="option=who;
+option=hang;" id="cprno" operator="Caller:" emotions="tired, don't want to talk anymore" textpl="Nie... już nie. Przyślij już lepiej tę karetkę." texten="No... I haven't. You better send that ambulance." default="nolate" option2="ambu" option3="noambu" />
+ <dialogOption id="nolate" operator="Operator:" emotions="firmly" textpl="{UDZIEL PIERWSZEJ POMOCY!} Jak najszybciej rozpocznij resuscytację, on wciąż może żyć." texten="{GIVE FIRST AID!} Williams, listen up, you need to perform CPR until the ambulance arrives. He could still be alive." default="toolate" />
+ <dialogOption elementProperties="option=hang;" id="toolate" operator="Caller:" emotions="angry and desperate; in the end of sentence despair dominate over anger;" textpl="Człowieku, przecież ci mówię! Dostał prosto w głowę! Cały we krwi, nie oddycha i nie da się... Nie da się go już uratować." texten="I told you already! He took it right in the head! He's all covered in blood, no signs of life, and no way... no way he's coming back." default="who" option2="ambu" option3="noambu" />
+ <dialogOption id="ambu" operator="Operator:" textpl="{AMBULANS} Ok, już wysyłam ambulans." texten="{AMBULANCE} Alright, sending an ambulance now." default="ambuok" actionOnEnd="ambu->active = false;
+hang->active=true;
+opinionEffect = -5;
+onIgnore = - 10;" />
+ <dialogOption id="ambpol" operator="Operator:" textpl="{AMBULANS I POLICJA} Ok, już wysyłam ambulans i policję." texten="{POLICE WILL COME} Alright, I've got an ambulance on the way and I'm sending a sergeant to your location." default="noneed" actionOnEnd="ambu-> active = false;
+ambpol-> active = false;
+hang->active=true;
+opinionEffect = 10;" COMMENT="alt. Sergeant, Inspector, Lieutenant etc."/>
+ <dialogOption id="noambu" operator="Operator:" textpl="{PO CO KARETKA?} Dlaczego mam przysyłać karetkę skoro upierasz się, że on już nie żyje?" texten="{WHAT'S AMBULANCE FOR?} Why shoud I send an ambulance if you're insisting he's already dead?" default="proced" />
+ <dialogOption id="noneed" operator="Caller:" textpl="Nie potrzebuję wsparcia. Potrzebna jest tylko karetka do spisania aktu zgonu." texten="I don't need backup. I just need an ambulance to issue a death certificate." default="noneedok" option2="itsforyou" />
+ <dialogOption id="noneedok" operator="Operator:" textpl="{TYLKO AMUBLANS} Ok, już wysyłam ambulans." texten="{JUST AN AMBULANCE} Alright 258, sending an ambulance now." default="end" actionOnEnd="opinionEffect = -5;
+onIgnore = - 10;" />
+ <dialogOption id="itsforyou" operator="Operator:" emotions="a moment of hesitation after ..." textpl="{POLICJA JEST PO CIEBIE} Nie wysyłam policji jako wsparcia. Muszą obejrzeć miejsce zdarzenia, spisać twoje zeznania i odebrać odznakę oraz broń. Przynajmniej tymczasowo, dla twojego dobra." texten="{THE POLICE ARE COMING FOR YOU} I'm not sending police as backup. They need to examine the scene and take your statement, as well as your badge and gun... at least temporarily." default="really" actionOnEnd="opinionEffect = 10;" />
+ <dialogOption id="really" operator="Caller:" emotions="with bitterness, sorrow" textpl="Coo? Poważnie? Wykonywałem swoją pracę! Groziło mi bezpośrednie zagrożenie. Wszystko zgodnie z procedurami. Kurwa, wsadzicie mnie?" texten="Whaat? Are you serious? I was just doing my job! I was protecting myself! Everything was done by the book. Fuck, are you gonna lock me up?" default="reallya" option2="justhelp" option3="noneedok" COMMENT="Groziło mi bezpośrednie niebezpieczeństwo ( tutaj warto uzyć w wersji angielskiej dokładnego sformułowania z procedur co do uzycia broni)"/>
+ <dialogOption id="reallya" operator="Operator:" textpl="{PO PROSTU POCZEKAJ} Poczekaj na przyjazd wsparcia." texten="{JUST WAIT} Wait for the sergeant to get there." default="reallyend" actionOnEnd="policeman.isActive = false;
+policeman2.isActive = true;" />
+ <dialogOption id="justhelp" operator="Operator:" textpl="{TO DLA TWEGO BEZPIECZEŃSTWA} To będzie najlepsze rozwiązanie. Musimy postępować zgodnie z procedurami, jeśli nie chcesz być oskarżony o nadużycie siły. " texten="{THAT'S THE PROTOCOL} Williams, you know the protocol for an officer involved shooting. Wait for your sergeant to arrive on scene." default="whatever" actionOnEnd="policeman.isActive = false;
+policeman2.isActive = true;" />
+ <dialogOption id="reallyend" operator="Caller:" emotions="coldly" textpl="Walcie się." texten="Screw you." actionOnEnd="actionHangup;" />
+ <dialogOption id="whatever" operator="Caller:" emotions="tired, don't want to talk anymore" textpl="A rób co chcesz. Czekam na miejscu." texten="Fine, have it your way. I'll wait here." actionOnEnd="actionHangup;" />
+ <dialogOption id="proced" operator="Caller:" emotions="irritated" textpl="Pracujesz od wczoraj? Nie znasz procedur? Muszą potwierdzić zgon." texten="Did you become a cop yesterday? Don't you know the drill? They need to pronounce him dead." default="ambu" option2="ambpol" option3="doing" COMMENT="To trzeba zweryfikować jak wygląda w stanach, to wazny element"/>
+ <dialogOption id="ambuok" operator="Caller:" textpl="W porządku. Czekam na miejscu." texten="Alright. I'll wait here." default="back" option2="hang" />
+ <dialogOption id="end" operator="Caller:" textpl="W porządku. Czekam na miejscu." texten="Alright. I'll wait here." actionOnEnd="actionHangup;" />
+ <dialogOption id="hang" operator="Operator:" textpl="{ROZŁĄCZ SIĘ} 10-4. Bez odbioru." texten="{END CALL} 10-4. Dispatch is out." default="end" />
+ <dialogOption id="reminder" operator="Caller:" emotions="stressed" textpl="Co teraz?" texten="Now what?" />
+ <dialogOption id="reminder2" operator="Caller:" emotions="impatient" textpl="Na co czekamy?" texten="What are we waiting for?" />
+ </dialog>
+ <aar >
+ <reportElement id="story" textpl="Policjant postrzelił czarnoskórego mężczyznę podejrzanego o kradzież samochodu." texten="A police officer has shot a black male suspected of attempting to steal a car." />
+ <reportElement id="deadly" textpl="Postrzał okazał się śmiertelny." texten="The wound proved fatal." />
+ <reportElement id="noweapon" textpl="Funkcjonariusz błędnie założył, że napastnik jest uzbrojony." texten="The police officer wrongly assumed the perpetrator was carrying a gun." />
+ </aar>
+ </conversation>
+ <conversation id="bos2tjam" textpl="Korek drogowy" texten="Traffic jam" >
+ <scene >
+ <passerby elementProperties="sex=M; type = White;" id="caller" operator="Caller:" emotions="white male, 40-50 yo, biały facet, 40-50 lat, resounding voice of typical fatty Republican; For reference: https://www.youtube.com/watch?v=ORqbBpNuF-k" textpl="Dzwoniący" texten="Caller" />
+ <criminal elementProperties="isActive = false; type = AfAm; fightRisk = 0.2;" id="protester1" textpl="Uczestnik demonstracji" texten="Protester" addToAAR="escalation" />
+ <criminal elementProperties="isActive = false; type = AfAm; fightRisk = 0.2;" id="protester2" textpl="Uczestnik demonstracji" texten="Protester" />
+ <criminal elementProperties="isActive = false; type = AfAm; fightRisk = 0.2;" id="protester3" textpl="Uczestnik demonstracji" texten="Protester" />
+ <criminal elementProperties="isActive = false; type = AfAm; fightRisk = 0.2;" id="protester4" textpl="Uczestnik demonstracji" texten="Protester" />
+ <criminal elementProperties="isActive = false; type = AfAm; fightRisk = 0.2;" id="protester5" textpl="Uczestnik demonstracji" texten="Protester" />
+ <criminal elementProperties="isActive = false; type = AfAm; fightRisk = 0.2;" id="protester6" textpl="Uczestnik demonstracji" texten="Protester" />
+ </scene>
+ <dialog >
+ <dialogOption id="1" operator="Operator:" textpl="911, słucham?" texten="911, what's your emergency?" default="2" addToAAR="story" />
+ <dialogOption id="2" operator="Caller:" emotions="frustration, anger,
+(background: car horns, indistant shouts, sound of megaphone)" textpl="Zróbcie tu porządek! Przez tą cholerną demonstrację spóźnię się na samolot!" texten="Can you impose some order around here? I'm gonna miss my flight because of these damn protests!" default="desc" option2="protests" option3="address" actionOnEnd="opinionEffect = -2;" />
+ <dialogOption id="address" operator="Operator:" textpl="{ADRES} Proszę podać adres miejsca, w którym się pan znajduje." texten="{ADDRESS} Please tell me where you are." default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" textpl="Jestem w pobliżu [[ADDRESS]]." texten="I'm near [[ADDRESS]]." default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="desc" operator="Operator:" textpl="{CO SIĘ DZIEJE?} Co się stało?" texten="{WHAT'S GOING ON?} What seems to be the problem?" default="noblocked" />
+ <dialogOption id="noblocked" operator="Caller:" emotions="frustration, anger, " textpl="Przez miasto nie da się przejchać! Wszystko stoi. Korek ciągnie się przez całą ulicę. Nie mogę ruszyć ani w przód, ani w tył! Niech ich chuj strzeli z tymi wszystkimi demonstracjami..." texten="It's impossible to get through the city! There's traffic everywhere, the whole street's bumper to bumper. Can't move forward, can't go back! Fuck them and their protests..." default="protests" option3="nothingtodo" />
+ <dialogOption id="protests" operator="Operator:" textpl="{PROTESTY?} Co to za protesty?" texten="{PROTESTS?} Are you able to tell what they're protesting about, sir?" default="protests1" />
+ <dialogOption id="protests1" operator="Caller:" emotions="suprised,
+(background: increasing chanting -Hands up, dont shoot!!- (like they come closer from the distance)" textpl="Nie wiesz? Policja zastrzeliła wczoraj jakiegoś czarnucha, który kradł auto. Teraz te wszystkie darmozjady łażą po ulicach i krzyczą o niesprawiedliwości. Ech, wzięliby się za uczciwą pracę..." texten="Didn't you hear? Yesterday the police shot a nigger who was stealing a car. Now all those lazy-ass hippies are out in the streets crying about injustice. Hey, can't expect them to get an honest job, can we..." default="nothingtodo" option2="address" option3="gopolice" addToAAR="reason" COMMENT="alt. nagrać z black thug"/>
+ <dialogOption id="nothingtodo" operator="Operator:" textpl="{NIC NIE MOGĘ ZROBIĆ} Obawiam się, że musi pan po prostu poczekać. Niewiele poradzę na korek." texten="{I CAN'T DO ANYTHING}Sir, I'm afraid all I can do is advise you to wait, sir. There's not much we can do about traffic." default="attack" />
+ <dialogOption id="attack" operator="Caller:" emotions="outrage" textpl="Jak to?! Od czego jesteście? Wyślij policję, żeby rozgoniła to zbiegowisko! Niech dadzą normalnym ludziom pracować!" texten="What's that supposed to mean?! What is it that you actually do, then? Send the police to take care of this mob! Let the honest folk do their work!" default="peace" option2="gopolice" option3="address" />
+ <dialogOption id="peace" operator="Operator:" textpl="{MAJĄ DO TEGO PRAWO} Dopóki to pokojowa demonstracja mają prawo protestować." texten="{THEY HAVE THE RIGHT TO DO IT}Sir, if they're keeping the protest peaceful, they have the right to demonstrate." default="country" />
+ <dialogOption id="gopolice" operator="Operator:" textpl="{WYŚLĘ POLICJĘ, ABY INTERWENIOWAŁA} Wyślę oddział policji, aby utorował drogę i przerwał demonstrację." texten="{I'LL SEND THE POLICE TO INTERVENE} I'll send the police to clear the way and move the demonstrators along, sir." default="great" actionOnEnd="opinionEffect = - 10;
+onIgnore = 2;
+protester1.isActive = true;
+protester2.isActive = true;
+protester3.isActive = true;
+protester4.isActive = true;
+protester5.isActive = true;
+protester6.isActive = true;" />
+ <dialogOption id="country" operator="Caller:" emotions="sigh at the beginning, starting tirade " textpl="Co się porobiło z tym krajem... Kiedyś załatwilibyście to raz-dwa. Do widzenia!" texten="What's going on with this country... Back in my day you'd take care of this in a flash! This is bullshit!" actionOnEnd="actionHangup;" />
+ <dialogOption id="great" operator="Caller:" textpl="Świetnie. Powodzenia, chłopaki!" texten="Great. Go get 'em!" actionOnEnd="actionHangup;" />
+ <dialogOption id="end" operator="Caller:" textpl="..." texten="…" actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" textpl="Halo, halo?" texten="Hello, is anyone there?" />
+ <dialogOption id="reminder2" operator="Caller:" textpl="Słuchasz mnie?" texten="Are you listening to me?" />
+ </dialog>
+ <aar >
+ <reportElement id="story" textpl="Dzwoniący utknął w korku spowodowanym przez demonstrację." texten="A caller got stuck in traffic caused by protests." />
+ <reportElement id="reason" textpl="Przyczyną protestów było wczorajsze postrzelenie czarnoskórego przez policjanta. Demonstranci uważają, że był to akt rasizmu." texten="The demonstration was provoked by a police officer shooting a black male yesterday. The protesters believe the shooting was racially motivated." />
+ <reportElement id="escalation" textpl="Operator wysłał policję, aby przerwała demonstrację, co doprowadziło do eskalacji protestów." texten="The operator sent the police to break up the demonstration, causing it to escalate." />
+ </aar>
+ </conversation>
+ <conversation id="bos3polbeat" textpl="Pobity protestujący" texten="Beaten protester" >
+ <scene >
+ <passerby elementProperties="sex=W; type=AfAm;" id="caller" emotions="Girl, young, 20-30 yo, black, speaking with accent, trying to shout out a crowd;
+worries about her boyfriend, but generally quarrelsome" textpl="Dzwoniąca" texten="Caller" />
+ <witness elementProperties="isActive = false;
+sex=W;
+type=AfAm;" id="caller2" textpl="Dzwoniąca" texten="Caller" />
+ <injured elementProperties="hp = 60; sex=M;
+hpchange = -0.5" id="boy" textpl="Pobity przez policję" texten="Beat by the police" />
+ <witness elementProperties="isActive = false; type = AfAm; fightRisk = 0.1;" id="protester1" textpl="Uczestnik demonstracji" texten="Protester" />
+ <witness elementProperties="isActive = false; type = AfAm; fightRisk = 0.1;" id="protester2" textpl="Uczestnik demonstracji" texten="Protester" />
+ <witness elementProperties="isActive = false; type = AfAm; fightRisk = 0.1;" id="protester3" textpl="Uczestnik demonstracji" texten="Protester" />
+ <witness elementProperties="isActive = false; type = AfAm; fightRisk = 0.1;" id="protester4" textpl="Uczestnik demonstracji" texten="Protester" />
+ <witness elementProperties="isActive = false; type = AfAm; fightRisk = 0.1;" id="protester5" textpl="Uczestnik demonstracji" texten="Protester" />
+ </scene>
+ <dialog >
+ <dialogOption id="1" operator="Operator:" textpl="911, w czym mogę pomóc?" texten="911, what's your emergency?" default="2" />
+ <dialogOption id="2" operator="Caller:" emotions="https://www.youtube.com/watch?v=DtZMQNZ0oUI
+commanding tone, but with concern
+(background: shouting, maybe throwing something, police megaphones, might shouting hands up dont shoot or black lives matter)
+" textpl="Przyślij karetkę! Mój chłopak został pobity!" texten="Send an ambulance! My boyfriend was beat up!" default="where" option2="how" option3="injuries" actionOnEnd="opinionEffect = 8;
+sendpol->active = false;
+sit->active = false;" addToAAR="story" />
+ <dialogOption id="where" operator="Operator:" textpl="{GDZIE JESTEŚCIE?} Gdzie to się stało?" texten="{WHERE ARE YOU?} Where did it happen?" default="protests" />
+ <dialogOption id="how" operator="Operator:" textpl="{JAK TO SIĘ STAŁO?} Jak to dokładnie się stało?" texten="{HOW DID THIS HAPPEN?} How exactly did it happen?" default="beaten" />
+ <dialogOption id="injuries" operator="Operator:" textpl="{JAKIE OBRAŻENIA?} Opisz dokładnie, jakich obrażeń doznał twój chłopak. Czy oddycha?" texten="{IS HE BREATHING?} OK. Is your boyfriend breathing?" default="injdesc" />
+ <dialogOption id="protests" operator="Caller:" emotions="briefly" textpl="Na demonstracji przy [[ADDRESS]]!" texten="At the protest at [[ADDRESS]]!" default="whatprotest" option2="back" option3="details" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="details" operator="Operator:" textpl="{GDZIE DOKŁADNIE?} Jak możemy was znaleźć w tłumie?" texten="{WHERE EXACTLY?} How can we find you in the crowd?" default="monu" />
+ <dialogOption id="monu" operator="Caller:" emotions="briefly" textpl="Jesteśmy tuż przy fontannie, widać ją z daleka." texten="We're by the fountain, you can see it from a distance." default="back" option2="how" />
+ <dialogOption id="whatprotest" operator="Operator:" textpl="{CO TO ZA PROTEST?} Co to za demonstracja?" texten="{WHAT'S THE PROTEST AGAINST?} Okay, what are you protesting?" default="whatprotest2" />
+ <dialogOption id="whatprotest2" operator="Caller:" emotions="hateful" textpl="Glina, który zastrzelił Danny'ego Ronda nie został ukarany. Chcemy zobaczyć tego sukinsyna na krześle!" texten="The cop who shot Danny Rond hasn't been punished. We wanna that motherfucker put in the electric chair!" default="how" option2="injuries" option3="back" />
+ <dialogOption id="injdesc" operator="Caller:" emotions="extremely concerned" textpl="Oddycha, ale z trudem. Nie jest w stanie wydusić ani słowa! Widzę, że jest przytomny, patrzy na mnie." texten="He's breathing, but barely. He can't talk. But he's conscious, he's looking at me." default="air" option2="broken" />
+ <dialogOption id="broken" operator="Operator:" textpl="{ZŁAMANIA?} Czy widzisz jakies złamania lub inne poważne obrażenia zewnętrzne?" texten="{ANY BROKEN BONES?} Can you see any obvious signs of serious injuries?" default="brokeny" />
+ <dialogOption id="brokeny" operator="Caller:" emotions="slightly panicked, worried" textpl="Yyyy... nie wiem, chyba nie wszystko w porządku z jego kolanem." texten="Ummm... I can't tell, but I think something might be wrong with his knee." default="dontmove" option2="fix" />
+ <dialogOption id="dontmove" operator="Operator:" textpl="{UNIERUCHOM JE} Przede wszystkim staraj się nie poruszać uszkodzoną nogą. Spróbuj ją unieruchomić. Delikatnie podłóż coś pod kolano, może to być na przykład złożona bluza." texten="{IMMOBILIZE IT} Alright, first of all, try not to move the injured leg. See if you can immobilize it. Gently put something under the knee, a jacket or a hoodie folded up." default="done" />
+ <dialogOption elementProperties="option = sendamb;
+option = sendpol;" id="done" operator="Caller:" emotions="sound of taking off a jacket" textpl="Zdejmę kurtkę, chwila . . . . . . . . . . . . . . . . Zrobione!" texten="I'm taking my jacket off, hold on . . . . . . . . . . . . . . . . Done!" default="air" option2="where" option3="how" actionOnEnd="opinionEffect +=2;
+onIgnore = -6;" addToAAR="goodhelp" COMMENT="można dodać jeszcze usztywnianie jakimś prętem itp."/>
+ <dialogOption id="fix" operator="Operator:" textpl="{NASTAW JE} Spróbuj je nastawić. Poproś kogoś, aby przytrzymał twego chłopaka w pasie i mocno pociągnij za stopę." texten="{RESET IT} Okay, you gonna try to reset it. Here's what you gonna do. You gonna ask someone to hold your boyfriend by the waist and you gonna grab him by the foot and pull it really, really hard." default="fixbad" />
+ <dialogOption id="fixbad" operator="Caller:" emotions="First and last sentence to the phone, rest to the background
+Background: loud groan of pain on the dots, after that frightened and panicked, last sentence (to the operator) with anger " textpl="W porządku... Pomożesz mi? Musisz go tu przytrzymać . . . . . . . . . . . O mój Boże. Joe? Joe! Przepraszam, nie chciałam ci zrobić krzywdy. To był fatalny pomysł, jest jeszcze gorzej!" texten="Alright... Hey, can you help me out? You've gotta hold him for me . . . . . . . . . . . . . .Oh my god! Joe? Joe! I'm sorry, I didn't mean to hurt you. That was a bad idea, now it's even worse!" default="air" option2="where" option3="how" actionOnEnd="boy.hp = 40;
+opinionEffect = 5;
+onIgnore = -15;" addToAAR="badhelp" />
+ <dialogOption id="air" operator="Operator:" textpl="{COŚ PRZESZKADZA W ODDYCHANIU?} Czy ma możliwość swobodnego oddychania? Nic nie blokuje jego dróg oddechowych?" texten="{IS THE AIRWAY BLOCKED?} Can your boyfriend breathe normally? Is there anything obstructing his breathing?" default="crowd" />
+ <dialogOption id="crowd" operator="Caller:" emotions="Worried" textpl="Nie ma nic w ustach, ale wokół jest straszny tłok i jest dość duszno." texten="There's nothing in his mouth, but it's really crowded around here and pretty stuffy." default="move" option2="space" option3="sit" />
+ <dialogOption id="move" operator="Operator:" textpl="{WYNIEŚ GO Z TŁUMU} Poproś kogoś, aby pomógł ci wynieść go z tłumu." texten="{CARRY HIM OUT OF THE CROWD} Ask somebody to help you get him out of the crowd." default="move1" />
+ <dialogOption elementProperties="option=sendpol;" id="move1" operator="Caller:" emotions="After alright she talks to people around. Groan on word three. Last sentence is for operator, with fear and frustration." textpl="Dobrze . . . Hej, pomóż mi go podnieść! . . . . . . Raz... Dwa... Trzy... [AAAAaaaaaa!] Joe, wszystko w porządku?! Fuck, nie pomogło mu to, coś zabolało go w klatce, kiedy próbowaliśmy go podnieść. " texten="Alright . . . Hey, help me get him up! . . . . . . One... Two... Three... [AAAAaaaaaa!] Joe, are you okay?! Fuck, it didn't help, he got a pain in his chest when we tried to move him." default="how" option2="where" option3="sendamb" actionOnEnd="opinionEffect = 5;
+onIgnore = -15;
+boy.hp = 30;
+boy.hpchange = -0.8;" addToAAR="badhelp" />
+ <dialogOption id="space" operator="Operator:" textpl="{ZRÓBCIE WIĘCEJ MIEJSCA} Poproś ludzi wokół, aby zrobili więcej miejsca." texten="{MAKE MORE ROOM} Ask people to clear an area around the boyfriend." default="tooloud" />
+ <dialogOption elementProperties="option=where; option=sendamb;" id="tooloud" operator="Caller:" emotions="Shouting to people around, frustrated" textpl="Hej, rozsuńcie się . . . . ZRÓBCIE MU MIEJSCE . . . . . Nie wiem, czy to wiele pomogło, jest tu tak tłoczno i głośno, że mało kto mnie usłyszał!" texten="Hey, back off . . . . . MAKE SOME ROOM FOR HIM . . . . . I don't know if it helped anything, it's so crowded and loud in here barely anyone can hear me!" default="back" option2="broken" option3="how" />
+ <dialogOption id="sit" operator="Operator:" textpl="{POSADŹ GO} Pomóż mu w przyjęciu pozycji siedzącej. Możliwe, że wystąpiło krwawienie we wnętrzu płuc, a w takiej sytuacji pomoże mu to w oddychaniu." texten="{SIT HIM UP} Help him up into a sitting position. There's a chance he's started bleeding into his lungs, so sitting him up might help him breathe." default="sit1" actionOnEnd="opinionEffect += 2;
+onIgnore = -6;
+boy.hpchange = 0;" addToAAR="goodhelp" />
+ <dialogOption elementProperties="option=how;" id="sit1" operator="Caller:" emotions="talking to the boy at first, sensitive voice. Coughing during dots. Last sentence hopefully" textpl="Joe, Joe.. teraz spróbujemy usiąść. . . . . . . . . . . Chyba jest lepiej!" texten="Joe, Joe... let's try to sit up. . . . . . . . . . . . . . . I think it helped!" default="where" option2="sendpol" option3="sendamb" />
+ <dialogOption elementProperties="option=whatprotest;" id="beaten" operator="Caller:" emotions="angry" textpl="Zaatakowała nas policja! Mieli tylko pilnować protestu, ale było jak zwykle. Musieli pokazać, że są silniejsi niż głupie czarnuchy! Co za gnoje..." texten="We've been attacked by the police! They were supposed to protect the protesters, but of course that's never how things go. They had to show they were stronger than us. Fucking pigs..." default="where" option2="reason" option3="others" actionOnEnd="sendpol->active = true;" />
+ <dialogOption id="reason" operator="Operator:" textpl="{CO BYŁO POWODEM?} Co było powodem starcia?" texten="{WHAT WAS THE REASON?} Do you know how the fighting started?" default="reason1" />
+ <dialogOption elementProperties="option=sendpol;
+option=sendamb;" id="reason1" operator="Caller:" emotions="sarcastic" textpl="A czy w tym mieście policja potrzebuje powodu, żeby pobić czarnego?" texten="And since when do the police need a reason to beat up black people?" default="whofirst" option2="injuries" option3="where" />
+ <dialogOption id="whofirst" operator="Operator:" textpl="{KTO ZAATAKOWAŁ PIERWSZY?} Kto zaatakował pierwszy?" texten="{WHO ATTACKED FIRST?} Miss, do you know who attacked first?" default="them" />
+ <dialogOption id="them" operator="Caller:" emotions="starts accusingly, but during description of attacking her boyfriend more concern in voice" textpl="Oni! Joe tylko lekko odepchnął palanta, który groził mi gazem. Dostał za to pałką po nogach, a kiedy był już na ziemi ten sadysta dalej go bił! Przestał dopiero, kiedy po uderzeniu w klatkę piersiową, Joe zaczął mieć problemy z oddechem..." texten="They did! All Joe did was lightly push the fucker who threatened to gas me! That got him battoned in the legs, and even when he was already down that sadist kept hitting him! He only stopped when he got Joe in the chest and he started breathing weird..." default="injuries" option2="wherepol" option3="where" actionOnEnd="sit->active = true;" addToAAR="policefight" />
+ <dialogOption id="wherepol" operator="Operator:" textpl="{GDZIE JEST POLICJANT?} Gdzie jest teraz ten policjant?" texten="{WHERE IS THE POLICE OFFICER?} Do you know where the police officer is now?" default="wherepol1" />
+ <dialogOption elementProperties="option=sendpol;
+option=sendamb;" id="wherepol1" operator="Caller:" emotions="contemptuously" textpl="Nie wiem i nie chcę wiedzieć. Posszedł sobie gdzieś." texten="I don't know and I don't wanna know. He vanished somewhere." default="back" option2="injuries" option3="where" />
+ <dialogOption id="others" operator="Operator:" textpl="{INNI RANNI?} Czy ktoś jeszcze poza twoim chłopakiem jest ranny?" texten="{IS ANYONE ELSE INJURED?} Are there any other people injured besides your boyfriend?" default="onlyhim" />
+ <dialogOption id="onlyhim" operator="Caller:" emotions="at first hesitation, anger then" textpl="Nie wiem... chyba nie. Może najpierw mu pomożecie, zanim zaczniecie wymagać ode mnie pilnowania wszystkich wokół?" texten="I don't know... I don't think so. Maybe you can help him first before you send me off to take care of others?" default="back" option2="injuries" option3="where" />
+ <dialogOption id="sendamb" operator="Operator:" textpl="{WYŚLĘ AMBULANS} Dobrze, już wysyłam karetkę, niedługo będzie na miejscu." texten="{I'LL SEND AN AMBULANCE} Alright, I'm sending an ambulance, it should arrive shortly." default="thanks" />
+ <dialogOption id="thanks" operator="Caller:" emotions="concern" textpl="Dziękuję, poczekamy." texten="Thank you, we'll wait." actionOnEnd="actionHangup;" />
+ <dialogOption id="sendpol" operator="Operator:" textpl="{WYŚLĘ AMBULANS I POLICJĘ} Wyślę ambulans oraz jednostkę policji, żeby zbadała sprawę pobicia." texten="{I'LL SEND AN AMBULANCE AND POLICE} I'm sending an ambulance and a police unit to investigate the assault." default="nopol" />
+ <dialogOption id="nopol" operator="Caller:" emotions="hatefully" textpl="Zwariowałeś? Nie chcemy tu policji! Wystarczająco dużo już zrobili!" texten="Are you outta your mind? We don't want no police here! They've done enough already." default="check" option2="sendamb" />
+ <dialogOption id="check" operator="Operator:" emotions="fastly" textpl="{POLICJA MUSI ZBADAĆ SPRAWĘ} Proszę pani, jeśli faktycznie doszło do nadużycia siły przez policję musimy to zbadać, aby ukarać winnych. To będzie inna jednostka. Proszę się nie bać, nawet jeśli jeden policjant zachował się niewłaściwie, cała reszta jest po to, aby was chronić." texten="{THE POLICE NEED TO INVESTIGATE THE INCIDENT} Miss, if the excessive use of police force has actually taken place, the police will need to investigate it to charge those responsible. This will be a different unit. Please don't be afraid, one police officer may have acted inappropriately, but the rest are there to uphold the law." default="check1" actionOnEnd="caller2.isActive = true;
+protester1.isActive = true;
+protester2.isActive = true;
+protester3.isActive = true;
+protester4.isActive = true;
+protester5.isActive = true;" addToAAR="checkmust" />
+ <dialogOption id="end" operator="Caller:" textpl="..." texten="..." actionOnEnd="actionHangup;" />
+ <dialogOption id="check1" operator="Caller:" emotions="accusingly" textpl="Oni są po to, żeby chronić was, a nie nas. Rób co chcesz, byle karetka przyjechała jak najszybciej." texten="They're there to protect YOU, not us. Suit yourself, but I want that ambulance here now." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" emotions="whisper, not to the phone" textpl="Joe, kochanie, wytrzymaj jeszcze chwilę..." texten="Joe, honey, hold on a bit longer..." />
+ <dialogOption id="reminder2" operator="Caller:" emotions="commanding tone" textpl="Przyślijcie tu lekarza!" texten="Send a doctor!" />
+ </dialog>
+ <aar >
+ <reportElement id="story" textpl="Partner dzwoniącej kobiety został pobity na demonstracji." texten="The partner of the female caller was attacked during the protest." />
+ <reportElement id="badhelp" textpl="Wskazówki pierwszej pomocy udzielone przez operatora spowodowały pogorszenie stanu rannego" texten="First aid instructions given by the operator caused a deterioration in the victim's condition" />
+ <reportElement id="goodhelp" textpl="Wskazówki operatora pomogły w ustablizowaniu stanu zdrowia ofiary." texten="The operator's instructions helped stabilize the victim's condition." />
+ <reportElement id="checkmust" textpl="Operator zdecydował się wysłać policję na miejsce zdarzenia w celu zebrania zeznań i zbadania sprawy, pomimo ryzyka, że spotka się to z agresywną reakcją protestujących." texten="The operator decided to send police to the scene to take statements and investigate the incident, despite the risk of them facing aggression from the protesters." />
+ <reportElement id="policefight" textpl="Według relacji dzwoniącej Joe został pobity przez policjanta bez wyraźnego powodu. Wydział dyscyplinarny wszczął śledztwo w tej sprawie." texten="According to the caller's report, Joe was assaulted by a police officer for no apparent reason. The disciplinary unit opened an investigation into this incident." />
+ </aar>
+ </conversation>
+ <conversation id="bos4polfight" texten="Attacked policeman " >
+ <scene >
+ <injured elementProperties="sex=M; type=White;
+hp=55; hpchange = - 0.7;
+hat=1;" blockedBy="protester1;
+protester2;
+protester3;
+protester4;" id="caller" emotions="young (26-30 yo) unexperienced policeman, trying to be dominating when talking to attackers, but it sounds fake, trying to hide fear, don't know what to do " texten="Injured policeman" />
+ <injured elementProperties="sex=M; type=White;
+hp=45; hpchange = - 0.4;
+hat=1;" blockedBy="protester1;
+protester2;
+protester3;
+protester4;" id="hurt" texten="Injured policeman" />
+ <criminal elementProperties="type = AfAm;
+fightRisk = 0.7;
+weapon = e_pistol;" id="protester1" emotions="black,in smiliar age (20-30 yo), strong accent, speaks indistinctly" texten="Attacker" />
+ <criminal elementProperties="type = AfAm;
+fightRisk = 0.7;
+weapon = e_knife;" id="protester2" texten="Attacker" />
+ <criminal elementProperties="type = AfAm;
+fightRisk = 0.7;
+weapon = e_pistol;" id="protester3" texten="Attacker" />
+ <criminal elementProperties="type = AfAm;
+fightRisk = 0.7;
+weapon = e_baseball;" id="protester4" texten="Attacker" />
+ <timer elementProperties="time=11;" id="endcall" texten="timertoendcall;" actionOnEnd="actionHangup;" addToAAR="story2" />
+ </scene>
+ <dialog >
+ <dialogOption id="1" operator="Caller:" texten="INCOMING TRANSMISSION . . . PANIC BUTTON ACTIVATED. . . This is Bravo 454. To all units! I need support at [[ADDRESS]]. My partner is down! We were attacked by four aggressive individuals. They threw a brick at my partner! He was hit straight in the head!" default="what" option2="help" actionOnEnd="opinionEffect = 10;
+actionSetLocation;
+what3->active=false;
+hearme->active=false;" addToAAR="story" />
+ <dialogOption id="what" operator="Operator:" texten="{I'M LISTENING} Dispatch to 454 Acknowledging emergency button activation. Respond, please." default="looper" />
+ <dialogOption id="what2" operator="Operator:" texten="{WHAT'S GOING ON?} Dispatch to 454. What's going on?" default="looper" actionOnEnd="what2->active=false;
+what3->active=true;" />
+ <dialogOption id="what3" operator="Operator:" texten="{WHAT HAPPENED?} Dispatch to 454. What happened?" default="looper" actionOnEnd="what3->active=false;" />
+ <dialogOption id="help" operator="Operator:" texten="{HELP IS ON THE WAY} 454 We have units responding to assist. " default="looper" actionOnEnd="help->active=false;
+hearme->active=true;" />
+ <dialogOption id="gun" operator="Operator:" texten="{USE THE GUN} 454 if you or your partner are under armed threat, you should use your firearm." default="looper" actionOnEnd="gun->active=false;
+listen->active=true;" />
+ <dialogOption id="leave" operator="Operator:" texten="{BACK OFF} 454 if you can hear this, back off! Don't play a hero. . . Wait for backup! " default="looper" actionOnEnd="leave->active=false;
+hearme->active=true;" />
+ <dialogOption id="listen" operator="Operator:" texten="{SILENCE} . . . . . . . . . . . . " default="looper" actionOnEnd="listen->active=true;
+hearme->active=true;" />
+ <dialogOption id="hearme" operator="Operator:" texten="{DO YOU HEAR ME?} 454 Do you copy? " default="looper" actionOnEnd="hearme->active=true;" />
+ <dialogOption elementProperties="option=help;
+option=hearme;
+option=listen;
+option=gun;
+option=leave;
+option=what3;
+option=what2;" id="looper" operator="Caller:" texten="PANIC BUTTON ACTIVE . . . . . . . . . . . . . . . . . . . . . . . . " />
+ <dialogOption id="end" operator="Caller:" texten="END OF TRANSMISSION." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="PANIC BUTTON ACTIVE . . . . . . . . . . . . . . . . . . . . . . . . " COMMENT="Długi plik dzwiękowy"/>
+ <dialogOption id="reminder2" operator="Caller:" texten="PANIC BUTTON ACTIVE . . . . . . . . . . . . . . . . . . . . . . . . " />
+ </dialog>
+ <aar >
+ <reportElement id="story" texten="The policeman was attacked by a few aggressive protesters. When his partner was knocked down, he activated a panic button: one-way transmission to every unit in the area." />
+ <reportElement id="story2" texten="The policeman was disarmed and after a quick struggle run away. Attackers successfully chased him and beat the policeman heavily." />
+ </aar>
+ </conversation>
+ <conversation id="bos5shoplift" texten="Shop robbery" >
+ <scene >
+ <witness elementProperties="sex=M;" id="caller" operator="Caller:" emotions="50-60 yo, male, maybe latino?" texten="Shop owner" />
+ <dead elementProperties="isActive = false; sex = M;" id="callerdead" texten="Shop owner" />
+ <criminal elementProperties="sex=M; fightRisk = 0.6;
+prisonChance = 1; sex=M; weapon = e_pistol;" id="thief1" texten="Thief" />
+ <criminal elementProperties="fightRisk = 0.6;
+prisonChance = 1; sex=M;" id="thief2" texten="Thief" />
+ <criminal elementProperties="fightRisk = 0.6;
+prisonChance = 1; sex=M;" id="thief3" texten="Thief" />
+ <criminal elementProperties="fightRisk = 0.6;
+prisonChance = 1; sex=M;" id="thief4" texten="Thief" />
+ <criminal elementProperties="fightRisk = 0.6;
+prisonChance = 1; sex=M;" id="thief5" texten="Thief" />
+ <criminal elementProperties="fightRisk = 0.6;
+prisonChance = 1; sex=M;" id="thief6" texten="Thief" />
+ <criminal elementProperties="fightRisk = 0.6;
+prisonChance = 1; sex=M;" id="thief7" texten="Thief" />
+ <criminal elementProperties="fightRisk = 0.6;
+prisonChance = 1; sex=M;" id="thief8" texten="Thief" />
+ <criminal elementProperties="fightRisk = 0.6;
+prisonChance = 1; sex=M;" id="thief9" texten="Thief" />
+ <dead elementProperties="isActive = false; sex=M;" id="deadthief1" texten="Dead thief" />
+ <dead elementProperties="isActive = false; sex=M;" id="deadthief2" texten="Dead thief" />
+ <fire elementProperties="isActive = false;
+work = 200;" id="shopfire" texten="Fire in the shop" />
+ <injured elementProperties="isActive = false;
+sex=M;
+hp = 90;
+hpchange = -1;" blockedBy="shopfire" id="callerinj" texten="Shop owner" />
+ </scene>
+ <dialog >
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 8;" />
+ <dialogOption id="2" operator="Caller:" emotions="shocked, can't believe what is happening, mixed anger with disbelief (background: car alarms, sound of breaking glass, falling things etc.)" texten="Those fuckers are robbing my shop! I can't believe what's happening! Where are the goddamn police? Protests turn into some insane riot!" default="what" option2="howmany" option3="address" actionOnEnd="takegun->active=false;" addToAAR="story" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS} What's the address of your shop?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="It is at [[ADDRESS]]. Or rather it WAS!" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="345 Orthodox Valley" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="124 9th Street" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="504 Mandela Road" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="what" operator="Operator:" emotions="sounds a bit tired in that dialogue, especially in a few first lines" texten="{RIOT?} All right, sir. I need you to calm down. Tell me what's happening." default="disaster" />
+ <dialogOption elementProperties="option=back;" id="disaster" operator="Caller:" emotions="despair, anger, anxious" texten="It's a total, fucking disaster! They smashed every window in my shop and they're taking whatever they want! They took every goddamn TV! I'm ruined! Every store on the street has been looted!" default="weapon" option2="safe" option3="address" />
+ <dialogOption id="howmany" operator="Operator:" texten="{HOW MANY?} How many thieves do you see?" default="ten" />
+ <dialogOption elementProperties="option=back;" id="ten" operator="Caller:" emotions="anger, after word fucking... he takes a deep breath and tries to calm down a bit" texten="I dunno...! They're just coming in or out whenever they like. Fuck... I guess, right now it's about ten motherfuckers in here." default="weapon" option2="safe" option3="address" />
+ <dialogOption id="weapon" operator="Operator:" texten="{ANY WEAPON?} Do they have any weapons?" default="weapon1" />
+ <dialogOption id="weapon1" operator="Caller:" emotions="more slowly, he's trying to see their weapons during talking" texten="I don't see any guns, but some of them have bats and knives." default="weaponyou" option2="back" />
+ <dialogOption id="weaponyou" operator="Operator:" texten="{DO YOU HAVE A GUN?} And you, sir? Do you have a gun?" default="weaponyes" />
+ <dialogOption id="weaponyes" operator="Caller:" emotions="moment of hesitation at the beginning, talking nervously" texten="Oh, yes... I have my old .45 under the counter. I haven't used it in ages." default="back" option2="takegun" actionOnEnd="takegun->active=true;" />
+ <dialogOption id="safe" operator="Operator:" texten="{ARE YOU SAFE?} Sir, I know that you're worried about your shop, but you have to take care of your own safety first. Are you in a safe place right now?" default="standing" />
+ <dialogOption elementProperties="option = takegun;
+option = weapon;
+option = notime;" id="standing" operator="Caller:" emotions="mixed anger with disbelief, anxious" texten="No, I'm just... I'm just standing in the door to the back office. They're totally ignoring me! What should I do?!" default="wait" option2="sneakout" option3="protect" />
+ <dialogOption id="notime" operator="Operator:" texten="{CAN'T HELP YOU NOW} I'm sorry, sir, all units are occupied right now but we'll get officers there as soon as we can." default="notimeend" actionOnEnd="opinionEffect=-10;
+onIgnore=-10;" />
+ <dialogOption id="notimeend" operator="Caller:" emotions="rage, last sentence to himself" texten="What the fuck?! Fine, I'll do it in the my way then! Where is that fucking gun..." actionOnEnd="thief1.isActive=false;
+thief2.isActive=false;
+thief3.isActive=false;
+thief4.isActive=false;
+thief5.isActive=false;
+thief6.isActive=false;
+thief7.isActive=false;
+thief8.isActive=false;
+thief9.isActive=false;
+deadthief1.isActive=true;
+deadthief2.isActive=true;
+actionHangup;" addToAAR="ignored" />
+ <dialogOption id="wait" operator="Operator:" texten="{WAIT FOR POLICE} Sir, just wait for the police. Officers are on the way. " default="wait1" />
+ <dialogOption id="wait1" operator="Caller:" emotions="hesitation" texten="Okay... I will... But should I stay here or...?" default="hide" option2="nohide" option3="address" />
+ <dialogOption id="nohide" operator="Operator:" texten="{STAY} Stay where you are, okay? Officers will be there shortly.
+" default="okhide" />
+ <dialogOption id="hide" operator="Operator:" texten="{HIDE} You should find a place where you'll be safe until the police arrive. Can you lock yourself in the back office? " default="close" />
+ <dialogOption id="sneakout" operator="Operator:" texten="{SNEAK OUT OF THE SHOP} Try to sneak out of the shop. If you do it carefully, they won't notice you." default="no" />
+ <dialogOption id="protect" operator="Operator:" texten="{TELL THEM TO GO OUT} They're clearly taking advantage of your passivity. I'm sure that you can scare them away. Don't let them steal your merchandise. Tell them in firm words that police are on the way and it's better for them to leave now. " default="protecta" actionOnEnd="opinionEffect = -8;
+onIgnore = -10;" />
+ <dialogOption id="takegun" operator="Operator:" texten="{TAKE A GUN} OK, first thing you're going to do is get your 45 from behind the counter.... I hope you don't need to use it, but... just in case. And stay out of sight! " default="gotit" />
+ <dialogOption id="no" operator="Caller:" emotions="exploded with anger" texten="And I'm supposed to leave my store to these scumbags?! No way! And why should I go out in the street? It isn't any safer than staying in my store!" default="onlyway" option2="protect" option3="address" />
+ <dialogOption id="onlyway" operator="Operator:" emotions="reasonable" texten="{YOUR LIFE IS MORE IMPORTANT} Sir, your inventory...your money...they're just things. Your life is more important than any of that. And the best way to stay safe is if you leave the area as soon as possible. " default="okgo" />
+ <dialogOption elementProperties="option=address;" id="gotit" operator="Caller:" emotions="(background: sound of muffled steps, rummage, maybe loaded gun at the end);" texten="Okay... . . . . . . . . . . . . . . . . . . . . . . . . . Got it! What now?" default="hide" option2="sneakout1" option3="protect1" />
+ <dialogOption id="sneakout1" operator="Operator:" texten="{SNEAK OUT OF THE SHOP} Try to sneak out of the shop. If you do it carefully, they won't notice you." default="outalive" actionOnEnd="opinionEffect = 10;" />
+ <dialogOption id="protect1" operator="Operator:" texten="{PROTECT YOUR SHOP} They're clearly taking advantage of your passivity. I'm pretty sure that you can scare them away. Don't let them steal your livelihood!" default="protect2" actionOnEnd="opinionEffect = -5;
+onIgnore = -10;" />
+ <dialogOption id="protect2" operator="Caller:" texten="You're damn right! I'll scare the crap outta them!" default="shoot" option2="safety" option3="address" />
+ <dialogOption id="shoot" operator="Operator:" texten="{WARN THEM} Just warn them! Shoot in the air to scare them away." default="protectc" />
+ <dialogOption id="safety" operator="Operator:" texten="{YOUR SAFETY FIRST} Remember, your safety is the piority. You can protect yourself if your life is in danger. " default="protectb" actionOnEnd="opinionEffect=-5;
+onIgnore =-5;" addToAAR="violence" />
+ <dialogOption id="close" operator="Caller:" emotions="hesitation," texten="Yes, yes I can try, but... I don't know... I'll lose sight of them. I'd rather see what is happening here. " default="doit" option2="back" option3="address" />
+ <dialogOption id="doit" operator="Operator:" texten="{BETTER HIDE} It's better for you to hide, trust me. Just lock yourself in your office and wait for the police to get there." default="okhide" actionOnEnd="opinionEffect = -5;
+onIgnore = -10;" />
+ <dialogOption id="okgo" operator="Caller:" emotions="moment of silence, resigned, sigh in the middle " texten=". . . . . . I guess you're right... I'll try to sneak out the back door. Wish me luck. " actionOnEnd="callerdead.isActive=true;
+caller.isActive=false;
+actionHangup;" addToAAR="nogungo" />
+ <dialogOption id="okhide" operator="Caller:" emotions="resigned" texten="Ok.... I hope I'm still alive by then. Tell them to get here fast, please. " actionOnEnd="opinionEffect = 5;
+onIgnore = -8;
+shopfire.isActive=true;
+caller.isActive=false;
+callerinj.isActive=true;
+thief1.isActive=false;
+thief2.isActive=false;
+thief3.isActive=false;
+thief4.isActive=false;
+thief5.isActive=false;
+thief6.isActive=false;
+thief7.isActive=false;
+thief8.isActive=false;
+thief9.isActive=false;
+actionHangup;" addToAAR="stayfire" />
+ <dialogOption id="protecta" operator="Caller:" emotions="unsure, trying to get the courage up; After that shouting to the guys in the shop; then distant shouting and sound of shooting; sound of falling phone in the end" texten="Damn right. I.. I gotta do it... Yeah... I'll try... HEY, FUCKERS! GET THE FUCK OUTTA MY SHOP OR THE COPS ARE GONNA SHOOT YOUR ASS DOWN! . . . . . . . . . . . . . " actionOnEnd="callerdead.isActive=true;
+caller.isActive=false;
+actionHangup;" addToAAR="nogunfight" />
+ <dialogOption id="protectb" operator="Caller:" emotions="unsure, trying to get courage up; After that shouting to the guys in the shop; then distant shouting and sound of shooting" texten="Damn right. I.. I gotta do it... Yeah... I'll try... HEY, FUCKERS! STOP ROBBING MY SHOP! GET FUCK OUTTA MY SHOP OR I WILL SHOOT YOUR ASS DOWN! . . . . . . . . . . . . . . . " default="alive" actionOnEnd="alive2->active=false;" />
+ <dialogOption id="protectc" operator="Caller:" emotions="unsure, trying to get courage up; After that shouting to the guys in the shop; then distant shouting and sound of shooting" texten="Yeah... I'll try... HEY, FUCKERS! GET THE FUCK OUTTA MY SHOP OR I WILL SHOOT YOUR ASS DOWN! . . . . . . . . . . . . . . .
+" default="alive" actionOnEnd="alive1->active=false;" />
+ <dialogOption id="alive" operator="Operator:" texten="Sir? Are you alright?" default="alive1" option2="alive2" />
+ <dialogOption id="alive1" operator="Caller:" emotions="moment of silence, tried, breathing heavily, sound of falling down in the end " texten=". . . . . . . . Yes, I am. I shot... Just... get here quickly ok? I will be waiting here." actionOnEnd="thief1.isActive=false;
+thief2.isActive=false;
+thief3.isActive=false;
+thief4.isActive=false;
+thief5.isActive=false;
+thief6.isActive=false;
+thief7.isActive=false;
+thief8.isActive=false;
+thief9.isActive=false;
+deadthief1.isActive=true;
+deadthief2.isActive=true;
+actionHangup;" addToAAR="gunfight" COMMENT="Błąd pomiedzy operatorem a callerem. Trzeba wykleić coś z tekstu niżej."/>
+ <dialogOption id="alive2" operator="Caller:" emotions="moment of silence, breathing heavily, relief" texten=". . . . . . . . Yes, I am. I shot in... in the air. They ran away. I'm okay... Just... get here quickly in case they come back, okay? I'll be waiting here." actionOnEnd="alive2->active=false;
+actionHangup;" addToAAR="warning" />
+ <dialogOption id="outalive" operator="Caller:" emotions="moment of silence at first (considering options), then determined, sound of the loading gun in the end" texten=". . . . . . . . Yes, that's a good idea. I'll go out through the back door. I'm gonna shoot my way out if I have to. I'm really, REALLY tired of this shit. " actionOnEnd="caller.isActive=false;
+actionHangup;" addToAAR="gunngo" />
+ <dialogOption id="end" operator="Caller:" texten=". . . . " />
+ <dialogOption id="reminder" operator="Caller:" emotions="unsure" texten="Hello? Are you still with me?" />
+ <dialogOption id="reminder2" operator="Caller:" emotions="mixed disgust with fear" texten="Jesus, they act like animals..." />
+ </dialog>
+ <aar >
+ <reportElement id="story" texten="Protest against police brutality turned into an aggressive riot against law enforcers. Some men use that opportunity to robbing a nearby shop." />
+ <reportElement id="stayfire" texten="The caller hid in the shop. Thieves stole all valuable things from the shop and set shop on fire which trapped shop owner inside the store." />
+ <reportElement id="nogungo" texten="The shop owner left the shop unnoticed. However, he was attacked on the street by another group of thugs. He hadn't any weapon to protect himself and police were found him dead with a knife in his chest. " />
+ <reportElement id="nogunfight" texten="The shop owner tried to scare thieves away, but he hadn't any weapon. One of the thieves shot him." />
+ <reportElement id="gunfight" texten="The shop owner shot one of the thieves when he was trying to pull out a gun. Rest of thieves have started to run away during which the caller shot another one. Police were found him in the deep shock, sitting next to the dead body in the center of the shop." />
+ <reportElement id="warning" texten="The shop owner used his gun to make a warning shot. In the result of this, thieves run away." />
+ <reportElement id="gunngo" texten="The caller took his weapon to protect himself during the runaway. He managed to get out off the zone of a fight. However, his shop was devastated completely." />
+ <reportElement id="violence" texten="Operator should have convinced the caller to make a warning shot, which would limit the number of casualties." />
+ <reportElement id="ignored" texten="Operator refused to send help to the caller due to a limited number of units. That annoyed the caller who decided to handle with the thieves on his own. In the result, he shot down two of them. The rest has run away." />
+ </aar>
+ </conversation>
+ <conversation elementProperties="onIgnore=-100;" id="bos6nguard" texten="Call from National Guard" COMMENT="trzeba zrobić żeby się nie szukało adres albo znajdywało wjeżdzającą jednostkę national guard">
+ <scene >
+ <passerby id="caller" texten="Soldier" COMMENT="do usunięcia przy skryptowaniu"/>
+ </scene>
+ <dialog >
+ <dialogOption id="1" operator="Caller:" emotions="loud and clear voice, firmly, with confidence" texten="INCOMING TRANSMISSION . . . National Guard to the Boston Emergency Dispatch Center, over!" default="2" actionOnEnd="opinionEffect = 5;
+" addToAAR="story" />
+ <dialogOption id="2" operator="Operator:" texten="EDC, here. Go ahead National Guard." default="enter" />
+ <dialogOption id="enter" operator="Caller:" texten="The mayor has requested National Guard units provide civil disturbance control. Under that authority we are taking over command. Have all police units fall back to their respective stations and await further orders." default="badidea" option2="coop" option3="okw" />
+ <dialogOption id="badidea" operator="Operator:" texten="{DANGEROUS TO CIVILIANS} With all due respect, sir, using National Guard units to put down the riots could aggravate the situation. That will be dangerous for everyone in the city. " default="enough" />
+ <dialogOption id="coop" operator="Operator:" emotions="a bit stuttering, stressed" texten="{COOPERATE WITH POLICE} Respectfully, sir, cooperation between police and National Guard would be more beneficial. Our officers know the city and keeping them in their stations during this crisis is counter-productive." default="enough" />
+ <dialogOption id="okw" operator="Operator:" emotions="a bit stuttering, stressed" texten="{YES, SIR} Yes, sir! I'll have all police units return to station immediately." default="every" />
+ <dialogOption id="enough" operator="Caller:" texten="You had your chance to manage the situation. Police actions only made things worse." default="okw" option2="noway" />
+ <dialogOption id="noway" operator="Operator:" texten="{NO} No, I won't do that, sir. Our officers must stay in the field and protect civilians. " default="punish" />
+ <dialogOption id="every" operator="Caller:" texten="I need you to have ALL units fall back to their stations NOW! I don't care if they ARE currently occupied. " default="yess" option2="why" option3="danger" />
+ <dialogOption id="yess" operator="Operator:" texten="{YES, SIR} I understand, sir. I'll have all units fall back immediately. " default="thanky" actionOnEnd="opinionEffect = 1;" addToAAR="obey" />
+ <dialogOption id="why" operator="Operator:" texten="{WHY IS THAT?} Why is that, sir?" default="notime" />
+ <dialogOption id="notime" operator="Caller:" emotions="military style" texten="I haven't got time for this! You have your order, I'm not going to debate it! " default="yess" option2="danger" />
+ <dialogOption id="danger" operator="Operator:" texten="{THAT COULD BE DANGEROUS} That'll put civilians at risk. Our officers are in the middle of this trying to regain control." default="punish" />
+ <dialogOption id="punish" operator="Caller:" emotions="cold, official voice; sound calm but real anger behind that" texten="Are you aware that disobeying National Guard commands sanctioned by the mayor could result in jail time for you?" default="dutyfirst" option2="eee" />
+ <dialogOption id="dutyfirst" operator="Operator:" emotions="more agressive, you are making a stance" texten="{IT DOESN'T MATTER} Yes...yes, I do. But I won't change my mind. My primary responsible as an emergency dispatcher is protecting the people. And your orders will put them at risk, so I choose to disobey them." default="regret" actionOnEnd="opinionEffect = 20;" addToAAR="stay" />
+ <dialogOption id="eee" operator="Operator:" texten="{I'LL PULL UNITS BACK} Emm... I'm sorry, sir. You're right, the decision is up to you. I'll have all units pull back immediately. " default="thanky" actionOnEnd="opinionEffect = 1;" addToAAR="obey" />
+ <dialogOption id="regret" operator="Caller:" texten="You'll regret that, I can promise you" actionOnEnd="actionHangup;
+nguardFailed;" />
+ <dialogOption id="thanky" operator="Caller" texten="That's great. I'm out." actionOnEnd="actionHangup;" />
+ <dialogOption id="end" operator="Caller:" texten=" . . . ." />
+ <dialogOption id="reminder" operator="Caller:" emotions="irritated" texten="Operator, do you copy?" />
+ <dialogOption id="reminder2" operator="Caller:" emotions="irritated" texten="Operator, if you disobey this order, you will be removed by force " />
+ </dialog>
+ <aar >
+ <reportElement id="story" texten="Commander of National Guard informed the operator that army will enter the city to provide riot control. He requested the operator to pull back all units back to base." />
+ <reportElement id="obey" texten="Operator decided to execute the order. National Guard put down the riots, but a number of casualties and injures was significant." />
+ <reportElement id="stay" texten="Operator was removed from the office as he refused to obey the order. Disciplinary board will investigate that case, but the chief of the Emergency Dispatch Center upheld operator's decision accessing it as 'reasonable'. " />
+ </aar>
+ </conversation>
+ <conversation id="genbreath" texten="Breathing problems" >
+ <scene >
+ <passerby elementProperties="sex=W;" id="caller" emotions="young woman/teenager (15-25)" texten="Caller" COMMENT="dobre źródła:
+https://medlineplus.gov/ency/article/000007.htm"/>
+ <injured elementProperties="sex=W;
+hp=90;
+hpchange=-2;" id="woman" texten="Woman" />
+ <injured elementProperties="isActive=false;
+sex=W;
+type=Old;" id="grandma" texten="Elderly woman" />
+ <dead elementProperties="isActive=false;
+sex=W;" id="deadwoman" texten="Dead woman" />
+ </scene>
+ <dialog >
+ <dialogOption elementProperties="option=3gym;
+option=3street;
+option=heartattackgym;
+option=heartattackhouse;
+option=heartattackstreet;" id="1" operator="Operator:" texten="911, what's your emergency?" default="2gym" option2="2house" option3="2street" actionOnEnd="opinionEffect = 3;
+70->active=false;" COMMENT="generic bcg"/>
+ <dialogOption elementProperties="bgsound=cgenbreath_0_gym" id="2gym" operator="Caller:" emotions="Panically, fastly" texten="She can't breath! What should I do?!" default="who" option2="where" option3="action" actionOnEnd="manydrug->active=false;
+laygood->active=false;
+house->active=false;
+street->active=false;" addToAAR="story" COMMENT="tło gym; wybór mall lub gym"/>
+ <dialogOption id="2house" operator="Caller:" emotions="Panically, fastly" texten="She can't breath! What should I do?!" default="who" option2="where" option3="action" actionOnEnd="manydrug->active=false;
+laygood->active=false;
+gym->active=false;
+street->active=false;
+mall->active=false;" addToAAR="story" COMMENT="generic bcg"/>
+ <dialogOption elementProperties="bgsound=cgenbreath_0_out" id="2street" operator="Caller:" emotions="Panically, fastly" texten="She can't breath! What should I do?!" default="who" option2="where" option3="action" actionOnEnd="manydrug->active=false;
+laygood->active=false;
+gym->active=false;
+house->active=false;
+mall->active=false;" addToAAR="story" COMMENT="street"/>
+ <dialogOption elementProperties="bgsound=cgenbreath_0_gym" id="3gym" operator="Caller:" emotions="Stressed, unsure" texten="Um...I've got someone here who's having a hard time trying to breathe." default="who" option2="where" option3="action" actionOnEnd="family->active=false;
+manydrug->active=false;
+laygood->active=false;
+house->active=false;
+street->active=false;" addToAAR="story" COMMENT="tło gym; wybór mall lub gym"/>
+ <dialogOption elementProperties="bgsound=cgenbreath_0_out" id="3street" operator="Caller:" emotions="Stressed, unsure" texten="Um...I've got someone here who's having a hard time trying to breathe." default="who" option2="where" option3="action" actionOnEnd="family->active=false;
+manydrug->active=false;
+laygood->active=false;
+house->active=false;
+mall->active=false;
+gym->active=false;" addToAAR="story" COMMENT="street"/>
+ <dialogOption elementProperties="option=medicine;
+bgsound=cgenbreath_0_gym" id="heartattackgym" operator="Caller:" emotions="Panically, fastly" texten="You have to help her! She says her chest feels like it's being crushed and she can't breathe! Is she having a heart attack?!" default="who" option2="where" option3="action" actionOnEnd="passerby->active=false;
+allergy->active=false;
+asthma->active=false;
+drugs->active=false;
+telllay->active=false;
+house->active=false;
+street->active=false;
+family->active=false;" COMMENT="tło gym; wybór mall lub gym"/>
+ <dialogOption elementProperties="option=medicine" id="heartattackhouse" operator="Caller:" emotions="Panically, fastly" texten="You have to help her! She says her chest feels like it's being crushed and she can't breathe! Is she having a heart attack?!" default="who" option2="where" option3="action" actionOnEnd="passerby->active=false;
+allergy->active=false;
+asthma->active=false;
+drugs->active=false;
+telllay->active=false;
+gym->active=false;
+street->active=false;
+mall->active=false;" COMMENT="generic bcg"/>
+ <dialogOption elementProperties="option=medicine;
+bgsound=cgenbreath_0_out" id="heartattackstreet" operator="Caller:" emotions="Panically, fastly" texten="You have to help her! She says her chest feels like it's being crushed and she can't breathe! Is she having a heart attack?!" default="who" option2="where" option3="action" actionOnEnd="passerby->active=false;
+normal->active=false;
+allergy->active=false;
+asthma->active=false;
+drugs->active=false;
+telllay->active=false;
+gym->active=false;
+house->active=false;
+mall->active=false;" COMMENT="street"/>
+ <dialogOption id="who" operator="Operator:" texten="{WHO IS THAT?} Could you be more specific? Who can't breath? " default="passerby" option2="family" option3="normal" />
+ <dialogOption id="passerby" operator="Caller:" emotions="Stressed, unsure" texten="I don't know her. I was just walking by when she said she couldn't breathe." default="howold" option2="back" option3="action" actionOnEnd="house->active=false;
+" COMMENT="outside bcg"/>
+ <dialogOption elementProperties="option=medicine" id="family" operator="Caller:" emotions="panically" texten="My grandma!" default="howold" option2="back" option3="action" actionOnEnd="30->active=false;
+50->active=false;
+70->active=true;
+grandma.isActive=true;
+woman.isActive=false;
+exercise->active=false;
+gym->active=false;" COMMENT="generic bcg"/>
+ <dialogOption elementProperties="option=medicine;
+" id="normal" operator="Caller:" emotions="Stressed, unsure" texten="She's my friend!" default="howold" option2="back" option3="action" actionOnEnd="house->active=false;
+50->active=false;
+70->active=false;" COMMENT="outside bcg"/>
+ <dialogOption elementProperties="option=mall" id="where" operator="Operator:" texten="{WHERE?} Where did it happen?" default="gym" option2="street" option3="house" />
+ <dialogOption id="gym" operator="Caller:" emotions="Stressed, unsure" texten="We're in the gym." default="address" option2="back" actionOnEnd="family->active=false;
+walking->active=false;" COMMENT="gym bcg"/>
+ <dialogOption id="street" operator="Caller:" emotions="Stressed, unsure" texten="On a street." default="address" option2="back" COMMENT="outside bcg"/>
+ <dialogOption id="house" operator="Caller:" emotions="panically" texten="In our house!" default="address" option2="back" actionOnEnd="passerby->active=false;
+normal->active=false;" COMMENT="generic bcg"/>
+ <dialogOption id="mall" operator="Caller:" emotions="Stressed, unsure" texten="In a shopping mall." default="precise" option2="address" option3="back" actionOnEnd="family->active=false;" COMMENT="gym bcg"/>
+ <dialogOption id="precise" operator="Operator:" texten="{WHICH SHOP?} Please be precise. In which shop exactly?" default="grocery" option2="zoo" option3="toilet" />
+ <dialogOption id="grocery" operator="Caller:" emotions="Stressed, unsure" texten="In the grocery shop." default="back" option2="address" option3="action" COMMENT="outside bcg"/>
+ <dialogOption elementProperties="option=action" id="zoo" operator="Caller:" emotions="Stressed, unsure" texten="In the pet store." default="back" option2="allergy" option3="address" COMMENT="outside bcg"/>
+ <dialogOption id="toilet" operator="Caller:" emotions="Stressed, unsure" texten="This happened in the restroom..." default="back" option2="address" actionOnEnd="action->active=false;" COMMENT="outside bcg"/>
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?} Could you give me an address?" default="addressa0" option2="addressa1" option3="addressa2" />
+ <dialogOption id="addressa0" operator="Caller:" emotions="fastly, stressed" texten="Yes, of course, it's [[ADDRESS]]." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" emotions="fastly, stressed" texten="It's [[ADDRESS]]." default="back" actionOnEnd="actionSetLocation" COMMENT="pociąć dźwięk"/>
+ <dialogOption id="addressa2" operator="Caller:" emotions="fastly, stressed" texten="[[ADDRESS]]." default="back" actionOnEnd="actionSetLocation" COMMENT="tylko zaszumiony adres"/>
+ <dialogOption id="addressa3" operator="Caller:" emotions="fastly, stressed" texten="Yes, of course, it's 32th Alley." default="back" />
+ <dialogOption id="howold" operator="Operator:" texten="{HOW OLD?} Okay, how old is she?" default="30" option2="50" option3="70" />
+ <dialogOption id="30" operator="Caller:" emotions="unsure" texten="I don't know... mid-30s?" default="back" />
+ <dialogOption id="50" operator="Caller:" emotions="unsure" texten="Hard to tell...If I had to guess I'd say around 50?" default="back" />
+ <dialogOption id="70" operator="Caller:" emotions="stressed, starts crying in second sentence" texten="She had her [[AGE]] birthday... Please, don't tell me she's going to die...." default="back" actionOnEnd="grandma.isActive=true;
+woman.isActive=false;" COMMENT="do zaszumienia [[AGE]], który będzie generował liczbę"/>
+ <dialogOption id="action" operator="Operator:" texten="{WHAT WAS SHE DOING?} What exactly was she doing?" default="walking" option2="exercise" option3="phone" />
+ <dialogOption elementProperties="option=loosen;" id="walking" operator="Caller:" texten="I don't know... walking? Nothing special, I guess." option2="position" />
+ <dialogOption elementProperties="option=tripod;
+option=loosen;" id="exercise" operator="Caller:" texten="She'd just finished her cardio. " default="calmbreath" option2="position" COMMENT="gym bcg"/>
+ <dialogOption elementProperties="option=loosen;" id="phone" operator="Caller:" texten="She was on her mobile phone.." default="stress" option2="position" />
+ <dialogOption id="calmbreath" operator="Operator:" texten="{REST FOR A WHILE} Shortness of breath might be result of exhausting excercises. Tell her to rest for a while. She needs to breath deeply and calmly." default="calmbreath1" option2="calmbreath2" />
+ <dialogOption id="calmbreath1" operator="Caller:" emotions="Except first and last sentence speaks off the phone" texten="Okay... Hey, you need to breath deeply... Everything will be fine... Breath in.... and out.... Is it better? It looks that she's getting better! " default="end" option2="waither" actionOnEnd="opinionEffect=2;
+onIgnore=2;" addToAAR="goodadvice" />
+ <dialogOption id="calmbreath2" operator="Caller:" emotions="Resentful" texten="Okay... Hey, you need to breath deeply... Everything will be fine... Breath in.... and out.... I don't think that's helping. We need an ambulance! " default="end" option2="position" option3="where" />
+ <dialogOption id="waither" operator="Operator:" texten="{STAY WITH HER FOR A WHILE} Can you stay with her for a while? Please monitor her condition and call us back if she starts to heave breathing problems again. " default="endok" />
+ <dialogOption id="stress" operator="Operator:" texten="{CALM HER} It might be the effect of stress, try to calm her down." default="calmbreath1" option2="calmbreath2" />
+ <dialogOption id="allergy" operator="Operator:" texten="{HOW DOES HER FACE LOOK?} How does her face look? Is there any rash, swelling of face or throat?" default="yes" option2="no" COMMENT="swelling of her face ?"/>
+ <dialogOption elementProperties="option=address" id="yes" operator="Caller:" texten="One minute . . . . . . . Yes! There is a little red rash on her neck!" default="notouch" option2="out" option3="end" />
+ <dialogOption id="no" operator="Caller:" texten="One minute . . . . . . . I don't know, her skin looks normal." default="back" />
+ <dialogOption id="notouch" operator="Operator:" texten="{DON'T TOUCH HER!} Don't touch her! That might be contagious! Tell everybody to leave the shop and wait outside for emergency services." default="badend" />
+ <dialogOption id="out" operator="Operator:" texten="{TAKE HER OUT OF THE SHOP} Take her out of the shop! She might have an allergy to animals. That might explain her shortness of breath." default="outok" COMMENT="that might explain her ?"/>
+ <dialogOption id="badend" operator="Caller:" emotions="panically" texten="O my God! EVERYBODY... GET OUT!" actionOnEnd="actionHangup;
+opinionEffect = -5;
+onIgnore = -8;" addToAAR="badadviceanimal" />
+ <dialogOption id="outok" operator="Caller:" texten="Ok! We'll do that! Please, get here quickly!" actionOnEnd="opinionEffect+=2;
+woman.hpchange=0;
+grandma.hpchange=0;
+actionHangup;" addToAAR="goodadvice" />
+ <dialogOption elementProperties="option=manydrug" id="medicine" operator="Operator:" texten="{MEDICINES?} Does she take any medication? Does she have any chronic illnesses?" default="idn" option2="asthma" option3="drugs" />
+ <dialogOption id="idn" operator="Caller:" texten="I don't know anything about it..." default="back" />
+ <dialogOption id="asthma" operator="Caller:" emotions="recalling that fact" texten="I... . . . yes, yes. She has asthma!" default="inhaler" option2="address" option3="end" />
+ <dialogOption elementProperties="option=address" id="drugs" operator="Caller:" emotions="sound of spilling things on the floor" texten="Emm.. . . . I don't. . . . . Here are some drugs! I found them in her purse! There are a few blue pills and a red one. Should I give them to her?! " default="red" option2="blue" option3="end" />
+ <dialogOption elementProperties="option=end;" id="manydrug" operator="Caller:" texten="Emm.. . . . I don't. . . . .Oh, wait! I found some drugs in her purse! What should I give her? " default="nitro" option2="aspirin" option3="anti" />
+ <dialogOption id="nitro" operator="Operator:" texten="{NITROGLYCERIN} Look for nitroglycerin!" default="nodrug" option2="take" actionOnEnd="opinionEffect+=2;" addToAAR="nitroglyc" />
+ <dialogOption id="aspirin" operator="Operator:" texten="{ASPIRIN} Aspirin could delay an impending heart attack. She should chew it before swallowing to make it more effective." default="nodrug" option2="take" actionOnEnd="opinionEffect+=1;" addToAAR="asp" COMMENT="before swallowing it ?"/>
+ <dialogOption id="anti" operator="Operator:" texten="{ANTIBIOTIC} If you find some antibiotics, give them to her." default="take" actionOnEnd="opinionEffect+=-3;
+onIgnore=-8;
+woman.hpchange=-2;
+grandma.hpchange=-2;" addToAAR="baddrug" />
+ <dialogOption id="nodrug" operator="Caller:" emotions="panically" texten="I'm looking for it . . . . . . . I can't... fuck... There's nothing like that in her purse! Is there anything else that will work? " default="back" option2="dontdrug" />
+ <dialogOption id="dontdrug" operator="Operator:" texten="{DON'T GIVE HER ANY DRUGS} If you don't know what drug she takes, you shouldn't give her anything." default="dontdrug1" />
+ <dialogOption elementProperties="option=position;
+option=loosen;" id="dontdrug1" operator="Caller:" texten="Sure, but what I can do then?" default="where" option2="end" option3="address" />
+ <dialogOption elementProperties="option=position;
+option=loosen;" id="take" operator="Caller:" emotions="indinstic talk with an injured woman about taking a medicine" texten="Okay. . . . . . Here, I've got it! . . . . . . . . . . . . . . . Okay, she's taken the medicine, what now? " default="where" option2="end" option3="address" />
+ <dialogOption id="red" operator="Operator:" texten="{GIVE RED PILL} Give her the red pill." default="goodpill" option2="badpill" actionOnEnd="opinionEffect = -5;
+onIgnore = -8;" addToAAR="badadvice" />
+ <dialogOption id="blue" operator="Operator:" texten="{GIVE BLUE PILL} Give her the blue pill." default="goodpill" option2="badpill" actionOnEnd="opinionEffect = -5;
+onIgnore = -8;" addToAAR="badadvice" />
+ <dialogOption id="goodpill" operator="Caller:" texten="Okay, I'll do that, but send someone here fast!" actionOnEnd="woman.hpchange=1;
+grandma.hpchange=1;
+actionHangup;" />
+ <dialogOption id="badpill" operator="Caller:" texten="Okay, I'll do that, but send someone here fast!" actionOnEnd="woman.hpchange=-2;
+grandma.hpchange=-2;
+actionHangup;" />
+ <dialogOption id="inhaler" operator="Operator:" texten="{FIND INHALER} Try to find an inhaler, it should be in a first aid kit or something personal in her bag. The inhaler usually shape like a big letter L, but it could be round as well. If you have to, help her use it: place it in her mouth between her teeth and press the plunger." default="goodpill" />
+ <dialogOption id="position" operator="Operator:" texten="{POSITION?} What is she doing right now? Is she standing, is she sitting, is she lying down?" default="lying" option2="sitting" option3="standing" />
+ <dialogOption id="lying" operator="Caller:" texten="She's laying down....on her back." default="situp" option2="back" option3="address" />
+ <dialogOption elementProperties="option=tripod;
+option=laygood;" id="sitting" operator="Caller:" texten="Sitting." default="telllay" option2="back" option3="address" />
+ <dialogOption elementProperties="option=tripod;
+option=laygood;" id="standing" operator="Caller:" texten="She's standing" default="telllay" option2="back" option3="address" />
+ <dialogOption id="telllay" operator="Operator:" texten="{TELL HER TO LAY DOWN} Tell her to lay down, that should help." default="telllay1" actionOnEnd="opinionEffect+=-1;
+woman.hpchange=-1;
+grandma.hpchange=-1;" addToAAR="badadvice" />
+ <dialogOption id="laygood" operator="Operator:" texten="{TELL HER TO LAY DOWN} Tell her to lay down, that should help." default="positionchange" actionOnEnd="opinionEffect+=+1;
+woman.hpchange=1;
+grandma.hpchange=1;" addToAAR="goodadvice" />
+ <dialogOption id="situp" operator="Operator:" texten="{SIT UP} She may need sit up to breathe. Please help her to change position and see if it works." default="positionchange" actionOnEnd="opinionEffect+=+1;
+woman.hpchange=1;
+grandma.hpchange=1;" addToAAR="goodadvice" COMMENT="1. she may need (...) sit up ? 2. to change positions ?"/>
+ <dialogOption id="tripod" operator="Operator:" texten="{TRIPOD POSITION} Help her assume the tripod position. She should sit or stand leaning forward and then support her upper body with her hands on her knees." default="tripodok" addToAAR="goodadvice" />
+ <dialogOption id="tripodok" operator="Caller:" texten="Okay, that sounds complicated but... we'll try to do that . . . . . . . . . . . . . . . . . . . . . . . . . Done. What's next? " default="medicine" option2="end" option3="address" actionOnEnd="opinionEffect+=1;
+woman.hpchange=+1.5;
+grandma.hpchange=+1.5;" />
+ <dialogOption id="positionchange" operator="Caller:" emotions="indistinct talking to injured" texten="Okay. . . . . . . . . . . . .Done. What's next?" default="medicine" option2="end" option3="address" />
+ <dialogOption id="telllay1" operator="Caller:" emotions="unsure" texten=". . . . . . I don't know if that helps, but... you're an expert. What should I do next?" default="medicine" option2="end" option3="address" />
+ <dialogOption id="loosen" operator="Operator:" texten="{LOOSEN HER CLOTHES} Does she have any tight clothing? If so, you might have to loosen a little bit. " default="loosenyes" option2="loosenno" COMMENT="loosen a little bit?"/>
+ <dialogOption id="loosenyes" operator="Caller:" texten="Okay, I'll unbutton her shirt . . . . . . . . . Okay, done." default="back" actionOnEnd="opinionEffect+=1;
+woman.hpchange=+0.5;
+grandma.hpchange=+0.5;" />
+ <dialogOption id="loosenno" operator="Caller:" texten="I don't see anything like that." default="back" />
+ <dialogOption id="end" operator="Operator:" texten="{WAIT FOR AMBULANCE} Wait for an ambulance, it's on the way." default="endok" />
+ <dialogOption id="endok" operator="Caller:" texten="Okay, I will wait with her. Bye!" actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="How can I help her?!" />
+ <dialogOption id="reminder2" operator="Caller:" emotions="off the phone" texten="You need to breath!" />
+ </dialog>
+ <aar >
+ <reportElement id="story" texten="A person near caller suffered from shortness of breath." />
+ <reportElement id="badadviceanimal" texten="A reason of the dyspnea was strong animal allergy. Operator mistakenly thought that was a contagious disease and aroused panic. In result, victim didn't get proper help and died. " />
+ <reportElement id="goodadvice" texten="Operator gave a proper medical instruction." />
+ <reportElement id="badadvice" texten="Operator gave an improper medical instruction." />
+ <reportElement id="nitroglyc" texten="Operator advised to give nitroglycerin to a person who suffers heart attack, which is the best medical solution in such situation." />
+ <reportElement id="asp" texten="Operator advised to give aspirin to a person who suffers heart attack, which could help to stop or delay heart attack, especially if it don't start yet." />
+ <reportElement id="baddrug" texten="Operator advised to give unproper medicine to a person who suffers heart attack." />
+ </aar>
+ </conversation>
+ <conversation elementProperties="type=generable;" id="genvandals" texten="Vandals" >
+ <scene >
+ <witness elementProperties="sex=W;" id="caller" operator="Caller:" texten="Caller" COMMENT="black street accent"/>
+ <criminal elementProperties="fightRisk = 0.5;
+prisonChance = 0.5; sex=M;" id="fighter1" texten="Vandal" />
+ <criminal elementProperties="fightRisk = 0.5;
+prisonChance = 0.5; sex=M;" id="fighter2" texten="Vandal" />
+ <criminal elementProperties="isActive = false; fightRisk = 0.5;
+prisonChance = 0.5; sex=M;" id="fighter3" texten="Vandal" />
+ <criminal elementProperties="isActive = false; fightRisk = 0.5;
+prisonChance = 0.5; sex=M;" id="fighter4" texten="Vandal" />
+ <criminal elementProperties="isActive = false; fightRisk = 0.5;
+prisonChance = 0.5; sex=M;" id="fighter5" texten="Vandal" />
+ <criminal elementProperties="isActive = false; fightRisk = 0.5;
+prisonChance = 0.5; sex=M;" id="fighter6" texten="Vandal" />
+ <injured elementProperties="isActive = false;
+hp=60;
+hpchange=-1.3;
+sex=M;" id="injuredf" texten="Injured man" />
+ <fire elementProperties="isActive=false;
+work=50;" id="trash" texten="Trashbin on fire" />
+ <fire elementProperties="isActive=false;
+work=300;
+workchange=1;" id="greatfire" texten="Fire" />
+ <tech elementProperties="isActive=false;
+work=500;" id="electro" texten="Street electrical box" />
+ <tech elementProperties="isActive=false;
+work=500;" id="firehydrant" texten="Fire hydrant" />
+ </scene>
+ <dialog >
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" option2="2a" actionOnEnd="ignore2->active=false;" addToAAR="story" />
+ <dialogOption id="2" operator="Caller:" emotions="Woman, 50-60 yo, concerned, a bit frightened, a bit disgusted by such behaviour" texten="Hello, could you do something about those idiots?" default="where" option2="many" option3="doing" actionOnEnd="opinionEffect = 3;" />
+ <dialogOption elementProperties="chance=0.15;
+bgsound=cgenvandals_0_1" id="2a" operator="Caller:" texten="I want to report a group of men causing trouble." default="where" option2="many" option3="doing" actionOnEnd="opinionEffect = 3;
+two->active=false;
+bus->active=false;
+shop->active=false;
+block->active=false;
+destroybuild->active=false;" COMMENT="tło park"/>
+ <dialogOption elementProperties="option=bus;" id="where" operator="Operator:" texten="{WHERE?} Where are they?" default="shop" option2="park" option3="block" />
+ <dialogOption elementProperties="bgsound=cgenvandals_0_2" id="bus" operator="Caller:" texten="Near bus station at [[ADDRESS]]." default="back" actionOnEnd="actionSetLocation;
+destroybuild->active=false;
+theftyes->active=false;" COMMENT="tło samochody"/>
+ <dialogOption id="shop" operator="Caller:" texten="They are standing in front of a shop." default="back" option2="address" />
+ <dialogOption id="park" operator="Caller:" texten="They are in the park." default="back" option2="address" actionOnEnd="destroybuild->active=false;
+theftyes->active=false;" />
+ <dialogOption id="block" operator="Caller:" texten="They are under my window." default="back" option2="address" actionOnEnd="theftyes->active=false;" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?} Could you give me a precise address of the incident?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="Oh, yes. It's at [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="12 Rosberry Road" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="34 8th Alley" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="505 Rosemary Square" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="many" operator="Operator:" texten="{HOW MANY ARE INVOLVED?} How many of them are there?" default="two" option2="four" option3="group" />
+ <dialogOption id="two" operator="Caller:" texten="There's two of them." default="back" option2="where" option3="doing" />
+ <dialogOption id="four" operator="Caller:" texten="I saw a four of them!" default="back" option2="where" option3="doing" actionOnEnd="fighter3.isActive = true;" />
+ <dialogOption id="group" operator="Caller:" texten="I don't know. There's a whole group of them. Maybe six or seven?" default="back" option2="where" option3="doing" actionOnEnd="fighter3.isActive = true;
+fighter4.isActive = true;
+fighter5.isActive = true;
+fighter6.isActive = true;
+opinionEffect = 4;" />
+ <dialogOption id="doing" operator="Operator:" texten="{WHAT ARE THEY DOING?} Please describe what exactly this men are doing?" default="destroy" option2="pedestrian" option3="destroybuild" />
+ <dialogOption elementProperties="option=injuries;" id="destroy" operator="Caller:" texten="They're acting like animals. Just smashing and breaking everything around." default="back" option2="where" option3="ignore" />
+ <dialogOption elementProperties="option=injuries;" id="pedestrian" operator="Caller:" texten="They're being assholes! Acting aggressively to anyone who comes near them. They're shouting, pushing, throwing things. It looks like they're wanting to get into a fight with someone." default="back" option2="where" option3="ignore" />
+ <dialogOption id="destroybuild" operator="Caller:" texten="Right now they're vandalizing a building." default="howdestroy" option2="where" option3="ignore" actionOnEnd="bus->active=false;
+park->active=false;" />
+ <dialogOption id="howdestroy" operator="Operator:" texten="{PRECISE} OK, so what exactly are they doing to the building? What kind of damage?" default="door" option2="window" option3="graffiti" />
+ <dialogOption elementProperties="option=injuries;" id="door" operator="Caller:" texten="They kicked down a door!" default="back" option2="theft" option3="fire" />
+ <dialogOption id="window" operator="Caller:" texten="They are throwing bricks at windows." default="back" option2="fire" option3="injuries" />
+ <dialogOption id="graffiti" operator="Caller:" texten="They are making some ugly painting on its wall." default="back" option2="fire" actionOnEnd="firey->acitve=false;
+firey2->active=false;
+ignore2->active=true;
+ignore->active=false;" />
+ <dialogOption id="theft" operator="Operator:" texten="{ARE THEY STEALING?} Can you tell if they've stolen anything?" default="theftyes" option2="theftno" option3="theftwalk" />
+ <dialogOption id="theftyes" operator="Caller:" texten="I guess they could have. They've gone inside the building....oh, now it looks like they're leaving!" default="back" actionOnEnd="speed=15;
+caller.isActive=false;
+firey->active=false;
+firey2->active=false;" />
+ <dialogOption id="theftwalk" operator="Caller:" texten="Well, it looks like they might have robbed this one guy. They stopped him and a moment later it looked like he gave them his wallet." default="back" actionOnEnd="firey->active=false;
+firey2->active=false;" />
+ <dialogOption id="theftno" operator="Caller:" texten="No, I didn't see them go inside." default="back" />
+ <dialogOption id="fire" operator="Operator:" texten="{ANY OTHER DAMAGE?} Have they caused any other damage?" default="firey" option2="firen" option3="firey2" />
+ <dialogOption id="firey" operator="Caller:" texten="Well, they started a fire in a trash can" default="back" option2="where" option3="helpontheway" actionOnEnd="trash.isActive=true;
+injuriesyes->active=false;
+injfight->active=false;" addToAAR="bigfire" />
+ <dialogOption id="firey2" operator="Caller:" texten="Yes, they set a trash bin on fire... Oh my God. . . . . . it just fell over.. . . . . . . . Now, whole ground is on fire. Jesus... Send firefighters!" default="back" option2="where" option3="helpontheway" actionOnEnd="fighter1.isActive = false;
+fighter2.isActive = false;
+fighter3.isActive = false;
+fighter4.isActive = false;
+fighter5.isActive = false;
+fighter6.isActive = false;
+greatfire.isActive=true;
+caller.isAcitve=false;
+injuriesyes->active=false;
+injfight->active=false;" addToAAR="bigfire" />
+ <dialogOption id="firen" operator="Caller:" texten="No, I didn't see anything like that." default="back" option2="ignore2" option3="helpontheway" />
+ <dialogOption id="firedamageele" operator="Caller:" texten="Yes, they destroyed a street distribution cabinet." default="back" option2="ignore2" option3="helpontheway" actionOnEnd="fighter1.isActive = false;
+fighter2.isActive = false;
+fighter3.isActive = false;
+fighter4.isActive = false;
+fighter5.isActive = false;
+fighter6.isActive = false;
+caller.isAcitve=false;
+greatfire.isActive=false;
+electro.isActive=true;" COMMENT="nazwa potwierdzona przez voice actora"/>
+ <dialogOption id="firedamageele2" operator="Caller:" texten="Yes, they destroyed a street electrical box." default="back" option2="ignore2" option3="helpontheway" actionOnEnd="fighter1.isActive = false;
+fighter2.isActive = false;
+fighter3.isActive = false;
+fighter4.isActive = false;
+fighter5.isActive = false;
+fighter6.isActive = false;
+caller.isAcitve=false;
+greatfire.isActive=false;
+electro.isActive=true;" COMMENT="nazwa potwierdzona przez voice actora"/>
+ <dialogOption id="firedamageo" operator="Caller:" texten="Yes, they broke a fire hydrant" default="back" option2="ignore2" option3="helpontheway" actionOnEnd="fighter1.isActive = false;
+fighter2.isActive = false;
+fighter3.isActive = false;
+fighter4.isActive = false;
+fighter5.isActive = false;
+fighter6.isActive = false;
+caller.isAcitve=false;
+greatfire.isActive=false;
+electro.isActive=false;
+firehydrant.isActive=true;" COMMENT="nie podlinkowane"/>
+ <dialogOption id="injuries" operator="Operator:" texten="{ANY INJURIES?} Have they injured anyone?" default="injuries1" option2="injuriesyes" option3="injfight" />
+ <dialogOption id="injuries1" operator="Caller:" texten="No, I don't think so." default="back" option2="helpontheway" />
+ <dialogOption id="injuriesyes" operator="Caller:" emotions="panically" texten="Yes! They pushed an older man and he fell. I think he hit his head. He isn't moving." default="firstaid" option2="waitforamb" actionOnEnd="fighter1.isActive = false;
+fighter2.isActive = false;
+fighter3.isActive = false;
+fighter4.isActive = false;
+fighter5.isActive = false;
+fighter6.isActive = false;
+injuredf.isActive=true;" addToAAR="inj" />
+ <dialogOption id="injfight" operator="Caller:" emotions="panically" texten="Not that I can t.....OH! They've just started fighting with someone. One of them punched him! He's fallen to the grou....Jesus CHRIST! They're kicking him! All of them, they're kicking him!" default="firstaid" option2="waitforamb" actionOnEnd="injuredf.isActive=true;" addToAAR="inj" />
+ <dialogOption id="firstaid" operator="Operator:" texten="{GIVE FIRST AID} Could check his condition and give him first aid?" default="helpyes" option2="noway" />
+ <dialogOption id="waitforamb" operator="Operator:" texten="{WAIT FOR HELP} Ok ma'am I've got the ambulance on the way. Just wait for it, okay?" default="end" />
+ <dialogOption elementProperties="bgsound=cgenvandals_0_3" id="helpyes" operator="Caller:" texten="They've run away. I think I can try and help him." default="helpontheway" option2="instruction" actionOnEnd="opinionEffect=+1;
+injuredf.hpchange=0;" addToAAR="yeshelp" COMMENT="tło bez wandali"/>
+ <dialogOption id="noway" operator="Caller:" emotions="scared, outraged" texten="No WAY! These guys are really scary! That's why I called 911! So you guys can take care of them" default="helpontheway" option2="ignore" option3="where" addToAAR="nohelp" />
+ <dialogOption id="helpontheway" operator="Operator:" texten="{I'LL SEND HELP} Help is on the way. They'll be there shortly." default="end" />
+ <dialogOption id="instruction" operator="Operator:" texten="{FIRST AID INSTRUCTION?} Do you need me to give you direction on a first aid? It might be necessary to help him." default="nurse" actionOnEnd="opinionEffect+=1;" addToAAR="greatquestion" />
+ <dialogOption id="nurse" operator="Caller:" texten="No, that won't be necessary. I've worked as a nurse a few years ago. I'll call again if his condition worsens before the ambulance gets here" default="helpontheway" />
+ <dialogOption id="ignore" operator="Operator:" texten="{IGNORE} That's not a case for 911. Sorry, I can't send emergency units." default="endignore" actionOnEnd="opinionEffect=-2;
+onIgnore=-3;" addToAAR="badignore" />
+ <dialogOption id="ignore2" operator="Operator:" texten="{IGNORE} This is not an emergency for 911. I can't send any emergency units." default="endignore" actionOnEnd="opinionEffect=1;
+onIgnore=1;" addToAAR="ignorable" />
+ <dialogOption id="endignore" operator="Caller:" emotions="suprised" texten="Oh, really? So... I'll just ignore that if you say so. Bye." actionOnEnd="actionHangup" />
+ <dialogOption id="end" operator="Caller:" texten="Okay, thank you for your help." actionOnEnd="actionHangup" />
+ <dialogOption id="reminder" operator="Caller:" texten="Are you there, sir?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Hello?" />
+ </dialog>
+ <aar >
+ <reportElement id="story" texten="Caller reported men who behaving like vandals in public." />
+ <reportElement id="bigfire" texten="The action of vandals resulted in setting a fire in the area." />
+ <reportElement id="inj" texten="Vandals beat one of the pedestrians. His condition required medical help." />
+ <reportElement id="yeshelp" texten="Caller gave first aid to the men." />
+ <reportElement id="nohelp" texten="Caller refused to give first aid." />
+ <reportElement id="greatquestion" texten="Operator asked caller if he needs information about first aid instruction. However, that wasn't necessary." />
+ <reportElement id="badignore" texten="Operator decided to ignore the emergency call." />
+ <reportElement id="ignorable" texten="Operator decided to ignore the call, because that wasn't emergency matter." />
+ </aar>
+ </conversation>
+ <conversation id="mia1noise" textpl="Zakłócanie porządku" texten="Peace disturbance" >
+ <scene >
+ <witness elementProperties="sex=M" id="caller" emotions="an elderly, dignified man with good diction, serious, calm tone of voice" textpl="Zgłaszający" texten="Caller" addToAAR="notnec" />
+ </scene>
+ <dialog >
+ <dialogOption id="1" operator="Operator:" textpl="911, w czym mogę pomóc?" texten="911, what's your emergency?" default="intro" actionOnEnd="opinionEffect= -5; onIgnore= 2;" />
+ <dialogOption id="intro" operator="Caller:" emotions="he's trying to be calm and gentlemanly" textpl="Dzień dobry. Chciałbym wnieśc skargę. W moim mieszkaniu jest niesamowicie głośno. Od tego dudnienia dosłownie trzesą mi się szyby. Proszę coś z tym zrobić" texten="Hello. I'd like to lodge a complaint. It's unbearably loud here in my apartment. The windows are literally shaking because of the noise. Please do something about it." default="neighbors" option2="source" option3="where" addToAAR="story" />
+ <dialogOption id="neighbors" operator="Operator:" textpl="{SĄSIEDZI?} Czyli ma pan problem z sąsiadami?" texten="{NEIGHBORS?} Do you have a problem with your neighbors, sir?" default="festival" />
+ <dialogOption id="source" operator="Operator:" textpl="{SKĄD TEN HAŁAS?} Co jest źródłem tego hałasu?" texten="{WHAT NOISE?} What's the source of the noise?" default="festival" />
+ <dialogOption id="festival" operator="Caller:" emotions="irritated but still with manner in his voice" textpl="Raczy pan żartować? Chyba ciężko nie zauważyć co się dzieje w mieście? To ten tak zwany festwial muzyczny. Nie wiem czy tylko czy kogoś tam tak naprawdę obchodzi muzyka." texten="You must be joking! It's not hard to tell what's going on. It's that so called music festival! They sound like they have no idea what real music is over there." default="problem" option2="right" option3="where" />
+ <dialogOption id="problem" operator="Operator:" textpl="{TO NIE JEST ZGŁOSZENIE ALARMOWE} Rozumiem, że festiwal jest głośny i hałas może sprawiać pewien dyskomfort, ale to nie jest sytuacja alarmowa. Jeśli nie podoba się panu letni festiwal, proszę napisać skargę do władz miasta." texten="{IT'S NOT AN EMERGENCY} I understand that the music is kinda loud and it might be somewhat disruptive, but this is not an emergency. They have all the required permits from the city. If you don't like the music festival, you'll need to talk to your city councillor." default="joke" />
+ <dialogOption id="where" operator="Operator:" textpl="{ADRES} Skąd pan dzwoni?" texten="{ADDRESS?} Where are you calling from?" default="where1" />
+ <dialogOption id="joke" operator="Caller:" emotions="more irritated" textpl="Bardzo proszę nie żartować. Przecież w tym hałasie nie da się normalnie funkcjonować. Proszę zająć się tą sprawą, to jest wasz obowiązek." texten="Please don't make fun of the situation. It's impossible to enjoy my house apartment with all this noise. You have to do something about it. It's your duty as a public servant." option2="iknow" option3="right" />
+ <dialogOption id="iknow" operator="Operator:" textpl="{WIEM CO MAM ROBIĆ} Proszę pana, zapewniam, że znam swoje obowiązki. Nie musi pan mnie ich uczyć. I nie obejmują one odwoływania festiwalu z powodu skarg o hałas." texten="{I KNOW MY DUTIES} Sir, let me assure you I do know my duties. You do not have to remind me of them. And shutting down the festival because of the noise is not one of them." default="reason" actionOnEnd="onIgnore=1;" COMMENT="let me assure you I do know"/>
+ <dialogOption id="right" operator="Operator:" textpl="{NIE MOGĘ NIC ZROBIĆ} Nie mogę nic zrobić w tej sprawie. Festiwal jest legalny i nie mogę go zamknąć z powodu skargi o hałas." texten="{THERE IS NOTHING I CAN DO} There is nothing we can do, sir. The festival is completely legal. They have all the required permits. We can't shut it down because of noise complaints." default="reason" />
+ <dialogOption id="reason" operator="Caller:" emotions="angry" textpl="Świetnie, po prostu świetnie... I NORMALNI mieszkańcy mają tak siedzieć w tym cholernym hałasie przez cały czas? Co musi się stać żeby ktoś przerwał to szaleństwo?!" texten="Great, that's just great... And NORMAL people are supposed to bear this noise all that time? What has to happen in order to have this madness stopped?" default="reason1" />
+ <dialogOption id="reason1" operator="Operator:" textpl="Festiwal może zostać przerwany tylko ze względu na istotne zagrożenie bezpieczeństwa. Proszę o cierpliwość, festiwal trwa tylko kilka dni i odbywa się raz na rok. " texten="We'd only shut down the event if there was a serious security threat. Please be patient. The festival is only once a year. It'll be over in a couple of days." default="reason2" />
+ <dialogOption id="reason2" operator="Caller:" emotions="mad, the music in the background gets louder" textpl="Cierpliwość?! Łatwo panu mówić...! Niech pan posłucha tego dudnienia. . . . . . . . . . . . . . . . . . . . . " texten="Patient? Easy for you to say...! Just listen to this noise!. . . . . . . . . . . . . . . . . . . . . " default="block" option2="legal" />
+ <dialogOption id="block" operator="Operator:" textpl="{NIE BLOKUJ LINII} Proszę nie blokować linii alarmowej. Powiedziałem już panu wszystko w tej sprawie. " texten="{DO NOT BLOCK THE LINE} Sir, you're taking up an emergency line. I've already told you there's nothing that can be done." default="end" addToAAR="good" />
+ <dialogOption id="legal" operator="Operator:" textpl="{POLECAM ZATYCZKI DO USZU} Mogę panu polecić tylko zakup zatyczek do uszu. Jak już mówiłem nic z tym nie mogę zrobić." texten="{RECOMMEND EAR PLUGS} Maybe you should buy some earplugs, sir. Like I've already said, there's nothing I can do." default="end" actionOnEnd="opinionEffect= -5; onIgnore= 1;" addToAAR="bad" />
+ <dialogOption id="end" operator="Caller:" emotions="sound of phone throwing" textpl=" Co za. . . . . . . . . . . . . . . . . " texten="What a. . . . . . . . . . . . . . . . . ." default="place" actionOnEnd="actionHangup" />
+ <dialogOption id="notemer" operator="Operator:" textpl="{TO NIE JEST ZGŁOSZENIE ALARMOWE} Pana zgłoszenie nie jest zgłoszenie alarmowym. Nie mogę nikogo tam wysłać." texten="{IT'S NOT AN EMERGENCY} Sir, your call is not an emergency. I'm not sending anyone." default="notemer1" />
+ <dialogOption id="where1" operator="Caller:" textpl="Z domu. Mieszkam na [[ADDRESS]]i koncert słychać aż tutaj!" texten="From my home. I'm at [[ADDRESS]] and I can hear it here!" default="back" actionOnEnd="actionSetLocation;" COMMENT="Ustalone było, że miejsce festiwalu ma być widoczne cały czas."/>
+ <dialogOption id="addressa1" operator="Caller:" textpl="Z domu. Mieszkam na [[ADDRESS]]i koncert słychać aż tutaj!" texten="From my home. I'm at 315 Mendoza Ave and I can hear it here!" default="back" />
+ <dialogOption id="addressa2" operator="Caller:" textpl="Z domu. Mieszkam na [[ADDRESS]]i koncert słychać aż tutaj!" texten="From my home. I'm at 23rd Terrace and I can hear it here!" default="back" />
+ <dialogOption id="addressa3" operator="Caller:" textpl="Z domu. Mieszkam na [[ADDRESS]]i koncert słychać aż tutaj!" texten="From my home. I'm at Brickell Street 43 and I can hear it here!" default="back" />
+ <dialogOption id="reminder" operator="Caller:" emotions="trying to outshout the noise" textpl="Słyszy mnie pan?" texten="Can you hear me?" />
+ <dialogOption id="reminder2" operator="Caller:" emotions="irritated" textpl="Cholera, czy to ja ogłuchłem czy pan?" texten="Damn, is it me who is deaf or you?" />
+ </dialog>
+ <aar >
+ <reportElement id="story" textpl="Zgłaszający zadzwonił ze skargą na hałas dochodzący z terenu letniego festiwalu." texten="The caller complained about the noise coming from a summer festival." />
+ <reportElement id="good" textpl="Operator odmówił podjęcia interwencji." texten="The operator refused to take action." />
+ <reportElement id="bad" textpl="Operator odmówił podjęcia interwencji w nieuprzejmy sposób. Dzwoniący wniósł skargę." texten="The operator impolitely refused to take action. The caller filed a complaint." />
+ <reportElement id="notnec" textpl="Operator niepotrzebnie wysłał jednostki do miejsca zamieszkania dzwoniącego." texten="The operator sent services to the caller's address without justified cause." />
+ </aar>
+ </conversation>
+ <conversation id="mia2alarm" textpl="Zakłócanie porządku 2" texten="Bomb alarm" >
+ <scene >
+ <witness elementProperties="sex=M;" id="caller" emotions="the same voice as before" textpl="Zgłaszający" texten="Caller" />
+ <work elementProperties="work=600;" id="bomb" textpl="Szukanie potencjalnej bomby" texten="Bomb search" addToAAR="fake" COMMENT="TO DO: ikona plecka lub znaku zapytania"/>
+ </scene>
+ <dialog >
+ <dialogOption id="1" operator="Operator:" textpl="911, słucham?" texten="911, what's your emergency?" default="intro" actionOnEnd="opinionEffect =-5; onIgnore = 5;" />
+ <dialogOption elementProperties="option=howfind" id="intro" operator="Caller:" emotions="stressed" textpl="Dzień dobry. Chciałbym powiadomić, że na terenie festiwalu jest bomba." texten="Hello. Listen carefully... I've found a bomb at the festival." default="where" option2="look" option3="why" addToAAR="story" COMMENT="ustawienie adresu w miejscu festiwalu"/>
+ <dialogOption id="where" operator="Operator:" emotions="serious, fast" textpl="{GDZIE?} Gdzie dokładnie znajduje się bomba?" texten="{WHERE?} The music festival? OK, where is the bomb?" default="where1" />
+ <dialogOption id="where1" operator="Caller:" emotions="unsure, like he has just decided where the bomb is" textpl="Eee... szukajcie jej koło sceny!" texten="Uhmm... Look for it around the stage!" default="back" option2="send" option3="ignore" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="look" operator="Operator:" emotions="serious, fast" textpl="{JAK WYGLĄDA?} Jak wygląda bomba?" texten="{HOW DOES IT LOOK?} OK, what does the bomb look like?" default="look1" />
+ <dialogOption id="look1" operator="Caller:" emotions="unsure" textpl="Yyy... no ma wystające kable. Wyświetlacz z zegarem..." texten="Uhhh... it has wires... and... um... a display with a timer..." default="back" option2="send" option3="ignore" />
+ <dialogOption id="howfind" operator="Operator:" textpl="Proszę o informacje, które pomogą ją znaleźć. Jest w samochodzie? W walizce? W plecaku?" texten="{DETAILS?}Please, give me any information that can help us find it. Is it in a car? Is it in a suitcase? Or a backpack?" default="howfind1" />
+ <dialogOption id="howfind1" operator="Caller:" emotions="loudly, like he has just decided what colour it is" textpl="W plecaku! Jest... czerwony!" texten="It's in a backpack! It's... red!" default="back" option2="send" option3="ignore" />
+ <dialogOption id="why" operator="Operator:" textpl="{SKĄD WIESZ?} Skąd pan o tym wie? Wie pan kto ją podłożył?" texten="{HOW DO YOU KNOW THAT?} OK. Did you see who left it?" default="why1" />
+ <dialogOption id="why1" operator="Caller:" emotions="a bit panicky" textpl="Nie! Chcę pozostać anonimowy!" texten="No! I didn't. I just found it... um... I want to stay anonymous!" default="back" option2="send" option3="ignore" />
+ <dialogOption id="send" operator="Operator:" textpl="{WYSYŁAM SŁUŻBY} Na miejsce zostaną wysłane odpowiednie służby. Dziękujemy za zgłoszenie." texten="{I'LL SEND THE FORCES} Alright, sir, I'm notifying officers working at the festival and I have fire and ambulance responding as well. Thank you." default="end" />
+ <dialogOption id="end" operator="Caller:" emotions="unsure" textpl="Czyli teraz ten cały festiwal zostanie przerwany?" texten="So the whole festival will be suspended?" default="maybe" option2="sendend" />
+ <dialogOption id="maybe" operator="Operator:" textpl="{OKAŻE SIĘ} Ta decyzja należy do służb i organizatorów festiwalu." texten="{WE WILL SEE} That'll be up to the organizers and the officer in charge." default="ok" />
+ <dialogOption id="ok" operator="Caller:" textpl="No dobrze. Ale pamiętajcie, że nie ma co ryzykować życia ludzi dla jakiegoś durnego festiwalu." texten="Okay. But remember, there's no point in risking people's lives for some stupid music festival. " default="sure" option2="sendend" />
+ <dialogOption id="sure" operator="Operator:" textpl="{CZY JEST PAN PEWIEN?} Czy jest pan pewny, że tam jest bomba? Za fałszywy alarm grożą panu poważne konsekwencje?" texten="{ARE YOU SURE ABOUT THE BOMB?} Um....are you sure about the bomb, sir? You do realize there are serious consequences for making a false report. Especially a bomb threat." default="sure1" />
+ <dialogOption id="sure1" operator="Caller:" emotions="sudden confidence" textpl="Tak! Trzeba zamknąć ten festiwal! Jeśli mi pan nie uwierzy zginą setki osób!" texten="Yes! This festival has to stop! If you don't believe me, hundreds could die!" default="sendend" option2="dontbelieve" />
+ <dialogOption id="dontbelieve" operator="Operator:" emotions="Sherlock style" textpl="{NIE WIERZĘ PANU} Nie wierzę panu. Znam ten głos - dzwonił pan do mnie wcześniej ze skargą na hałas dobiegający z festiwalu. Nie sądzę, żeby podłożył pan bombę, ale jestem w stanie uwierzyć, że postanowił pan złożyć fałszywe zgłoszenie, żeby festiwal został przerwany!" texten="{I DON'T BELIEVE YOU} Wait a minute....it sounds like your story's changing....Hey!, I thought I recognized your voice! You called earlier...you were complaining about the volume of the music coming from the festival. You didn't find a bomb, did you? But I bet you're willing to make a false bomb threat to shut down the event!" default="dontbelieve1" actionOnEnd="opinionEffect=-4;" addToAAR="fake" />
+ <dialogOption id="sendend" operator="Operator:" texten="{HELP IS ON THE WAY} Okay, the emergency services are on a way, they should be there soon." default="sendok" actionOnEnd="opinionEffect=-3; onIgnore=-3;
+" addToAAR="fake" COMMENT="dźwięk z call alb3 id: resc"/>
+ <dialogOption id="dontbelieve1" operator="Caller:" emotions="scared" textpl="Ja... Przepraszam... Wiem, że to absurdalne, ale nie mogłem wytrzymać w tym cholernym hałasie!" texten="I... I'm sorry... um... I know it's absurd, but... I couldn't stand that goddamn noise!" actionOnEnd="actionHangup;" addToAAR="reason" />
+ <dialogOption id="sendok" operator="Caller:" texten="Okay. " actionOnEnd="actionHangup;" COMMENT="dźwięk z kwestii alt - mia1noise_intro - please, do"/>
+ <dialogOption id="ignore" operator="Operator:" texten="{IGNORE} We have no time for that now, sir. " actionOnEnd="opinionEffect=-3;
+actionHangup;" addToAAR="fake" COMMENT="wyciąć z wa_b3_notime"/>
+ <dialogOption id="reminder" operator="Caller:" texten="Hello..." />
+ <dialogOption id="reminder2" operator="Caller:" texten="Can you hear me?" />
+ </dialog>
+ <aar >
+ <reportElement id="story" texten="Caller reported bomb planted at the festival area.." />
+ <reportElement id="fake" texten="Bomb alarm occured to be faked." />
+ <reportElement id="reason" texten="False bomb alarm was made by person who was irritated by loud muisc." />
+ </aar>
+ </conversation>
+ <conversation id="mia3snake" textpl="Wąż" texten="Snake" >
+ <scene >
+ <passerby elementProperties="sex=W;" id="jessica" emotions="nastolatka, przyjemny głos, w stylu blodynek ze slasher horrorów przykład: https://www.youtube.com/watch?v=ENyIbLd_g48" textpl="Dzwoniąca" texten="Caller" />
+ <passerby elementProperties="sex=M;" id="ted" textpl="Towarzysz dziewczyny" texten="Girl's companion" />
+ <injured elementProperties="isActive=false;
+hp=100;
+sex=M;
+hpChange=-0.5" id="ited" textpl="Ugryziony przez węża Ted" texten="Ted, bitten by a snake" />
+ <work elementProperties="isActive=false;
+work=50;
+icon=OnSitePic_Snake;" id="vsnake" textpl="Mokasyn" texten="Copperhead" />
+ <work elementProperties="isActive=false;
+work=25;
+icon=OnSitePic_Snake;" id="psnake" textpl="Pyton" texten="Python" />
+ <work elementProperties="isActive=false;
+work=75;
+icon=OnSitePic_Snake;" id="usnake" textpl="Nieznany wąż" texten="Unknown snake" />
+ <work elementProperties="isActive=false;
+work=35" id="ecamp" textpl="Puste obozowisko" texten="Empty campsite" addToAAR="empty" />
+ <work elementProperties="isActive=false;
+work=10;
+icon=OnSitePic_Snake;" id="hsnake" textpl="Niegroźny wąż" texten="Harmless snake" />
+ <injured elementProperties="isActive=false;
+hp=80;
+sex=W;
+hpChange=-0.6;" id="icall" textpl="Dzwoniąca ugryziona przez węża" texten="Caller, bitten by a snake" />
+ </scene>
+ <dialog >
+ <dialogOption id="1" operator="Operator:" textpl="911, what's your emergency?" texten="911, what's your emergency?" default="intro" actionOnEnd="opinionEffect =3; " addToAAR="story" />
+ <dialogOption id="intro" operator="Caller:" emotions="panicky, screaming" textpl="Tu jest wąż!!! Zabierzcie go stąd! Szybko!" texten="There's a snake in here!!! Please, get it out of here....NOW!" default="really" option2="where" option3="ifbite" actionOnEnd="usnake.isActive=true;" />
+ <dialogOption id="really" operator="Operator:" textpl="{ZACHOWAJ SPOKÓJ} Spokojnie, proszę nie panikować. Czasem zdarza się spotkać węża, ale nie zawsze stanowi on zagrożenie." texten="{CALM DOWN} Alright miss, calm down, please don't panic. The snake might not be dangerous." default="city" />
+ <dialogOption id="where" operator="Operator:" textpl="{GDZIE?} Gdzie jest ten wąż? Skąd pani dzwoni?" texten="{WHERE?} Where's the snake? Where are you calling from?" default="address" />
+ <dialogOption id="ifbite" operator="Operator:" textpl="{CZY SĄ RANNI?} Czy ktoś został ugryziony przez węża?" texten="{ANYONE GOT BITTEN?} Did it bite anyone?" default="ifbite1" />
+ <dialogOption id="address" operator="Caller:" textpl="Jesteśmy przy [[ADDRESS]]!" texten="We're at [[ADDRESS]]!" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="address1" operator="Caller:" textpl="Jesteśmy przy 200 Biscane Boulevard!" texten="We're at 200 Biscane Boulevard!" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="address2" operator="Caller:" textpl="Jesteśmy przy 12 17 Street!" texten="We're at 12 17 Street!" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="address3" operator="Caller:" textpl="Jesteśmy przy 145 23 Avenue!" texten="We're at 145 23 Avenue!" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="ifbite1" operator="Caller:" textpl="Nie, na szczęście nie." texten="No, nobody's been bitten, thank God!" default="back" />
+ <dialogOption elementProperties="option=where" id="city" operator="Caller:" emotions="a bit more calm but still stressed" textpl="Mam nadzieję! Spotkaliśmy go z chłopakiem na spacerze. Myślałam, że w mieście to się nie zdarza! " texten="I hope so! " default="spec" option2="ifbite" option3="sendhelp" />
+ <dialogOption id="spec" operator="Operator:" textpl="{OPISZ WĘŻA} Czy możesz opisać tego węża?" texten="{DESCRIBE IT} Do you know what kind of snake it is? Can you describe it?" default="pyton" option2="mokasyn" option3="garden" />
+ <dialogOption id="sendhelp" operator="Operator:" textpl="{WYŚLĘ POMOC} Rozumiem. W takim razie wysyłam pomoc." texten="{WAIT FOR HELP} Got it. I'm sending help." default="thank" actionOnEnd="opinionEffect=-2; " addToAAR="unknow" />
+ <dialogOption id="sendhelpgood" operator="Operator:" textpl="{WYŚLĘ POMOC} Rozumiem. W takim razie wysyłam pomoc." texten="{WAIT FOR HELP} Got it. I'm sending help." default="thank" />
+ <dialogOption id="thank" operator="Caller:" emotions="panicking" textpl="Niech przyjadą tu szybko, zanim ten wąż kogoś ugryzie!" texten="They better get here fast, before it bites someone!" actionOnEnd="actionHangup;" addToAAR="help" />
+ <dialogOption elementProperties="option=sendhelpgood" id="mokasyn" operator="Caller:" textpl="Nie widzę go zbyt dobrze, leży zwinięty nieruchomo. Jest ciemnobrązowy, gładki... " texten="I can't see well, it's curled up, not moving. Dark brown, plain..." default="venomalert" option2="noharm" option3="where" actionOnEnd="vsnake.isActive=true;
+bite->active=true;
+goodbite->active=true;
+badbite->active=false;
+noharmwrong->active=true;
+noharmgood->active=false;
+usnake.isActive=false;" />
+ <dialogOption elementProperties="option=sendhelpgood" id="pyton" operator="Caller:" emotions="pod koniec wpada w panikę" textpl="Nie widzę go zbyt dobrze, leży zwinięty nieruchomo. Mimo to jest wielki! Ma duże brązowe cętki na ciele... Czy to nie takie węże owijają się ludziom wokół szyi?!" texten="I can't see well, it's curled up, not moving. He's huge though! And has those big brown speckles. Isn't that the one that wraps around people's necks?" default="hungry" option2="where" option3="noharm" actionOnEnd="psnake.isActive=true;
+usnake.isActive=false; " />
+ <dialogOption elementProperties="option=sendhelp" id="garden" operator="Caller:" textpl="Nie widzę go zbyt dobrze, leży zwinięty nieruchomo. Jest raczej mały, czarny z białą głową." texten="I can't see well, it's curled up, not moving. It's kinda small.... black with a white head." default="noharm" option2="leave" option3="where" actionOnEnd="hsnake.isActive=true;
+usnake.isActive=false;" COMMENT="harmless"/>
+ <dialogOption id="noharm" operator="Operator:" textpl="{TO NIC GROŹNEGO} Spokojnie, to jest zupełnie nieszkodliwy lokalny wąż. Często można go spotkać w ogrodach i w parkach. Nie jest jadowity i nic wam nie zrobi." texten="{IT'S HARMLESS} Calm down, it's completely harmless. You find them all the time in local gardens and parks...it isn't venomous. " default="noharmgood" option2="noharmwrong" actionOnEnd="opinionEffect +=-3" addToAAR="unharm" />
+ <dialogOption id="noharmgood" operator="Caller:" emotions="calm" textpl="Uff. Dzięki. Naprawdę się baliśmy. Dzięki jeszcze raz." texten="Phew. Thanks. It really scared us. Thank you." default="over" />
+ <dialogOption id="noharmwrong" operator="Caller:" emotions="na luzie" textpl="O serio? Boże tak nas wystraszył... Chodź zobaczymy go z bliska . . . . . . . . " texten="Oh really? God, it really scared us. Come, let's have a closer look . . . . . . . ." default="closer2" />
+ <dialogOption id="over" operator="Operator:" textpl="{NIE MA SPRAWY} Nie ma sprawy. Cieszę się, że nic nikomu się nie stało." texten="{NO PROBLEM} No problem. I'm glad everyone's fine." default="over1" actionOnEnd="vsnake.isActive=false; usnake.isActive=false; psnake.isActive=false;" />
+ <dialogOption id="over1" operator="Caller:" textpl="Dzięki. Pa!" texten="Thanks. Bye!" actionOnEnd="actionHangup;
+onIgnore=2" />
+ <dialogOption id="closer" operator="Operator:" textpl="{PODEJDŹ DO WĘŻA} Podejdź do węża. Potrzebuje dokładnego opisu aby ustalić, czy coś wam grozi." texten="{APPROACH IT} Carefully approach the snake. I need a better description to tell if you're in danger." default="closer1" />
+ <dialogOption id="closer1" operator="Caller:" emotions="z ociąganiem, kroki, dźwięk upadającego telefonu" textpl="No dobrze... spróbuję. . . . . . . . . . AAA!" texten="Okay... I'll try. . . . . . . . . . . . AAHHHH!" actionOnEnd="actionHangup;
+jessica.isActive=false;
+icall.isActive=true;
+opinionEffect +=-4;
+onIgnore=-1" addToAAR="callharm" />
+ <dialogOption id="closer2" operator="Caller:" textpl="AAA!" texten="AAAHH!" actionOnEnd="actionHangup;
+jessica.isActive=false;
+icall.isActive=true;
+opinionEffect +=-4;
+onIgnore=-1" addToAAR="callharm" />
+ <dialogOption id="hungry" operator="Operator:" textpl="{TO PYTON TYGRYSI} Opis pasuje do pytona tygrysiego. Potrafi być groźny kiedy jest zły lub głodny." texten="{IT IS BLACK-TAILED PYTHON} Black-tailed python fits that description. It's not poisonous but it can be dangerous if it's hungry or irritated." default="hungry1" />
+ <dialogOption elementProperties="
+option=where" id="hungry1" operator="Caller:" textpl="O matko! Co mamy robić?" texten="Oh my God! What should we do?" default="leave" option2="kill" option3="emehelp" />
+ <dialogOption id="leave" operator="Operator:" textpl="{WYCOFAJCIE SIĘ SPOKOJNIE} Powinniście powoli i spokojnie wycofać sie w przeciwnym kierunku. Starajcie poruszać się cicho i bez paniki." texten="{BACK OUT SLOWLY}I want you to stay calm, and just slowly back away. Don't panic, just move calmly and quietly back and leave the snake alone." default="slowback1" COMMENT="trzeba sprawdzić ze słuchu"/>
+ <dialogOption id="venomalert" operator="Operator:" textpl="{TO JADOWITY WĄŻ} Opis pasuje do mokasyna błotnego. To bardzo niebezpieczny wąż. Jego ugryzienie może spowodować martwicę tkanek." texten="{HE'S VENOMOUS} Oh! That sounds like a cottonmouth. It's a venomous snake. They're very dangerous. His bite might cause tissue necrosis." default="venomhelp" />
+ <dialogOption elementProperties="
+option=where" id="venomhelp" operator="Caller: " emotions="panicked, whispering" textpl="O Boże, co mamy robić?!" texten="Oh God, what should we do?" default="emehelp" option2="leave" option3="kill" />
+ <dialogOption id="emehelp" operator="Operator:" textpl="{POCZEKAJCIE NA POMOC} Zostańcie na miejscu i nie ruszajcie się. Wyślę do was pomoc!" texten="{WAIT FOR HELP} Stay where you are and don't move. I'm sending help!" default="stay" />
+ <dialogOption id="stay" operator="Caller:" emotions="whispering" textpl="Nawet nie drgniemy. Proszę, uratujcie nas!" texten="We can't move...it might bite us! Please send help!" actionOnEnd="actionHangup;" addToAAR="help" />
+ <dialogOption id="slowback1" operator="Caller:" textpl="Już nas nie ma." texten="OK, we're moved away from it." actionOnEnd="actionHangup;" addToAAR="escape" />
+ <dialogOption id="kill" operator="Operator:" textpl="{ZABIJCIE WĘŻA} Poszukajcie jakieś broni - może to być solidny kij lub pręt i zabijcie węża." texten="{KILL THE SNAKE} Look for something that you can use as a weapon, like a long stick, and kill the snake." default="bite" />
+ <dialogOption id="bite" operator="Caller:" emotions="the voice in the background screams from pain" textpl="Gdzie tu jest jakiś . . . . Dobra, mam . . . Wal w niego!!!. . . . . . O matko! . . . Nie! . . . Nie, nie, nie!" texten="A stick... . . . Okay, got one . . . Hit it, John!!! . . . . . . . Oh my God! . . . No! . . . No, no, no!" default="bite1" actionOnEnd="ted.isActive=false;
+ited.isActive=true;
+usnake.isActive=false;
+vsnake.isActive=false;" />
+ <dialogOption id="bite1" operator="Operator:" textpl="Co się stało?" texten="What happened?" default="bite2" />
+ <dialogOption elementProperties="option=sack" id="bite2" operator="Caller:" emotions="crying" textpl="Ugryzł mego chłopaka... Nie umieraj!" texten="It bit my boyfriend! Oh, Baby....please.... Don't die!" default="hold" option2="firstaid" option3="firstaid2" />
+ <dialogOption id="hold" operator="Operator:" textpl="{POMOC JEST W DRODZE} Pomoc jest w drodze. Zostańcie na miejscu i czekajcie." texten="{HELP IS ON THE WAY} Help is on the way. Stay there and wait." default="goodbite" option2="badbite" />
+ <dialogOption id="goodbite" operator="Caller:" emotions="błagalnym tonem" textpl="Pospieszcie się. . . proszę!" texten="Hurry up. . . please!" actionOnEnd="actionHangup;
+opinionEffect +=-2" addToAAR="fine" />
+ <dialogOption id="badbite" operator="Caller:" emotions="błagalnym tonem" textpl="Pospieszcie się. . . proszę!" texten="Hurry up. . . please!" actionOnEnd="actionHangup;
+opinionEffect +=-4" addToAAR="loss" />
+ <dialogOption id="firstaid" operator="Operator:" textpl="{USPOKÓJCIE GO} Posadź go i postaraj się go uspokoić. Mniejsze tętno spowolni truciznę." texten="{CALM HIM DOWN} Have him sit down and keep him calm...you don't want his heart rate to increase." default="firstaid1" actionOnEnd="ited.hpChange=+20;
+opinionEffect+=1;" />
+ <dialogOption id="firstaid1" operator="Caller:" emotions="jęki bólu w tle" textpl="Dobrze . . . Kochanie usiądź, wszystko będzie w porządku, już do nas jadą. . . . . . . . . . . " texten="Good. . . Sit down, honey. The ambulance is on the way. . . . . . . . . . . " default="back" option2="where" actionOnEnd="actionHangup;" />
+ <dialogOption id="firstaid2" operator="Operator:" textpl="{UNIERUCHOMCIE KOŃCZYNĘ} Unieruchomcie ugryzioną kończynę w takiej pozycji, by znajdowała się poniżej poziomu serca." texten="{IMMOBILIZE THE LIMB} You're going to keep the bitten limb below the level of his heart, do you understand?." default="firstaid3" actionOnEnd="ited.hp +=20;
+opinionEffect+=1;" />
+ <dialogOption id="firstaid3" operator="Caller:" textpl="Tak zrobimy. Przyjedźcie jak najszybciej..." texten="OK, that's done. Please.... come quickly..." default="back" option2="where" actionOnEnd="actionHangup;" />
+ <dialogOption id="sack" operator="Operator:" textpl="{SPRÓBUJ WYSSAĆ JAD} Spróbuj wyssać jad z jego rany." texten="{TRY TO SUCK OUT THE VENOM} I want you to try and suck out the venom from the wound. Then, spit it on the ground but don't swallow it!" default="sackyes" actionOnEnd="opinionEffect+=-3;" addToAAR="badidea" />
+ <dialogOption id="sackyes" operator="Caller:" textpl="Jezu, nie wiem czy dam radę to zrobić. . . [wdech] . . . . . . . . . . Ugh, jakie okropne . . . . . Niedobrze mi . . . " texten="Jesus Christ. I don't know if I can do it. . . [inhales]. ...ok...here goes.... . . . . . . . . Yuck, disgusting. . . . . I feel sick. . . " actionOnEnd="actionHangup;
+jessica.isActive=false;
+icall.isActive=true;" />
+ <dialogOption id="reminder" operator="Caller:" textpl="Jest pan tam?" texten="Are you there?" />
+ <dialogOption id="reminder2" operator="Caller:" textpl="Potrzebujemy pomocy!" texten="We need help!" />
+ </dialog>
+ <aar >
+ <reportElement id="story" textpl="Podczas spaceru po mieście para młodych osób spotkała węża." texten="During a city stroll a young couple have encountered a snake." />
+ <reportElement id="unknow" textpl="Operator wysłał na miejsce jednostki ratunkowe, nie pozyskując wcześniej odpowiednich informacji." texten="The operator has sent the emergency services without gathering the necessary information beforehand." />
+ <reportElement id="escape" textpl="Operator zasugerował opuszczenie niebezpiecznego miejsca." texten="The operator suggested leaving the hazardous place." />
+ <reportElement id="badidea" textpl="Operator zasugerował wyssanie jadu, co poskutkowało zatruciem także osoby udzielającej pomoc." texten="The operator suggested sucking out the venom, resulting in the person helping also being poisoned. " />
+ <reportElement id="fine" textpl="Operator zasugerował zabicie węża. Niestety, jedna z osób została ugryziona przez niego ugryziona i spędziła tydzień w szpitalu." texten="The operator suggested killing the snake. Unfortunately one person was bitten and needed to be hospitalized for a week." />
+ <reportElement id="loss" textpl="Operator zasugerował zabicie węża. Jedna z osób została ugryziona przez nieznanego węża. Niestety, właściwa surowica została podana zbyt późno i poszkodowana osoba bezpowrotnie straciła nogę." texten="The operator suggested killing the snake. One person was bitten by an unknown breed of snake. Unfortunately the correct antivenom was given too late and the victim lost a leg." />
+ <reportElement id="help" textpl="Operator zadysponował na miejsce jednostki ratunkowe. Wąż został zabezpieczony, nikt nie odniósł obrażeń." texten="The operator has sent emergency services to the scene. The snake has been caught. No one was injured." />
+ <reportElement id="empty" textpl="Operator zadysponował na miejsce jednostki ratunkowe. Na miejscu obozowania nikogo nie zastano. Interwencja okazała się nie potrzebna." texten="The operator has sent emergency services to the scene. No one was found at the scene. Intervention turned out to be unnecessary." />
+ <reportElement id="callharm" textpl="Operator przekonał rozmówczynię by podeszła do węża. Naraziło to dzwoniącą na ryzyko, które zakończyło się atakiem węza." texten="The operator convinced the caller to approach the snake. This put her in direct risk, resulting in the snake attacking." />
+ <reportElement id="unharm" textpl="Operator przekonał rozmówczynię, że wąż jest całkowicie nieszkodliwy." texten="The operator convinced the caller that snake was completely harmless." />
+ </aar>
+ </conversation>
+ <conversation id="mia4water" textpl="Zdarzenie nad wodą" texten="Water accident" COMMENT="można pomyśleć nad nowym tytułem">
+ <scene >
+ <passerby elementProperties="sex=M" id="caller" textpl="Zgłaszający" texten="Caller" />
+ <witness elementProperties="isActive=false; sex=W" id="missing" textpl="Zaginiona" texten="Missing woman" />
+ <injured elementProperties="isActive=false;
+sex=M;
+Hp=100;
+hpChange=-1" blockedBy="swater" id="mdrown" textpl="Tonący mężczyzna" texten="Drowning man" />
+ <injured elementProperties="isActive=false;
+sex=W;
+Hp=100;
+ hpChange=-1" blockedBy="swater" id="gdrown" textpl="Tonąca dziewczyna" texten="Drowning girl" />
+ <injured elementProperties="isActive=false;
+type=children ;
+Hp=75;
+hpChange=-1" blockedBy="swater" id="kdrown" textpl="Tonące dziecko" texten="Drowning child" />
+ <injured elementProperties="isActive=false; Hp=100; hpchange=-0.25" id="burn" textpl="Poparzony przez meduzy" texten="Stung by a jellyfish" />
+ <injured elementProperties="isActive=false;
+sex =M;
+Hp=100;
+hpChange=-1" id="bite" textpl="Mężczyzna ugryziony przez rekina" texten="Man bitten by a shark" />
+ <injured elementProperties="isActive=false;
+sex=M;
+Hp=100;
+ hpChange=-2" id="air" textpl="Podtopiony mężczyzna" texten="Near-drowned man" COMMENT="Wyrzucony na brzeg, lub zdołał sie wydostać ale miał w płucach za dużo wody."/>
+ <dead elementProperties="isActive=false;" blockedBy="swater" id="dbody" textpl="Topielec" texten="Drowned man" COMMENT="TODO Obrazek ciała w wodzie."/>
+ <dead elementProperties="isActive=false; sex=M" blockedBy="swater" id="dcaller" textpl="Dzwoniący" texten="Caller" />
+ <work elementProperties="isActive=false; work=500" id="swater" textpl="Szukanie w morzu" texten="Searching in the sea" COMMENT="Symulacja pracy jaką trzeba wykonać by odnaleść topielca w wodzie."/>
+ </scene>
+ <dialog >
+ <dialogOption id="1" operator="Operator:" textpl="911, what's your emergency?" texten="911, what's your emergency?" default="introa" option2="introb" option3="introc" actionOnEnd="opinionEffect=3;" />
+ <dialogOption id="introa" operator="Caller:" emotions="nervous" textpl="Pomocy! Ktoś się topi!" texten="Help! Someone's drowning!" default="where" option2="who" option3="sure" actionOnEnd="swater.isActive=true;
+saw->action=false;
+look->action=false;
+noemergency->action=false;
+water->action=false;
+address->active=false;" addToAAR="story1" />
+ <dialogOption elementProperties="option=look" id="introb" operator="Caller:" emotions="nervous" textpl="Potrzebna jest pomoc! Pilnie! Na wybrzeżu leży młody chłopak i się nie rusza!" texten="We need help! Immediately! There's a young man lying on the the shore, he's not moving!" default="where" option2="saw" option3="con" actionOnEnd="
+noemergency->active=false; water->active=false; who->active=false; sure->active=false;
+address->active=false;" addToAAR="story2" />
+ <dialogOption elementProperties="option=noemergency" id="introc" operator="Caller:" emotions="spokojnie" textpl="Mam nietypową sprawę. Na brzegu znalazłem porzucone kobiece ubranie i koc. Obok leżała komórka." texten="Hi. I want to report something unusual. Um, I found some woman's clothes folded up on a blanket on the shore. There was a cellphone sitting on top." default="where" option3="water" actionOnEnd="address1->active=false;" addToAAR="story3" />
+ <dialogOption id="where" operator="Operator:" textpl="{GDZIE JESTEŚ?} Gdzie jesteś?" texten="{WHERE?} OK, where are you calling from, sir?" default="address" option2="address1" />
+ <dialogOption id="address" operator="Caller:" textpl="Jestem na wybrzeżu... hmm... to niedaleko [[ADDRESS]]. " texten="I'm at a public beach... uhmm... the one near [[ADDRESS]]." default="back" actionOnEnd="actionSetLocation;" COMMENT="calm"/>
+ <dialogOption id="address1" operator="Caller:" texten="I'm at [[ADDRESS]]!" default="back" actionOnEnd="actionSetLocation;" COMMENT="nervous"/>
+ <dialogOption id="address2" operator="Caller:" texten="I'm at 12 17 Street!" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="address3" operator="Caller:" texten="I'm at a public beach... uhmm... the one near 145 23 Avenue!" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="sure" operator="Operator:" textpl="{JESTEŚ PEWIEN?} Jesteś absolutnie pewien, że ktoś się topi?" texten="{ARE YOU SURE?} Are you absolutely sure that someone's drowning?" default="sureyes" option2="sureno" />
+ <dialogOption id="sureyes" operator="Caller:" emotions="impatient" textpl="Tak. Oczywiście, że tak." texten="Yes. Of course I am" default="back" />
+ <dialogOption id="sureno" operator="Caller:" textpl="Ta... chwila... obok tonącego z wody właśnie wynurzyła się druga osoba. Wygląda na to, że ktoś się tylko wygłupiał. Przepraszam, za pomyłkę. Do widzenia!" texten="Hold on... sorry, someone else is in the water... right next to the drowning person.... it looks like a stupid joke. I'm sorry for calling 911. Bye." actionOnEnd="actionHangup;
+opinionEffect=-2;
+swater.isActive=false;" addToAAR="falsecall" />
+ <dialogOption id="who" operator="Operator:" textpl="{KTO?} Kto się topi?" texten="{WHO?} OK, who's drowning?" default="kid" option2="men" option3="girl" />
+ <dialogOption elementProperties="option=swim;" id="kid" operator="Caller:" textpl="Małe dziecko spadło z materaca i wpadło do wody." texten="A child fell off a air mattress to the water." default="act" option2="go" option3="where" actionOnEnd="kdrown.isActive=true; swater.work=200" />
+ <dialogOption elementProperties="option=swim;" id="men" operator="Caller:" textpl="To jakiś dorosły, chyba mężczyzna." texten="It's an adult... a man, I guess." default="act" option2="go" option3="where" actionOnEnd="mdrown.isActive=true; " />
+ <dialogOption elementProperties="option=swim;" id="girl" operator="Caller:" textpl="To jakaś młoda dziewczyna! " texten="It's a young woman!" default="act" option2="go" option3="where" actionOnEnd="gdrown.isActive=true;
+drawnbad1->active=false" />
+ <dialogOption id="go" operator="Operator:" textpl="{PŁYŃ NA RATUNEK} Szybko, płyń tam i spróbuj wyciągnąć tonącego na brzeg!" texten="{SWIM TO HELP} Quickly! You need to help the drowning person get to shore!" default="drawngood" option2="drawnbad" option3="drawnbad1" />
+ <dialogOption id="drawngood" operator="Caller:" emotions="throwing phone, few steps and splash" textpl="W porządku już płynę! . . . " texten="Ok, I will! . . . . . . . . . . . . . . . . " actionOnEnd="actionHangup; swater.isActive=false;
+kdrown.hpChange=-0.25;
+mdrown.hpChange=-0.25;
+gdrown.hpChange=-0.25;" addToAAR="dgoodend" />
+ <dialogOption elementProperties="chance=0.20" id="drawnbad1" operator="Caller:" emotions="throwing phone, few steps and splash" textpl="W porządku już płynę! . . . " texten="Ok, I will! . . . . . . . . . . . . . . . . " actionOnEnd="actionHangup;
+dbody.isActive=true;
+dcaller.isActive=true;
+kdrown.isActive=false;
+mdrown.isActive=false;
+gdrown.isActive=false;
+opinionEffect=-4;
+" addToAAR="dbadend" />
+ <dialogOption id="drawnbad" operator="Caller:" emotions="throwing phone, few steps and splash" textpl="W porządku już płynę! . . . " texten="Ok, I will! . . . . . . . . . . . . . . . . " actionOnEnd="actionHangup;
+dcaller.isActive=true;
+dbody.isActive=true;
+kdrown.isActive=false;
+mdrown.isActive=false;
+gdrown.isActive=false;
+opinionEffect =-4;
+" addToAAR="dbadend" />
+ <dialogOption id="act" operator="Operator:" textpl="{WYSYŁAM POMOC} Zrozumiałem. Wysyłam na miejsce służby ratunkowe." texten="{I'LL SEND HELP} Understood, sir. I'm responding fire and ambulance." default="act1" />
+ <dialogOption elementProperties="option=go;
+option=where;" id="act1" operator="Caller:" textpl="A co ja mam robić?" texten="And what should I do?" default="stay" option2="swim" option3="rescuer" />
+ <dialogOption id="stay" operator="Operator:" textpl="{ZOSTAŃ NA BRZEGU} Zostań na brzegu i czekaj na przybycie ratowników." texten="{STAY AT THE SHORE} Stay on the shore, keep the person in your sight and wait for the fire and ambulance to get there, OK?." default="onlystay" />
+ <dialogOption id="swim" operator="Operator:" textpl="{UMIESZ PŁYWAĆ?} Czy umiesz pływać?" texten="{CAN YOU SWIM?} Can you swim?" default="swimyes" option2="swimno" option3="swimrescue" />
+ <dialogOption id="swimyes" operator="Caller:" emotions="very unsure" textpl="Tak... Pływałem trochę kiedy byłem w liceum." texten="Emm... yes.... I did a little competitive swimming in high school. " default="back" option2="go" option3="where" actionOnEnd="drawnbad1->active=true;
+drawnbad->active=false;" />
+ <dialogOption id="swimno" operator="Caller:" textpl="Nie umiem." texten="Nope." default="act" option2="where" />
+ <dialogOption id="swimrescue" operator="Caller:" emotions="self assured" textpl="Tak, pracowałem jako ratownik kilka sezonów w czasach studiów!" texten="Yes, I used to work as a life guard when I was in university!" default="back" option2="go" option3="where" actionOnEnd="drawnbad1->active=false;
+drawnbad->active=false;" />
+ <dialogOption id="rescuer" operator="Operator:" textpl="{POSZUKAJ RATOWNIKA} Rozejrzyj się po plaży i poszukaj ratownika." texten="{LOOK FOR A LIFEGUARD} Look around the beach, try to find a lifeguard." default="rescueryes" option2="rescuerno" />
+ <dialogOption id="rescuerno" operator="Caller:" textpl="Chwila.... nigdzie go nie ma." texten="OK, hang on a sec..... there aren't any lifeguards around." default="back" />
+ <dialogOption id="rescueryes" operator="Caller:" textpl="Już... Widzę jego samochód. Biegnę tam!" texten="Wait... I can see lifeguard's car. I'm running there now!" actionOnEnd="actionHangup; swater.isActive=false;
+kdrown.chChange=-0.10;
+mdrown.hpChange=-0.10;
+gdrown.hpChange=-0.10;
+opinionEffect +=2" addToAAR="dgoodend" />
+ <dialogOption elementProperties="
+option=rescuer;
+option=swim" id="onlystay" operator="Caller:" emotions="z oburzeniem" textpl="Jak to? Mam tylko stać i patrzeć jak ktoś się topi?!" texten="What? I'm supposed to just stand here and watch as somebody drowns?" default="beachwork" option2="yesstay" option3="where" />
+ <dialogOption id="yesstay" operator="Operator:" textpl="{CZEKAJ CIERPLIWIE} Proszę byś zaczekał na przyjazd służb. Nie możemy ryzykować." texten="{WAIT PATIENTLY} Please wait for the ambulance and fire to get there. We can't risk your life as well." default="istay" actionOnEnd="opinionEffect +=-2" />
+ <dialogOption id="istay" operator="Caller:" emotions="disappointed" textpl="Dobrze. Mam tylko nadzieję, że nie utopi się na moich oczach." texten="Okay... I just hope they don't drown..." actionOnEnd="actionHangup;" />
+ <dialogOption id="beachwork" operator="Operator:" textpl="{DZIAŁAJ NA BRZEGU} Możesz wiele zdziałać na brzegu. Zaznacz na plaży miejsce znajdujące się dokładnie naprzeciwko osoby topiącej się. Postaraj się zapamiętać, jak daleko od brzegu ta osoba się znajduje." texten="{ACT ON THE BEACH} You can do a lot without going in the water. Just imagine a straight line that runs between the drowning person and the beach and then mark it on the sand. Try to remember how far it is from the shore to the person." default="beachwork1" actionOnEnd="opinionEffect +=2" addToAAR="cando" />
+ <dialogOption id="beachwork1" operator="Caller:" textpl="Zrozumiałem." texten="Got it." actionOnEnd="actionHangup; swater.work=100" />
+ <dialogOption id="saw" operator="Operator:" textpl="{CZY WIDZIAŁEŚ ZDARZENIE?} Czy widziałeś jak ten chłopak znalazł się na brzegu?" texten="{HAVE YOU SEEN THE EVENT?} Did you see the guy make it back to shore?" default="sawyes" option2="sawno" />
+ <dialogOption id="sawyes" operator="Caller:" textpl="Tak, wyglądało to jakby wyczołgał się z wody." texten="Yeah, he crawled out of the water." default="back" actionOnEnd="nothing->active=false" />
+ <dialogOption id="sawno" operator="Caller:" textpl="Nie, kiedy przyszedłem już leżał." texten="No, he was already here when I found him." default="back" />
+ <dialogOption id="con" operator="Operator:" textpl="{CZY JEST PRZYTOMNY?} Musimy wiedzieć czy jest przytomny. Podejdź do niego, chwyć go za ramię i zapytaj czy wszystko jest w porządku." texten="{IS HE CONSCIOUS?} OK, is he conscious? Go over to him, touch his shoulder and ask him if he's OK." default="conyes" option2="connie" />
+ <dialogOption id="conyes" operator="Caller:" emotions="steps on the sand, whispers" textpl="Chwila. . . . . . . . . . . . . . . . . . . . Tak jest w porządku. Mówi, że wszystko z nim ok. Pomoc nie będzie potrzebna." texten="Alright, I'm checking him now. . . . . . . . . . . . . . . . . . Yeah, he's okay. He said he's fine. It looks like we don't need any help. Sorry!" actionOnEnd="actionHangup;" addToAAR="falsecall" />
+ <dialogOption id="connie" operator="Caller:" textpl="Zero reakcji. W ogóle się nie rusza." texten="There's no reaction. He's not moving at all..." default="breath" option2="where" />
+ <dialogOption id="look" operator="Operator:" textpl="{OBEJRZYJ GO DOKŁADNIE} Czy na ciele widzisz jakieś rany?" texten="{EXAMINE HIM} OK, can you tell, are there any obvious injuries?" default="shark" option2="jellyfish" option3="nothing" />
+ <dialogOption id="shark" operator="Caller:" emotions="frightened" textpl="Chwila... . . . . O Boże, on krwawi! Wygląda jakby miał nadgryzioną nogę z boku uda." texten="Wait . . . . . . . . Oh my God, he's bleeding! His thigh looks like... damn! It looks like something bit him." default="sendhelp" option2="sfirstaid" option3="sharkalert" actionOnEnd="bite.isActive=true;" />
+ <dialogOption elementProperties="option=where" id="jellyfish" operator="Caller:" textpl="Na nodze ma silne zaczerwienienie i obrzęk. Są na niej też takie dziwne niebieskie nitki." texten="His leg is swollen and red....and there are weird blue threads on his skin..." default="sendhelp" option2="jfirstaid" actionOnEnd="burn.isActive=true;" COMMENT="Meduzy są o dziwo dużym problemem w Maimi. Co kilka lat elnino przynosi tysiące tropikalnych meduz na wybrzeże florydy i władzę muszą wtedy zamykać plaże."/>
+ <dialogOption elementProperties="option=where" id="nothing" operator="Caller:" textpl="Nic nie widzę." texten="Uh...I don't see any." default="sendhelp" option2="breath" option3="leave" actionOnEnd="air.isActive=true;" />
+ <dialogOption id="sendhelp" operator="Operator:" textpl="{WYSYŁAM POMOC} Wysyłam na miejsce karetkę. Proszę zostań przy nim aż przyjadą." texten="{I'LL SEND HELP} I'll send an ambulance. Please stay with him until they arrive." default="sendhelp1" />
+ <dialogOption id="sendhelp1" operator="Caller:" textpl="Oczywiście. Poczekam." texten="Sure. I'll wait." actionOnEnd="actionHangup; " />
+ <dialogOption id="sfirstaid" operator="Operator:" textpl="{ZATAMUJ KRWAWIENIE} Musimy zatamować krwawienie. Przyłóż do rany czysty ręcznik. i uciśnij tak mocno jak tylko możliwe. Uciskaj tak aż do momentu przyjazdu pogotowia." texten="{STOP THE BLEEDING} OK, you're gonna have to stop the bleeding. If you have a clean towel put it over the wound and apply pressure. You're going to need to do that until the ambulance arrives." default="sfirstaid1" actionOnEnd="bite.hpChange=-0.25" addToAAR="help" />
+ <dialogOption id="sharkalert" operator="Operator:" textpl="{OSTRZEŻ INNYCH PRZED WCHODZENIEM DO WODY} W wodzie prawdopodobnie znajduje się rekin, który zaatakował tego człowieka. Dopilnuj aby nikt nie wchodził do wody, dopóki pomoc nie dotrze na miejsce" texten="{WARN THE OTHERS} If this was a shark attack it may still be out there swimming around. You're gonna need to warn everybody else on the beach. Make sure they stay out of the water." default="warning" actionOnEnd="opinonEffect +=2" />
+ <dialogOption id="warning" operator="Caller:" textpl="Postaram się o to. Przyjedźcie szybko!" texten="I'll take care of it. But, please, get here quickly!" default="back" />
+ <dialogOption id="sfirstaid1" operator="Caller:" textpl="Rozumiem. Tylko się pośpieszcie." texten="Got it. Just hurry up." default="back" />
+ <dialogOption id="jfirstaid" operator="Operator:" textpl="{PRZEMYJ OPARZENIE MORSKĄ WODĄ} Opis pasuje do poparzenia wywołanego przez meduzę. Ostrożnie przemyj nogę morską wodą i usuń nitki. Ale bądź ostrożny! To są parzydełka - dotykaj je tylko przez materiał, aby się nie poparzyć." texten="{RINSE THE STINGS WITH WATER} The description fits jellyfish stings. Carefully rinse the leg with fresh water and remove the tentacles. But be extremely careful and protect your hands! Those are nematocysts - you touch them with bare skin and you'll get stung too." default="jfirstaid1" />
+ <dialogOption id="jbad2" operator="Caller:" textpl=". . . . . . . . . . Zrobione. Hm, jest jeszcze bardziej zaczerwienione niż wcześniej..." texten=". . . . . . . . . It's done. It actually looks more red than before..." default="sendhelp" option2="where" />
+ <dialogOption id="jstop" operator="Operator:" textpl="{STOP} Nie rób tego! Musisz użyć czystej, niesłonej wody! Morska może tylko pogroszyć sytuację." texten="{STOP} WAIT! STOP! Don't do it! You need to use fresh water! Seawater might make it worse." default="jokay" actionOnEnd="burn.hpChange=0.10;
+opinionEffect +=2" addToAAR="help" />
+ <dialogOption id="jokay" operator="Caller:" textpl="Dobrze! Mam butelkę wody w plecaku." texten="Okay! I have a bottle of water in my bag. " default="sendhelp" option2="where" />
+ <dialogOption id="jbad" operator="Operator:" textpl="{OK} Dobrze, zrób to." texten="{OK} Yes, go ahead and do it. " default="jbad2" actionOnEnd="burn.hpChange=-0.5;
+jfirstaid->active=false;
+opinionEffect +=-2" addToAAR="ihelp" />
+ <dialogOption id="jfirstaid1" operator="Caller:" emotions="na koniec słychać kroki po piasku" textpl="Jasne. Już to robię." texten="Sure thing. I'm on it. I'll use some seawater . . . . . . . " default="jbad" option2="jstop" />
+ <dialogOption id="breath" operator="Operator:" textpl="{CZY ODDYCHA?} Powiedz mi czy ta osoba oddycha." texten="{IS HE BREATHING?} Tell me, is he breathing? " default="breathyes" />
+ <dialogOption id="breathyes" operator="Caller:" emotions="nervous" textpl="Tak, oddycha! Choć z trudem." texten="Wait... yes, he's breathing! But barely." default="layside" option2="sendhelp" option3="look" actionOnEnd="air.hpChange=-0.25" />
+ <dialogOption id="layside" operator="Operator:" textpl="{POZYCJA BOCZNA BEZPIECZNA} Przewróć go na bok, odchyl jego głowę do tyłu. Obserwuj co się będzie działo. Gdyby przestał oddychać, reanimuj go. Pomoc jest już w drodze." texten="{RECOVERY POSITION} You're going to place him in what's called the recovery position. So that means, on his side with the arm under his body extended over his head so his head can rest on it and the leg on the upside of his body brought forward with the knee bent to keep his body from falling over. Keep your eyes on him and check him regularly. Help is on the way." default="layside1" actionOnEnd="air.hpChange=-0.15;
+opinionEffect=+1;" />
+ <dialogOption id="layside1" operator="Caller:" textpl="W porządku. Poczekam z nim." texten="Alright. I'll wait with him." actionOnEnd="actionHangup;" addToAAR="help" />
+ <dialogOption id="leave" operator="Operator:" textpl="{ZOSTAW GO} Myślę, że nic mu jest. Możesz go zostawić." texten="{LEAVE HIM} I think he is fine. You can leave him." default="leave1" actionOnEnd="caller.isActive=false" />
+ <dialogOption id="leave1" operator="Caller:" textpl="Skoro tak twierdzisz..." texten="If you say so..." actionOnEnd="actionHangup; opinionEffect=-5; onIgnore=-5" addToAAR="ignore" />
+ <dialogOption id="noemergency" operator="Operator:" textpl="{TO NORMALNE} Nie widze w tym nic dziwnego, właściciel pewnie zaraz po nie wróci." texten="{THAT'S NORMAL} I don't see anything strange about that, the owner will probably come back soon." default="noemergency1" actionOnEnd="opinionEffect=-5;
+onIgnore=-5; swater.isActive=false;" addToAAR="ignore" />
+ <dialogOption id="noemergency1" operator="Caller:" textpl="Ok. Do widzenia." texten="Okay. Goodbye." actionOnEnd="actionHangup;" />
+ <dialogOption id="water" operator="Operator:" textpl="{CZY KTOŚ SIĘ KĄPIE W OKOLICY?} Czy widzisz kogoś w wodzie?" texten="{ANYONE IN THE WATER?} Can you see anyone in the water?" default="yeswater" option3="drowning" />
+ <dialogOption id="yeswater" operator="Caller:" textpl="Jest jedna dziewczyna. Zaczekaj zawołałam ją . . . . . . . . . . . . . . . . tak to jej rzeczy. Przepraszam. Fałszywy alarm." texten="There's a girl... Wait, I'll ask her. . . . . . . . . . . . . . . . Yeah, that's her stuff. Sorry about that. It was a false alarm." actionOnEnd="actionHangup; opinionEffect=-2; swater.isActive=false;" addToAAR="falsecall" />
+ <dialogOption id="drowning" operator="Caller:" textpl="Nie widzę nikogo. . . . Chwila! Tam chyba ktoś się topi!" texten="I can't see anyone. . . . . Wait! I think someone's out in the water... I think they're drowning!" default="where" option2="who" option3="sure" actionOnEnd="noemergency->active=false;
+kid->active=false;
+men->active=false;" />
+ <dialogOption id="reminder" operator="Caller:" textpl="Hallo, Proszę pana..." texten="Hello? Sir..." />
+ <dialogOption id="reminder2" operator="Caller:" textpl="Hej, Potrzebuje pomocy!" texten="Hey! I need help!" />
+ </dialog>
+ <aar >
+ <reportElement id="story1" textpl="Zgłoszono topiącego się w morzu człowieka." texten="A man drowning in the sea has been reported." />
+ <reportElement id="story2" textpl="Na plaży znaleziono nieprzytomnego młodego mężczyznę." texten="A man lying unconscious on the beach has been reported." />
+ <reportElement id="story3" textpl="Na plaży znaleziono porzucone damskie rzeczy." texten="A woman's abandoned clothes have been found on the beach." />
+ <reportElement id="falsecall" textpl="Operator otrzymał fałszywe zgłoszenie o zagrożeniu życia. Interwencja nie była potrzebna." texten="The operator has received a false report of a life-threatening situation. There was no need for intervention." />
+ <reportElement id="dgoodend" textpl="Operator pozwolił by zgłaszają skoczył do wody by ratować tonącą osobę. Zgłaszający wyciągnął ją na brzeg." texten="The operator let the caller jump into the water to save the drowning person. The caller managed to pull the drowning person to the shore." />
+ <reportElement id="dbadend" textpl="Operator pozwolił by zgłaszają skoczył do wody by ratować tonącą osobę. Niestety zgłaszający nie dał rady jej uratować i oboje utonęli." texten="The operator let the caller jump into the water to save the drowning person. Unfortunately the caller did not manage to save the drowning person and they both drowned." />
+ <reportElement id="ignore" textpl="Operator zignorował zgłoszenie o zagrożeniu życia." texten="The operator ignored the emergency call on a life-threatening situation." />
+ <reportElement id="help" textpl="Operator prawidłowo poinstruował dzwoniącego jak udzielić poszkodowanemu pierwszej pomocy." texten="The operator appropriately guided the caller in applying first aid to the victim." />
+ <reportElement id="nofound" textpl="Pomimo wielogodzinnej akcji poszukiwawczej nie znaleziono nikogo." texten="Despite many hours of searching no one has been found." />
+ <reportElement id="badfound" textpl="Po wielogodzinnej akcji poszukiwawczej odnaleziono w wodzie ciało zaginionej dziewczyny." texten="After many hours of searching the body of a missing girl has been found in the water." />
+ <reportElement id="found" textpl="Po wielogodzinnej akcji poszukiwawczej odnaleziono zaginioną dziewczynę." texten="After many hours of searching a missing girl has been found." />
+ <reportElement id="ihelp" textpl="Operator udzielił niewłaściwych instrukcji dotyczących pierwszej pomocy co pogorszyło stan chorego." texten="The operator instructed the caller incorrectly, resulting in the aggravation of the victim's condition." />
+ <reportElement id="cando" textpl="Operator zrobił wszystko by uratować tonącą osobę." texten="The operator did everything they could to save the drowning person." />
+ </aar>
+ </conversation>
+</conversations></data>

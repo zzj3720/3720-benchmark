@@ -1,0 +1,86 @@
+<data><conversations>
+<conversation elementProperties="type=generable;" id="gen19" texten="Stomach ache" COMMENT="RECORDED">
+ <scene COMMENT="339">
+ <injured elementProperties="sex=M; hp=60;" id="caller" operator="Caller:" texten="Caller" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" />
+ <dialogOption id="2" operator="Caller:" emotions="painful voice" texten="Hello, my stomach hurts really bad..." default="howlong" option2="symp" option3="address" actionOnEnd="opinionEffect = 2;" addToAAR="story" />
+ <dialogOption id="address" operator="Operator:" texten="{WHAT'S YOUR ADDRESS?} What is your address, sir?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="It's [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="13 Raspberry Road" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="104 8th Alley" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="64 Frotemond Plaza" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="name" operator="Operator:" texten="{WHAT'S YOUR NAME?} And your name?" default="name1" option2="name2" option3="name3" />
+ <dialogOption id="name1" operator="Caller:" texten="My name is Kevin Rogerson." default="back" />
+ <dialogOption id="name2" operator="Caller:" texten="I'm Steve Walters." default="back" />
+ <dialogOption id="name3" operator="Caller:" texten="My name's Seth Dorts." default="back" />
+ <dialogOption id="howlong" operator="Operator:" texten="{HOW LONG?} So how long have you had this stomach pain?" default="now" option2="hours" option3="weeks" />
+ <dialogOption id="now" operator="Caller:" emotions="painful voice" texten="About an hour ago....it started suddenly." default="symp" option2="address" option3="send" />
+ <dialogOption id="hours" operator="Caller:" emotions="painful voice" texten="I've been feeling awful since morning, but it feels like it's getting worse by the hour." default="symp" option2="address" option3="send" />
+ <dialogOption id="weeks" operator="Caller:" emotions="unsure" texten="Hmm... it's about two weeks, I guess." default="doctor" option2="address" option3="send" actionOnEnd="opinionEffect = -2;
+headache-&gt;active=false;
+vomits-&gt;active=false;" />
+ <dialogOption id="symp" operator="Operator:" texten="{DOES ANYTHING ELSE HURT YOU?} Does anything else hurt?" default="nosymp" option2="headache" option3="vomits" />
+ <dialogOption id="nosymp" operator="Caller:" emotions="painful voice" texten="No... I can't feel anything except the pain in my belly." default="godoc" option2="send" option3="eat" />
+ <dialogOption id="headache" operator="Caller:" emotions="painful voice" texten="I have a terrible headache." default="othersym" option2="alco" option3="send" actionOnEnd="diar-&gt;active=false;
+pale-&gt;active=false;" />
+ <dialogOption id="vomits" operator="Caller:" emotions="painful voice" texten="I vomited half an hour ago." default="othersym" option2="alco" option3="eat" />
+ <dialogOption id="alco" operator="Operator:" texten="{DID YOU DRINK ALCOHOL?} Sir, have you drank alcohol lately?" default="noalco" option2="party" option3="vine" />
+ <dialogOption id="noalco" operator="Caller:" emotions="resentful, angry" texten="What? No! I'm not hangover!" default="back" />
+ <dialogOption id="party" operator="Caller:" emotions="ashamed" texten="Well... I went to a party last night and... maybe I drink a bit too much..." default="address" option2="send" option3="nosendalko" actionOnEnd="opinionEffect=-2;
+musheat-&gt;active=false;
+nosendresp1-&gt;active=false;" addToAAR="alco" />
+ <dialogOption id="vine" operator="Caller:" texten="Only a glass of wine during dinner." option2="eat" option3="nosendalko" />
+ <dialogOption id="nosendalko" operator="Operator:" texten="{IT'S NOT AN EMERGENCY} Sir, that's probably the result of having too much alcohol last night, I think that's the reason. I can't send an ambulance in such situation. So here is my advice: Wait a couple of hours, if the pain is still there or it increases get yourself to the emergency room at the hospital, OK?" default="nosendresp1" option2="nosendresp2" />
+ <dialogOption id="nosendresp1" operator="Caller:" emotions="really angry" texten="What?! Is this a joke to you? I can barely make it to the toilet and you tell me to wait?" default="nosendresp1a" />
+ <dialogOption id="nosendresp1a" operator="Operator:" emotions="trying to calm him down" texten="{CALM DOWN} Sir..." default="nosendresp1b" />
+ <dialogOption id="nosendresp1b" operator="Caller:" emotions="really angry" texten="I've heard enough. Bye." actionOnEnd="actionHangup;" />
+ <dialogOption id="nosendresp2" operator="Caller:" texten="Okay, I guess you're right. Bye." actionOnEnd="actionHangup;" />
+ <dialogOption id="eat" operator="Operator:" texten="{WHAT DID YOU EAT?} Have you eaten anything unusual lately, sir?" default="noeat" option2="burritoeat" option3="musheat" />
+ <dialogOption elementProperties="option=address;" id="noeat" operator="Caller:" texten="No, just what I always eat." default="symp" option2="send" option3="godoc" />
+ <dialogOption id="burritoeat" operator="Caller:" emotions="unsure" texten="Hm, I don't know.... I've eaten a burrito, but I don't know if it counts as unusual." default="address" option2="send" option3="nosendfood" actionOnEnd="opinionEffect=-2;" addToAAR="food" />
+ <dialogOption elementProperties="option=godoc;" id="musheat" operator="Caller:" texten="Well... maybe it's because of those mushrooms..." default="sendmush" option2="symp" option3="address" actionOnEnd="headache-&gt;active=false;
+nosymp-&gt;active=false;
+noother-&gt;active=false;
+pale-&gt;active=false;
+caller.hp=40; caller.hpchange=-0.3;
+opinionEffect=3;" addToAAR="mushrooms" />
+ <dialogOption id="doctor" operator="Operator:" texten="{WHY DIDN'T YOU VISIT A DOCTOR} So why haven't you gone to a doctor, sir?" default="doctime" option2="docserious" option3="docpain" />
+ <dialogOption id="doctime" operator="Caller:" emotions="regretful" texten="I was busy. There were so many things to do..." default="godoc" option2="send" option3="address" actionOnEnd="caller.hp=85;" addToAAR="noemergency" />
+ <dialogOption id="docserious" operator="Caller:" texten="I didn't think it would get so bad. But the pain didn't go away and now it's even worse!" default="godoc" option2="send" option3="address" actionOnEnd="caller.hp=85;" addToAAR="noemergency" />
+ <dialogOption id="docpain" operator="Caller:" emotions="extremely painful voice" texten="I wasn't able to do it. I took a few days off at work, but the pain was so overwhelming... I literally haven't got out of my bed since Tuesday." default="godoc" option2="send" option3="address" actionOnEnd="opinionEffect=2; caller.hp=40;" />
+ <dialogOption id="godoc" operator="Operator:" texten="{SEE A DOCTOR} You should go visit a doctor as soon as possible. 911 is for emergencies I hope you understand that, so I can't send an ambulance in this kind of case." default="endfood2" option2="nosendresp2" addToAAR="ignore" />
+ <dialogOption id="othersym" operator="Operator:" texten="{ANY OTHER SYMPTOMS?} Do you have any other symptoms?" default="diar" option2="pale" option3="noother" />
+ <dialogOption id="diar" operator="Caller:" emotions="painful voice" texten="Umm...I also have diarrhea." default="sendsymp" option2="godoc" option3="address" addToAAR="sympserious" />
+ <dialogOption id="pale" operator="Caller:" emotions="painful voice" texten="I looked in the mirror and my skin's very pale, I have chills and I can't stop sweating" default="sendsymp" option2="godoc" option3="address" addToAAR="sympserious" />
+ <dialogOption id="noother" operator="Caller:" emotions="unsure" texten="No, I don't think so." default="back" option2="eat" option3="send" />
+ <dialogOption id="nosendfood" operator="Operator:" texten="{FOOD MIGHT BE THE REASON} Are you sure about quality of that food that you had? Maybe you have an indigestion." default="nosendfoodok" option2="nosendfooddis" />
+ <dialogOption id="nosendfoodok" operator="Caller:" emotions="unsure" texten="I haven't been to that restaurant before... and, now that I think about it, the burrito didn't taste right...but I ate it anyway." default="endfood" actionOnEnd="opinionEffect=-2;
+endfood2-&gt;active=true;" />
+ <dialogOption id="nosendfooddis" operator="Caller:" emotions="sure, confident, demanding voice" texten="It's not about the food..." default="send" option2="endfood" option3="address" actionOnEnd="opinionEffect = 1; onIgnore = 2;
+endfood1-&gt;active=false;" />
+ <dialogOption id="endfood" operator="Operator:" texten="{GO TO A DOCTOR} Probably there's nothing to worry about. Although, I think you should contact your doctor if the pain doesn't go away." default="endfood1" option2="endfood2" addToAAR="ignore" />
+ <dialogOption id="endfood1" operator="Caller:" emotions="with relief" texten="Sure. Thank you! Bye." actionOnEnd="actionHangup;" />
+ <dialogOption id="endfood2" operator="Caller" emotions="sarcastic " texten="Seriously? I knew I could go to the doctor before I called you. Thanks for nothing!" actionOnEnd="actionHangup;" />
+ <dialogOption id="send" operator="Operator:" texten="{I'LL SEND AN AMBULANCE}Okay, I'll send an ambulance to you." default="waitsick" addToAAR="sended" />
+ <dialogOption id="sendmush" operator="Operator:" texten="{I'LL SEND AN AMBULANCE} Sir, there is a possibility that you ate a poisonous mushroom. I'll send an ambulance immediately." default="endmush" />
+ <dialogOption id="endmush" operator="Caller:" emotions="terrified" texten="Oh, God... what have I done?!?... Please... get the ambulance here fast!" actionOnEnd="actionHangup;" />
+ <dialogOption id="sendsymp" operator="Operator:" texten="{I'LL SEND AN AMBULANCE} Your symptoms could be a sign of something really serious. I'm gonna get you medical help as soon as possible." default="waitsick" />
+ <dialogOption id="waitsick" operator="Caller:" emotions="grateful, but still sick" texten="Thank you... thank you very much. I'll wait for them to get here. Bye." actionOnEnd="actionHangup;" />
+ <dialogOption id="end" operator="Caller:" texten=". . . . . . . . . . ." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" emotions="in prolonged pain" texten="Ohhhh, my stomach!" />
+ <dialogOption id="reminder2" operator="Caller:" emotions="in pain" texten="Oh... can you help me?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="The caller had a severe stomach ache." />
+ <reportElement id="sympserious" texten="He had symptoms that might've been a sign of a serious disease." />
+ <reportElement id="mushrooms" texten="He ate poisonous mushrooms." />
+ <reportElement id="food" texten="He had an indigestion. Medical help was not necessary." />
+ <reportElement id="noemergency" texten="The stomach ache did not appear suddenly and caller should visit a doctor. A medical intervence wasn't necessary." />
+ <reportElement id="alco" texten="The stomach ache was caused by alcohol and medical help wasn't needed." />
+ <reportElement id="sended" texten="The operator decided to send an ambulance." />
+ <reportElement id="ignore" texten="The operator decided that the case was not urgent enough to send emergency medical services. " />
+ </aar>
+ </conversation>
+</conversations></data>

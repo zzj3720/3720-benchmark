@@ -1,0 +1,72 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="own79" texten="Mathematical problem" actionOnEnd="opinionEffect = 2" addToAAR="Ch�opiec zadzwoni� po pomoc z matematyk�." COMMENT="RECORDED">
+ <scene>
+ <passerby elementProperties="type=Children;
+sex=M;" id="child" texten="Child on the phone" />
+ <witness elementProperties="type=White;
+sex=W;
+bill=200;" id="mother" texten="Child's mother" addToAAR="inter" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = -1;" />
+ <dialogOption id="2" operator="Boy" texten="Yeah, I need some help." default="3" />
+ <dialogOption id="3" operator="Operator:" emotions="	talking a bit with child accent" texten="{WHAT'S THE PROBLEM?} What's the problem little guy?" default="4" />
+ <dialogOption id="4" operator="Boy" texten="With my m[...]" default="5" option2="6" option3="address" />
+ <dialogOption id="5" operator="Operator:" texten="{MOUTH?} With your mouth?" default="7" />
+ <dialogOption id="6" operator="Operator:" texten="{MATH?} With your math?" default="7b" />
+ <dialogOption id="7" operator="Boy" texten="No, with my math..." default="7b" />
+ <dialogOption id="7b" operator="Boy" texten="... I have to do it. Will you help me?" default="address" option2="11" option3="17" />
+ <dialogOption id="address" operator="Operator:" texten="{WHERE DO YOU LIVE?} Where do you live little guy?" default="8" />
+ <dialogOption id="8" operator="Boy" texten="No, with my math." default="9" option2="back" />
+ <dialogOption id="9" operator="Operator:" texten="{WHERE ARE YOU?} Yeah, I know, you want help with your math, but where do you live?" default="10" />
+ <dialogOption id="10" operator="Boy" texten="No. I want you to talk to me on the phone." default="11" option2="back" option3="mom" />
+ <dialogOption id="mom" operator="Operator:" texten="{ARE YOUR PARENTS HOME?} Is your mom or dad nearby?" default="mom2" />
+ <dialogOption id="mom2" operator="Boy" texten="Yes, but she is busy..." default="mom3" option2="17" option3="back" />
+ <dialogOption id="mom3" operator="Operator:" texten="{ASK HER ON THE PHONE} Can you ask her on the phone?" default="mom4" />
+ <dialogOption id="mom4" operator="Boy" texten="Ok . . . . . . . . Mooooom! Mooom come on the phone!" default="mom5" />
+ <dialogOption id="mom5" operator="Boy" texten=". . . . . . . . . . . . . ." default="mom6" />
+ <dialogOption id="11" operator="Operator:" texten="{I CAN'T DO THAT} No, I can't do that, but I can send someone else to help you." default="12" />
+ <dialogOption id="12" operator="Boy" texten="Okay, uhm..." default="13" option2="address" option3="mom" />
+ <dialogOption id="13" operator="Operator:" texten="{WHAT KIND OF MATH?} So what kind of math do you have that you need help with?" default="14" />
+ <dialogOption id="14" operator="Boy" texten="I have take aways." default="15" />
+ <dialogOption id="15" operator="Operator:" texten="{TAKE AWAYS?} You have to do the take aways?" default="16" />
+ <dialogOption id="16" operator="Boy" texten="Yeah." default="17" option2="mom" option3="address" />
+ <dialogOption id="17" operator="Operator:" texten="{WHAT'S THE MATH?} Alright, what's the math?" default="20" actionOnEnd="opinionEffect = -2;" />
+ <dialogOption id="20" operator="Boy" texten="Okay, seventeen..." default="21" />
+ <dialogOption id="21" operator="Operator:" texten="Yeah?" default="22" />
+ <dialogOption id="22" operator="Boy" texten="Take away seven..." default="23" />
+ <dialogOption id="23" operator="Operator:" texten="Uhum..." default="24" />
+ <dialogOption id="24" operator="Boy" texten="Is what?" default="25" option2="252" option3="253" />
+ <dialogOption id="25" operator="Operator:" texten="{WHAT DO YOU THINK?} You tell me how much do you think it is?" default="26" />
+ <dialogOption id="252" operator="Operator:" texten="{TEN}That's ten." default="30" addToAAR="goodmath" />
+ <dialogOption id="253" operator="Operator:" texten="{ONE}That's one." default="30" />
+ <dialogOption elementProperties="option=252;
+option=253;" id="26" operator="Boy" texten="I don't know one?" default="31" option2="mom" option3="address" />
+ <dialogOption id="30" operator="Boy" texten="Ok..." default="31" option2="mom" option3="address" />
+ <dialogOption id="31" operator="Operator:" texten="{WHAT'S NEXT?} Yeah... what's another problem, that was a tough one." default="32" />
+ <dialogOption id="32" operator="Boy" texten="Umm here is one four.... take away four." default="33" option2="332" option3="333" />
+ <dialogOption id="33" operator="Operator:" texten="{WHAT'S YOUR GUESS?} And how much do you think that is?" default="334" />
+ <dialogOption id="332" operator="Operator:" texten="{ZERO} It's zero." default="mom6" />
+ <dialogOption id="333" operator="Operator:" texten="{EIGHT} It's eight." default="mom6" addToAAR="badmath" />
+ <dialogOption id="334" operator="Boy" texten="Five!" default="mom6" actionOnEnd="achiv=smile;" addToAAR="badmath" />
+ <dialogOption id="mom6" operator="Mom:" emotions="[in distant]" texten="Oscar what are you doing?!" default="34" />
+ <dialogOption id="34" operator="Boy/Mom" emotions="[in distant]" texten="The police man is helping me with my math...
+ - What did I told you 'bout playing on the phone?
+ - But I need help, you told me to call somebody!
+ - I didn't mean the police!" default="35" />
+ <dialogOption id="35" operator="Mom:" texten="Hello? I'm sorry!" default="36" />
+ <dialogOption id="36" operator="Operator:" texten="{IS EVERYTHING OK?} No problem ma'am, is everything alright there?" default="37" />
+ <dialogOption id="37" operator="Mom:" texten="Yes! I'm sorry, I'll tell him to stay off the phone!" default="38" />
+ <dialogOption id="38" operator="Operator:" emotions="smiling, laughing" texten="It's ok, just make sure he's not afraid to make 911 call in the future, okay?" default="39" />
+ <dialogOption id="39" operator="Mom:" texten="Of course, thank you, goodbye!" actionOnEnd="opinionEffect = -2;
+actionHangup" />
+ <dialogOption id="reminder" operator="Boy" texten="... hello?" />
+ <dialogOption id="reminder2" operator="Boy" texten="... Mister are you busy too?" />
+ </dialog>
+ <aar>
+ <reportElement id="inter" texten="Intervention was completely unnecessary." />
+ <reportElement id="goodmath" texten="Math help was provided." />
+ <reportElement id="badmath" texten="However, some calculation error occurred." />
+ </aar>
+ </conversation>
+</conversations></data>

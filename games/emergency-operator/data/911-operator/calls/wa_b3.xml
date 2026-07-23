@@ -1,0 +1,98 @@
+<data><conversations>
+<conversation id="wa_b3" texten="Possible bomb" COMMENT="RECORDED">
+ <scene COMMENT="370">
+ <witness elementProperties="sex=M;" id="caller" operator="Caller:" texten="Security officer (caller)" />
+ <tech elementProperties="work=300;
+icon=OnSitePic_Wan;
+timer=bombt;" id="bomb" texten="Car bomb" actionOnEnd="bombt.isActive=false;
+evacuation.isActive=false;" />
+ <timer elementProperties="time=120;" id="bombt" texten="Time to blow up: {1}s" actionOnEnd="bomb.isActive=false;
+blown.isActive=true;
+bombeffect;
+evacuation.isActive=false;" addToAAR="explode" />
+ <passerby id="w1" texten="Resident" />
+ <passerby id="w2" texten="Resident" />
+ <passerby id="w3" texten="Resident" />
+ <passerby id="w4" texten="Resident" />
+ <passerby id="w5" texten="Resident" />
+ <work elementProperties="work=200;
+icon=OnSitePic_EvacuationArea;" id="evacuation" texten="Evacuation" actionOnEnd="w1.isActive=false;
+w2.isActive=false;
+w3.isActive=false;
+w4.isActive=false;
+w5.isActive=false;" />
+ <injured elementProperties="hp=60;
+sex=M;
+isActive=false;" id="w6" texten="Roughed up man" />
+ <tech elementProperties="isActive=false;
+icon=OnSitePic_explodingCar;
+work=200;" id="blown" texten="Blown up car" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" />
+ <dialogOption id="2" operator="Caller:" emotions="man ~40 or more, unsure, suprised" texten="Hello? Umm... there's a strange car at the back of our building..." default="whatp" option2="name" option3="legal" actionOnEnd="opinionEffect = 8;" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?}Could you give me the address, sir?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="Yes, we're at [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="its 345 Oxygen Road" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="its 124 2nd Avenue" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="its 504 Basic Square" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="whatp" operator="Operator:" texten="{WHICH BUILDING?}Is this a residence or a business?" default="whatpa1" option2="whatpa2" option3="whatpa3" />
+ <dialogOption id="whatpa1" operator="Caller:" texten="It's an insurance company office building." default="address" option2="back" />
+ <dialogOption id="whatpa2" operator="Caller:" texten="It's an office of a mining company." default="address" option2="back" />
+ <dialogOption id="whatpa3" operator="Caller:" texten="It's a labor union office." default="address" option2="back" />
+ <dialogOption id="legal" operator="Operator:" texten="{PROHIBITED AREA?}Is that car parked in prohibited area?" default="resarea" />
+ <dialogOption id="resarea" operator="Caller:" texten="It's private property." default="who" option2="notime" option3="whatp" />
+ <dialogOption id="name" operator="Operator:" texten="{WHO ARE YOU?}Who am I speaking to?" default="name1" />
+ <dialogOption id="name1" operator="Caller:" texten="I'm Jason Sobers, security guard." default="back" />
+ <dialogOption id="who" operator="Operator:" texten="{WHO PARKED THE CAR?}Did you see who parked it there?" default="whoa" />
+ <dialogOption id="whoa" operator="Caller:" emotions="concerned" texten="That's the thing, nobody saw it being parked and it's not supposed to be there, it's a restricted area." default="check1" option2="cams" option3="notime" />
+ <dialogOption id="cams" operator="Operator:" texten="{ANY CAMERAS?}Are there any surveillance cameras in the area?" default="camsfail" />
+ <dialogOption id="camsfail" operator="Caller:" emotions="concerned" texten="Yeah, we do, but the car is parked exactly in the blind spot!" default="check1" option2="whatp" option3="notime" />
+ <dialogOption id="dontcome" operator="Operator:" texten="{STAY AWAY FROM THE CAR}Sir, tell everyone to stay away from the area." default="dontcomea" />
+ <dialogOption id="dontcomea" operator="Caller:" texten="Well, ok... do you think it's that important?" default="evacuate" option2="remain" option3="address" />
+ <dialogOption id="evacuate" operator="Operator:" emotions="strict" texten="{EVACUATE THE BUILDING}You should start to evacuate the building immediately! Sound the fire alarm now!" default="evacuatea" />
+ <dialogOption id="remain" operator="Operator:" texten="{NOT SURE}No sir, maybe not. Please keep calm, the situation is under control." default="whattodo" />
+ <dialogOption id="evacuatea" operator="Caller:" emotions="feared" texten="Oh my god... do you think it's one of those bombs?! Should I tell people?" default="tellyes" option2="tellno" actionOnEnd="w1.isActive=false;
+w2.isActive=false;
+w3.isActive=false;
+w4.isActive=false;
+w5.isActive=false;" />
+ <dialogOption id="tellyes" operator="Operator:" texten="{YES}Yes, tell everyone and evacuate as fast as possible!" default="tellyesa" addToAAR="panic" />
+ <dialogOption id="tellno" operator="Operator:" texten="{NO}No, just pull the fire alarm and make sure everyone gets to a safe place." default="tellnoa" addToAAR="nopanic" />
+ <dialogOption id="tellyesa" operator="Caller:" emotions="really scared! Alarm ring soon after" texten="OH MY GOD!!! Of course! . . . . . . . . . . . . . . EVERYONE, GET OUT OF HERE NOW, THERE'S A BOMB!..... RUN!....." default="waits" option2="address" actionOnEnd="w6.isActive = true; opinionEffect += -3; onIgnore = -10;
+bgsound=cwa_b3_0_alarmpanic2;
+evacuation.isActive=false;" />
+ <dialogOption id="tellnoa" operator="Caller:" emotions="scared! Alarm ring soon after" texten="Oh my.... of course.... the alarm . . . . . . . . . . . . . . . . . . . what now?" default="waits" option2="address" actionOnEnd="bgsound=cwa_b3_0_alarm2;" />
+ <dialogOption id="waits" operator="Operator:" texten="{GO TO SAFE ZONE AND WAIT}There is nothing more for you to do right now, just get out of the building, wait in the safe zone for the emergency services to arrive. They will be there shortly." default="end" />
+ <dialogOption id="whattodo" operator="Caller:" texten="What should I do then?" default="whattodoa" option2="evacuate" option3="address" />
+ <dialogOption id="whattodoa" operator="Operator:" texten="{JUST WAIT}Just wait for the services to arrive." default="endwait" actionOnEnd="opinionEffect = 6; onIgnore = -10;" addToAAR="noevac" />
+ <dialogOption id="endwait" operator="Caller:" texten="Ok, I will wait..." actionOnEnd="actionHangup" />
+ <dialogOption id="check1" operator="Operator:" texten="{DID YOU CHECK CAR?}Did you check that car?" default="nocheck" />
+ <dialogOption id="nocheck" operator="Caller:" texten="Not yet. I thought it might be dangerous. There's all kinds of stories about bombs going off in the news. I thought I'd call 911 first." default="check2" option2="dontcome" />
+ <dialogOption id="check2" operator="Operator:" texten="{CHECK THE CAR} Go out and check the car closely." default="check3" actionOnEnd="opinionEffect = -3; onIgnore = -10;" addToAAR="risk" />
+ <dialogOption elementProperties="bgsound=cwa_b3_0_empty;" id="check3" operator="Caller:" emotions="[sound of opening door and steps]" texten="Ok, I'm going . . . . . . . . . . . . . . . . . . . What should I check?" default="check4" actionOnEnd="bgsound=cwa_b3_0_outside;" />
+ <dialogOption id="check4" operator="Operator:" texten="Just look through the windows and under the car." default="tellmorea" />
+ <dialogOption id="tellmorea" operator="Caller:" emotions="unsure at first, disbelief and shocked at the end" texten="Ok... Hmmm . . . . . I don't see anything under the car . . . . . . . . I'm looking in the windows . . . . . . Oh, sweet Jesus . . . Is that a bomb?" default="describe" option2="goback" />
+ <dialogOption id="describe" operator="Operator:" texten="{WHAT DO YOU SEE?}What do you see?" default="describe1" />
+ <dialogOption id="describe1" operator="Caller:" emotions="shocked" texten="There is... there's a device with a lot of cables and wires. It's attached to... some kind of a container. God, what should I do?!" default="goback" />
+ <dialogOption id="goback" operator="Operator:" emotions="trying to stay calm" texten="{GO BACK!}Go back to the building immediately!" default="goback1" />
+ <dialogOption id="goback1" operator="Caller:" emotions="running, problem with catching his breath [sound of opening door]" texten="Yes... I'm going back . . . . . . . . . . . . . . . . . . . . . . . . I'm inside!" default="evacuate" option3="address" actionOnEnd="bgsound=cwa_b3_0;" />
+ <dialogOption id="notime" operator="Operator:" texten="{IT'S NOT IMPORTANT} We have no time for that now, sir. Please contact the security of the building." default="notimea" />
+ <dialogOption id="notimea" operator="Caller:" emotions="helpless voice" texten="But I am security!" default="ignore" option3="check1" />
+ <dialogOption id="ignore" operator="Operator:" texten="{IT'S YOUR JOB}So... aren't you paid to deal with such problems?" default="ignored" />
+ <dialogOption id="ignored" operator="Caller" emotions="ashamed a bit, frustrated" texten="Well... yes, but I-I... Nevermind. I'll find somebody who will treat me seriously. Bye." actionOnEnd="actionHangup;" addToAAR="ignorefail" />
+ <dialogOption id="end" operator="Caller:" texten="Ok, I'm going! Thank you!" actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hello?" default="back" />
+ <dialogOption id="reminder2" operator="Caller:" texten="I really think that might be dangerous!" default="back" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="The caller reported an unknown car in a restricted area." />
+ <reportElement id="panic" emotions=" " texten="The caller notified the people about a bomb, causing panic, which resulted in a person being injured." />
+ <reportElement id="noevac" texten="The operator told the security guard to wait for emergency services." />
+ <reportElement id="nopanic" texten="The operator instructed to evacuate the building." />
+ <reportElement id="risk" texten="Operator's instructions put the caller in danger. Checking the car could cause detonation of the bomb." />
+ <reportElement id="ignorefail" texten="Operator ignored a serious terrorist threat." />
+ <reportElement id="explode" texten="The bomb blew up." />
+ </aar>
+ </conversation>
+</conversations></data>

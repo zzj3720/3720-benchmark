@@ -1,0 +1,82 @@
+{
+  "schema": "911-operator-gameplay-import-v1",
+  "source": {
+    "title": "911 Operator",
+    "steam_app_id": "503560",
+    "build_id": "7533741",
+    "assembly_sha256": "689723028bbbee5f3b0401889486aaec3718386a53287eadc4c3cfa71ca491fb",
+    "resources_sha256": "60ae2fe1f740de3b46dc328f79ffe6af04b62f0900ba537d9343e494327d906d"
+  },
+  "inventory": {
+    "calls": 56,
+    "call_dialogue_nodes": 2159,
+    "call_scene_elements": 247,
+    "internal_conversations": 12,
+    "report_groups": 117,
+    "report_types": 137,
+    "vehicle_types": 28,
+    "maps": 30,
+    "map_nodes": 351353,
+    "map_connections": 752020,
+    "career_chapters": 5,
+    "career_duties": 14,
+    "career_fixed_call_slots": 60
+  },
+  "definitions": [
+    {
+      "asset_name": "reportConversation5",
+      "root_element": "data",
+      "items": 12,
+      "xml_elements": 683,
+      "source_sha256": "bd67bb986ae962e4f4b6b3464299fef8136666f52fb1dcdc49be37c27eea8ade",
+      "file_sha256": "d7a4e3a628704aaa3c89e986252f518ba2bac7552057c2b8ba053094c79cb89b",
+      "file": "definitions/report-conversations.xml"
+    },
+    {
+      "asset_name": "reportGroups",
+      "root_element": "meta",
+      "items": 117,
+      "xml_elements": 119,
+      "source_sha256": "a85c872303c082ea2a8d5e428f9da1662fd3bd9e9b57188f6b594f5a85d90cf4",
+      "file_sha256": "af98bb15be69473015feb3a423e9b8f1613925bf81410df410ffab14deb834f0",
+      "file": "definitions/report-groups.xml"
+    },
+    {
+      "asset_name": "reportTypes7",
+      "root_element": "meta",
+      "items": 137,
+      "xml_elements": 139,
+      "source_sha256": "65debb1e410bb5c847d52a7716dc6e1dd01380e81728a3efd51318edfefea105",
+      "file_sha256": "616bed904d11a9ec2af4711f9144d296cc06f204c3d5abfffa45771b832e822b",
+      "file": "definitions/report-types.xml"
+    },
+    {
+      "asset_name": "vehicleTypes2",
+      "root_element": "meta",
+      "items": 28,
+      "xml_elements": 30,
+      "source_sha256": "60fb7685ec784b04582da171392333c72ebe104e294326c8ca4b85ba9fec7910",
+      "file_sha256": "d722c6ad263e88daa2c5c4861befe891b4d113bb9e41ace4eff50d89fe51d908",
+      "file": "definitions/vehicle-types.xml"
+    },
+    {
+      "asset_name": "PeopleDatabase",
+      "root_element": "RandomPersonDatabase",
+      "items": 229,
+      "xml_elements": 231,
+      "source_sha256": "ef4973002f20964b1c39ff656a5387e952f68c2e20568c703953c7caeed44b86",
+      "file_sha256": "50dc1d2841a8131e8d215128132d96fd65db422214c4fa1d363cc43ae4aaf3d3",
+      "file": "definitions/people.xml"
+    }
+  ],
+  "artifact_sha256": "1c970413976c140cec9694eedcfe83006c8fb45c778cc0a34d003d798dd32f69",
+  "excluded": [
+    "audio",
+    "map_jpg",
+    "textures",
+    "models",
+    "ui",
+    "non_english_localization",
+    "steam_account_data"
+  ]
+}

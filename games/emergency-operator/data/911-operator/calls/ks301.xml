@@ -1,0 +1,69 @@
+<data><conversations>
+<conversation id="ks301" texten="Bear in a bush">
+ <scene>
+ <witness elementProperties="sex=M;" id="caller" operator="Caller:" texten="Caller" />
+ <injured elementProperties="isActive = false; hp = 50; hpChange = -0.4" id="aftera" texten="Injured man" />
+ <tech elementProperties="icon=OnSitePic_Bear;
+work = 80;" id="bear" texten="Bear" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" />
+ <dialogOption id="2" operator="Caller:" emotions="male, any, older than 35, sheepish" texten="Hi. I know it sounds silly, but I think there might be a bear in my backyard." default="serious" option2="5" option3="address" />
+ <dialogOption id="name" operator="Operator:" texten="{WHAT IS YOUR NAME?} What is your name, sir?" default="namea" option2="nameb" option3="namec" />
+ <dialogOption id="namea" operator="Caller:" texten="Amos Hayes" default="back" />
+ <dialogOption id="nameb" operator="Caller" texten="Frank Woolen" default="back" />
+ <dialogOption id="namec" operator="Caller:" texten="Anthony Roswell" default="back" />
+ <dialogOption id="serious" operator="Operator:" emotions="tired" texten="{ARE YOU SERIOUS?} Sir, are you sure you have an emergency? Joking 911 line is strictly prohibited." default="4" />
+ <dialogOption id="4" operator="Caller:" texten="I'm not joking! I hear the bear right now!" default="5" option3="address" addToAAR="bear" />
+ <dialogOption id="5" operator="Operator:" texten="{CAN YOU SEE IT?} Do you see the bear?" default="6" />
+ <dialogOption id="6" operator="Caller:" texten="No. I haven't seen it. It is just making a really loud and scary growling noise." default="10" option2="dontsend" option3="address" />
+ <dialogOption id="address" operator="Operator:" texten="{WHAT'S YOUR ADDRESS?} Could I have your address please?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="It is [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="It is 56 Oak Street" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="It is 81 Washington Street" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="It is 21 Main Avenue" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="10" operator="Operator:" texten="{ARE YOU SURE?} Sir, you perfectly sure the bear is there, even though you have not actually seen it. Am I right?" default="11" />
+ <dialogOption id="11" operator="Caller:" emotions="very unsure, but frightened" texten="Well... I wouldn't say that I'm perfectly sure, but... it's-it's dark and there is a big bush in our yard and it is sha-shaking and there is a crazy growling sound coming out of it and I..." default="12" option2="14" option3="food" />
+ <dialogOption id="12" operator="Operator:" emotions="bureaucratic" texten="{ANYTHING ELSE?} Anything else?" default="13" />
+ <dialogOption id="13" operator="Caller:" emotions="very unsure, but frightened" texten="Well... I'm hearing he-heavy breathing. And the leaves are rustling." default="14" option2="dontsend" />
+ <dialogOption id="14" operator="Operator:" emotions="currious" texten="{DESCRIBE THE SOUND} Could you describe the sound to me?" default="15" />
+ <dialogOption id="15" operator="Caller:" emotions="caller tries to roar, the result is rather funny, than scary" texten="Hmm... it sounds like AARRRRGHGHGHLGLGLGLGGL..." default="16" />
+ <dialogOption id="16" operator="Operator:" emotions="Trying not to laugh" texten="{THANK YOU} ... Thank you sir." default="dontsend" option2="send" option3="food" />
+ <dialogOption id="send" operator="Caller:" texten="{I'LL SEND THE FIREFIGHTERS} I will send a firefighters unit as one is available. They will take care of it." default="send1" actionOnEnd="opinionEffect += 3;" addToAAR="sended" />
+ <dialogOption id="send1" operator="Caller:" emotions="with relief " texten="Thank you so much! I'm waiting." actionOnEnd="actionHangup;" />
+ <dialogOption id="dontsend" operator="Operator:" texten="{IT'S PROBABLY NOT DANGEROUS} Sir, if it was a bear, you would recognize it easily. It's probably just a common harmless animal like stray cat or raccoon." default="19" actionOnEnd="opinionEffect = -1;" />
+ <dialogOption id="19" operator="Caller:" emotions="Panicked" texten="But.. But.. What if it's not?!" default="food" option2="hide" option3="dontsendend" />
+ <dialogOption id="food" operator="Operator:" texten="{WAS THERE ANY FOOD?} Sir, did you have any food left in your backyard? Even in trash bin?" default="food1" />
+ <dialogOption id="food1" operator="Caller:" texten="Yes. yesterday, I made barbecue for a few friends. There was too much leftovers, so I put them the trash bin." default="hide" option2="check" />
+ <dialogOption id="hide" operator="Operator: " texten="{HIDE IN YOUR HOUSE} If you are outside the house, please come into and lock the door, sir." default="hide1" />
+ <dialogOption id="hide1" operator="Caller:" emotions="with relief" texten="Yes, that's a great idea. Wait a second." default="send" option2="dontsendwait" option3="address" actionOnEnd="opinionEffect += 1;" addToAAR="hide" />
+ <dialogOption id="dontsendwait" operator="Operator:" texten="{IT'S PROBABLY A CAT} Now, just wait and observe the bush. Try not to leave the house without need. I guess that it's just a cat, but if the bear comes out please call us again and I'll send the emergency unit immediately." default="eh" actionOnEnd="opinionEffect = -1;" addToAAR="nosend" />
+ <dialogOption id="eh" operator="Caller:" emotions="sigh" texten="I was hoping that you send somebody now. But okay. I'll wait." actionOnEnd="actionHangup;" />
+ <dialogOption id="check" operator="Operator:" texten="{CHECK THE BUSH} Sir, do you have any pot, pan or something else which can be used to make a noise?" default="21" />
+ <dialogOption id="21" operator="Caller:" texten="Umm.. Yeah.. Why?" default="22" />
+ <dialogOption id="22" operator="Operator:" texten="{MAKE A NOISE} I'd like you to make some noise in front of the bush." default="23" />
+ <dialogOption id="23" operator="Caller:" emotions="scared" texten="What? Why?" default="24" />
+ <dialogOption id="24" operator="Operator:" texten="If there is actually a bear, it should come out and run away." default="25" />
+ <dialogOption id="25" operator="Caller:" emotions="pleading" texten="Is that wise?" default="26" option2="maybenot" />
+ <dialogOption id="26" operator="Operator:" texten="{YOU SHOULD CHECK IT} Sir, we need to confirm that there is a threat before we can dispatch emergency unit." default="27" />
+ <dialogOption id="maybenot" operator="Operator:" texten="{I'LL SEND THE FIRE DEPARTMENT} If you afraid to do it alone, I will send the firefighters to check it." default="send1" addToAAR="sended" />
+ <dialogOption id="27" operator="Caller:" emotions="resigned; [moment of silence, noise of hitting a pot with spoon]" texten="So, it's only way. Okay . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ." default="28" />
+ <dialogOption id="28" operator="Caller:" emotions="panicaly, whispering" texten="Ohh, there is a bear actually! But it didn't go away! Fuck!" default="29" actionOnEnd="aftera.isActive = true;
+caller.isActive = false;
+opinionEffect = - 3;" addToAAR="attack" />
+ <dialogOption id="29" operator="Operator:" texten="{ARE YOU THERE?}Sir? Sir, are you there?" default="30" />
+ <dialogOption id="30" operator="Caller:" emotions="sound of running men, chasing by bear; some screams, roars" texten=". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ." actionOnEnd="actionHangup;" />
+ <dialogOption id="dontsendend" operator="Operator:" texten="{DON'T BLOCK THE LINE} As I said there's no sign of emergency situation. Please don't block the line, sir." default="end1" actionOnEnd="opinionEffect = -1;" />
+ <dialogOption id="end1" operator="Caller:" emotions="resigned" texten="Eh... I thought you would treat my problem seriously.... Bye" actionOnEnd="actionHangup;" addToAAR="nosend" />
+ <dialogOption id="reminder" operator="Caller:" texten="I could swear I heard a roar. Did you hear it?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Are you still there?" />
+ </dialog>
+ <aar>
+ <reportElement id="bear" texten="Caller reported a wild animal in his backyard." />
+ <reportElement id="hide" texten="Operator told the man to lock himself inside the house." />
+ <reportElement id="attack" texten="Instructions given by operator caused that caller was attacked by the bear." />
+ <reportElement id="nosend" texten="The operator decided to not send any unit, because the signs of bear's presence was unclear." />
+ <reportElement id="sended" texten="The operator decided to send a unit to investigate the case. The bear was founded in the bush and was transported to the nearest veterinary institution." />
+ </aar>
+ </conversation>
+</conversations></data>

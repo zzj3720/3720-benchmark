@@ -1,0 +1,687 @@
+{
+  "schema": "911-operator-career-v1",
+  "steam_app_id": "503560",
+  "source_build_id": "7533741",
+  "chapters": [
+    {
+      "number": 1,
+      "city": "Kapolei",
+      "map_id": "150921582",
+      "duties": [
+        {
+          "number": 1,
+          "fixed_calls": [
+            {
+              "order": 1,
+              "call_id": "97",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 2,
+              "call_id": "81",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 3,
+              "call_id": "gen12",
+              "deactivated_dialogue_ids": [
+                "child",
+                "empty",
+                "emptymed"
+              ]
+            },
+            {
+              "order": 4,
+              "call_id": "chris",
+              "deactivated_dialogue_ids": []
+            }
+          ]
+        }
+      ],
+      "generated_reports": true,
+      "call_interval_seconds": {
+        "min": 88,
+        "max": 93
+      },
+      "report_interval_seconds": {
+        "min": 30,
+        "max": 60
+      },
+      "completion": {
+        "reputation": 10.0,
+        "efficiency_percent": 50
+      },
+      "source": {
+        "chapter_method": "Campaign::GetChapter_1",
+        "level_generator": "LevelDataGenerator::generateKapolei"
+      }
+    },
+    {
+      "number": 2,
+      "city": "Albuquerque",
+      "map_id": "151364049",
+      "duties": [
+        {
+          "number": 1,
+          "fixed_calls": [
+            {
+              "order": 1,
+              "call_id": "53",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 2,
+              "call_id": "own79",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 3,
+              "call_id": "68",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 4,
+              "call_id": "gen19",
+              "deactivated_dialogue_ids": [
+                "weeks",
+                "headache",
+                "othersym",
+                "noeat",
+                "burritoeat"
+              ]
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "fixed_calls": [
+            {
+              "order": 1,
+              "call_id": "steve",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 2,
+              "call_id": "gen21",
+              "deactivated_dialogue_ids": [
+                "running",
+                "three",
+                "four",
+                "bottle",
+                "knife",
+                "light",
+                "heavy",
+                "calmno",
+                "police1n"
+              ]
+            },
+            {
+              "order": 3,
+              "call_id": "ny1",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 4,
+              "call_id": "ny2",
+              "deactivated_dialogue_ids": []
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "fixed_calls": [
+            {
+              "order": 1,
+              "call_id": "ch4",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 2,
+              "call_id": "own67",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 3,
+              "call_id": "102",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 4,
+              "call_id": "gen18",
+              "deactivated_dialogue_ids": [
+                "3",
+                "4",
+                "fight",
+                "noises",
+                "idk",
+                "family"
+              ]
+            }
+          ]
+        }
+      ],
+      "generated_reports": true,
+      "call_interval_seconds": {
+        "min": 88,
+        "max": 93
+      },
+      "report_interval_seconds": {
+        "min": 20,
+        "max": 30
+      },
+      "completion": {
+        "reputation": 30.0,
+        "efficiency_percent": 40
+      },
+      "source": {
+        "chapter_method": "Campaign::GetChapter_2",
+        "level_generator": "LevelDataGenerator::generateAlbuquerque"
+      }
+    },
+    {
+      "number": 3,
+      "city": "Chicago",
+      "map_id": "153388690",
+      "duties": [
+        {
+          "number": 1,
+          "fixed_calls": [
+            {
+              "order": 1,
+              "call_id": "gen16",
+              "deactivated_dialogue_ids": [
+                "2b",
+                "2c",
+                "idk",
+                "hour",
+                "shop",
+                "parking"
+              ]
+            },
+            {
+              "order": 2,
+              "call_id": "alb2",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 3,
+              "call_id": "gen13",
+              "deactivated_dialogue_ids": [
+                "faintyes",
+                "drunkno",
+                "breathno",
+                "breathy",
+                "injuriesyes"
+              ]
+            },
+            {
+              "order": 4,
+              "call_id": "alb1",
+              "deactivated_dialogue_ids": []
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "fixed_calls": [
+            {
+              "order": 1,
+              "call_id": "ch1",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 2,
+              "call_id": "alb4",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 3,
+              "call_id": "gen20",
+              "deactivated_dialogue_ids": [
+                "garbage",
+                "garage"
+              ]
+            },
+            {
+              "order": 4,
+              "call_id": "107",
+              "deactivated_dialogue_ids": []
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "fixed_calls": [
+            {
+              "order": 1,
+              "call_id": "bribe",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 2,
+              "call_id": "gen11",
+              "deactivated_dialogue_ids": [
+                "wheny",
+                "2b",
+                "injured0",
+                "way2",
+                "way1",
+                "fineb",
+                "finea"
+              ]
+            },
+            {
+              "order": 3,
+              "call_id": "ny3",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 4,
+              "call_id": "gen14",
+              "deactivated_dialogue_ids": [
+                "w1",
+                "w2"
+              ]
+            },
+            {
+              "order": 5,
+              "call_id": "alb3",
+              "deactivated_dialogue_ids": []
+            }
+          ]
+        }
+      ],
+      "generated_reports": true,
+      "call_interval_seconds": {
+        "min": 88,
+        "max": 93
+      },
+      "report_interval_seconds": {
+        "min": 20,
+        "max": 30
+      },
+      "completion": {
+        "reputation": 40.0,
+        "efficiency_percent": 50
+      },
+      "source": {
+        "chapter_method": "Campaign::GetChapter_3",
+        "level_generator": "LevelDataGenerator::generateChicago"
+      }
+    },
+    {
+      "number": 4,
+      "city": "San Francisco",
+      "map_id": "26819236",
+      "duties": [
+        {
+          "number": 1,
+          "fixed_calls": [
+            {
+              "order": 1,
+              "call_id": "gen10",
+              "deactivated_dialogue_ids": [
+                "wheny",
+                "injured0",
+                "cars1",
+                "cars2",
+                "injuriesa1",
+                "whoi",
+                "whoduno"
+              ]
+            },
+            {
+              "order": 2,
+              "call_id": "gen11_2",
+              "deactivated_dialogue_ids": [
+                "2b",
+                "wheny",
+                "injured1",
+                "injured2",
+                "way3",
+                "weapon1"
+              ]
+            },
+            {
+              "order": 3,
+              "call_id": "ksold3",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 4,
+              "call_id": "gen13",
+              "deactivated_dialogue_ids": [
+                "breathyes",
+                " drunkyes",
+                " blockn",
+                " breathsmell",
+                " breathy",
+                " cprno"
+              ]
+            },
+            {
+              "order": 5,
+              "call_id": "gen14",
+              "deactivated_dialogue_ids": [
+                "w2",
+                "w3",
+                "ex1"
+              ]
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "fixed_calls": [
+            {
+              "order": 1,
+              "call_id": "gen16",
+              "deactivated_dialogue_ids": [
+                "now",
+                "idk",
+                "nolegal",
+                "asshole",
+                "noelse",
+                "yesyes",
+                "gta"
+              ]
+            },
+            {
+              "order": 2,
+              "call_id": "gen20",
+              "deactivated_dialogue_ids": [
+                "garbage",
+                "room",
+                "nocar",
+                "sbig",
+                "burnout"
+              ]
+            },
+            {
+              "order": 3,
+              "call_id": "go90",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 4,
+              "call_id": "gen12",
+              "deactivated_dialogue_ids": [
+                "buttcall",
+                "child",
+                "empty"
+              ]
+            },
+            {
+              "order": 5,
+              "call_id": "gen18",
+              "deactivated_dialogue_ids": [
+                "2",
+                "4",
+                "party",
+                "fight",
+                "students",
+                "family"
+              ]
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "fixed_calls": [
+            {
+              "order": 1,
+              "call_id": "gen21",
+              "deactivated_dialogue_ids": [
+                "running",
+                "three",
+                "two",
+                "noweapons",
+                "started",
+                "heavy",
+                "police1y"
+              ]
+            },
+            {
+              "order": 2,
+              "call_id": "gen19",
+              "deactivated_dialogue_ids": [
+                "now",
+                "weeks",
+                "nosymp",
+                "diar",
+                "pale",
+                "burritoeat",
+                "musheat",
+                "vine",
+                "noalco"
+              ]
+            },
+            {
+              "order": 3,
+              "call_id": "287",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 4,
+              "call_id": "288",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 5,
+              "call_id": "289",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 6,
+              "call_id": "290",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 7,
+              "call_id": "291",
+              "deactivated_dialogue_ids": []
+            }
+          ]
+        }
+      ],
+      "generated_reports": true,
+      "call_interval_seconds": {
+        "min": 88,
+        "max": 93
+      },
+      "report_interval_seconds": {
+        "min": 25,
+        "max": 40
+      },
+      "completion": {
+        "reputation": 70.0,
+        "efficiency_percent": 50
+      },
+      "source": {
+        "chapter_method": "Campaign::GetChapter_4",
+        "level_generator": "LevelDataGenerator::generateSanFrancisco"
+      }
+    },
+    {
+      "number": 5,
+      "city": "Washington",
+      "map_id": "158368533",
+      "duties": [
+        {
+          "number": 1,
+          "fixed_calls": [
+            {
+              "order": 1,
+              "call_id": "wa3",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 2,
+              "call_id": "gen10_3",
+              "deactivated_dialogue_ids": [
+                "wheny",
+                "injured1",
+                "injured2",
+                "carsno",
+                "cars1",
+                "whoi",
+                "whoother"
+              ]
+            },
+            {
+              "order": 3,
+              "call_id": "gen11_2",
+              "deactivated_dialogue_ids": [
+                "2",
+                "whenm",
+                "whenh",
+                "injured1",
+                "injured2",
+                "finea",
+                "way"
+              ]
+            },
+            {
+              "order": 4,
+              "call_id": "gen13_2",
+              "deactivated_dialogue_ids": [
+                "faintno",
+                "breathno",
+                "drunkyes",
+                "breathsmell",
+                "breathno"
+              ]
+            },
+            {
+              "order": 5,
+              "call_id": "gen14",
+              "deactivated_dialogue_ids": [
+                "w1",
+                "w3"
+              ]
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "fixed_calls": [
+            {
+              "order": 1,
+              "call_id": "gen16",
+              "deactivated_dialogue_ids": [
+                "now",
+                "idk",
+                "gta"
+              ]
+            },
+            {
+              "order": 2,
+              "call_id": "gen20_2",
+              "deactivated_dialogue_ids": [
+                "2b",
+                "garbage",
+                "garage",
+                "burnout",
+                "cause1",
+                "teens"
+              ]
+            },
+            {
+              "order": 3,
+              "call_id": "wa1",
+              "deactivated_dialogue_ids": []
+            },
+            {
+              "order": 4,
+              "call_id": "gen19",
+              "deactivated_dialogue_ids": [
+                "weeks",
+                "headache",
+                "othersym",
+                "noeat",
+                "burritoeat"
+              ]
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "fixed_calls": [
+            {
+              "order": 1,
+              "call_id": "gen20_2",
+              "deactivated_dialogue_ids": [
+                "room",
+                "garage",
+                "2b"
+              ]
+            },
+            {
+              "order": 2,
+              "call_id": "gen16",
+              "deactivated_dialogue_ids": [
+                "now",
+                "ok",
+                "ok2",
+                "gta",
+                "parking",
+                "hour"
+              ]
+            },
+            {
+              "order": 3,
+              "call_id": "gen10",
+              "deactivated_dialogue_ids": [
+                "whenm",
+                "whenh",
+                "injured1",
+                "injured2"
+              ]
+            },
+            {
+              "order": 4,
+              "call_id": "gen22",
+              "deactivated_dialogue_ids": [
+                "2",
+                "2b",
+                "side",
+                "mall",
+                "illegal",
+                "blocking",
+                "myspot",
+                "nospace",
+                "privat"
+              ]
+            },
+            {
+              "order": 5,
+              "call_id": "wa2",
+              "deactivated_dialogue_ids": []
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "fixed_calls": []
+        }
+      ],
+      "generated_reports": true,
+      "call_interval_seconds": {
+        "min": 88,
+        "max": 93
+      },
+      "report_interval_seconds": {
+        "min": 10,
+        "max": 28
+      },
+      "completion": {
+        "reputation": 100.0,
+        "efficiency_percent": 60
+      },
+      "source": {
+        "chapter_method": "Campaign::GetChapter_5",
+        "level_generator": "LevelDataGenerator::generateWashington"
+      }
+    }
+  ]
+}

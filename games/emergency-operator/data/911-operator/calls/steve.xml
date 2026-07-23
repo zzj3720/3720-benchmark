@@ -1,0 +1,37 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="steve" texten="Singer" COMMENT="RECORDED">
+ <scene>
+ <suspect elementProperties="type=AfAm;
+sex=M;
+bill=1000;" id="wonder" texten="Stevie Wonder Wannabe" addToAAR="song" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect=-1;" />
+ <dialogOption id="2" operator="caller" emotions="singing! (background only)" texten="I just called to say I love you!" default="excuse" option2="hello" option3="hang" addToAAR="prank" COMMENT="https://www.youtube.com/watch?v=QwOU3bnuU0k" />
+ <dialogOption id="hello" operator="Operator:" emotions="normal (yet)" texten="{HELLO?}Hello?" default="3" COMMENT="www.youtube.com/watch?v=84RxK4N1wfE" />
+ <dialogOption id="3" operator="caller" texten="(singing)" default="hang" option2="isitme" option3="redial" />
+ <dialogOption id="isitme" operator="Operator:" emotions="Like Lionel Richie" texten="{IS IT ME YOU'RE LOOKING FOR?}Is it me you're looking for?" default="4" />
+ <dialogOption id="4" operator="caller" texten="I just called to say how much I care..." default="hang" option2="where" />
+ <dialogOption id="where" operator="Operator:" emotions="Like Lionel Richie" texten="{WHERE YOU ARE?}cause I wonder where you are?" default="5" addToAAR="nodo" />
+ <dialogOption id="5" operator="caller" texten="(singing)" default="hang" option2="what" />
+ <dialogOption id="what" operator="Operator:" emotions="Like Lionel Richie" texten="{WHAT YOU DO?}and I wonder whaaat you doo?" default="6" />
+ <dialogOption id="6" operator="caller" texten="(singing)" default="hang" option2="youall" />
+ <dialogOption id="youall" operator="Operator:" emotions="Like Lionel Richie" texten="{YOU'RE ALL I'VE EVER WANTED}You're all I've ever wanted..." default="7" />
+ <dialogOption id="7" operator="caller" texten="(singing)" default="hang" option2="loveyou" />
+ <dialogOption id="8" operator="caller" texten="(singing)" default="hello" option2="hang" option3="redial" />
+ <dialogOption id="loveyou" operator="Operator:" emotions="normal now :)" texten="{LOVE YOU TOO, BYE!}...I love you too! Bye!" actionOnEnd="achiv=smile;
+actionHangup;" />
+ <dialogOption id="hang" operator="Operator:" texten="{HANGUP} [HANGUP]" actionOnEnd="actionHangup;" />
+ <dialogOption id="excuse" operator="Operator:" emotions="normal" texten="Excuse me?" default="8" />
+ <dialogOption id="redial" operator="Operator:" texten="[HANGUP AND REDIAL]" actionOnEnd="opinionEffect=-1;
+actionHangup;" />
+ <dialogOption id="reminder" operator="caller" texten="(singing)" />
+ <dialogOption id="reminder2" operator="caller" texten="(singing)" />
+ </dialog>
+ <aar>
+ <reportElement id="prank" texten="It was a prank call. No interactions could be made with the caller." />
+ <reportElement id="nodo" texten="The caller was unwilling to change the song" />
+ <reportElement id="song" texten="At the place a song was sung to the officers, however they were not very happy to go there." />
+ </aar>
+ </conversation>
+</conversations></data>

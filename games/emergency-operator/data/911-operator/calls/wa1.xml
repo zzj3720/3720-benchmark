@@ -1,0 +1,56 @@
+<data><conversations>
+<conversation id="wa1" texten="Run over dog" COMMENT="RECORDED">
+ <scene>
+ <passerby elementProperties="sex=M;
+type=White;" id="caller" emotions="around 50 years old , Kevin Spacey like" texten="Frank Underhill (caller)" />
+ <injuried elementProperties="isActive = true;
+hp = 30;
+hpchange = -0.5;
+photo=Icons/Equipment/e_dog;" id="dog" texten="Dog" actionOnEnd="opinionEffect = -1;" addToAAR="unnecessary" />
+ <dead elementProperties="isActive = false;
+photo=Icons/Equipment/e_dog;" id="deaddog" texten="Dead dog" />
+ </scene>
+ <dialog>
+ <dialogOption elementProperties="bgsound=cwa1_0_dog;" id="1" operator="Operator:" texten="911, what's your emergency?" default="2" />
+ <dialogOption id="2" operator="Caller:" emotions="around 50 years old , Kevin Spacey like" texten="There was an accident, please send an ambulance." default="what" option2="address" />
+ <dialogOption id="what" operator="Operator:" texten="{WHAT HAPPENED?}Alright sir, you gonna have to tell me more, before I send an ambulance." default="accident" />
+ <dialogOption id="send" operator="Operator:" texten="{I'LL SEND THE AMBULANCE}Just stand by the ambulance will be there shortly." default="thanks" />
+ <dialogOption id="accident" operator="Caller:" emotions="slightly annoyed, talking briefly" texten="What more do you want to know?" default="info" option3="address" />
+ <dialogOption id="info" operator="Operator:" texten="{WHAT EXACTLY HAPPEN?}What exactly did happen? Who is injured?" default="info1" />
+ <dialogOption id="info1" operator="Caller:" emotions="dogs whinning" texten="A dog was hit by some asshole driver. I don't know how serious the injuries are, but it looks really bad." default="sup" option3="address" />
+ <dialogOption id="sup" operator="Operator:" texten="{DOG?}A dog? You mean a dog is injured?" default="ofc" addToAAR="story" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS} Where did it happen?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="At [[ADDRESS]]" default="back" option2="send" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="At 104 Doungton ave." default="back" option2="send" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="At 232 Roosevelt st." default="back" option2="send" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="At 478 Osmond blv." default="back" option2="send" actionOnEnd="actionSetLocation" />
+ <dialogOption id="ofc" operator="Caller:" emotions="irritated, dogs whinning in background" texten="Yes, a dog was run over by a car!" default="vet" option2="send" option3="help" />
+ <dialogOption id="vet" operator="Operator:" texten="{CALL A VET} I can't send an ambulance for an injured dog. You will have to take it to a vet." default="vet1" />
+ <dialogOption id="help" operator="Operator:" texten="{TRY TO HELP} Is the dog in critical condition? Maybe you can help him by yourself." default="help1" />
+ <dialogOption id="help1" operator="Caller:" emotions="dogs whinning" texten="I don't think so... It looks terrible. He can't really move... seems like there is something wrong with his spine." default="kill" />
+ <dialogOption id="vet1" operator="Caller:" texten="I don't know if it makes sense. The dog probably will probably die before they arrive." default="kill" />
+ <dialogOption id="kill" operator="Caller:" emotions="dogs whinning" texten="That dog is in enormous pain. Maybe I should kill it?" default="killit" option2="callvet" option3="sendf" />
+ <dialogOption id="killit" operator="Operator:" texten="{DO IT} If there's no other way to help this dog, maybe you should." default="done" addToAAR="necessary" />
+ <dialogOption id="callvet" operator="Operator:" texten="{GIVE VET NUMBER} Sir, I strongly recommend you don't do that. I can give you the number to a good vet. Do you have something to write it down?" default="callvet1" addToAAR="necessary" />
+ <dialogOption id="sendf" operator="Operator:" texten="{SEND HELP} No! The situation is critical enough to send the ambulance. Please wait, the help is on the way." default="thanks" />
+ <dialogOption id="done" operator="Caller:" emotions="slowly, with reflection" texten="You're right. My dad always said that they're two kinds of pain: the pain that makes you stronger or useless pain. That dog will never be stronger. There is no point to his suffering..." default="doneop1" option2="doneop2" option3="address" />
+ <dialogOption id="doneop1" operator="Operator:" texten="{...} . . ." default="done1" />
+ <dialogOption id="doneop2" operator="Operator:" texten="{DON'T DO IT!} No no Sir don't do that please! I'll send someone there right away, they will be there shortly!" actionOnEnd="actionHangup;" />
+ <dialogOption elementProperties="bgsound=cwa1_0;" id="done1" operator="Caller:" emotions="dogs loud whine, scilence" texten=". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ." default="done2" actionOnEnd="dog.isActive = false;
+deaddog.isActive = true;" />
+ <dialogOption id="done2" operator="Caller:" texten="It's over now. Sorry for an unnecessary call." actionOnEnd="actionHangup;
+opinionEffect = 0;
+onIgnore=0;" />
+ <dialogOption id="callvet1" operator="Caller:" emotions="moment of silence at the beginning" texten=". . . . . . . . . It is not a good idea. Moments like this require somebody who will act. Who will do unpleasant, but necessary, things." default="doneop1" option2="doneop2" />
+ <dialogOption id="thanks" operator="Caller:" texten="Thanks. I'll wait with it." actionOnEnd="actionHangup;
+opinionEffect = -1;" addToAAR="unnecessary" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hello?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Can you hear me?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="A dog was run over by a car." />
+ <reportElement id="unnecessary" texten="Medical service was dispatched unnecessarily." />
+ <reportElement id="necessary" texten="Animal's condition was critical. Caller decided to inflict a mortal wound, that would end the dog's suffering." />
+ </aar>
+ </conversation>
+</conversations></data>

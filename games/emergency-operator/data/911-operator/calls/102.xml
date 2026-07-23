@@ -1,0 +1,35 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="102" texten="Bad pizza" COMMENT="RECORDED">
+ <scene>
+ <suspect elementProperties="sex=M;
+type=AfAm;" id="caller" texten="Man under influence of drugs (caller)" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = -1;" />
+ <dialogOption id="2" operator="Caller:" emotions="male, maybe black, ~30, stoned ; )" texten="Hello? Oh, hi. I have a problem, I ordered a pizza and it's too damn spicy..." default="3" option2="sure" />
+ <dialogOption id="sure" operator="Operator:" texten="{WRONG NUMBER}Are you sure you've reached the right number?" default="surea" />
+ <dialogOption id="3" operator="Operator:" texten="{EXCUSE ME?}Excuse me?" default="hot" />
+ <dialogOption id="surea" operator="Caller:" texten="Daaaaamn sure." default="dang" option2="joke" option3="hi" />
+ <dialogOption id="hot" operator="Caller:" texten="My pizza. It's extremely spicy. I could barely manage to eat a slice." default="dang" option2="occ" option3="pla" addToAAR="trashcall" />
+ <dialogOption id="dang" operator="Operator:" texten="{ARE YOU IN DANGER?} Sir, are you in danger, but you can't talk about it because of someone in the room?" default="nah" />
+ <dialogOption id="nah" operator="Caller:" emotions="confused" texten="What? Nah! I just want to get my money back!" default="occ" option2="joke" option3="waste" />
+ <dialogOption id="joke" operator="Operator:" texten="{ARE YOU KIDDING?} Is this a joke?" default="jokea" />
+ <dialogOption id="jokea" operator="Caller:" texten="Yo, do I sound like I'm joking? Pizza is neeeeever a joke." default="occ" option2="pla" option3="hi" />
+ <dialogOption id="hi" operator="Operator:" texten="{ARE YOU HIGH?} Are you high?" default="hia" />
+ <dialogOption id="hia" operator="Caller:" emotions="lazy, a bit nostalgic and sad" texten="High as a kite. And I want my munchies. It's tough, man." default="waste" option2="no" option3="hu" />
+ <dialogOption id="occ" operator="Operator:" texten="{DON'T BLOCK THE LINE}Please don't occupy the line unnecessarily." default="thi" />
+ <dialogOption id="hu" operator="Operator:" texten="{HANG UP}" actionOnEnd="actionHangup" />
+ <dialogOption id="pla" operator="Operator:" texten="{CALL THE PIZZA PLACE} This isn't a matter for police. Please call the pizza place and complain to them." default="fo" />
+ <dialogOption id="waste" operator="Operator:" texten="{DON'T WASTE MY TIME} Man, don't waste my time!" default="thi" addToAAR="angry" />
+ <dialogOption id="thi" operator="Caller:" texten="Think, how would you feel if it was your pizza... Ughhh... I'm disappointed, dude. May your pizza never be too spicy. Peace." actionOnEnd="actionHangup" />
+ <dialogOption id="fo" operator="Caller:" texten="I tried, yo, but they told me to fuck off. It was very rude. Can some officer come and help me?" default="occ" option2="waste" option3="no" />
+ <dialogOption id="no" operator="Operator:" texten="{CAN'T HELP YOU}Sir, we can't help you." default="thi" />
+ <dialogOption id="reminder" operator="Caller:" emotions="painfully" texten="Ughhhh... that was hot." />
+ <dialogOption id="reminder2" operator="Caller:" texten="Maaaan..." />
+ </dialog>
+ <aar>
+ <reportElement id="trashcall" texten="The caller was under influence of drugs. He hadn't got any emergency situation and he was occupying the line unnecessarily" />
+ <reportElement id="angry" texten="The operator lose his patience during the conversation." />
+ </aar>
+ </conversation>
+</conversations></data>

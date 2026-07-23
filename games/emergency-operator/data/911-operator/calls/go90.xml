@@ -1,0 +1,109 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="go90" texten="Childbirth in a traffic jam" COMMENT="RECORDED">
+ <scene COMMENT="495">
+ <passerby elementProperties="sex = M;" id="father" texten="Father (caller)" />
+ <injuried elementProperties="hp = 90; sex = W;" id="mother" texten="Mother" />
+ <injuried elementProperties="hp = 90; type=children; photo=Icons/OnSitePictures/OnSitePic_Baby;" id="child" texten="Newborn" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="stay-&gt;active=false;" addToAAR="story" />
+ <dialogOption id="2" operator="Caller:" emotions="stressful, excited, nervous" texten="My wife is giving birth!" default="where" option2="freq" option3="month" />
+ <dialogOption id="where" operator="Operator:" texten="{WHERE?} Sir, keep calm. Where are you?" default="jam" />
+ <dialogOption id="freq" operator="Operator:" texten="{ANY CONTRACTIONS?} Is your wife having contractions?" default="freq1" />
+ <dialogOption elementProperties="option=stay;" id="jam" operator="Caller:" emotions="[horns], very nervous, almost begging for help" texten="We were heading to hospital, but we get stuck in a traffic jam! There is no way we can get out of here! Please help us!" default="freq" option2="month" option3="address" />
+ <dialogOption id="freq1" operator="Caller:" emotions="[woman voice in the background]" texten="Yes... wait a second . . do you have contractions? . . . . . . . . . . . . Contractions are getting stronger and occur very often. Send an ambulance quickly!" default="toolate" option2="stay" option3="address" />
+ <dialogOption id="month" operator="Operator:" texten="{WHAT MONTH IS IT?} How far along is your wife's pregnancy?" default="month1" />
+ <dialogOption id="month1" operator="Caller:" emotions="[horns], very nervous, almost begging for help" texten="She's in her ninth month, sir! We need help!" default="back" />
+ <dialogOption id="address" operator="Operator:" texten="{WHERE ARE YOU?} Sir, do you know where you are, can you give me address?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="We're stuck near [[ADDRESS]]." default="back" actionOnEnd="actionSetLocation;
+stay-&gt;active=true;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="We're stuck near 20 Frote Road" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="We're stuck near 104 9th Alley" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="We're stuck near 154 Downtown Street" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="toolate" operator="Operator:" texten="{YOU HAVE TO ACT} Sir, I've sent an ambulance, but it may not arrive before the baby does." default="panic" actionOnEnd="bgsound=cgo90_0_2;" />
+ <dialogOption id="panic" operator="Caller:" emotions="panically [background at the end until player choose operator line: mumbling: Oh my god... what now... I can't... ]" texten="What?! What does it mean?! That's our baby!!! I don't know what to do!!! " default="hardcalm" option2="namecalm" option3="address" actionOnEnd="bgsound=cgo90_0_3;" COMMENT="uwaga, je��i lektor m�wi na backgroundzie co stanie si� gdy w��czy sie reminder? Dlatego przypisano domy�lne t�o do backgroundow. Do weryfikacji czy nie bedzie s�yszlane przejscie" />
+ <dialogOption id="hardcalm" operator="Operator:" emotions="interupting firmly" texten="{BE A MAN} Hey, sir! You need to be strong, strong for your wife, strong for your baby. And believe me when I say this your wife has far tougher job ahead of her, ok?" default="trycalm" />
+ <dialogOption id="namecalm" operator="Operator:" emotions="interupting with confident, pleasant voice" texten="{EVERYTHING WILL BE FINE} Everything's gonna be fine, sir. Do you have a name for the baby yet?" default="namecalm1" />
+ <dialogOption id="namecalm1" operator="Caller:" emotions="confused, calmer" texten="Em... yes. We're expecting a girl, so we'll name her Lucy, after my grandma." default="namecalm2" />
+ <dialogOption id="namecalm2" operator="Operator:" emotions="pleasant voice" texten="{STAY CALM} That's a beautiful name. So, please be calm, listen my instructions and together we will take care of your wife and Lucy, sound good?" default="namecalm3" />
+ <dialogOption id="namecalm3" operator="Caller:" emotions="[deep breath] definitely more calm than before" texten=". . . . . okay... let's do it..." default="first" addToAAR="keepcalm" />
+ <dialogOption elementProperties="bgsound=cgo90_0;" id="trycalm" operator="Calller:" emotions="still little afraid" texten="I-I'll try..." default="first" addToAAR="nocalm" />
+ <dialogOption id="first" operator="Caller:" texten="What should I do first?" default="clothes" option2="flat" option3="left" />
+ <dialogOption id="clothes" operator="Operator:" texten="{TAKE OFF HER CLOTHES} What you're gonna have to do is expose your wife from waist down. So you're gonna help take her pants off. She shouldn't have anything below the waist." default="clothes1" />
+ <dialogOption id="flat" operator="Operator:" texten="{LAY HER DOWN} I want you to get your wife comfortable on a back on a steady flat surface." default="backseat" />
+ <dialogOption id="left" operator="Operator:" texten="{FIND SOMEONE TO HELP} I want you to get out of your car and see if you can find someone else also stuck in traffic, who maybe is a medical professional. " default="left1" />
+ <dialogOption id="left1" operator="Caller:" texten="Should I leave my wife alone?!" default="leftyes" option2="leftno" />
+ <dialogOption id="leftno" operator="Operator:" texten="{NO} No, that's a bad idea." default="thenwhat" actionOnEnd="opinionEffect+=-1;" />
+ <dialogOption id="thenwhat" operator="Caller:" texten="Then what should I do???" default="clothes" option2="flat" option3="address" />
+ <dialogOption id="leftyes" operator="Operator:" texten="{YES} Yes. Try to do it quickly." default="leftend" actionOnEnd="opinionEffect=-3;
+onIgnore=-3;" addToAAR="badidea" />
+ <dialogOption id="leftend" operator="Caller:" emotions="unconvinced" texten="Okay... So... I'm going. Thanks for the help... I guess..." actionOnEnd="actionHangup;" />
+ <dialogOption id="backseat" operator="Caller:" emotions="[some noises]" texten="Okay, wait. I'll make some space on the backseat . . . . . . . . . . . . . . . . . . .. . . . . . . . . . . . . . . . . . ." default="backseat1" />
+ <dialogOption id="backseat1" operator="Caller:" emotions="mumbling [some noises]" texten="Thank God I bought a big car. . . . . . . . ." default="backseat2" />
+ <dialogOption id="backseat2" operator="Caller:" emotions="to his wife" texten="Lay down, honey. You need to lay down. . . . . . . . . . . . ." default="backseat3" />
+ <dialogOption id="backseat3" operator="Caller:" texten="Okay, what's next?" default="clothes" option2="relax" option3="water" />
+ <dialogOption id="clothes1" operator="Caller:" texten="Sure." default="clothes2" />
+ <dialogOption id="clothes2" operator="Caller:" emotions="to his wife [sound of taking off clothes]" texten="Honey, you need to take off your pants... Let me help you . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ." default="clothes3" />
+ <dialogOption id="clothes3" operator="Caller:" texten="Done." default="flat" option2="relax" option3="water" />
+ <dialogOption id="relax" operator="Operator:" texten="{RELAX AND WAIT} Now, your wife should try to relax and breath deeply. She'll probably have an urge to push very soon." default="okstart" actionOnEnd="forcepush-&gt;active=false;" />
+ <dialogOption id="water" operator="Operator:" texten="{WATER BREAKING?} Has her water broken?" default="water1" />
+ <dialogOption id="water1" operator="Caller:" texten="My wife says so..." default="relax" option2="push" />
+ <dialogOption id="push" operator="Operator:" texten="{PUSH} Now, you should tell your wife to push." default="okstart" actionOnEnd="opinionEffect+=-1; onIgnore=-3;
+relaxpush-&gt;active=false;" addToAAR="badinst" />
+ <dialogOption id="okstart" operator="Caller:" texten="Okay." default="forcepush" option2="relaxpush" />
+ <dialogOption id="forcepush" operator="Caller:" emotions="to his wife, shouting/cheering" texten="Push, honey! Push! Come on!" default="screams" />
+ <dialogOption id="relaxpush" operator="Caller:" emotions="to his wife, pleasant voice" texten="Relax, sweetheart. Take a deep breaths. Yes, like that. Everything will be okay." default="screams" />
+ <dialogOption elementProperties="bgsound=cgo90_0_4;" id="screams" operator="Caller:" emotions="woman screaming" texten=". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ." default="babysee" />
+ <dialogOption id="babysee" operator="Caller:" emotions="woman screaming" texten="I see the baby!" default="head" option2="pull" />
+ <dialogOption id="head" operator="Operator:" emotions="woman screaming" texten="{CAN YOU SEE THE HEAD?} Can you see the head?" default="head1" option2="legs" />
+ <dialogOption id="legs" operator="Caller:" emotions="panically" texten="I can't! I don't see the head! Oh God, those are legs. Christ, what I'm supposed to do?!" default="stoplab" />
+ <dialogOption id="stoplab" operator="Operator:" texten="Your wife needs to stop pushing or at least delay her labor. The ambulance is on the way." default="end2" actionOnEnd="child.hpchange=-0.3;" />
+ <dialogOption id="pull" operator="Operator:" emotions="woman screaming" texten="{PULL OUT THE BABY} You should pull the baby in your direction." default="pull1" actionOnEnd="opinionEffect+=-1;
+onIgnore=-3;" addToAAR="badinst" />
+ <dialogOption id="head1" operator="Caller:" emotions="woman screaming" texten="Yes, it's the head!" default="inprogress" />
+ <dialogOption id="pull1" operator="Caller:" emotions="shocked" texten="What? I can't do that! The head is slippery and I don't want to hurt the baby." default="inprogress" />
+ <dialogOption id="inprogress" operator="Operator:" emotions="woman screaming" texten="{WAIT} Okay, wait until the baby is out. You'll need to catch her and protect her from falling." default="inprogress1" />
+ <dialogOption id="inprogress1" operator="Caller:" emotions="nervous" texten="Okay, okay. Darling, you can do this!" default="inprogress2" />
+ <dialogOption id="inprogress2" operator="Caller:" emotions="woman screaming" texten=". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ." default="inprogress3" />
+ <dialogOption id="inprogress3" operator="Caller:" emotions="almost crying from happiness " texten="Oh, my God...... she's here. It's a girl! Our baby..." default="congrats" option2="breathing" actionOnEnd="bgsound=cgo90_0_2;" />
+ <dialogOption id="congrats" operator="Operator:" emotions="also happy" texten="{CONGRATS!} Congratulations! You did it!" default="congrats2" addToAAR="itsalive" />
+ <dialogOption id="congrats2" operator="Caller:" emotions="almost crying from happiness " texten="Thank you!" default="breathing" option2="stomach" actionOnEnd="bgsound=cgo90_0_2;" />
+ <dialogOption id="breathing" operator="Operator:" texten="{IS IT BREATHING?} Is Lucy breathing? Is she crying?" default="breathing1" option2="nocry" actionOnEnd="opinionEffect+=1; onIgnore=-3;" />
+ <dialogOption id="breathing1" operator="Caller:" emotions="extremly happy, crying a bit [child starts crying]" texten="Yes, she is... she looks healthy and beautiful. My sweet Lucy..." default="givetoma" option2="stomach" actionOnEnd="bgsound=cgo90_0_5;" />
+ <dialogOption id="nocry" operator="Caller:" emotions="panically" texten="She isn't crying! I don't know... I don't know if she's breathing!" default="rub" option2="badwait" option3="address" actionOnEnd="child.hpchange=-0.5;" />
+ <dialogOption id="rub" operator="Operator:" texten="{RUB HER BACK} Don't panic, sir. If she's not crying you may need to clear her airway. Use your little finger to remove any mucus from her mouth, then turn her over, face down, and pat her back." default="rubworked" />
+ <dialogOption id="badwait" operator="Operator:" texten="{WAIT FOR HELP} Don't do anything, just wait for an ambulance. It's on the way." default="end2" actionOnEnd="bgsound=cgo90_0;" addToAAR="badwait" />
+ <dialogOption id="rubworked" operator="Caller:" emotions="extremly happy, crying a bit [child starts crying]" texten="Okay. . . . . It worked! Oh, Jesus, I'm so happy, Lucy is alive!" default="givetoma" option2="stomach" actionOnEnd="bgsound=cgo90_0_5;" />
+ <dialogOption id="givetoma" operator="Operator:" texten="{GIVE CHILD TO YOUR WIFE} You can give Lucy to your wife." default="cordblock" actionOnEnd="opinionEffect+=-1; onIgnore=-3;" addToAAR="badinst" />
+ <dialogOption id="stomach" operator="Operator:" texten="{PUT CHILD ON MOTHER'S STOMACH} You should put the child on mother's stomach." default="stomach1" />
+ <dialogOption id="stomach1" operator="Caller:" emotions="sfx of putting baby" texten=". . . . . . ." default="pulsate" option2="tie" />
+ <dialogOption id="cordblock" operator="Caller:" emotions="frightened " texten="Sure...... Oh, I can't do it, because of umbilical cord. Sweet God, I almost disrupted it." default="tie" option2="pulsate" />
+ <dialogOption id="tie" operator="Operator:" texten="{TIE THE CORD} Find something to tie the umbilical cord. It could be anything: ribbon, string or even a clean shoelace." default="tie1" COMMENT="mistake was caller insted of operator" />
+ <dialogOption id="pulsate" operator="Operator:" texten="{IS IT PULSATING?} Check if the umbilical cord is still pulsating." default="pulsate1" actionOnEnd="opinionEffect+=1;
+onIgnore=-3;
+necess-&gt;active=false;" />
+ <dialogOption id="pulsate1" operator="Caller:" texten="No, it isn't!" default="tie" />
+ <dialogOption id="tie1" operator="Caller:" texten="Okay, I got a ribbon." default="tie2" />
+ <dialogOption id="tie2" operator="Operator:" texten="{MAKE A KNOT} Now, you should make a knot about 1,5 inches from the newborn's belly." default="tie3" />
+ <dialogOption elementProperties="bgsound=cgo90_0_2;" id="tie3" operator="Caller:" emotions="[some noises, child crying]" texten=". . . . . . . . . . . . . . . . . . . . It's done. Should I cut it?" default="necess" option2="nonecess" />
+ <dialogOption id="necess" operator="Operator:" texten="{DO IT} Yes, do it immediately." default="stayordrive" actionOnEnd="opinionEffect+=-1; onIgnore=-3;" addToAAR="badinst" />
+ <dialogOption id="nonecess" operator="Operator:" texten="{NOT NECESSARILY} It isn't necessary. You can wait with that until you get to the hospital." default="stayordrive" />
+ <dialogOption id="stayordrive" operator="Caller:" texten="Okay... The traffic jam looks a bit smaller. Should I drive to the hospital or an ambulance will arrive here?" default="stay" option2="drive" option3="address" />
+ <dialogOption id="stay" operator="Operator:" texten="{WAIT} Just wait, the ambulance is almost there." default="end" actionOnEnd="opinionEffect+=1; onIgnore=-3;" />
+ <dialogOption id="drive" operator="Operator:" texten="{DRIVE ON YOUR OWN} The hardest part is behind you and your wife too. Drive her to the hospital and drive carefully." default="end" actionOnEnd="opinionEffect=3; onIgnore=2;" />
+ <dialogOption id="end" operator="Caller:" texten="Okay, thank you very much sir." default="address" actionOnEnd="actionHangup;" />
+ <dialogOption id="end2" operator="Caller:" emotions="panically" texten="Oh God, we'll try. Please, hurry!" actionOnEnd="actionHangup;" />
+ <dialogOption elementProperties="bgsound=cgo90_0;" id="reminder" operator="Caller:" emotions="[woman voice in background]" texten=". . . . . . . . . . . . . . . . . . . . . . . . . . . ." />
+ <dialogOption elementProperties="bgsound=cgo90_0;" id="reminder2" operator="Caller:" emotions="nerovus" texten="So what should I do now?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="A pregnant woman started giving a birth in a traffic jam." />
+ <reportElement id="badinst" texten="The operator gave wrong medical instruction." />
+ <reportElement id="keepcalm" texten="The operator succesfully calmed the man down." />
+ <reportElement id="nocalm" texten="The operator didn't manage to calm down the man." />
+ <reportElement id="badidea" texten="The operator put the woman in danger. Her husband left her alone, because of the operator's instruction." />
+ <reportElement id="badwait" texten="The operator didn't give important medical instruction, which put the newborn's life in danger." />
+ <reportElement id="itsalive" texten="The child was born." />
+ </aar>
+ </conversation>
+</conversations></data>

@@ -1,0 +1,44 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="ch4" texten="Bat in a room" COMMENT="RECORDED">
+ <scene>
+ <passerby elementProperties="sex=W;" id="caller" operator="Caller:" texten="Caller" />
+ <tech elementProperties="icon=OnSitePic_Bat;
+work = 50;" id="bat" texten="Bat" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect=1;" addToAAR="story" />
+ <dialogOption id="2" operator="Caller:" emotions="panicking, begging for help; door slam sound" texten="HELP! AAAAAA! . . . . There's a bat in my apartment!!!" default="address" option2="calm" option3="deal" />
+ <dialogOption id="name" operator="Operator:" emotions="strict!" texten="{WHAT'S YOUR NAME?} What is your name?" default="namea0" />
+ <dialogOption id="namea0" operator="Caller:" texten="[[NAME]]" />
+ <dialogOption id="namea1" operator="Caller:" texten="Selina Kyle!" />
+ <dialogOption id="namea2" operator="Caller:" texten="Talia al Ghul!" />
+ <dialogOption id="namea3" operator="Caller:" texten="Julie Madison!" />
+ <dialogOption id="address" operator="Operator:" emotions="strict!" texten="{WHERE ARE YOU?} What's your address?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="[[ADDRESS]]!!!" default="back" option2="sendh" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="345 Oxygen Road, apartment 52!" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="124 2nd Alley!" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="504 Basic Square!" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="batman" operator="Operator:" texten="{SHOULD I SEND... BATMAN?}So what do you want me to do... send... batman?" default="batmana" />
+ <dialogOption id="batmana" operator="Caller:" texten="I don't care who you send, just send someone please!!!" default="back" option2="sendh" actionOnEnd="bgsound=cch4_00;" />
+ <dialogOption id="calm" operator="Operator:" emotions="strict!" texten="{HIDE YOURSELF} The bat isn't gonna hurt you. It's more afraid of you than you are of it. Just close the door and stay calm." default="calma" />
+ <dialogOption id="calma" operator="Caller:" texten="I did, I'm in the toilet, but I can hear it flying around the whole apartment! I'm locked here, please help me!" default="back" option2="batman" option3="deal" />
+ <dialogOption id="sendh" operator="Operator:" texten="{I'LL SEND HELP}Ok, I will send help, just stay there please." default="end" />
+ <dialogOption id="deal" operator="Operator:" texten="{OPEN THE WINDOW} Ma'am, you can help yourself, just open the window wide and turn off the lights, before you know it the bat will be gone." default="deala" addToAAR="dealit" />
+ <dialogOption id="deala" operator="Caller:" texten="No way I'm going out of here!" default="address" option2="haveto" option3="batman" />
+ <dialogOption id="haveto" operator="Operator:" texten="{YOU HAVE TO} You have to, I am not gonna send an officer over there, your life is not in danger. It's not even an emergency, it's a bat in your house." default="havetoa" />
+ <dialogOption id="havetoa" operator="Caller:" emotions="crying" texten="But oh... please! . . . . . . . . . [crying]" default="candoit" option2="back" option3="batman" />
+ <dialogOption id="candoit" operator="Operator:" texten="{BE CAREFUL} You can do it ma'am. Just be careful, ok?" default="candoita" />
+ <dialogOption id="hangup" operator="Operator:" texten="{HANGUP} ...." actionOnEnd="actionHangup;
+opinionEffect=0;" addToAAR="ignored" />
+ <dialogOption id="candoita" operator="Caller:" emotions="crying" texten="No I can't.... I really can't...." default="hangup" option2="address" option3="sendh" />
+ <dialogOption id="end" operator="Caller:" emotions="crying" texten="Hurry!" default="address" actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hello?" default="back" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Are you there?" default="back" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="The woman was extremely scared by a bat that flew into her apartment." />
+ <reportElement id="dealit" texten="The operator tried to convince the woman to handle situation by herself." />
+ <reportElement id="ignored" texten="The operator decided to end the conversation." />
+ </aar>
+ </conversation>
+</conversations></data>

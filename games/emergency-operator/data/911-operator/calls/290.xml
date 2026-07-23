@@ -1,0 +1,54 @@
+<data><conversations>
+<conversation id="290" texten="Power cut" COMMENT="RECORDED">
+ <scene>
+ <passerby elementProperties="sex=W;
+type=White;" id="caller" emotions="Female, 42 year old, down to earth, precise, cool-headed but tension can be heard in her voice" texten="Anna Stark (caller)" />
+ <injuried elementProperties="hp = 60;
+type=Old;
+sex=M;
+hpChange = -0.01;" id="injuried1" emotions="Male, 75 year old" texten="Old man on life-support" actionOnEnd="battery.isActive = false;" />
+ <timer elementProperties="time = 120;" id="battery" texten="Battery exhausted!" actionOnEnd="injuried1.hpChange = -1;" addToAAR="battex" />
+ <tech elementProperties="work = 100; icon=OnSitePic_Generator" id="generator" texten="Generator to run" actionOnEnd="battery.isActive = false;" addToAAR="runagain" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 4;" />
+ <dialogOption id="2" operator="Caller:" texten="This is Anna Stark from the 'Silence Evening' care facility." default="5" option2="address" addToAAR="story" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?} What's the address ma'am?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="It's [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="It's 53 Wolden Street" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="It's 4 Pine Street" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="It's 110 Cedar Avenue" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="5" operator="Operator:" texten="{WHAT HAPPENED?} Tell me what happened?" default="6" />
+ <dialogOption id="6" operator="Caller:" texten="We still don't have electricity after the earthquake." default="7" option2="13" option3="address" />
+ <dialogOption id="7" operator="Operator:" texten="{IT'S NORMAL} Ma'am, there are a lot of households that don't have electricity right now." default="8" />
+ <dialogOption id="8" operator="Caller:" emotions="restless" texten="But we have elderly guests to take care of!" default="9" option2="13" option3="address" />
+ <dialogOption id="9" operator="Operator:" texten="{AREN'T YOU PREPARED?} Aren't you prepared for such situations?" default="10" />
+ <dialogOption id="10" operator="Caller:" texten="One of our emergency generators broke during earthquake, we cannot sustain for much longer." default="11" option2="13" option3="25" />
+ <dialogOption id="11" operator="Operator:" texten="{NO SPARE ONE?} Don't you have a spare generator?" default="12" />
+ <dialogOption id="12" operator="Caller:" emotions="shouting" texten="You think I am an idiot?! If the situation wasn't critical and we had other options I wouldn't be calling out, especially after an earthquake. I know you are completely busy." default="13" option2="26" actionOnEnd="opinionEffect += -1" addToAAR="lostpat" />
+ <dialogOption id="13" operator="Operator:" texten="{ANY DANGER?} OK. Is anyone in a life-threatening situation?" default="14" />
+ <dialogOption id="14" operator="Caller:" texten="One of our patients has an artificial heart, and his batteries are running out!" default="15" option2="17" option3="address" />
+ <dialogOption id="15" operator="Operator:" texten="{TRY RECHARGING IT} Is it possible to recharge the battery?" default="16" />
+ <dialogOption id="16" operator="Caller:" texten="Internal battery is empty and external one is almost depleted." default="17" option2="21" />
+ <dialogOption id="17" operator="Operator:" texten="{WHAT DO YOU SUGGEST?} What do you suggest?" default="18" />
+ <dialogOption elementProperties="option=address;" id="18" operator="Caller:" texten="Send us someone with a power generator and if that ain't gonna happen he needs to be taken to a hospital fast! I mean fast!" default="19" option2="21" option3="23" />
+ <dialogOption id="19" operator="Operator:" texten="{OWN TRANSPORT?}You have your own transport?" default="20" />
+ <dialogOption id="20" operator="Caller:" emotions="worried" texten="If I had, I wouldn't be calling you. Patient is nonambulatory, an ambulance is a necessity." default="21" option2="25" />
+ <dialogOption id="21" operator="Operator:" texten="{HOW MUCH TIME LEFT?}How much time do we have?" default="22" />
+ <dialogOption id="22" operator="Caller:" texten="A few minutes, less than that if you want to transport him in a vehicle without onboard life-support." default="23" option2="address" option3="25" />
+ <dialogOption id="23" operator="Operator:" texten="{I'LL SEND A TECH UNIT} I'll try to request someone with battery units or a fully-fitted ambulance as soon as possible." default="24" />
+ <dialogOption id="24" operator="Caller:" texten="Hurry or he'll die." actionOnEnd="actionHangup" addToAAR="sended" />
+ <dialogOption id="25" operator="Operator:" texten="{TEAM'S ON THE WAY} Don't you worry, ma'am. The team is on their way." default="24" />
+ <dialogOption id="26" operator="Operator:" texten="{CALM DOWN}Ma'am please calm down." default="14" />
+ <dialogOption id="reminder2" operator="Caller:" emotions="nervously" texten="Do something or my patient's gonna die!" />
+ <dialogOption id="reminder" operator="Caller:" emotions="nervously" texten="Hello, are you there?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="A facility for the elderly didn't have electricity after a quake and theirs emergency generator had broken." />
+ <reportElement id="sended" texten="The operator decided to send emergency services." />
+ <reportElement id="lostpat" texten="The caller has lost her patience, because of operator's questions." />
+ <reportElement id="runagain" texten="The emergency services have managed to run power generator again." />
+ <reportElement id="battex" texten="The battery has exhausted, causing the person heart to stop." />
+ </aar>
+ </conversation>
+</conversations></data>

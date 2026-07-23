@@ -1,0 +1,53 @@
+<data><conversations>
+<conversation id="alb3" texten="Plane crash" COMMENT="RECORDED">
+ <scene>
+ <witness elementProperties="sex=M;
+type=White;" id="witn" emotions="Male, around 30-40 years old, shocked but composed" texten="Caller" />
+ <tech elementProperties="work = 250;" id="workk" texten="Rubble" />
+ <injuried elementProperties="sex=W;
+type=White;" id="owner" texten="Plane crash victim" />
+ <dead elementProperties="sex=M;
+type=AfAm;" blockedBy="workk" id="dpl" texten="Plane crash victim" />
+ <injuried elementProperties="sex=M;
+type=White;" blockedBy="workk" id="injpl" texten="Plane crash victim" />
+ <injuried elementProperties="sex=M;
+type=White;
+isActive=false;" blockedBy="workk" id="colla" texten="Injured witness" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="addressa0" actionOnEnd="opinionEffect = 4;" />
+ <dialogOption id="addressa0" operator="Caller:" emotions="very emotional" texten="Send people here! Now! At [[ADDRESS]]" default="wh" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="Send people here! Now! At 217 Main Street!" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="Send people here! Now! At 1506 Sunshine Boulevard!" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" emotions="speaks fast" texten="Send people here! Now! At 45 Long Drive!" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="wh" operator="Operator:" texten="{WHAT HAPPENED?} Alright what happened?" default="wha" />
+ <dialogOption id="wha" operator="Caller:" emotions="loud" texten="A plane has crashed into a house!" default="pl" option2="fir" option3="ins" addToAAR="crash" />
+ <dialogOption id="pl" operator="Operator:" texten="{WHAT PLANE?} What type of plane? A large one or a small one?" default="pla" />
+ <dialogOption id="pla" operator="Caller:" emotions="loud" texten="A small one... two seater, I guess!" default="back" option2="cas" />
+ <dialogOption id="fir" operator="Operator:" texten="{IS THERE FIRE?} Is anything on fire?" default="fira" />
+ <dialogOption id="fira" operator="Caller:" texten="There's some smoke coming out from the rooftop, but I can't see the flames." default="ins" option2="back" />
+ <dialogOption id="ins" operator="Operator:" texten="{ANYONE INSIDE?} Can you tell if there is anyone inside the house?" default="insa" />
+ <dialogOption id="insa" operator="Caller:" texten="No, a woman ran outside. She said she was alone and she's not injured, but I can tell she's in deep shock." default="back" />
+ <dialogOption id="cas" operator="Operator:" texten="{IS ANYONE INJURED?} Is there anyone else there who's injured?" default="casa" />
+ <dialogOption id="casa" operator="Caller:" texten="I think whoever was in the plane is dead, but I'm not sure... Can't see them!" default="make" option2="back" option3="resc" />
+ <dialogOption id="make" operator="Operator:" texten="{ANY SURVIVORS?} Can you make it through to see if there is any survivors?" default="makea" />
+ <dialogOption id="makea" operator="Caller:" texten="You sure I should go in there?" default="makeyes" option2="makeno" />
+ <dialogOption id="makeyes" operator="Operator:" texten="{HELP THEM}Yes, go and try to help!" default="makeyes2" />
+ <dialogOption id="makeyes2" operator="Caller:" texten="Ok, I will try!" actionOnEnd="colla.isActive = true;
+witn.isActive = false;
+opinionEffect+=-1;
+actionHangup;" addToAAR="collapse" />
+ <dialogOption id="makeno" operator="Operator:" texten="{NOT IF IT'S DANGEROUS}Not if it is any danger to you in any way, ok?" default="makeno2" />
+ <dialogOption id="makeno2" operator="Caller:" texten="Then I'll better stay! Send someone here quick!" default="resc" />
+ <dialogOption id="resc" operator="Operator:" texten="{HELP IS ON THE WAY}Okay, the emergency services are on the way, they should be there soon." default="hurr" />
+ <dialogOption id="hurr" operator="Caller:" texten="Hurry!" actionOnEnd="actionHangup;" addToAAR="plane" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hello?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Hey!" />
+ </dialog>
+ <aar>
+ <reportElement id="crash" texten="The caller was a plane crash witness. He informed the dispatcher about disaster." />
+ <reportElement id="plane" texten="Accident resulted in dead victims." />
+ <reportElement id="collapse" texten="The caller got injured while trying to make his way to the victims." />
+ </aar>
+ </conversation>
+</conversations></data>

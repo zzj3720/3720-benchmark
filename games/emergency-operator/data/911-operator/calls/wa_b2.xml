@@ -1,0 +1,46 @@
+<data><conversations>
+<conversation id="wa_b2" texten="Possible bomb" COMMENT="RECORDED">
+ <scene COMMENT="58">
+ <tech elementProperties="work=300;
+icon=OnSitePic_bomb;
+timer=bombt;" id="bomb" texten="The bomb" actionOnEnd="bombt.isActive=false;
+evacuation.isActive=false;" />
+ <timer elementProperties="time=60;" id="bombt" texten="Time to blow up: {1}s" actionOnEnd="rubble.isActive=true;
+fireb.isActive=true;
+bomb.isActive=false;
+evacuation.isActive=false;
+bombeffect;" addToAAR="explode" />
+ <passerby id="w1" texten="Resident" />
+ <passerby blockedBy="rubble" id="w2" texten="Resident" />
+ <passerby blockedBy="rubble" id="w3" texten="Resident" />
+ <tech elementProperties="isActive=false;
+work=400;
+icon=OnSitePic_Rubble;" id="rubble" texten="Rubble" />
+ <fire elementProperties="isActive=false;
+work=200;" id="fireb" texten="Fire" />
+ <work elementProperties="work=200;
+icon=OnSitePic_EvacuationArea;" id="evacuation" texten="Evacuation" actionOnEnd="w1.isActive=false;
+w2.isActive=false;
+w3.isActive=false;" addToAAR="evac" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 10;" />
+ <dialogOption id="2" operator="Caller:" emotions="villan voice, sarcastic" texten="Now you know I'm not joking... The next bomb will blow up at [[ADDRESS]]. You have 5 minutes to evacuate." default="why" option2="where" option3="what" actionOnEnd="
+actionSetLocation;" />
+ <dialogOption id="why" operator="Operator:" texten="{WHY?} Why are you doing this?!" default="whya" />
+ <dialogOption id="whya" operator="Caller:" emotions="ironic" texten="You will learn soon enough." actionOnEnd="actionHangup" />
+ <dialogOption id="where" operator="Operator:" texten="{WHERE ARE YOU?} Where are you calling from?" default="wherea" />
+ <dialogOption id="wherea" operator="Caller:" emotions="1st sentence still laughing, 2nd serious" texten="HAHAHA! That was really lame and disrespectful! You have 3 minutes instead." actionOnEnd="bombt.time=45;
+actionHangup;" />
+ <dialogOption id="what" operator="Operator:" texten="{WHAT DO YOU WANT?} What are your terms?" default="whata" />
+ <dialogOption id="whata" operator="Caller:" texten="Do as I say when I call you next time." default="back" actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" emotions="sinister" texten="Tic-tock-tik-tock" default="back" />
+ <dialogOption id="reminder2" operator="Caller:" emotions="as in example - ignoring" texten="It's not gonna work man, I know the drill." default="back" />
+ </dialog>
+ <aar>
+ <reportElement id="evac" texten="The residents were evacuated." />
+ <reportElement id="story" texten="The caller has given a warning about an incoming explosion." />
+ <reportElement id="explode" texten="The bomb blew up." />
+ </aar>
+ </conversation>
+</conversations></data>

@@ -1,0 +1,52 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="81" texten="Small car fire" COMMENT="RECORDED">
+ <scene>
+ <fire elementProperties="workChange = 0.5; work = 30;" id="fire" texten="Car on fire" actionOnEnd="smoke.isActive=false;" addToAAR="ext" />
+ <passerby elementProperties="type = White;
+sex = W;" id="caller" texten="Caller" />
+ <timer elementProperties="time = 60;" id="smoke" texten="The caller was poisoned by smoke." actionOnEnd="caller.hp = 80;
+opinionEffect += -2;
+onIgnore=-5;" addToAAR="timeout" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 1;
+onIgnore = 2;
+18-&gt;active=false;" />
+ <dialogOption id="2" operator="Caller:" emotions="women, nervous, panic" texten="Hello, I need help! It's burning!" default="3" option2="address" />
+ <dialogOption id="3" operator="Operator:" texten="{WHAT'S BURNING?} I am sorry Ma'am what's burning?" default="4" />
+ <dialogOption id="4" operator="Caller:" texten="It's burning! Send in the fire brigade immediately, please!" default="5" option2="address" option3="18" />
+ <dialogOption id="5" operator="Operator:" texten="{CALM DOWN} Ok Ma'am I need you to calm down. What is burning?" default="6" />
+ <dialogOption elementProperties="option = 18;" id="6" operator="Caller:" texten="My car! There's smoke coming from under the hood! Send firefighters!" default="7" option2="address" option3="7b" addToAAR="story" />
+ <dialogOption id="7" operator="Operator:" texten="{GET OUT OF THE CAR} What I want you to do is get away from your car. Do it as safely as you can ok?	" default="7a" actionOnEnd="smoke.isActive = false;" addToAAR="instructions" />
+ <dialogOption id="7a" operator="Caller:" emotions="[sound door and the street]" texten="Ok..." default="back" option2="address" />
+ <dialogOption id="7b" operator="Operator:" texten="{IS ANYONE HURT?} Is anyone hurt?" default="8" />
+ <dialogOption id="8" operator="Caller:" texten="No, no one is hurt. Will you send help?!" default="9" option2="address" option3="18" />
+ <dialogOption id="9" operator="Operator:" texten="{TRY TO PUT IT OUT} Did you try to put the fire out yourself?" default="10" />
+ <dialogOption id="10" operator="Caller:" texten="Erm ... myself? No..." default="11" option2="18" option3="address" />
+ <dialogOption id="11" operator="Operator:" texten="{USE AN EXTINGUISHER} Go to the trunk of your car take out the fire extinguisher and pull the pin." default="12" />
+ <dialogOption id="12" operator="Caller:" emotions="[door sound and the street at the end]" texten="Ok, I'm going . . . . . . . . . . . . . . . . . ." default="13" />
+ <dialogOption id="13" operator="Operator:" texten="{USE IT ON THE ENGINE} Please pull the lever under the steering wheel to open the hood, and then spray the fire extinguisher onto the engine." default="14" addToAAR="selfaid" />
+ <dialogOption id="14" operator="Caller:" emotions="[Sound extinguisher, after a while]" texten=". . . . . . . . . . . . . . . . . . it worked, the fire is gone! I will call for roadside assistance... Thanks!" default="15" option2="18" actionOnEnd="smoke.isActive = false;
+fire.isActive=false;
+opinionEffect = 0;
+onIgnore=2;" addToAAR="ext" />
+ <dialogOption id="15" operator="Operator:" texten="{NO PROBLEM}You're welcome." actionOnEnd="actionHangup;" />
+ <dialogOption id="address" operator="Operator:" texten="{WHERE ARE YOU?} Ma'am where are you?" default="addressa0" actionOnEnd="18-&gt;active=true;" />
+ <dialogOption id="addressa0" operator="Caller:" texten="I'm near [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="Near Shell gas station at route 43" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="At Lake Street... 56" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="Near tall building on Seventh Street" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="18" operator="Operator:" texten="{I'LL SEND THE FIREMEN} Ok, I'm sending the fire brigade." default="19" actionOnEnd="opinionEffect = 1" />
+ <dialogOption id="19" operator="Caller:" texten="Well, I'm waiting!" actionOnEnd="actionHangup" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hello, can you help me? My car is still on fire." />
+ <dialogOption id="reminder2" operator="Caller:" texten="Hello?" />
+ </dialog>
+ <aar>
+ <reportElement id="instructions" texten="The driver was told to leave the car." />
+ <reportElement id="story" texten="Caller's car was on fire." />
+ <reportElement id="selfaid" texten="The operator has given helpful instructions. No intervention was needed." />
+ <reportElement id="ext" texten="The car fire was extinguished." />
+ <reportElement id="timeout" texten="The car has burned completely, and the driver was slightly poisoned by smoke" />
+ </aar>
+ </conversation>
+</conversations></data>

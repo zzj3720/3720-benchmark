@@ -1,0 +1,55 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="ny2" texten="Axe Robbery" COMMENT="TO RECORD">
+ <scene COMMENT="128">
+ <suspect elementProperties="sex=M;
+type=White;
+bill=2000;" id="caller" texten="Gamer (caller)" actionOnEnd="opinionEffect=-2;" addToAAR="unneces" />
+ <deco elementProperties="icon=OnSitePic_Computer" id="fcomputer" texten="Computer" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 1;
+where_2-&gt;active=false;" />
+ <dialogOption id="2" operator="Caller:" emotions=" Frustrated" texten="I was robbed! Bastard!" default="what" option2="robbrery" option3="where" addToAAR="story" />
+ <dialogOption id="what" operator="Operator:" texten="{WHAT WAS STOLEN?}What was stolen?" default="what_1" />
+ <dialogOption id="what_1" operator="Caller:" texten="My axe! I've been working for so long to get it!" default="robbrery" option2="where" option3="back" />
+ <dialogOption id="robbrery" operator="Operator:" texten="{HOW DID IT HAPPEN?} Sir, were you assaulted? Was this a burglary?" default="robbery_1" />
+ <dialogOption id="robbery_1" operator="Caller:" texten="No, just a shameless theft! The deal was - I drop the axe and he drops gold, but that bastard just picked the axe, didn't pay and ran away instead!" default="where" option2="gold" option3="novirtual" COMMENT="bylo robbery_2" />
+ <dialogOption id="robbery_2" operator="Operator:" texten="{I DON'T UNDERSTAND}Sorry, I don't really understand." default="robbery_4" />
+ <dialogOption id="robbery_4" operator="Caller:" texten="Hey, it's simple.." default="where" option2="gold" option3="novirtual" />
+ <dialogOption id="where" operator="Operator:" texten="{WHERE?} Where did it happen?" default="where_1" actionOnEnd="opinionEffect = -1;
+where_2-&gt;active=true;" />
+ <dialogOption id="where_1" operator="Caller:" texten="In the Evergreen Forest. Near the blacksmith's house." default="where_2" option2="back" />
+ <dialogOption id="where_2" operator="Operator:" texten="{ADDRESS?} I'm asking for your real address." default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="It's [[ADDRESS]]." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="It's 243 1st street." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="It's 4576 Wide Avenue." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="It's 9th street." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="gold" operator="Operator:" texten="{GOLD?} So, he was supposed to pay with... gold?" default="gold_1" actionOnEnd="opinionEffect = -1;" />
+ <dialogOption elementProperties="option=where_2;" id="gold_1" operator="Caller:" texten="Yes, it's the currency here. We've agreed for 6000 golden coins." default="gold_2" option2="where" option3="what" />
+ <dialogOption id="gold_2" operator="Operator:" texten="{WHAT?} I'm confused. I don't get it." default="gold_3" />
+ <dialogOption id="gold_game" operator="Operator:" texten="{IS IT A GAME?} Sir, are we talking about a computer game?" default="gold_3" />
+ <dialogOption id="gold_3" operator="Caller:" texten="It's in the game! That's how the trades go, but he tricked me and stole my axe!" default="knowhim" option2="gold" option3="novirtual" />
+ <dialogOption id="knowhim" operator="Operator:" texten="{WHO DID IT?}Do you know who did it?" default="knowhim_1" actionOnEnd="opinionEffect = -1;" />
+ <dialogOption elementProperties="option=where_2;" id="knowhim_1" operator="Caller:" texten="His nickname is NiceOrk1337. He belongs to the Misty Assassins' Guild." default="novirtual" option2="back" option3="where" />
+ <dialogOption id="novirtual" operator="Operator:" texten="{NOT AN EMERGENCY} Sir. Events happening in virtual worlds... they are not emergencies." default="novirtual_1" />
+ <dialogOption elementProperties="option=where_2;
+option=where;" id="novirtual_1" operator="Caller:" texten="But it was a robbery!" default="novirtual_2" option2="mean" option3="send" />
+ <dialogOption id="novirtual_2" operator="Operator:" texten="{I CAN'T HELP YOU} Tell me, honestly, would it help if I sent the police over?" default="novirtual_3" />
+ <dialogOption elementProperties="option=where_2;
+option=where;" id="novirtual_3" operator="Caller:" texten="Um... not really." default="nothingtodo" />
+ <dialogOption id="nothingtodo" operator="Operator:" texten="{CAN'T DO ANYTHING}So there's nothing I can do for you, Sir." default="end" />
+ <dialogOption id="end" operator="Caller:" texten="Uhhh.... Gosh. Alright, I will find him and kill him myself." actionOnEnd="actionHangup;" />
+ <dialogOption id="mean" operator="Operator:" texten="{YOU'RE RIDICULOUS} Come down to earth, man. 911 is intended to be used in real emergencies." default="mean2" actionOnEnd="opinionEffect=-1; onIgnore=0;" addToAAR="meanopt" />
+ <dialogOption id="mean2" operator="Caller:" emotions="sigh" texten="It was a real robbery! Okay, I'll get him on my own!" actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hello?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Are you there?" />
+ <dialogOption id="send" operator="Operator:" texten="{I'LL SEND THE POLICE} Alright, I'll send the police to you." default="sendok" actionOnEnd="opinionEffect = -2; onIgnore=-1;" />
+ <dialogOption id="sendok" operator="Caller:" texten="You better hurry!" actionOnEnd="actionHangup;" />
+ </dialog>
+ <aar>
+ <reportElement id="meanopt" texten="The operator has lost his temper." />
+ <reportElement id="story" texten="The caller reported a robbery in a virtual world." />
+ <reportElement id="unneces" texten="The policeman reported that the intervention was completely unnecessary." />
+ </aar>
+ </conversation>
+</conversations></data>

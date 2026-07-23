@@ -1,0 +1,45 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="xmas" texten="Christmas call" COMMENT="RECORDED">
+ <scene>
+ <witness elementProperties="sex=M; type=White;
+photo=Photos/_0004_Bartek" id="caller" operator="Caller:" texten="Bartek Gajewski" />
+ <witness elementProperties="sex=W; type=White;" id="team1" texten="Martyna Markowicz" />
+ <witness elementProperties="sex=W; type=White;" id="team2" texten="Ola Wiak" />
+ <witness elementProperties="sex=M; type=White;" id="team3" texten="Krzysiek Kowal" />
+ <witness elementProperties="sex=M; type=White;
+photo=Photos/_0006_Radek" id="team4" texten="Radek Rowicki" />
+ <witness elementProperties="sex=M; type=White;" id="team5" texten="Tomek Dziuba" />
+ <witness elementProperties="sex=M; type=White;
+photo=Photos/_0008_Adam" id="team6" texten="Adam Mirkowski" />
+ <witness elementProperties="sex=M; type=White;
+photo=Photos/_0007_Kamil" id="team7" texten="Kamil Sobierajski" />
+ <witness elementProperties="sex=M; type=White;" id="team8" texten="Mateusz Bogucki" />
+ <witness elementProperties="sex=M; type=White;
+photo=Photos/_0009_Ian" id="team9" texten="Ian Slessor" />
+ <timer elementProperties="time=6;" id="endcall" texten="timertoendcall;" actionOnEnd="opinionEffect=3;
+onIgnore=9;
+actionHangup;" addToAAR="listenuntilend" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="sing1" />
+ <dialogOption id="sing1" operator="Caller:" texten="[singing]" default="hello" option2="excuse" option3="hangup" actionOnEnd="opinionEffect = 3;
+onIgnore = 3;
+actionSetLocation;" addToAAR="wishes" />
+ <dialogOption id="hello" operator="Operator:" texten="{HELLO?} Hello?" default="sing2" COMMENT="csteve_hello" />
+ <dialogOption id="excuse" operator="Operator:" texten="{EXCUSE ME?} Excuse me?" default="sing2" />
+ <dialogOption id="serious" operator="Operator:" texten="{ARE YOU SERIOUS?} Are you serious?" default="looper" actionOnEnd="serious-&gt;active=true;" />
+ <dialogOption id="funny" operator="Operator:" texten="{THAT'S FUNNY} Yea, that's nice one." default="looper" />
+ <dialogOption id="hangup" operator="Operator:" texten="{HANGUP} [HANGUP]" actionOnEnd="actionHangup;" />
+ <dialogOption id="sing2" operator="Caller:" texten="[singing]" default="serious" option2="listen" option3="hangup" />
+ <dialogOption id="listen" operator="Operator:" texten="{LISTEN} . . . . . . . . . . . . . . ." default="looper" actionOnEnd="listen-&gt;active=true;" />
+ <dialogOption elementProperties="option=funny" id="looper" operator="Caller:" texten="[singing]" default="listen" option2="serious" option3="hangup" />
+ <dialogOption id="end" operator="Operator:" texten="..." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="[singing]" />
+ <dialogOption id="reminder2" operator="Caller:" texten="[singing]" />
+ </dialog>
+ <aar>
+ <reportElement id="wishes" texten="Jutsu Games team wishes you a Merry Christmas!" />
+ <reportElement id="listenuntilend" texten="You've listened through the whole Christmas carol!" />
+ </aar>
+ </conversation>
+</conversations></data>

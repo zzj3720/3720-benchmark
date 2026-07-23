@@ -1,0 +1,23 @@
+<data><conversations>
+<conversation id="wa_b1" texten="Blown up car" COMMENT="RECORDED">
+ <scene COMMENT="35">
+ <tech elementProperties="icon=OnSitePic_explodingCar;
+work=200;" blockedBy="fire" id="blown" texten="Blown up car" />
+ <fire elementProperties="work=200;
+workchange=0.5;" id="fire" texten="Car fire" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 5;" />
+ <dialogOption id="2" operator="Caller:" emotions="villan voice, sarcastic, sinister" texten="Oh, you're gonna have an emergency real soon" default="3" option2="address" />
+ <dialogOption id="3" operator="Operator:" texten="{WHAT DO YOU MEAN?} What do you mean?" default="4" />
+ <dialogOption id="4" operator="Caller:" texten="I mean that you should look out your window... cya!" actionOnEnd="actionHangup" COMMENT="moze wyrzuci� cya! z ko�ca? raczej niezby pasuje do reszty dialogu i postaci" />
+ <dialogOption id="address" operator="Operator:" texten="{WHERE?} Where?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="Oh, right outside your window." actionOnEnd="actionHangup" />
+ <dialogOption id="reminder" operator="Caller:" emotions="calmly" texten="10...... 9...... 8...... 7....... 6......" default="back" />
+ <dialogOption id="reminder2" operator="Caller:" texten="5...... 4....... 3...... 2....... 1......" default="back" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="The caller has mentioned the bomb explosion that happened few seconds later." />
+ </aar>
+ </conversation>
+</conversations></data>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<meta>
+	<reportTypes>
+		<type id="POL-187" name="Homicide" type="police" icon="police" code="187" description="Homicide" descriptionpl="Morderstwo" popularity="2"/>
+		<type id="POL-207" name="Kidnapping" type="police" icon="police" code="207" description="Kidnapping" descriptionpl="Porwanie" popularity="1"/>
+		<type id="POL-207A" name="Kidnapping attempt" type="police" icon="police" code="207A" description="Kidnapping attempt" descriptionpl="Próba porwania" popularity="2"/>
+		<type id="POL-211" name="Robbery" type="police" icon="police" code="211" description="Robbery" descriptionpl="Rozbój" popularity="5"/>
+		<type id="POL-211A" name="Robbery alarm" type="police" icon="police" code="211A" description="Robbery alarm" popularity="5"/>
+		<type id="POL-211S" name="Robbery alarm, silent" type="police" icon="police" code="211S" description="Robbery alarm, silent" popularity="5"/>
+		<type id="POL-217" name="Assault with intent to murder" type="police" icon="police" code="217" description="Assault with intent to murder" descriptionpl="Napad z zamiarem morderstwa" popularity="2"/>
+		<type id="POL-240" name="Assault" type="police" icon="police" code="240" description="Assault" descriptionpl="Napad" popularity="4"/>
+		<type id="POL-242" name="Battery" type="police" icon="police" code="242" description="Battery" descriptionpl="Pobicie" popularity="5"/>
+		<type id="POL-245" name="Assault with a deadly weapon" type="police" icon="police" code="245" description="Assault with a deadly weapon" descriptionpl="napad z bronią" popularity="4"/>
+		<type id="POL-246" name="Shooting at inhabited dwelling" type="police" icon="police" code="246" description="Shooting at inhabited dwelling" popularity="5"/>
+		<type id="POL-261" name="Rape" type="police" icon="police" code="261" description="Rape" descriptionpl="Gwałt" popularity="5"/>
+		<type id="POL-261A" name="Attempted rape" type="police" icon="police" code="261A" description="Attempted rape" descriptionpl="Próba gwałtu" popularity="5"/>
+		<type id="POL-273A" name="Child neglect" type="police" icon="police" code="273A" description="Child neglect" descriptionpl="Pozostawione dziecko"/>
+		<type id="POL-273D" name="Wife beating - Felony" type="police" icon="police" code="273D" description="Wife beating - Felony" descriptionpl="Przemoc domowa" prisonChance="1"/>
+		<type id="POL-288" name="Lewd conduct" type="police" icon="police" code="288" description="Lewd conduct" descriptionpl="czyny lubieżne"/>
+		<type id="POL-311" name="Indecent exposure" type="police" icon="police" code="311" description="Illegal pornography" popularity="1"/>
+		<type id="POL-314" name="Indecent exposure" type="police" icon="police" code="314" description="Indecent exposure" descriptionpl="Exhibicjonizm"/>
+		<type id="POL-374B" name="Illegal dumping" type="police" icon="police" code="374B" description="Illegal dumping" descriptionpl="Nielegalne wyrzucanie śmieci"/>
+		<type id="POL-390" name="Drunk" type="police" icon="police" code="390" description="Drunk" descriptionpl="Pijany"/>
+		<type id="POL-390D" name="Drunk, unconscious" type="police" icon="police" code="390D" description="Drunk, unconscious"/>
+		<type id="POL-415" name="Disturbance" type="police" icon="police" code="415" description="Disturbance" descriptionpl="Zakłucanie spokoju"/>
+		<type id="POL-417" name="Person with a gun" type="police" icon="police" code="417" description="Person with a gun" descriptionpl="Człowiek z pistoletem"/>
+		<type id="POL-417A" name="Person with a knife" type="police" icon="police" code="417A" description="Person with a knife" descriptionpl="Człowiek z nożem"/>
+		<type id="POL-459" name="Burglary" type="police" icon="police" code="459" description="Burglary" descriptionpl="Włamanie"/>
+		<type id="POL-459A" name="Burglar alarm" type="police" icon="police" code="459A" description="Burglar alarm"/>
+		<type id="POL-459S" name="Burglar alarm, silent" type="police" icon="police" code="459S" description="Burglar alarm, silent"/>
+		<type id="POL-470" name="Forgery" type="police" icon="police" code="470" description="Forgery"/>
+		<type id="POL-480" name="Hit and run - Felony" type="police" icon="police" code="480" description="Hit and run - Felony" descriptionpl="Ucieczka z miejsca wypadku" prisonChance="1"/>
+		<type id="POL-481" name="Hit and run - Misdemeanor" type="police" icon="police" code="481" description="Hit and run - Misdemeanor" descriptionpl="Ucieczka z miejsca wypadku" bill="1000" billRange="500" prisonChance="0.4"/>
+		<type id="POL-484" name="Petty theft" type="police" icon="police" code="484" description="Petty theft" descriptionpl="Mała kradzież"/>
+		<type id="POL-487" name="Grand theft" type="police" icon="police" code="487" description="Grand theft" descriptionpl="Kradzież"/>
+		<type id="POL-488" name="Petty theft" type="police" icon="police" code="488" description="Petty theft" descriptionpl="Mała kradzież"/>
+		<type id="POL-502" name="Drunk Driving" type="police" icon="police" code="502" description="Drunk Driving" descriptionpl="Prowadzenie pod wpływem"/>
+		<type id="POL-503" name="Auto theft" type="police" icon="police" code="503" description="Auto theft" descriptionpl="Kradzież auta"/>
+		<type id="POL-504" name="Tampering with a vehicle" type="police" icon="police" code="504" description="Tampering with a vehicle" descriptionpl="Próba kradzieży auta"/>
+		<type id="POL-505" name="Reckless driving" type="police" icon="police" code="505" description="Reckless driving" descriptionpl="niebezpieczne prowadzenie"/>
+		<type id="POL-507" name="Public nuisance" type="police" icon="police" code="507" description="Public nuisance" descriptionpl="Zakłucznie porządku publicznego"/>
+		<type id="POL-510" name="Speeding or racing vehicles" type="police" icon="police" code="510" description="Speeding or racing vehicles" descriptionpl="Przekroczenie prędkości"/>
+		<type id="POL-586" name="Illegal parking" type="police" icon="police" code="586" description="Illegal parking" descriptionpl="Nieprawidłowe parkowanie"/>
+		<type id="POL-594" name="Malicious mischief" type="police" icon="police" code="594" description="Malicious mischief" descriptionpl="oszustwo"/>
+		<type id="POL-595" name="Runaway car" type="police" icon="police" code="595" description="Runaway car" descriptionpl="Ucieczka od kontroli"/>
+		<type id="POL-604" name="Throwing missiles" type="police" icon="police" code="604" description="Throwing missiles" descriptionpl="Rzucanie niebezpiecznymi przedmiotami"/>
+		<type id="POL-647" name="Lewd conduct" type="police" icon="police" code="647" description="Lewd conduct" descriptionpl="Roznegliżowanie"/>
+		<type id="POL-653M" name="Threatening phone calls " type="police" icon="police" code="653M" description="Threatening phone calls "/>
+		<type id="POL-5150" name="mentally disturbed person" type="police" icon="police" code="5150" description="mentally disturbed person"/>
+		<type id="MED-1" name="Abdominal Pain/Problems" type="medical" icon="medical" code="1" description="Abdominal Pain/Problems"/>
+		<type id="MED-2" name="Allergies (Reactions)/ Envenomations (Stings, Bites)" type="medical" icon="medical" code="2" description="Allergies (Reactions)/ Envenomations (Stings, Bites)"/>
+		<type id="MED-3" name="Animal Bites/Attacks" type="medical" icon="medical" code="3" description="Animal Bites/Attacks"/>
+		<type id="MED-4" name="Assault/Sexual" type="medical" icon="medical" code="4" description="Assault/Sexual" descriptionpl="Napad"/>
+		<type id="MED-5" name="Back Pain (Non-Traumatic/Non-Recent)" type="medical" icon="medical" code="5" description="Back Pain (Non-Traumatic/Non-Recent)"/>
+		<type id="MED-6" name="Breathing Problems" type="medical" icon="medical" code="6" description="Breathing Problems"/>
+		<type id="MED-7" name="Burns (Scalds) /Explosions" type="medical" icon="medical" code="7" description="Burns (Scalds) /Explosions"/>
+		<type id="MED-8" name="Carbon Monoxide/Inhalation/HAZMAT/CBRN" type="medical" icon="medical" code="8" description="Carbon Monoxide/Inhalation/HAZMAT/CBRN"/>
+		<type id="MED-9" name="Cardiac or Respiratory Arrest/Death" type="medical" icon="medical" code="9" description="Cardiac or Respiratory Arrest/Death"/>
+		<type id="MED-10" name="Chest Pain" type="medical" icon="medical" code="10" description="Chest Pain"/>
+		<type id="MED-11" name="Choking" type="medical" icon="medical" code="11" description="Choking"/>
+		<type id="MED-12" name="Convulsions/Seizures" type="medical" icon="medical" code="12" description="Convulsions/Seizures"/>
+		<type id="MED-13" name="Diabetic Problems" type="medical" icon="medical" code="13" description="Diabetic Problems"/>
+		<type id="MED-14" name="Drowning/Diving/SCUBA Accident" type="medical" icon="medical" code="14" description="Drowning/Diving/SCUBA Accident" poi="water"/>
+		<type id="MED-15" name="Electrocution/Lightning" type="medical" icon="medical" code="15" description="Electrocution/Lightning"/>
+		<type id="MED-16" name="Eye Problems/Injuries" type="medical" icon="medical" code="16" description="Eye Problems/Injuries"/>
+		<type id="MED-17" name="Falls" type="medical" icon="medical" code="17" description="Falls"/>
+		<type id="MED-18" name="Headache" type="medical" icon="medical" code="18" description="Headache"/>
+		<type id="MED-19" name="Heart Problems/A.I.C.D." type="medical" icon="medical" code="19" description="Heart Problems/A.I.C.D."/>
+		<type id="MED-20" name="Heat/Cold Exposure" type="medical" icon="medical" code="20" description="Heat/Cold Exposure"/>
+		<type id="MED-21" name="Hemorrhage/Lacerations" type="medical" icon="medical" code="21" description="Hemorrhage/Lacerations" descriptionpl="krwotok / otwarte rany"/>
+		<type id="MED-22" name="Inaccessible Incident/Entrapments" type="medical" icon="medical" code="22" description="Inaccessible Incident/Entrapments"/>
+		<type id="MED-23" name="Overdose/Poisoning (Ingestion)" type="medical" icon="medical" code="23" description="Overdose/Poisoning (Ingestion)"/>
+		<type id="MED-24" name="Pregnancy/Childbirth/Miscarriage" type="medical" icon="medical" code="24" description="Pregnancy/Childbirth/Miscarriage"/>
+		<type id="MED-25" name="Psychiatric/Suicide Attempt" type="medical" icon="medical" code="25" description="Psychiatric/Suicide Attempt"/>
+		<type id="MED-26" name="Sick Person" type="medical" icon="medical" code="26" description="Sick Person"/>
+		<type id="MED-27" name="Stab/Gunshot/Penetrating Trauma" type="medical" icon="medical" code="27" description="Stab/Gunshot/Penetrating Trauma"/>
+		<type id="MED-28" name="Stroke (CVA)/Transient Ischemic Attack (TIA)" type="medical" icon="medical" code="28" description="Stroke (CVA)/Transient Ischemic Attack (TIA)"/>
+		<type id="MED-29" name="Traffic/Transportation Incidents" type="medical" icon="medical" code="29" description="Traffic/Transportation Incidents"/>
+		<type id="MED-30" name="Traumatic Injuries" type="medical" icon="medical" code="30" description="Traumatic Injuries"/>
+		<type id="MED-31" name="Unconscious/Fainting(Near)" type="medical" icon="medical" code="31" description="Unconscious/Fainting(Near)"/>
+		<type id="MED-32" name="Unknown Problem (Man Down)" type="medical" icon="medical" code="32" description="Unknown Problem (Man Down)"/>
+		<type id="MED-33" name="Inter-Facility Transfer/Palliative Care" type="medical" icon="medical" code="33" description="Inter-Facility Transfer/Palliative Care"/>
+		<type id="MED-34" name="Automatic Crash Notification (A.C.N.)" type="medical" icon="medical" code="34" description="Automatic Crash Notification (A.C.N.)"/>
+		<type id="MED-35" name="HCP (Health-Care Practitioner) Referral (United Kingdom only)" type="medical" icon="medical" code="35" description="HCP (Health-Care Practitioner) Referral (United Kingdom only)"/>
+		<type id="MED-36" name="Flu-Like Symptoms (Possible H1N1)" type="medical" icon="medical" code="36" description="Flu-Like Symptoms (Possible H1N1)"/>
+		<type id="MED-37" name="Inter-Facility Transfer specific to medically trained callers" type="medical" icon="medical" code="37" description="Inter-Facility Transfer specific to medically trained callers" poi="hospital"/>
+		<type id="FIRE-21" name="One-alarm fire" type="fire" icon="fire" code="10-21" description="One-alarm fire"/>
+		<type id="FIRE-22" name="Two-alarm fire" type="fire" icon="fire" code="10-22" description="Two-alarm fire"/>
+		<type id="FIRE-23" name="Three-alarm fire" type="fire" icon="fire" code="10-23" description="Three-alarm fire"/>
+		<type id="FIRE-24" name="Four-alarm fire" type="fire" icon="fire" code="10-24" description="Four-alarm fire"/>
+		<type id="FIRE-25" name="Five-alarm fire" type="fire" icon="fire" code="10-25" description="Five-alarm fire"/>
+		<type id="FIRE-26" name="Occupied high-rise bldg. Incident" type="fire" icon="fire" code="10-26" description="Occupied high-rise bldg. Incident"/>
+		<type id="FIRE-27" name="Medical facility incident" type="fire" icon="fire" code="10-27" description="Medical facility incident"/>
+		<type id="FIRE-28" name="Criminal detention facility incident" type="fire" icon="fire" code="10-28" description="Criminal detention facility incident"/>
+		<type id="FIRE-29" name="Report of explosive (specify scare, suspected or device)" type="fire" icon="fire" code="10-29" description="Report of explosive (specify scare, suspected or device)"/>
+		<type id="FIRE-30" name="Explosion" type="fire" icon="fire" code="10-30" description="Explosion"/>
+		<type id="FIRE-31" name="Rapid transit/Rail incident" type="fire" icon="fire" code="10-31" description="Rapid transit/Rail incident"/>
+		<type id="FIRE-32" name="Ground transport incident" type="fire" icon="fire" code="10-32" description="Ground transport incident"/>
+		<type id="FIRE-33" name="Structural collapse (building, scaffolding, etc.)" type="fire" icon="fire" code="10-33" description="Structural collapse (building, scaffolding, etc.)"/>
+		<type id="FIRE-34" name="Construction/demolition incident" type="fire" icon="fire" code="10-34" description="Construction/demolition incident"/>
+		<type id="FIRE-35" name="Elevator/escalator incident" type="fire" icon="fire" code="10-35" description="Elevator/escalator incident"/>
+		<type id="FIRE-36" name="Toxic fumes incident" type="fire" icon="fire" code="10-36" description="Toxic fumes incident"/>
+		<type id="FIRE-37" name="Tunnel incident (non-rail)" type="fire" icon="fire" code="10-37" description="Tunnel incident (non-rail)"/>
+		<type id="FIRE-38" name="Marine/harbor incident" type="fire" icon="fire" code="10-38" description="Marine/harbor incident"/>
+		<type id="FIRE-39" name="Aircraft emergency standby response" type="fire" icon="fire" code="10-39" description="Aircraft emergency standby response"/>
+		<type id="FIRE-40" name="Aircraft incident/crash" type="fire" icon="fire" code="10-40" description="Aircraft incident/crash" popularity="1"/>
+		<type id="FIRE-41" name="Bridge/elevated roadway collapse" type="fire" icon="fire" code="10-41" description="Bridge/elevated roadway collapse" popularity="1"/>
+		<type id="FIRE-42" name="Civil disturbance" type="fire" icon="fire" code="10-42" description="Civil disturbance"/>
+		<type id="FIRE-43" name="Hostage situation/barricaded person(s)" type="fire" icon="fire" code="10-43" description="Hostage situation/barricaded person(s)"/>
+		<type id="FIRE-44" name="Power failure/blackout" type="fire" icon="fire" code="10-44" description="Power failure/blackout"/>
+		<type id="FIRE-45" name="Chemical pipeline incident" type="fire" icon="fire" code="10-45" description="Chemical pipeline incident"/>
+		<type id="FIRE-46" name="Bulk oil storage/liquefied natural gas facility incident" type="fire" icon="fire" code="10-46" description="Bulk oil storage/liquefied natural gas facility incident"/>
+		<type id="FIRE-47" name="Nuclear substance spill/incident" type="fire" icon="fire" code="10-47" description="Nuclear substance spill/incident"/>
+		<type id="FIRE-49" name="Environmental incident (earthquake, hurricane, etc.)" type="fire" icon="fire" code="10-49" description="Environmental incident (earthquake, hurricane, etc.)"/>
+		<type id="FIRE-55" name="Planned Special Event response" type="fire" icon="fire" code="10-55" description="Planned Special Event response"/>
+		<type id="FIRE-57" name="Planned Mutual Aid response (specify)" type="fire" icon="fire" code="10-57" description="Planned Mutual Aid response (specify)"/>
+		<type id="FIRE-58" name="Planned MCI/standby response" type="fire" icon="fire" code="10-58" description="Planned MCI/standby response"/>
+		<type id="FIRE-59" name="All other incidents" type="fire" icon="fire" code="10-59" description="All other incidents"/>
+		<type id="FIRE-60" name="Major Emergency Response" type="fire" icon="fire" code="10-60" description="Major Emergency Response"/>
+		<type id="FIRE-80" name="Hazardous Materials Incident" type="fire" icon="fire" code="10-80" description="Hazardous Materials Incident"/>
+	</reportTypes>
+</meta>

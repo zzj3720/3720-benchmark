@@ -1,0 +1,69 @@
+<data><conversations>
+<conversation id="ny3" texten="Sports fans fight" COMMENT="RECORDED">
+ <scene>
+ <witness elementProperties="sex=M;
+type=White;" id="caller" texten="Caller" />
+ <fire elementProperties="workChange = 0.5; work = 30;" id="fire" texten="Coach on fire" />
+ <suspect elementProperties="fightRisk = 0.5;
+sex=M;
+type=White;
+prisonChance=0.8;" id="aggr1" texten="Aggressive thug" />
+ <suspect elementProperties="fightRisk = 0.5;
+sex=M;
+type=AfAm;
+prisonChance=0.8;" id="aggr2" texten="Aggressive thug" />
+ <injured elementProperties="hp = 90;
+sex=M;
+type=White;" id="injur1" texten="Injured fan" />
+ <injured elementProperties="hp = 90;
+sex=M;
+type=White;" id="injur2" texten="Injured fan" />
+ <injured elementProperties="hp = 90;
+sex=M;
+hpchange=-0.1;
+type=White;" id="injur3" texten="injured fan" />
+ <passerby elementProperties="sex=M;
+type=White;" id="norm1" texten="Fan" />
+ <passerby elementProperties="sex=M;
+type=White;" id="norm2" texten="Fan" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="strat_1" actionOnEnd="opinionEffect = 5;" />
+ <dialogOption id="strat_1" operator="Caller:" emotions="excited about the evemt, actually enjoys the scene" texten="Hello? Dude, we have a serious mess here!" default="what" option2="where" />
+ <dialogOption id="what" operator="Operator:" texten="{WHAT'S HAPPENING?}Ok, what's happening?" default="what_1" />
+ <dialogOption elementProperties="option=size;" id="what_1" operator="Caller:" texten="Our boys are beating up the other fans! I thought it's gonna be this kinda, you know, friendly brawl... but our boys are pushing it a bit too far. Can you send an ambulance or somethin'?" default="injured" option2="ours" option3="appeal" addToAAR="barFight" />
+ <dialogOption id="injured" operator="Operator:" texten="{IS ANYONE INJURED?}Is anyone severely injured?" default="injured_1" />
+ <dialogOption id="injured_1" operator="Caller:" texten="Well, not severely but some of them are pretty messed up. Few are actually unconscious. One of ours as well!" default="ours" option2="interwention" />
+ <dialogOption id="ours" operator="Operator:" texten="{OURS?}What do you mean by ours?" default="ours_1" />
+ <dialogOption id="ours_1" operator="Caller:" texten="I'm rootin' for Mets guys obviously! B-but I'm staying out of the fight..." default="appeal" option2="focus" option3="who_wins" />
+ <dialogOption id="appeal" operator="Operator:" texten="{TELL THEM TO STOP} Can you advise them to stop fighting try to get'em to break it up?" default="appeal_1" />
+ <dialogOption id="appeal_1" operator="Caller:" texten="Are you for real! I'm just spectating mate! From safe distance." default="interwention" option2="size" option3="who_wins" addToAAR="noaction1" />
+ <dialogOption id="interwention" operator="Operator:" texten="{I'LL SEND POLICE}Alright I am gonna have to send the police." default="interwention_1" />
+ <dialogOption id="interwention_1" operator="Caller:" texten="No! No need for that... just an ambulance... well, maybe some firefighters cuz the bus is in flames..." default="where" option2="back" option3="burning" />
+ <dialogOption id="where" operator="Operator:" texten="{WHERE?}What's the location of the fight?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="Bar on [[ADDRESS]]" default="back" option2="appeal" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="Bar on 21 Arthur Avenue" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="Bar on Christopeher Street" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="Bar on 5 Maiden Avenue" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="who_wins" operator="Operator:" texten="{WHO IS WINNING?}Who's winning?" default="who_wins_1" actionOnEnd="opinionEffect = 2; onIgnore = -3;" />
+ <dialogOption id="who_wins_1" operator="Caller:" texten="Our boys so far! They're really smacking them good!" default="size" option2="focus" />
+ <dialogOption id="size" operator="Operator:" texten="{HOW MANY FIGHTERS?}How many people are involved in the fight?" default="size_1" />
+ <dialogOption id="size_1" operator="Caller:" emotions="Last words spiteful" texten="Like ten dudes. It's one of those 'too many drinks per head' exchange of arguments thing, you know. And a bit of smoulder... maybe they beat us in the game but we did smoked their bus! Ha!" default="burning" option2="injured" option3="appeal" addToAAR="firefight" />
+ <dialogOption id="burning" operator="Operator:" texten="{IS SOMETHING ON FIRE?}Is something on fire?" default="burning_1" />
+ <dialogOption id="burning_1" operator="Caller:" texten="That's what I've said, they pushed it a little too far. Oh, you know, we're mourning our loss after that game. I kinda do understand them, wouldn't you mate?" default="burning_2" />
+ <dialogOption id="burning_2" operator="Operator:" texten="Setting a vehicle on fire and assaulting people, those are crimes..." default="burning_3" />
+ <dialogOption id="burning_3" operator="Caller:" texten="Oh, you're at work I guess. I just hope I did not spoil you the result of the game... did you record it?" default="focus" option2="where" option3="what" />
+ <dialogOption id="focus" operator="Operator:" texten="{FOCUS ON THE FIGHT}Can you please focus on the fight?" default="focus_1" />
+ <dialogOption id="focus_1" operator="Caller:" texten="Well, that's all! Ours are givin' them hell! So far..." default="end" option2="where" option3="size" />
+ <dialogOption id="end" operator="Operator:" texten="{UNITS ARE COMING}Ok, Sir, I've got officers on the way. They gonna break up the fight and deal with the situation." default="end1" />
+ <dialogOption id="end1" operator="Caller:" texten="Be quick about it." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hello?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Are you there?" />
+ </dialog>
+ <aar>
+ <reportElement id="barFight" texten="Witness reported bar fight between sport fans." />
+ <reportElement id="noaction1" texten="Fight started to expand. Witness refused to take action as he was afraid for his own safety." />
+ <reportElement id="firefight" texten="In the course of fight suspects set fire to a bus. Firefighter intervention was required." />
+ </aar>
+ </conversation>
+</conversations></data>

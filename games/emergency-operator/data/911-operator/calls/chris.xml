@@ -1,0 +1,32 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="chris" texten="Trapped under a car" COMMENT="RECORDED">
+ <scene>
+ <injuried elementProperties="sex=M; hp=50; hpchange=-0.1;" blockedBy="car" id="caller" operator="Caller:" texten="Car mechanic" />
+ <work elementProperties="work=50;" id="car" texten="Car" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2short" />
+ <dialogOption id="2" operator="Caller:" texten="Heeeelp... I can't breathe..." default="addre" option2="what" actionOnEnd="opinionEffect = 4;" addToAAR="story" />
+ <dialogOption id="2short" operator="Caller:" texten="Heeeelp... I can't breathe... I am trapped under a car!" option2="what" option3="where" actionOnEnd="opinionEffect = 4; where2-&gt;active=false;
+fell-&gt;active=false;
+under-&gt;active=false;" addToAAR="story" COMMENT="tak jak w filmiku: https://www.youtube.com/watch?v=7z53xF38Mto" />
+ <dialogOption id="where" operator="Operator:" texten="{ADDRESS?} Sir, keep calm. Where are you?" default="under" option2="where6" COMMENT="z go90" />
+ <dialogOption id="under" operator="Caller:" texten="I am trapped under the car!!" default="addre" />
+ <dialogOption id="what" operator="Operator:" texten="{WHAT?} What happened?" default="fell" option2="where6" COMMENT="z wa3 id: move1" />
+ <dialogOption id="fell" operator="Caller:" texten="Car fell on me, I need help!!" default="addre" />
+ <dialogOption id="addre" operator="Operator:" texten="{ADDRESS?} What's the address you're calling from?" default="where2" option2="where6" COMMENT="alb1 id: address" />
+ <dialogOption id="where2" operator="Caller:" emotions="panic" texten="Help!! Help!! I can't breath!!! Help me..." default="where3" />
+ <dialogOption id="where3" operator="Operator:" texten="{STAY CALM} Please try to stay calm." default="where4" COMMENT="ks300 id:20" />
+ <dialogOption id="where4" operator="Caller:" emotions="sound of phone falling on the ground" texten=". . . . . . . . . . . . . . . . " default="where5" addToAAR="nocon" />
+ <dialogOption id="where5" operator="Operator:" texten="Hello? What happened?" default="where6" COMMENT="89 id:10" />
+ <dialogOption id="where6" operator="Caller:" emotions="silence" texten=". . . . . . . . . . . . . . . . " actionOnEnd="actionHangup;" />
+ <dialogOption id="end" operator="Caller:" texten=". . . . . . . . . . . . . . . . " actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten=". . . . . . . . . . . . . . . . " />
+ <dialogOption id="reminder2" operator="Caller:" texten=". . . . . . . . . . . . . . . . " />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="Car mechanic got trapped under a car during the repairs. " />
+ <reportElement id="nocon" texten="Caller has lost consciousness during the conversation. He didn't manage to give his address, so usage of tracking tool was needed." />
+ </aar>
+ </conversation>
+</conversations></data>

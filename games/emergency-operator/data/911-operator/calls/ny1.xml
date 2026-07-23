@@ -1,0 +1,58 @@
+<data><conversations>
+<conversation id="ny1" texten="Serious fall" COMMENT="RECORDED">
+ <scene COMMENT="154">
+ <suspect elementProperties="type=M;
+sex=M;
+bill=1000;" id="caller" emotions="20-30 yo, Neil Patrick Harris like" texten="Barney Stinpson (caller)" />
+ <witness elementProperties="sex=W;" id="chick" texten="Attractive woman" />
+ <passerby elementProperties="sex=M;" id="teddy" texten="Ted Mosbay" />
+ <passerby elementProperties="sex=M;" id="marsh" texten="Marshall Eriks" />
+ <passerby elementProperties="sex=W;" id="robin" texten="Robin Serbatsky" />
+ <passerby elementProperties="sex=W;" id="lily" texten="Lily Aldron" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what is your emergency?" default="2" actionOnEnd="opinionEffect = 0;" />
+ <dialogOption id="2" operator="Caller:" texten="Hello, I need an ambulance, paramedics woman's life is in danger." default="con" option2="happen" option3="address" />
+ <dialogOption id="con" operator="Operator:" texten="{HOW IS SHE IN DANGER?} Ok, how is she in danger? What is her medical condition?" default="con1" />
+ <dialogOption id="con1" operator="Caller:" texten="I suspect there could be some internal bleeding. Maybe even fractures. Come quick and take her to the hospital!" default="send" option2="ext" option3="address" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?}What's the address you're calling from?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="[[ADDRESS]]" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="It's at Columbus Avenue 246" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="It's at Oak street 135" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="We're in MacLaren's Pub" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="ext" operator="Operator:" texten="{ANY INJURIES?} Do you see any injuries? How does she look?" default="ext1" />
+ <dialogOption id="ext1" operator="Caller:" texten="Oh, she looks gorgeous." default="after" option2="address" option3="happen" />
+ <dialogOption id="after" operator="Operator:" texten="{WHAT DO YOU MEAN?} What do you mean sir? She went through after serious accident, didn't she?" default="always" />
+ <dialogOption id="always" operator="Caller:" emotions="dreamy voice" texten="What can I say... she always looks stunning." default="sure" option2="address" option3="send" />
+ <dialogOption id="sure" operator="Operator:" texten="{DOES SHE REALLY NEED HELP?}Sir, does she really need medical help?" default="heaven" />
+ <dialogOption id="heaven" operator="Caller:" emotions="laugh track from a sitcom/young woman laugh" texten="Yes, she fell straight from heaven." default="cons" option2="niceone" option3="send" actionOnEnd="opinionEffect = -1;" />
+ <dialogOption id="heaven1" operator="Caller:" emotions="laugh track from a sitcom/young woman laugh" texten="She fell straight from heaven." default="cons" option2="niceone" option3="send" actionOnEnd="opinionEffect = -1;" />
+ <dialogOption id="happen" operator="Operator:" texten="{WHAT REALLY HAPPENED?} Sir, tell me what exactly did happen to her?" default="fell" />
+ <dialogOption id="fell" operator="Caller:" texten="Well, she did fell." default="high" option2="send" option3="fromw" />
+ <dialogOption id="high" operator="Operator:" texten="{HEIGHT OF FALL?}What height did she fall from?" default="high1" />
+ <dialogOption id="high1" operator="Caller:" texten="Well, I dunno but that was pretty high fall." default="precise" option2="con" option3="fromw" />
+ <dialogOption id="fromw" operator="Operator:" texten="{PRECISE?}Ok, how many feet of the ground was she when she fell?" default="heaven1" />
+ <dialogOption id="precise" operator="Operator:" texten="{MORE DETAILS} Sir, could you be more precise please? It will help me determine the urgency of ambulance response." default="feet" />
+ <dialogOption id="feet" operator="Caller:" emotions="fake outrage" texten="Of course she needs the ambulance! She's fallen from like 20,000 feet! Dude! Seriously!" default="not" />
+ <dialogOption id="not" operator="Woman:" emotions="suprised, intrigued" texten="No, I have not." default="serious" />
+ <dialogOption id="serious" operator="Operator:" texten="{ARE YOU SERIOUS?}Are you serious?" default="heaven" />
+ <dialogOption id="cons" operator="Operator:" texten="{CONSEQUENCES OF FAKE CALLS} Do you know the consequences of such prank calls? If somebody needs help, he might not get it, because of you." default="jjoke" addToAAR="good" />
+ <dialogOption id="niceone" operator="Operator:" texten="{NICE ONE} That's a nice one. I hope you'll get lucky tonight buddy." default="niceone1" actionOnEnd="opinionEffect = -1;" addToAAR="legend" />
+ <dialogOption id="niceone1" operator="Caller:" texten="Thanks a lot, bro." actionOnEnd="actionHangup;" />
+ <dialogOption id="send" operator="Operator:" texten="{I'LL SEND HELP} Okay. I've got an ambulance on the way." default="send1" actionOnEnd="opinionEffect = 0;" addToAAR="noneed" />
+ <dialogOption id="send1" operator="Caller:" texten="Oh, really? O... ok, I'll wait then." actionOnEnd="actionHangup;" />
+ <dialogOption id="jjoke" operator="Caller:" texten="Hey dude, it was just a joke. You need to chillax a bit." default="jjoke1" option2="quit" />
+ <dialogOption id="jjoke1" operator="Operator:" texten="{I'LL SEND THE POLICE} I'll send the police who are gonna explain to you why they don't tolerate this kind of jokes in our line of work." default="sorry" actionOnEnd="opinionEffect = 2;" />
+ <dialogOption id="quit" operator="Operator:" texten="{DON'T BLOCK THE LINE} You're blocking the emergency line, sir. I hope this is the last time because if you do it again there is gonna be serious consequences." default="again" actionOnEnd="opinionEffect = 0;" />
+ <dialogOption id="sorry" operator="Caller:" texten="Okay, okay. I'm sorry. Bye." actionOnEnd="actionHangup;" />
+ <dialogOption id="again" operator="Caller:" texten="Don't you worry my friend, I never use the same pick-up line twice, so you will never hear from me again. Bye." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hey, this stunning voluptuous young lady needs you!" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Hello?" />
+ </dialog>
+ <aar>
+ <reportElement id="noneed" texten="The medical intervention was unnecessary. The caller tried to use medical services to impress a woman by pick-up line about falling from heaven." />
+ <reportElement id="legend" texten="Although the pick-up line was legendary, the operator should warn the caller about fake call's consequences, instead of congratulating him the idea." />
+ <reportElement id="good" texten="The operator discovered that caller was trying to impress the girl by calling 911. The operator warn him about consequences of fake calls." />
+ </aar>
+ </conversation>
+</conversations></data>

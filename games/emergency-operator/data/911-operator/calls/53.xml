@@ -1,0 +1,52 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="53" texten="Undercover pizza" COMMENT="RECORDED">
+ <scene>
+ <criminal elementProperties="fightRisk = 0.5;
+weapon = e_pistol;
+prisonChance = 1;
+sex=M;
+type=White;" id="offender" texten="Drunk thug" />
+ <injuried elementProperties="hp = 90;
+sex=W;
+type=White;
+photo=Photos/_0000_AniaSzulc;" blockedBy="offender" id="caller" texten="Scared woman (caller)" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 3;" />
+ <dialogOption id="2" operator="Caller:" emotions="as in the trailer" texten="Hello, I would like to order a big pepperoni, with extra cheese, please, at [[ADDRESS]]" default="3" option2="16" option3="17" actionOnEnd="actionSetLocation;" addToAAR="story" />
+ <dialogOption id="3" operator="Operator:" texten="{EXCUSE ME?} Excuse me? You've reached 911 ..." default="4" />
+ <dialogOption id="4" operator="Caller:" texten="Yes, I know. Oh, and 2 cans of soda." default="18" option2="5" />
+ <dialogOption id="5" operator="Operator:" texten="{IS IT AN EMERGENCY?} Ma'am, do you have an emergency?" default="6" />
+ <dialogOption id="6" operator="Caller:" texten="Yes, I do" default="7" option2="19" option3="16" />
+ <dialogOption id="7" operator="Operator:" texten="{BUT YOU CAN'T TALK?} ... and you can't talk about it because of someone in the room?" default="8" addToAAR="clue" />
+ <dialogOption id="8" operator="Caller:" texten="Yes, exactly." default="9" option2="11" option3="21" />
+ <dialogOption id="9" operator="Operator:" texten="{ARE YOU INJURED?} Do you also need medical attention? Is somebody hurt?" default="10" />
+ <dialogOption id="10" operator="Caller:" texten="Yes, do you know how long it will be?" default="11" option2="21" />
+ <dialogOption id="11" operator="Operator:" texten="{I'LL SEND POLICE} I have officers about a mile away I'll send them right away" default="12" />
+ <dialogOption id="12" operator="Caller:" texten="Yes... please" default="13" option2="9" option3="20" />
+ <dialogOption id="13" operator="Operator:" texten="{STAY ON THE LINE} Can you stay on the line with me?" default="14" />
+ <dialogOption id="14" operator="Caller:" texten="No. Thanks, I hope you'll get here soon!" default="15" />
+ <dialogOption id="15" operator="Operator:" texten="Alright. The officers are coming!" default="end" />
+ <dialogOption id="end" operator="Caller:" texten="..." actionOnEnd="actionHangup" />
+ <dialogOption id="16" operator="Operator:" texten="{HANG UP} I hate these jokers ..." actionOnEnd="actionHangup" addToAAR="fail" />
+ <dialogOption id="17" operator="Operator:" texten="{IT'S A WRONG NUMBER} Excuse me, it's a wrong number." default="4" />
+ <dialogOption id="18" operator="Operator:" texten="{QUIT THE JOKES} Please quit those jokes, you are blocking the emergency line." default="23" actionOnEnd="actionHangup" />
+ <dialogOption id="19" operator="Operator:" texten="{ARE YOU HUNGRY?} ... and is it because you are very hungry?" default="23" />
+ <dialogOption id="20" operator="Operator:" texten="{ANY WEAPONS?}Are there any weapons in the house?" default="24" />
+ <dialogOption id="21" operator="Operator:" texten="{WHO IS THE OPPRESSOR?}Who is the oppressor?" default="23" />
+ <dialogOption id="22" operator="Operator:" texten="{WHAT IS GOING ON?}What is going on there?" default="23" />
+ <dialogOption id="23" operator="Caller:" texten="...." default="back" />
+ <dialogOption id="24" operator="Caller:" texten="Yes..." default="back" />
+ <dialogOption id="reminder" operator="Caller:" emotions="[Man shouting in a distance]" texten="...." />
+ <dialogOption id="reminder2" operator="Caller:" texten="...." />
+ </dialog>
+ <aar>
+ <reportElement id="clue" texten="The caller was found to be in danger." />
+ <reportElement id="prison" texten="The suspect was pacified and taken to custody." />
+ <reportElement id="helped" texten="The caller was given first aid." />
+ <reportElement id="story" texten="The caller was in fact in need of assistance and tried to reach 911 by pretending to order a pizza." />
+ <reportElement id="fail" texten="The operator has failed to help the caller." />
+ <reportElement id="timeout" texten="The caller was heavily beaten and needed to be hospitalized." />
+ </aar>
+ </conversation>
+</conversations></data>

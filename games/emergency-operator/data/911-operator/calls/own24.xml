@@ -1,0 +1,45 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="own24" texten="Child found" COMMENT="RECORDED">
+ <scene emotions="street sounds" COMMENT="https://youtu.be/w3ilzeGIESY?t=24m14s">
+ <passerby elementProperties="sex=W;
+type=White;" id="caller" texten="Caller" />
+ <injuried elementProperties="hp = 80;
+hpchange=-0.1;
+photo=Icons/OnSitePictures/OnSitePic_Baby;" blockedBy="container" id="child" texten="Newborn" addToAAR="success" />
+ <work elementProperties="work = 20;
+icon= OnSitePic_Garbage" id="container" texten="Container" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 4;" />
+ <dialogOption id="2" operator="Caller:" emotions="female ~30. suprised and shocked" texten="God, help! There is a child in our garbage container! Someone left a baby here!!!" default="3" option2="address" option3="5" />
+ <dialogOption id="address" operator="Operator:" texten="{WHERE ARE YOU?} Ma'am where are you calling from?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="Behind a block at [[ADDRESS]]." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="Behind a block at 8th street 49" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="Behind a block at Arthur Avenue 5" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="Behind a block at Maple street 264" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="3" operator="Operator:" texten="{IS IT BREATHING?} Is the baby breathing? Is it alive?" default="4" />
+ <dialogOption id="4" operator="Caller:" texten="Yes, alive and crying! I thought it was a cat... Oh God!" default="5" option2="address" />
+ <dialogOption id="5" operator="Operator:" texten="{CAN YOU SEE IT?} Can you see the baby?" default="6" />
+ <dialogOption id="6" operator="Caller:" texten="Yes, I can see and hear it! But I'm not able to reach it, I'm too short! It must be a newborn ..." default="7" option2="address" option3="8" />
+ <dialogOption id="7" operator="Operator:" texten="{I'LL SEND THE FIREMEN} I'm sending the fire department to pull out the baby from the dumpster. I need you to stay there so they know where to go." default="15" />
+ <dialogOption id="8" operator="Operator:" texten="{STAND ON SOMETHING} Did you try to stand on something?" default="9" />
+ <dialogOption id="9" operator="Caller:" texten="No, there's nothing really that I could use..." default="10" option2="7" />
+ <dialogOption id="10" operator="Operator:" texten="{LOOK AROUND} Look around. Is there anyone near by, somebody walking past? Maybe a neighbor?" default="11" />
+ <dialogOption id="11" operator="Caller:" emotions="[later, away from the phone]" texten="Wait a second... I'll call someone! . . . . . . . . . . . . Mr. Wilson, Mr. Wilson! Please help me! . . . . . . . . There is a child inside, I need you to lift me up!" default="12" option2="14" />
+ <dialogOption id="12" operator="Operator:" texten="{PULL THE BABY OUT} Carefully pull the baby out of the dumpster." default="13" COMMENT="Carefully pull the baby out of the dumpster." />
+ <dialogOption id="13" operator="Caller:" emotions="[strrugling] [baby crying]" texten=". . . . . . . . . . . . Ok, I did it! I have him in my hands!" default="14" option2="address" option3="13b" actionOnEnd="child.hpChange = -0.01;
+container.isActive = false;" addToAAR="out" />
+ <dialogOption id="13b" operator="Operator:" texten="{CAN IT BREATHE FREELY?} Make sure that baby can breathe freely." default="13c" actionOnEnd="opinionEffect += 1;" addToAAR="firstaid" />
+ <dialogOption id="13c" operator="Caller:" emotions="[struggling, breathing heavily]" texten="Oh my... its mouth is full of mucus... I'll wipe it..." default="14" option2="address" />
+ <dialogOption id="14" operator="Operator:" texten="{WAIT FOR AMBULANCE} You're doing great. I've got ambulance on the way, so just wait there ok?" default="15" />
+ <dialogOption id="15" operator="Caller:" texten="OK, I will wait right here, come quick!" actionOnEnd="actionHangup" />
+ <dialogOption id="reminder" operator="Caller:" texten="Oh gosh... we have to do something!" COMMENT="zamienione miejscami" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Hello? Do something!" />
+ </dialog>
+ <aar>
+ <reportElement id="success" texten="Life of the rescued child is not threatened. Parents of the child remains unknown." />
+ <reportElement id="out" texten="The caller took the children out of a garbage container." />
+ <reportElement id="firstaid" texten="The caller provided first aid to the children." />
+ </aar>
+ </conversation>
+</conversations></data>

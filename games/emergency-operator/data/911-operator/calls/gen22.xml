@@ -1,0 +1,69 @@
+<data><conversations>
+<conversation elementProperties="type=generable;" id="gen22" texten="Parking violation" COMMENT="RECORDED">
+ <scene COMMENT="154">
+ <witness elementProperties="sex=M;" id="caller" texten="Caller" />
+ <criminal elementProperties="prisonChance=0;
+fightRisk=0;
+bill=1000;
+photo=Icons/OnSitePictures/OnSitePic_Wan;" id="car" texten="Parked car" addToAAR="moved" />
+ <criminal elementProperties="isActive=false;
+prisonChance=0;
+fightRisk=0;
+photo=Icons/OnSitePictures/OnSitePic_Wan;" id="suspcar" texten="Suspicious car" addToAAR="check" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" option2="2b" option3="2c" addToAAR="story" />
+ <dialogOption id="2" operator="Caller:" texten="Hello, I want to report an illegally parked car." default="place" option2="legal" option3="why" actionOnEnd="opinionEffect = 1;" />
+ <dialogOption id="2b" operator="Caller:" texten="Um... there's a strange car parked here." default="place" option2="legal" option3="why" actionOnEnd="opinionEffect = 1;" />
+ <dialogOption id="2c" operator="Caller:" texten="Hi, there is a strange car parked here. Could you check it?" default="place" option2="legal" option3="why" actionOnEnd="opinionEffect = 1;" />
+ <dialogOption id="place" operator="Operator:" texten="{WHERE?} Where is the car parked?" default="side" option2="mall" option3="hospital" />
+ <dialogOption id="side" operator="Caller:" texten="On the sidewalk." default="address" option2="why" option3="legal" />
+ <dialogOption id="mall" operator="Caller:" texten="In the shopping mall parking." default="address" option2="why" option3="legal" actionOnEnd="privat-&gt;active=false;" />
+ <dialogOption id="hospital" operator="Caller:" texten="It's a restricted area." default="address" option2="why" option3="legal" />
+ <dialogOption id="legal" operator="Operator:" texten="{PROHIBITED AREA?} Is the car parked in a prohibited area?" default="illegal" option2="feeling" option3="blocking" />
+ <dialogOption id="illegal" operator="Caller:" texten="Yes, there's a sign here saying 'NO PARKING'" default="send" option2="dontsend2" option3="place" actionOnEnd="opinionEffect = 2;
+myspot-&gt;active=false;
+why-&gt;active=false;" addToAAR="illegal" />
+ <dialogOption id="feeling" operator="Caller:" texten="No... but I don't think it should be parked here." default="why" option2="dontsend2" option3="place" actionOnEnd="nospace-&gt;active=false;" />
+ <dialogOption id="blocking" operator="Caller:" texten="The car is blocking the traffic!" default="send" option2="dontsend2" option3="place" actionOnEnd="opinionEffect = 3;
+myspot-&gt;active=false;
+privat-&gt;active=false;
+why-&gt;active=false;" addToAAR="blocked" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?} Can you give me the address of where this car is parked, sir?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="It's [[ADDRESS]]" default="back" option2="send" option3="dontsend2" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="20 Frideric Street" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="402 Vortens Plaza" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="154 49th Alley" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="why" operator="Operator:" texten="{WHAT'S CONCERNING?} Sir, what is it about the parked car that has you concerned?" default="myspot" option2="nospace" option3="private" />
+ <dialogOption id="myspot" operator="Caller:" texten="This is my spot!" default="send" option2="dontsend2" option3="address" actionOnEnd="opinionEffect = -2;
+car.isActive=false;" addToAAR="noneed" />
+ <dialogOption id="nospace" operator="Caller:" texten="There is not enough space to walk through." default="send" option2="dontsend2" option3="address" actionOnEnd="opinionEffect = 1;
+onIgnore=1;" />
+ <dialogOption id="private" operator="Caller:" texten="Private cars are not allowed to park here." default="why2" />
+ <dialogOption id="dontsend2" operator="Operator:" texten="{NO EMERGENCY} Sir, this isn't an emergency call. You will need to contact proper city services to make a complain. " default="end2" option2="end3" />
+ <dialogOption id="why2" operator="Operator:" texten="Why is that, sir?" default="privat" option2="safe" />
+ <dialogOption id="privat" operator="Calller:" texten="It's private property." default="send" option2="dontsend2" actionOnEnd="opinionEffect = -1;" addToAAR="noneed" />
+ <dialogOption id="safe" operator="Caller:" texten="It's for safety reasons. Maybe I'm overreacting, but could you send the police to check it?" default="y" option2="n" option3="address" actionOnEnd="opinionEffect = 3;
+car.isActive=false;
+suspcar.isActive=true;" />
+ <dialogOption id="y" operator="Operator:" texten="{YES} Yes, of course. I'll send the police to check the car." default="thanks" />
+ <dialogOption id="n" operator="Operator:" texten="{NO} Sir, honestly I don't know why you would feel threatened by this vehicle." default="end" addToAAR="shouldcheck" />
+ <dialogOption id="send" operator="Operator:" texten="{POLICE WILL CHECK} I'll have an officer check it out and they'll decide if the car should be towed." default="thanks" />
+ <dialogOption id="thanks" operator="Caller:" emotions="with relief" texten="Thank you! Bye." actionOnEnd="actionHangup;" />
+ <dialogOption id="end" operator="Caller:" emotions="disappointed" texten="I hope you will not regret that decision. Bye." actionOnEnd="actionHangup;" />
+ <dialogOption id="end2" operator="Caller:" texten="Ok, I'll do it. Bye." actionOnEnd="actionHangup;" />
+ <dialogOption id="end3" operator="Caller:" texten="Oh, really? I though you have to at least try to help me. Eh..." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hello..? Are you still there?" />
+ <dialogOption id="reminder2" operator="Caller:" emotions="irritated" texten="Hey! I'm waiting!" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="The caller reported a car parked in a wrong area." />
+ <reportElement id="shouldcheck" texten="The operator didn't check the possible bomb threat." />
+ <reportElement id="check" texten="The operator decided to check the suspicious car, but the police didn't find anything dangerous." />
+ <reportElement id="blocked" texten="The car was blocking traffic." />
+ <reportElement id="illegal" texten="The car was parked in a handicapped parking space. Owner of the car broke the law, but the intervention of emergency services wasn't necessary." />
+ <reportElement id="noneed" texten="The intervention of emergency services wasn't necessary." />
+ <reportElement id="moved" texten="The car was removed." />
+ </aar>
+ </conversation>
+</conversations></data>

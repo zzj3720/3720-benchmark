@@ -1,0 +1,118 @@
+<data><conversations>
+<conversation elementProperties="type=generable;" id="gen13" texten="Unconscious man" COMMENT="RECORDED">
+ <scene>
+ <passerby elementProperties="sex=M;
+type=White;" id="caller" texten="Caller" />
+ <injuried elementProperties="sex=M;
+isActive = false;
+hp = 90;
+hpchange=-0.2" id="unconscious" texten="Unconscious man" />
+ <injuried elementProperties="sex=M;
+isActive = false;
+hp = 90;
+hpchange=-0.3" id="beaten" texten="Beaten man" />
+ <suspect elementProperties="sex=M;
+isActive = false;
+prisonChance=1;" id="drunk" texten="Drunk man" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect=3;
+40-&gt;active=false;
+42-&gt;active=false;" />
+ <dialogOption id="2" operator="Caller:" texten="Hello, there's an unconscious man here on the pavement." default="address" option2="faint" option3="injuries" />
+ <dialogOption id="address" operator="Operator:" texten="{WHERE?} Where are you calling from?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="I'm around [[ADDRESS]]." default="back" option2="breath" option3="drunk" actionOnEnd="actionSetLocation;
+40-&gt;active=true;
+42-&gt;active=true;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="Around 135 1st street" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="Around 246 2nd avenue" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="Around 389 Pine street" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="faint" operator="Operator:" texten="{DID YOU SEE HIM PASS OUT?}Did you see him pass out?" default="faintno" option2="faintyes" COMMENT="brakuje" />
+ <dialogOption id="faintno" operator="Caller:" texten="No, he was on the ground when I found him." default="back" option2="breath" option3="drunk" />
+ <dialogOption id="drunk" operator="Operator:" texten="{IS HE DRUNK?} Is it possible that he's drunk?" default="drunkno" option2="drunkyes" />
+ <dialogOption id="drunkno" operator="Caller:" texten="No, I guess not, he doesn't look drunk." default="breath" option2="back" option3="address" actionOnEnd="drunk.isActive = false;
+unconscious.isActive = true;
+beaten.isActive=false;
+breathsmell-&gt;active=false;" />
+ <dialogOption id="breath" operator="Operator:" texten="{IS HE BREATHING?} Is he breathing?" default="breathno" option2="breathsmell" option3="breathy" actionOnEnd="breath1-&gt;active=false;
+pulse-&gt;active=false;" />
+ <dialogOption id="breathy" operator="Caller:" texten="Umm... Yeah, I think he's breathing." default="injuries" option2="amb" option3="leave" actionOnEnd="breathno-&gt;active=false;" />
+ <dialogOption id="breathno" operator="Caller:" texten="Wait a second . . . . . . . . Oh God. He's not breathing." default="cpr" option2="block" actionOnEnd="drunk.isActive = false;
+unconscious.isActive = true;
+unconscious.hpChange=-1;
+beaten.isActive=false;
+breathy-&gt;active=false;" />
+ <dialogOption id="block" operator="Operator:" texten="{CHECK HIS MOUTH} Can you see anything in his mouth that might be blocking his airways?" default="blocky" option2="blockn" />
+ <dialogOption id="blockn" operator="Caller:" texten="Uhhh no, there's nothing in his mouth..." default="cpr" option2="address" />
+ <dialogOption id="blocky" operator="Caller:" texten="Well... His tongue looks like it's swollen." default="cpr" option2="clear" />
+ <dialogOption id="clear" operator="Operator:" texten="{TILT HIS HEAD} Grab his chin and forehead and tilt his head backwards. That should open the airway. Do you know how to perform CPR?" default="cprno" option2="cpryes" actionOnEnd="unconscious.hpChange=-0.5; " />
+ <dialogOption id="cpr" operator="Operator:" texten="{CAN YOU DO THE CPR?} Do you know how to perform the CPR?" default="cprno" option2="cpryes" />
+ <dialogOption id="cprno" operator="Caller:" texten="What? Uhm no, not really." default="instr" option2="waitbad" option3="askhelp" />
+ <dialogOption id="askhelp" operator="Operator:" texten="{ASK FOR HELP} Do you have anyone around to ask for help?" default="askhelpno" option2="askhelpy1" option3="askhelpy2" />
+ <dialogOption id="askhelpno" operator="Caller:" texten="No, I'm all alone. There's no one around." default="instr" option2="waitbad" />
+ <dialogOption id="askhelpy1" operator="Caller:" emotions="in distance" texten="There's some girl... Hey! Do you know how to perform the CPR? Yes? Help! Okay, She'll do it." default="great" option2="address" actionOnEnd="unconscious.hpChange=-0.5; " />
+ <dialogOption id="askhelpy2" operator="Caller:" emotions="in distance" texten="Hey! You! Do you know how to perform CPR? No?" default="instr" option2="waitbad" option3="address" />
+ <dialogOption id="instr" operator="Operator:" texten="{FOLLOW MY INSTRUCTIONS} Okay, so put your phone on the speaker mode and follow my instructions." default="instrok" option2="instrno" actionOnEnd="unconscious.hpChange=-0.5; " />
+ <dialogOption id="waitbad" operator="Operator:" texten="{WAIT FOR THE AMBULANCE} Well, in that case just wait for the ambulance to arrive. They're on their way." default="waiting" />
+ <dialogOption id="waiting" operator="Caller:" texten="If you say so... I'll wait." actionOnEnd="actionHangup" />
+ <dialogOption id="cpryes" operator="Caller:" emotions="in distance" texten="Yes, I'm on it!" default="great" />
+ <dialogOption id="great" operator="Operator:" texten="{CONTINUE THE CPR} Great, continue until the ambulance arrives." default="hurry" />
+ <dialogOption id="hurry" operator="Caller:" emotions="in distance" texten="Okay, hurry!" actionOnEnd="actionHangup" addToAAR="helped" />
+ <dialogOption id="instrok" operator="Caller:" emotions="in distance" texten="Okay, it's on the speaker now." default="23" />
+ <dialogOption id="23" operator="Operator:" texten="{START THE COMPRESSIONS} Place your hands in the center of the man's chest and start compressions, 30 times, faster than one compression per second." default="24" actionOnEnd="achiv=lifesaving;" />
+ <dialogOption id="24" operator="Caller:" emotions="in distance" texten="Okay. One, two, three..." default="25" />
+ <dialogOption id="25" operator="Operator:" texten="{VENTILATE HIM} Now tilt his head back, pinch his nose holding his chin up, cover his mouth with yours and blow, then repeat it one more time and go back to the chest compressions." default="kiss" option2="27" />
+ <dialogOption elementProperties="option=address;" id="kiss" operator="Caller:" emotions="in distance" texten="I'm not gonna kiss a stranger!" default="kissmust" option2="compr" option3="dont" />
+ <dialogOption id="27" operator="Caller:" emotions="in distance" texten="Okay!" default="great" />
+ <dialogOption id="kissmust" operator="Operator:" texten="{YOU MUST HELP} Sir, you must help him, you might even face a fine if you refuse." default="mustok" option2="noway" />
+ <dialogOption id="kissmust2" operator="Operator:" texten="{YOU HAVE TO} You have to help him, you might even face a fine if you refuse." default="mustok2" option2="noway2" />
+ <dialogOption id="mustok" operator="Caller:" emotions="in distance" texten="Ok, fine, fine. Ugh." default="great" />
+ <dialogOption id="mustok2" operator="Caller:" emotions="in distance" texten="Ok, fine, fine. Ugh." default="23" actionOnEnd="kiss-&gt;active=false;" />
+ <dialogOption id="compr" operator="Operator:" texten="{STICK WITH COMPRESSIONS} Ok, so just keep on performing the chest compressions until the ambulance arrives. It should be enough." default="31" />
+ <dialogOption id="31" operator="Caller:" emotions="in distance" texten="Hurry." actionOnEnd="actionHangup" />
+ <dialogOption id="dont" operator="Operator:" texten="{WAIT FOR PARAMEDICS} Then don't do anything and wait for the paramedics to arrive." default="waiting" />
+ <dialogOption elementProperties="option=address;" id="noway" operator="Caller:" emotions="in distance" texten="No way!" default="compr" option2="dont" option3="40" addToAAR="refused" />
+ <dialogOption id="noway2" operator="Caller:" emotions="in distance" texten="No way!" default="address" option2="dont" option3="40" addToAAR="refused" />
+ <dialogOption id="drunkyes" operator="Caller:" texten="Yeah, he smells like hell. Completely drunk. Yuck." default="breath1" option2="injuries" actionOnEnd="drunk.isActive = true;
+beaten.isActive = false;
+unconscious.isActive = false;" />
+ <dialogOption id="breath1" operator="Operator:" texten="{IS HE BREATHING?} Is he breathing?" default="breathsmell" option2="breathno" actionOnEnd="breath-&gt;active=false;" />
+ <dialogOption elementProperties="option=42;" id="breathsmell" operator="Caller:" texten="Yes, ugh, his breath smells so bad." default="injuries" option2="leave" option3="40" />
+ <dialogOption id="injuries" operator="Operator:" texten="{ANY INJURIES?} Does he have any visible injuries?" default="injuriesyes" option2="injuriesno" />
+ <dialogOption elementProperties="option=address;
+option=breath;
+option=drunk;" id="injuriesyes" operator="Caller:" texten="Uhm... A black eye, and there's some dry blood on his face too." default="40" option2="41" option3="42" actionOnEnd="beaten.isActive = true;
+drunk.isActive = false;
+unconscious.isActive = false;" />
+ <dialogOption elementProperties="option=address;
+option=breath;
+option=drunk;" id="injuriesno" operator="Caller:" texten="No, I think he's not injured." default="40" option2="41" option3="42" />
+ <dialogOption id="40" operator="Operator:" texten="{I'LL SEND THE POLICE} I'll send a police officer to check up on him, please stay there until they arrive." default="illwait" />
+ <dialogOption id="41" operator="Operator:" texten="{LEAVE HIM ALONE} Just leave him where he is." default="okthx" />
+ <dialogOption id="42" operator="Operator:" texten="{I'LL SEND AN AMBULANCE} I'm sending an ambulance." default="okthx" />
+ <dialogOption id="faintyes" operator="Caller:" texten="Yes, I saw him falling." default="pulse" />
+ <dialogOption id="pulse" operator="Operator:" texten="{CHECK HIS BREATH} Does he have a pulse? Is he breathing?" default="breathno" option2="breathyes" actionOnEnd="breath-&gt;active=false;
+breath1-&gt;active=false;" />
+ <dialogOption id="breathyes" operator="Caller:" texten="Yeah... he's breathing... oh wait. He's waking up." default="stay" option2="leave" option3="address" actionOnEnd="opinionEffect=1;
+onIgnore=0;" />
+ <dialogOption id="stay" operator="Operator:" texten="{STAY WITH HIM} Can you stay with him and make sure he's completely ok?" default="bye" />
+ <dialogOption id="leave" operator="Operator:" texten="{LEAVE} I guess you can leave him then." default="okthx" />
+ <dialogOption id="okthx" operator="Caller:" texten="Okay, thanks..." actionOnEnd="actionHangup" />
+ <dialogOption id="bye" operator="Caller:" texten="Sure. Bye!" actionOnEnd="actionHangup" />
+ <dialogOption id="instrno" operator="Caller:" texten="I won't do that, I'll hurt him or something." default="kissmust2" option2="address" option3="42" />
+ <dialogOption id="end" operator="Operator:" texten="{I'LL SEND SOMEONE} I'll send someone right away." default="enda" />
+ <dialogOption id="enda" operator="Caller:" texten="Ok, bye." actionOnEnd="actionHangup" />
+ <dialogOption id="illwait" operator="Caller:" texten="Okay, I'm waiting." actionOnEnd="actionHangup" />
+ <dialogOption id="amb" operator="Operator:" texten="{I'LL SEND AN AMBULANCE} I'll send an ambulance to check up on him. Can you wait there please?" default="bye" actionOnEnd="drunk.isActive = false;
+unconscious.isActive = true;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hello?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Man, talk to me!" />
+ </dialog>
+ <aar>
+ <reportElement id="prison" texten="The drunk man was taken to the police station to sober up." />
+ <reportElement id="helped" texten="The unconscious man was given first aid." />
+ <reportElement id="refused" texten="The caller refused to follow the operator's instructions." />
+ <reportElement id="fail" texten="The operator has failed to help the caller." />
+ </aar>
+ </conversation>
+</conversations></data>

@@ -6,10 +6,24 @@ locations, continuously degrading health, vehicle travel, responder work, and
 alarms that can wake an Agent but can never execute an action for it.
 
 `data/campaign/pilot.json` is an original
-acceptance fixture. It contains no data from 911 Operator. The format
-deliberately mirrors only the public concepts in
-the official Call Editor documentation so an importer can be evaluated after a
-locally owned game installation is available.
+acceptance fixture. It contains no data from 911 Operator.
+
+`data/911-operator/` is a separate gameplay-only extraction from a locally
+owned Steam installation. It preserves all installed call trees, city road
+graphs, gameplay definitions, and the five-chapter base career layout while
+excluding audio, images, UI, models, and localization. Regenerate or verify it
+with:
+
+```bash
+uv run games/emergency-operator/scripts/import_911_operator.py
+uv run games/emergency-operator/scripts/import_911_operator.py --check
+```
+
+The importer validates the supported game build, reads Unity `TextAsset`
+definitions, disassembles the career chapter methods, and refuses unknown
+source hashes instead of guessing at a changed format. The original pilot
+remains the packaged task until the richer dialogue and incident rules are
+implemented by the Rust engine.
 
 Game content, rules, APIs, tests, scripts, and live rendering are owned by this
 directory. The pure `Session`

@@ -1,0 +1,65 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="131" texten="Impaled cyclist" COMMENT="RECORDED">
+ <scene>
+ <witness elementProperties="sex=M; type=White;" id="worker1" emotions="male, ~40, eastern european, strange vocabulary" texten="Andrzej Nowak (caller)" COMMENT="Poszkodowany (P): m��czyzna 23 lata; rowerzysta g�rski trenuj�cy w terenie post industrialnym (zamkni�tej fabryki/wyburzanego osiedla) przewr�ci� sie i upad� na stercz�cy ok. p�� metrowy pr�t zbrojeniowy. HP40%. Zmiana-1%/5s" />
+ <witness elementProperties="sex=M; type=White;" id="worker2" emotions="male, in background" texten="Janusz Kowalski" COMMENT="Trzeba wys�a� stra� do odci�cia pr�ta i karetk� do zaopatrzenia pacjenta. Je�li zostanie wys�any jeden zesp��, czas jest liczony dalej do przyjazdu drugiego, kt�ry zostaje wezwany przez pierwszy." />
+ <injuried elementProperties="hp=60; hpChange = -0.3" blockedBy="stabtool" id="stabbed" texten="Impaled cyclist" />
+ <work elementProperties="work = 50; icon=OnSitePic_Rods" id="stabtool" texten="Impaling rod" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 3;" />
+ <dialogOption id="2" operator="Caller:" emotions="male, ~40, eastern european, strange vocabulary" texten="Hello. Because here we have a problem." default="3" />
+ <dialogOption id="3" operator="Operator:" texten="Ok, please tell me what happened?" default="4" />
+ <dialogOption id="4" operator="Caller:" texten="Because there is the man on the rod impaled." default="5" />
+ <dialogOption id="5" operator="Operator:" texten="Excuse me, what do you mean sir?" default="6" />
+ <dialogOption id="6" operator="Caller:" texten="Man on a... a rod. He hit the rod and is stabbed on rod." default="6a" />
+ <dialogOption id="6a" operator="Caller:" emotions="caller 2 from background" texten="(foreign language)" default="address" option2="11" option3="13" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?} Where are you calling from sir?" default="addressdet" />
+ <dialogOption id="addressdet" operator="Caller:" texten="We are in this broken building." default="addressdet2" option2="back" />
+ <dialogOption id="addressdet2" operator="Operator:" texten="{WHERE EXACTLY?} Where is it exactly?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="Old factory at [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="Old factory at Pine Street" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="Old factory at 5 avenue" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="Old factory at Oak Street" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="11" operator="Operator:" texten="{IS HE CONSCIOUS?} Is he conscious?" default="12" />
+ <dialogOption id="12" operator="Caller:" texten="I think he is... I mean I do not know... well, he's heavy breathing." default="13" />
+ <dialogOption id="13" operator="Operator:" texten="{IS HE MOVING?} Ok, Is he moving?" default="14" />
+ <dialogOption id="14" operator="Caller:" texten="He moves a little... with legs and hands on the sides ..." default="14a" />
+ <dialogOption id="14a" operator="Caller:" emotions="[2nd voice in background] " texten="(foreign language)" default="15" option2="18" option3="address" />
+ <dialogOption id="15" operator="Operator:" texten="{IS HE BLEEDING?} Listen, is he bleeding?" default="17" />
+ <dialogOption id="17" operator="Caller:" texten="No no... he is stuck on the rod. Rod is strong and he's on this rod. We can not move him." default="18" />
+ <dialogOption id="18" operator="Operator:" texten="{HE CAN'T MOVE?}So the victim can't move?" default="19" />
+ <dialogOption id="19" operator="Caller:" emotions="[shouting to the 2nd one] " texten="Yes, he can't move. We can lift him with Janusz and help him. (foreign language)" default="22" option2="40" option3="address" />
+ <dialogOption id="22" operator="Operator:" texten="{DON'T MOVE HIM} No, no don't move him! You can make his injuries worse. As long as he's breathing, he is ok. Just wait for the ambulance to get there." default="23" />
+ <dialogOption elementProperties="option=address;" id="23" operator="Caller:" texten="So we can go, right?" default="24" option2="60" option3="70" />
+ <dialogOption id="24" operator="Operator:" texten="{WAIT} Please wait for the ambulance to get there and if his condition gets worst I want you to call 911 again." default="25" addToAAR="wait" />
+ <dialogOption id="25" operator="Caller:" texten="Ok, ok." actionOnEnd="actionHangup;" COMMENT="Czas dojazdu ratownik�w +10%" />
+ <dialogOption id="40" operator="Operator:" texten="{PICK HIM UP} Please try to pick him up." default="41" addToAAR="badchoice" />
+ <dialogOption id="41" operator="Caller:" emotions="[From a distance] " texten="(foreign language)" default="42" />
+ <dialogOption id="42" operator="Caller:" texten="(foreign language)" default="43" />
+ <dialogOption id="43" operator="Caller:" emotions="[From a distance] then [Closer: ] " texten="Ok, Ok!........ We took him off but there is big blood." default="46" option2="24" actionOnEnd="stabbed.hpChange=-0.5;
+stabtool.work = 0;" />
+ <dialogOption id="46" operator="Operator:" texten="{STOP THE BLEEDING} Do you have something that you can use to stop the bleeding?" default="47" />
+ <dialogOption id="47" operator="Caller:" texten="I don't know. No I don't... just my jacket." default="48" option2="24" option3="address" />
+ <dialogOption id="48" operator="Operator:" texten="{PUT IT ON THE WOUND} Please try to put something on the wound and apply pressure so you can stop the bleeding!" default="49" actionOnEnd="stabbed.hpChange=-0.2;" addToAAR="bleeding" />
+ <dialogOption id="49" operator="Caller:" texten=". . . . . . . . . . We need ambulance here!" default="24" option2="address" option3="70" />
+ <dialogOption id="50" operator="Operator:" texten="{HELP IS COMING}Ambulance is on the way." default="73" />
+ <dialogOption id="60" operator="Operator:" texten="{YOU CAN GO} Yes, you can go. Ambulance is on its way." default="61" addToAAR="go" />
+ <dialogOption id="61" operator="Caller:" emotions="[from distance] " texten="So we go . . . . (foreign language)" actionOnEnd="actionHangup;" COMMENT="Czas dojazdu ratownik�w +30% ?" />
+ <dialogOption id="70" operator="Operator:" texten="{SEND SOMEONE TO THE ROAD} Stay with the injured man. Send your friend to the road and he can guide the ambulance to your location." default="71" actionOnEnd="opinionEffect += 1;" addToAAR="road" />
+ <dialogOption id="71" operator="Caller:" emotions="[in a distance] " texten="Alright . . . . . (foreign language)" default="72" option2="address" />
+ <dialogOption id="72" operator="Operator:" texten="{STOP THE BLEEDING} Please I want you to stop the bleeding so his condition doesn't get worst. And then please call again if it does." default="73" />
+ <dialogOption id="73" operator="Caller:" texten="Ok, ok." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Halo?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Anyone there?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="A man has impaled himself on a rod." />
+ <reportElement id="badchoice" texten="The operator instructed the caller to move the injured man, which caused serious internal damages in his body." />
+ <reportElement id="bleeding" texten="The operator provided proper instruction to stop the bleeding." />
+ <reportElement id="go" texten="The operator let to leave the injured man alone." />
+ <reportElement id="wait" texten="The ambulance lost some time on searching the place of the incident, because of imprecise address." />
+ <reportElement id="road" texten="One of the men guided the ambulance to the place of the incident. Thanks to that, paramedics could provide medical help sooner." />
+ </aar>
+ </conversation>
+</conversations></data>

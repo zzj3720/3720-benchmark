@@ -1,0 +1,62 @@
+<data><conversations>
+<conversation id="289" texten="Electrocuted" COMMENT="RECORDED">
+ <scene>
+ <passerby elementProperties="type=White;
+sex=M;" id="caller" emotions="male 23 yo" texten="Caller" />
+ <injuried elementProperties="hp = 60;
+hpChange = -0.2;
+type=Children;" id="injuried1" emotions="boy 15 yo electocuted, unconscious." texten="School kid" />
+ <dead elementProperties="type=Children;" id="injuried2" emotions="boy, 14 yo, dead." texten="School kid" />
+ <dead elementProperties="isActive=false;
+type=White;
+sex=M;" id="callerd" emotions="male 23 yo" texten="Caller" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 4;" />
+ <dialogOption id="2" operator="Caller:" emotions="[fast, nervous]" texten="We need help. Some cables are hanging down on the field near the school, some kids are lying under the cables... I'll go get them out of there..." default="address" option2="3" option3="8" />
+ <dialogOption id="3" operator="Operator:" texten="{BE CAREFUL} Ok, be careful sir and don't touch the cables." default="4" />
+ <dialogOption id="4" operator="Caller:" texten="Wait... the ground under the benches slided and there's some water flowing out, I guess some pipe has bursted." default="address" option2="5" option3="8" />
+ <dialogOption id="5" operator="Operator:" texten="{HELP THEM} They need your help!" default="6" />
+ <dialogOption id="6" operator="Caller:" emotions="[quiet pop, splash, lost connection]" texten="Ok, ok I'm not deaf. There's a girl lying on... AAAAAAAAAH!" actionOnEnd="callerd.isActive=true;
+caller.isActive=false;
+actionHangup;" addToAAR="electroc" COMMENT="LOUDER SCREAm zrobione" />
+ <dialogOption id="7" operator="Operator:" texten="{WHERE ARE YOU?} First tell me where you are?" default="addressa0" />
+ <dialogOption id="8" operator="Operator:" texten="{SECURE THE AREA} First, secure the area." default="9" />
+ <dialogOption id="9" operator="Caller:" texten="What do you mean?" default="10" option2="14" option3="22" />
+ <dialogOption id="10" operator="Operator:" texten="{ALERT OTHERS} Just stand somewhere near and warn other people not to go there. Ok?" default="11" addToAAR="helping" />
+ <dialogOption id="11" operator="Caller:" emotions="[angry]" texten="But I want to help!" default="12" option2="address" />
+ <dialogOption id="12" operator="Operator:" texten="{WHAT DO YOU SEE?} Let's start with you figuring out what exactly is going on." default="13" />
+ <dialogOption id="13" operator="Caller:" emotions="[reluctantly]" texten="Okay..." default="14" />
+ <dialogOption id="14" operator="Operator:" texten="{EXAMINE THE CABLES} Please take a look at the cables, are they hanging above the ground, touching it, are thick or thin?" default="15" />
+ <dialogOption id="15" operator="Caller:" emotions="[slowly, thinking]" texten="They aren't very thick and the wind is swinging them. Oh damn!" default="16" />
+ <dialogOption id="16" operator="Operator:" texten="{WHAT HAPPENED?} What happened?" default="17" />
+ <dialogOption id="17" operator="Caller:" emotions="[fast]" texten="They sparkle when they touch the ground. A bit like fireworks." default="18" option2="5" option3="address" />
+ <dialogOption id="18" operator="Operator:" texten="{DON'T TOUCH THEM} Those cables are live, please don't approach them. I'll send firefighters, to come and take care of it." default="19" />
+ <dialogOption id="19" operator="Caller:" texten="So what am I supposed to do?" default="20" option2="22" />
+ <dialogOption id="20" operator="Operator:" texten="{THAT'S ENOUGH}There's nothing more you can do right now." default="21" />
+ <dialogOption id="21" operator="Caller:" texten="So I just have to wait?" default="22" option2="28" option3="address" />
+ <dialogOption id="22" operator="Operator:" texten="{LOOK AROUND} I want you to look around, is there anything else going on besides the cables hanging down?" default="23" />
+ <dialogOption id="23" operator="Caller:" emotions="[slowly, thinking]" texten="Wait... the ground under the benches slid and there's some water flowing out, I guess some pipe has bursted." default="24" option2="26" />
+ <dialogOption id="24" operator="Operator:" texten="{IS WATER SPREADING?}Is the water spreading out on the field?" default="25" />
+ <dialogOption id="25" operator="Caller:" emotions="[fast]" texten="Yes, I can see that now, it flows slowly, but it's spreading." default="26" option2="address" />
+ <dialogOption id="26" operator="Operator:" texten="{ARE VICTIMS IN THE WATER?}Are the victims lying in the water?" default="27" />
+ <dialogOption id="27" operator="Caller:" texten="Yes. Should I get them away from there?" default="28" option2="5" />
+ <dialogOption id="28" operator="Operator:" texten="{JUST WAIT} Approaching them would be too dangerous, you have to wait." default="29" />
+ <dialogOption id="29" operator="Caller:" texten="Ok, I don't want to get hurt." default="30" actionOnEnd="actionHangup;" />
+ <dialogOption id="30" operator="Operator:" texten="{TRY TO HELP THEM} If you're sure that you're able to help them please try. But remember your safety first sir." default="31" option2="address" />
+ <dialogOption id="31" operator="Caller:" texten="OK, I will call you later!" actionOnEnd="actionHangup;" />
+ <dialogOption id="end" operator="Caller:" texten="..." actionOnEnd="actionHangup;" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?} Which field is it?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="The one at [[ADDRESS]]." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="its the Sue Bierman Park" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="its the Jefferson Square Park" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="its the Marina Green" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="reminder" operator="Caller:" emotions="[nervous]" texten="Hey! I want to help them somehow." />
+ <dialogOption id="reminder2" operator="Caller:" emotions="[nervous]" texten="Hello?!" />
+ </dialog>
+ <aar>
+ <reportElement id="electroc" texten="Due to wrong operator instructions the caller was electrocuted. This resulted in casualty" />
+ <reportElement id="helping" texten="Caller secured the area while waiting for emergency services." />
+ </aar>
+ </conversation>
+</conversations></data>

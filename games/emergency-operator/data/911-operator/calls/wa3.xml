@@ -1,0 +1,59 @@
+<data><conversations>
+<conversation id="wa3" texten="Suicide senator" COMMENT="RECORDED">
+ <scene>
+ <witness elementProperties="sex=W;
+type=White;" id="caller" texten="Jenny Wilis (caller)" />
+ <dead elementProperties="sex=M;
+type=White;" id="deads" texten="Senator Stampson" option2="question" option3="calm" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 3;" />
+ <dialogOption id="2" operator="Caller:" emotions="terrified" texten="Hello? Mr. Stampson is dead!" default="who" addToAAR="story" />
+ <dialogOption id="calm" operator="Operator:" texten="{CALM DOWN} Please, try to calm down and describe the situation." default="calm1" />
+ <dialogOption id="question" operator="Operator:" texten="{WHO IS HE?} Miss who is Mr. Stampson?" default="question1" />
+ <dialogOption id="question1" operator="Caller:" emotions="despair" texten="He is a senator, of course! Such a noble man... How he could do that?!" default="back" option2="address" option3="who" />
+ <dialogOption id="who" operator="Operator:" texten="{WHO ARE YOU?}Who are you?" default="who1" />
+ <dialogOption id="who1" operator="Caller:" texten="I'm Jenny Wilis... I work at the office of senator Stampson as an assistant... I thought he went home, the lights were off in his office..." default="question" option2="calm" option3="address" />
+ <dialogOption id="calm1" operator="Caller:" emotions="crying and stuttering" texten="He's hanging from the ceiling! Oh my god, why would he kill himself?" default="dont" option2="rescue" option3="address" />
+ <dialogOption id="dont" operator="Operator:" texten="{WAIT FOR THE POLICE} OK, Jenny don't touch anything please and just wait until the police get there." default="dont1" />
+ <dialogOption id="address" operator="Operator:" texten="{WHAT'S THE ADDRESS?} Jenny, what's the address?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="It's [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="It's 243 1st street." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="It's 4576 Wide Avenue." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="It's 9th street." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="dont1" operator="Caller:" emotions="frightened" texten="I would never do that. This is too much for me. Can I leave the r... OH MY GOD!" default="move1" />
+ <dialogOption id="move1" operator="Operator:" texten="{WHAT HAPPENED?} What happened?" default="move2" />
+ <dialogOption id="move2" operator="Caller:" emotions="whispering" texten="He's moving..." default="move3" option2="stop" />
+ <dialogOption id="move3" operator="Operator:" texten="{IS HE ALIVE?} Jenny what do you mean? Did he start breathing?" default="move4" />
+ <dialogOption id="stop" operator="Operator:" texten="{LEAVE THE ROOM} Jenny I think you're in shock. You should leave the room and wait for emergency services." default="leave1" actionOnEnd="opinionEffect = 2;" />
+ <dialogOption id="move4" operator="Caller:" texten="No. He just started... swinging." default="move5" option2="stop" option3="address" />
+ <dialogOption id="move5" operator="Operator:" texten="{CHECK THE WINDOWS} Swinging? Jenny could you check and see if any of the windows in room are open?" default="move6" />
+ <dialogOption id="move6" operator="Caller:" texten="One second... One of the window is slightly open." default="close" option2="leave" option3="rescue" />
+ <dialogOption id="close" operator="Operator:" texten="{CLOSE THE WINDOW} Don't be afraid, sounds like it's just the wind. Close the window and wait for emergency services." default="close1" actionOnEnd="opinionEffect = 0;" />
+ <dialogOption id="close1" operator="Caller:" texten="Yes... Please, hurry if you can." actionOnEnd="actionHangup;" addToAAR="bad" />
+ <dialogOption id="leave" operator="Operator:" texten="{LEAVE THE ROOM} The police will investigate that. Leave the room and wait for the emergency services. They're already on the way." default="leave1" actionOnEnd="opinionEffect = 3;" />
+ <dialogOption id="leave1" operator="Caller:" texten="Ok... Please, hurry." actionOnEnd="actionHangup;" addToAAR="good" />
+ <dialogOption id="rescue" operator="Operator:" texten="{TAKE HIM DOWN} Jenny I want you to try take the senator down and check if he's still alive." default="rescue1" />
+ <dialogOption id="rescue1" operator="Caller:" emotions="frightened" texten="What?! Please, don't make me do it." default="checkp" option2="checkn" option3="address" />
+ <dialogOption id="checkp" operator="Operator:" texten="{IT'S IMPORTANT} Jenny, it's very important. I'm sure the senator could always count on you. Please, do it for him." default="chair" actionOnEnd="opinionEffect = 0;" />
+ <dialogOption id="checkn" operator="Operator:" texten="{DON'T DO THIS} I understand Jenny, it's OK, calm down. Emergency services will be there any moment." default="leave1" />
+ <dialogOption id="chair" operator="Caller:" texten="But... But I'm too short to reach him." default="checkn" option2="find" option3="address" />
+ <dialogOption id="find" operator="Operator:" texten="{STAND ON SOMETHING} Try to find something in the room, something to stand on. Maybe a chair?" default="chair1" />
+ <dialogOption id="chair1" operator="Caller:" texten="Hmm, there is a chair lying on the floor. Should I use it?" default="chair2" option2="dont" option3="address" />
+ <dialogOption id="chair2" operator="Operator:" texten="{YES}Yes, but be careful." default="chair2a" />
+ <dialogOption id="chair3" operator="Caller:" texten="Ugh, he is too heavy for me. I don't think that I can manage to take him down." default="pulse" option2="wait" option3="address" />
+ <dialogOption id="chair2a" operator="Caller:" emotions="distant sound of moving chair" texten=". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ." default="chair3" />
+ <dialogOption id="pulse" operator="Operator:" texten="{CHECK HIS PULSE} Can you feel the pulse?" default="pulse1" />
+ <dialogOption id="wait" operator="Operator:" texten="{LEAVE THE ROOM} Jenny, if you can't take him down, you should just leave the room and wait for emergency services." default="close1" />
+ <dialogOption id="pulse1" operator="Caller:" texten="No. He's gone. His body is really cold." default="pulse2" />
+ <dialogOption id="pulse2" operator="Operator:" texten="{WAIT FOR THE POLICE} I understand. Jenny, I want you to wait for the police officers. They will be there shortly." default="close1" />
+ <dialogOption id="reminder" operator="Caller:" texten="Are you there?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="What should I do?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="The senator was found dead. His assistant claimed it's a suicide." />
+ <reportElement id="good" texten="The police started an investigation to establish if he'd committed suicide or had been murdered." />
+ <reportElement id="bad" texten="Crime scene was interfered, because of operator's instructions. The police was unable to claim if the senator had committed suicide or had been murdered." />
+ </aar>
+ </conversation>
+</conversations></data>

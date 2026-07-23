@@ -1,0 +1,88 @@
+<data><conversations>
+<conversation elementProperties="type=generable;" id="gen20" texten="Fire" COMMENT="RECORDED">
+ <scene COMMENT="216">
+ <passerby elementProperties="sex=M;" id="caller" operator="Caller:" emotions="Man, 50-60 yo" texten="Caller" />
+ <injured elementProperties="isActive = false; hp=100; hpchange = -0.3;" blockedBy="fire" id="inside1" texten="Tenant" />
+ <injured elementProperties="isActive = false; hp=60;
+hpchange = -0.5;" blockedBy="fire" id="inside3" texten="Tenant" />
+ <fire elementProperties="work = 100;" id="fire" texten="Fire" />
+ <fire elementProperties="isActive = false;
+work = 100;" id="car" texten="Car on fire" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" emotions="background sound - street" texten="911, what's your emergency?" default="2" option2="2b" actionOnEnd="send-&gt;active=false;" addToAAR="story" />
+ <dialogOption id="2" operator="Caller:" emotions="stressed out, not really talkative, a bit unpleasant voice" texten="I want to report a fire." default="what" option2="address" actionOnEnd="opinionEffect = 2;" />
+ <dialogOption id="2b" operator="Caller:" emotions="more concerned and excited voice " texten="There's a fire here!" default="what" option2="address" actionOnEnd="opinionEffect = 2;
+garbage-&gt;active=false;" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?} Where are you, sir?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="In front of [[ADDRESS]]." default="back" actionOnEnd="actionSetLocation;
+send-&gt;active=true;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="In front of 345 Fordon Road" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="At 124 5nd Alley" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="Behind 504 Roderick Square" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="name" operator="Operator:" texten="What's your name, sir?" default="name1" option2="name2" option3="name3" />
+ <dialogOption id="name1" operator="Caller:" texten="My name is Tom Hilder." default="back" />
+ <dialogOption id="name2" operator="Caller:" texten="I'm Chris Hoover." default="back" />
+ <dialogOption id="name3" operator="Caller:" texten="My name's Oliver Forterson." default="back" />
+ <dialogOption id="what" operator="Operator:" texten="{WHAT'S BURNING?} So what's on fire?" default="garbage" option2="room" option3="garage" />
+ <dialogOption elementProperties="chance=0.4;" id="garbage" operator="Caller:" emotions="dismissively" texten="Some garbage..." default="garbage1" option3="address" actionOnEnd="fire.work+=50;" />
+ <dialogOption elementProperties="bgsound=cgen20_0_largefire1;" id="room" operator="Caller:" emotions="unsure, concerned" texten="I guess it's a living room..." default="room1" option3="address" actionOnEnd="fire.work+=150;
+bgsound=cgen20_0_largefire2;" />
+ <dialogOption elementProperties="bgsound=cgen20_0_midfire1;" id="garage" operator="Caller:" emotions="slightly frightened" texten="It's a garage." default="gkind" option3="address" actionOnEnd="fire.work+=120;
+bgsound=cgen20_0_midfire2;" />
+ <dialogOption id="garbage1" operator="Operator:" texten="{IS IT SECURED?} Is that garbage placed in some sort of container or a trash bin?" default="dumpster" option2="trashcan" option3="pile" />
+ <dialogOption elementProperties="option=address;" id="dumpster" operator="Caller:" texten="A large dumpster is burning." default="howbig" option2="spread" option3="around" />
+ <dialogOption elementProperties="option=address;" id="trashcan" operator="Caller:" texten="It's in the trash can." default="howbig" option2="spread" option3="around" />
+ <dialogOption elementProperties="option=address;" id="pile" operator="Caller:" emotions="dismissively" texten="No, it's just a pile of rubbish." default="howbig" option2="spread" option3="around" actionOnEnd="fire.work+=-20; vbig-&gt;active=false;" />
+ <dialogOption id="around" operator="Operator:" texten="{ANY FLAMMABLES AROUND?} Are there any inflammable materials near the fire?" default="aroundy" option2="aroundn" />
+ <dialogOption id="aroundy" operator="Caller:" emotions="with confident" texten="Yes." default="back" option2="address" actionOnEnd="fire.workchange+=2;" />
+ <dialogOption id="aroundn" operator="Caller:" texten="No, I don't see any." default="back" option2="address" />
+ <dialogOption id="howbig" operator="Operator:" texten="{HOW BIG IS THE FIRE?} How big is the fire?" default="vbig" option2="mbig" option3="sbig" />
+ <dialogOption elementProperties="bgsound=cgen20_0_largefire1;" id="vbig" operator="Caller:" emotions="frightened" texten="Pretty big! The flames are shooting up 10, maybe 15 feet!" default="back" option2="send" option3="address" actionOnEnd="fire.work+=100; burnout-&gt;active=false;
+bgsound=cgen20_0_largefire2;" />
+ <dialogOption elementProperties="option=address;" id="mbig" operator="Caller:" emotions="slightly frightened" texten="It's kind of big, like the size of a bonfire." default="back" option2="send" option3="noneed" actionOnEnd="fire.work+=50; burnout-&gt;active=false;" />
+ <dialogOption elementProperties="option=address;" id="sbig" operator="Caller:" emotions="unsure" texten="It's hard to tell. There's a lot of smoke..." default="back" option2="send" option3="noneed" actionOnEnd="fire.work+=-50; spread-&gt;active=false; around-&gt;active=false;" />
+ <dialogOption id="spread" operator="Operator:" texten="{IS THE FIRE SPREADING?}Is the fire spreading anywhere?" default="spreadyes" option2="spreadno" option3="burnout" />
+ <dialogOption elementProperties="option=address;" id="spreadyes" operator="Caller: " texten="Yes." default="back" option2="send" option3="noneed" actionOnEnd="fire.workchange+=5;" />
+ <dialogOption elementProperties="option=address;" id="spreadno" operator="Caller:" emotions="unsure" texten="I don't think so." default="back" option2="send" option3="noneed" actionOnEnd="fire.workchange=0;" />
+ <dialogOption elementProperties="chance=0.25;
+option=address;" id="burnout" operator="Caller:" emotions="slightly suprised" texten="Hm, actually, it looks like it's burning out." default="back" option2="send" option3="noneed" actionOnEnd="opinionEffect=-2;
+vbig-&gt;active=false;
+mbig-&gt;active=false;
+aroundn-&gt;active=false;
+fire.workchange=-0.5;" />
+ <dialogOption id="room1" operator="Operator:" texten="{MORE DETAILS} I need you to be more specific, sir? Is the room in a house or an apartment?" default="house" option2="apartment" actionOnEnd="burnout-&gt;active=false;" />
+ <dialogOption elementProperties="option=address;" id="house" operator="Caller:" texten="It's part of the house." default="howbig" option2="spread" option3="inside" />
+ <dialogOption elementProperties="option=address;" id="apartment" operator="Caller:" texten="It's situated in apartment building." default="howbig" option2="spread" option3="inside" />
+ <dialogOption id="inside" operator="Operator:" texten="{ARE YOU INSIDE?}You're not inside, are you?" default="no" />
+ <dialogOption id="no" operator="Caller:" texten="No, I saw the fire through a window." default="back" option2="own" option3="somebody" />
+ <dialogOption id="own" operator="Operator:" texten="{IS IT YOUR PLACE?}Is it your place?" default="own1" />
+ <dialogOption id="own1" operator="Caller:" emotions="briefly" texten="No, I was just passing by." default="back" />
+ <dialogOption id="somebody" operator="Operator:" texten="{ANYONE INSIDE?} Do you know if there's anyone inside?" default="nobody" option2="light" option3="scream" />
+ <dialogOption elementProperties="option=address;" id="nobody" operator="Caller:" emotions="unsure, doesn't want to take responsibility" texten="I'm not sure, but I don't see or hear anyone." default="back" option2="send" option3="noneed" addToAAR="nobody" />
+ <dialogOption id="light" operator="Caller:" emotions="unsure, doesn't want to take responsibility" texten="Maybe...somebody might be there, I see lights on in other rooms." default="back" option2="send" option3="address" actionOnEnd="inside3.isActive=true; opinionEffect = 3;" addToAAR="inside" />
+ <dialogOption elementProperties="option=howbig; chance=0.25;" id="scream" operator="Caller:" emotions="worried" texten="Yes! I think so! I heard a scream just before I called..." default="spread" option2="send" option3="address" actionOnEnd="inside1.isActive=true;
+inside3.isActive=true; opinionEffect = 3;" addToAAR="inside" />
+ <dialogOption id="gkind" operator="Operator:" texten="{WHAT KIND?} What kind of a garage is it?" default="resgar" option2="parking" option3="underground" />
+ <dialogOption elementProperties="option=address;" id="resgar" operator="Caller:" texten="It's the garage, next to the house." default="car" option2="howbig" option3="spread" />
+ <dialogOption elementProperties="option=address;" id="parking" operator="Caller:" texten="It's a parking garage." default="car" option2="howbig" option3="spread" actionOnEnd="closecar-&gt;active=false;" />
+ <dialogOption elementProperties="option=address;" id="underground" operator="Caller:" texten="It's an underground garage." default="car" option2="howbig" option3="spread" actionOnEnd="nocar-&gt;active=false;" />
+ <dialogOption id="car" operator="Operator:" texten="{ANY CARS?} Are there any cars near the fire?" default="nocar" option2="closecar" option3="burncar" />
+ <dialogOption id="nocar" operator="Caller:" texten="No, there isn't." default="back" option2="noneed" option3="address" />
+ <dialogOption id="closecar" operator="Caller:" emotions="worried" texten="Yes, obviously, there are quite a few of them" default="back" option2="send" option3="address" actionOnEnd="fire.workchange+=3;" />
+ <dialogOption id="burncar" operator="Caller:" emotions="confused" texten="Actually, a car is already on fire." default="back" option2="send" option3="address" actionOnEnd="car.isActive=true;" />
+ <dialogOption id="noneed" operator="Operator:" texten="{IT'S NOT URGENT} Sir, I don't think the help of firefighters is really necessary. If the fire doesn't burn out, just call 911 again." default="noneed1" addToAAR="nosend" />
+ <dialogOption id="send" operator="Operator:" texten="{THE FIREFIGHTERS ARE COMING} The fire department is on the way." default="send1" />
+ <dialogOption id="send1" operator="Caller:" texten="Okay. Goodbye." actionOnEnd="actionHangup;" />
+ <dialogOption id="noneed1" operator="Caller:" emotions="irritated" texten="If you think so... Bye." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hello?" />
+ <dialogOption id="reminder2" operator="Caller:" emotions="irritated" texten="Is that everything you need to know?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="The caller reported a fire." />
+ <reportElement id="inside" texten="People were inside the burning building." />
+ <reportElement id="nosend" texten="The operator decided that there is no need to send emergency services." />
+ <reportElement id="nobody" texten="Nobody was inside burning building." />
+ </aar>
+ </conversation>
+</conversations></data>

@@ -1,0 +1,56 @@
+<data><conversations>
+<conversation id="alb4" texten="Car wash row" COMMENT="RECORDED">
+ <scene COMMENT="160">
+ <witness elementProperties="sex=W;
+type=White;" id="caller" emotions="woman" texten="Agnes Black (caller)" />
+ <suspect elementProperties="sex=M;
+type=White;" id="sman1" texten="Arguing man" />
+ <suspect elementProperties="sex=M;
+type=White;" id="sman2" texten="Arguing man" addToAAR="caught" />
+ </scene>
+ <dialog>
+ <dialogOption elementProperties="bgsound=calb4_0_fight;" id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="car-&gt;active=false;
+plates-&gt;active=false;
+brand-&gt;active=false;
+susp-&gt;active=false;" addToAAR="story" />
+ <dialogOption id="2" operator="Caller:" emotions="constant noise in the background" texten="Hi, I'd like to report two arguing men, they're shouting and pulling each others' clothes, I'm worried they will start fighting any moment." default="address" option2="know" />
+ <dialogOption id="address" operator="Operator:" texten="{WHERE?}Ok, where are you calling from?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="It's the car wash at [[ADDRESS]]." default="know" option2="gun" option3="calm" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="It's the car wash at 2608 Central Avenue." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="It's the car wash at 5603 Menaul Boulevard." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="It's the car wash at 2608 156 Indian School Road." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="know" operator="Operator:" texten="{DO YOU KNOW THEM?}Do you know either of these men?" default="knowa" />
+ <dialogOption id="knowa" operator="Caller:" texten="No, I have no idea who they are. Haven't seen them here before. They scared all my customers off!" default="gun" option2="calm" option3="address" />
+ <dialogOption id="name" operator="Operator:" texten="{WHAT'S YOUR NAME?}Ok, what is your name?" default="namea0" />
+ <dialogOption id="namea0" operator="Caller:" texten="[[NAME]] I'm the owner" default="back" />
+ <dialogOption id="namea1" operator="Caller:" texten="I'm Agnes Black, I'm the owner" default="back" />
+ <dialogOption id="gun" operator="Operator:" texten="{ANY WEAPONS?}Can you tell if they have any weapons?" default="guna" />
+ <dialogOption id="guna" operator="Caller:" emotions="impatient" texten="I don't know... Hurry, it's getting violent." default="calm" option2="back" option3="address" />
+ <dialogOption id="calm" operator="Operator:" texten="{CALM THEM DOWN?}Have you tried to calm them down?" default="calma" />
+ <dialogOption id="calma" operator="Caller:" emotions="from a distance until the are you there part" texten="Uh... Guys! Calm down or else the police will come! . . . . . . . . . Are you there, sir? I think they don't wanna meet any policemen. They're running to a car." default="car" option2="plates" option3="gun" actionOnEnd="car-&gt;active=true;
+susp-&gt;active=true;" />
+ <dialogOption id="car" operator="Operator:" texten="{DESCRIBE THE CAR}Can you tell the make and model of the car?" default="cara" actionOnEnd="brand-&gt;active=true;
+plates-&gt;active=true;" />
+ <dialogOption elementProperties="bgsound=calb4_0;" id="cara" operator="Caller:" emotions="would be nice if some tyre screeching was hearable" texten="A black SUV. They're driving away!" default="susp" option2="plates" option3="solved" actionOnEnd="caller.isActive = false;
+speed=30;" />
+ <dialogOption id="solved" operator="Operator:" texten="{PROBLEM SOLVED}Well, in that case your problem is solved." default="uh" actionOnEnd="opinionEffect=2; onIgnore=-3;" addToAAR="ran" />
+ <dialogOption id="susp" operator="Operator:" texten="{HOW DO THEY LOOK?} Can you tell me what the men look like? Are they white, black, hispanic?" default="suspa" />
+ <dialogOption id="suspa" operator="Caller:" texten="Both are white and tall, wearing dark clothes." default="brand" option2="plates" option3="patr" />
+ <dialogOption id="plates" operator="Operator:" texten="{PLATE NUMBER?}Were you able to get the license plate number?" default="platesa" />
+ <dialogOption id="platesa" operator="Caller:" texten="Not really, I don't see well." default="brand" option2="susp" option3="patr" />
+ <dialogOption id="brand" operator="Operator:" texten="{MAKE AND MODEL OF THE CAR?}Do you know the make and model of the SUV they left in?" default="branda" />
+ <dialogOption id="branda" operator="Caller:" texten="No, sorry." default="susp" option2="nope" option3="patr" />
+ <dialogOption id="nope" operator="Operator:" texten="{I CAN'T HELP}In that case, I can't help." default="uh" actionOnEnd="opinionEffect = 2; onIgnore=-3" addToAAR="ran" />
+ <dialogOption id="patr" operator="Operator:" texten="{WE'LL LOOK FOR THEM}I understand. I'll have officers keep a look out for them." default="bye" actionOnEnd="opinionEffect = 3;" />
+ <dialogOption id="bye" operator="Caller:" texten="Okay, bye!" actionOnEnd="actionHangup;" />
+ <dialogOption id="uh" operator="Caller:" texten="Umm okay, thanks I guess. Bye!" actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hello?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Sir?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="A worried car wash owner reported a fight between two men." />
+ <reportElement id="ran" texten="The suspects might have been known fugitives, but due to the operator's decision, they ran away." />
+ <reportElement id="caught" texten="The suspects were caught by police and turned out to be known fugitives." />
+ </aar>
+ </conversation>
+</conversations></data>

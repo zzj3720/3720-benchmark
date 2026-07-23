@@ -1,0 +1,53 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="89" texten="Cat in a tree" COMMENT="RECORDED">
+ <scene>
+ <passerby elementProperties="sex=M;
+type=White;" id="caller" texten="Jacob Copus (caller)" />
+ <work elementProperties="work=30;
+icon=OnSitePic_Cat;" id="cat" texten="Cat on a tree" addToAAR="taken" />
+ <injuried elementProperties="hp = 70;
+sex=M;
+type=White;
+isActive=false;" id="callerinj" texten="Jacob Copus (caller)" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 1;
+5-&gt;active=false;" />
+ <dialogOption id="2" operator="Caller:" emotions="male, any, older than 20" texten="Good evening ... I need help. Yeah, stupid thing ..." default="name" />
+ <dialogOption id="name" operator="Operator:" texten="{WHAT'S YOUR NAME?}What is your name sir?" default="namea" />
+ <dialogOption id="namea" operator="Caller:" texten="I'm Jacob Copus." default="back" option2="address" option3="3" />
+ <dialogOption id="3" operator="Operator:" texten="{WHAT HAPPENED?} Why did you call 911?" default="4" />
+ <dialogOption elementProperties="option=20;" id="4" operator="Caller:" texten="My cat climbed up a tree and won't come down. It's very dark... could you send firefighters?" default="address" option2="6" option3="5" actionOnEnd="5-&gt;active=true;" />
+ <dialogOption id="5" operator="Operator:" texten="{I'LL SEND THE FIREMEN} Ok, I will send the fire department." default="18" />
+ <dialogOption id="6" operator="Operator:" texten="{CLIMB THE TREE} Is it a tall tree? Have you tried climbing it and getting the cat down yourself?" default="7" />
+ <dialogOption id="7" operator="Caller:" texten="It's not really high.... but it's dark ..." default="5" option2="8" option3="20" />
+ <dialogOption id="8" operator="Operator:" texten="{DO IT YOURSELF} Well, you can try climbing the tree yourself if you want to try to get your cat down, but I don't have any fire department vehicles available right now to help you." default="9" />
+ <dialogOption id="9" operator="Caller:" emotions="trying to climb a tree, heavy breathing, [heavy drop later]" texten="Well, I'll try . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Aaaargh!" default="10" />
+ <dialogOption id="10" operator="Operator:" texten="{WHAT HAPPENED?} Hello? What happened?" default="12" />
+ <dialogOption id="12" operator="Caller:" emotions="angry, screaming of pain" texten="I fell off the f..... tree and I think I broke my leg! Why did you tell me to climb there?!" default="13" actionOnEnd="caller.isActive = false;
+callerinj.isActive = true;" addToAAR="broken" />
+ <dialogOption id="13" operator="Operator:" emotions="iritated" texten="I did not tell you to do anything." default="14" />
+ <dialogOption id="14" operator="Caller:" emotions="angry, screaming of pain" texten="You told me to take that damn cat out of the tree! I will make a complaint! Help, it hurts like hell!" default="15" option2="address" actionOnEnd="opinionEffect = -2" addToAAR="compain" />
+ <dialogOption id="15" operator="Operator:" texten="{I'LL SEND AN AMBULANCE} I'm sending you an ambulance, please wait." default="19" />
+ <dialogOption id="address" operator="Operator:" texten="{WHERE ARE YOU?} Where are you calling from?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="I'm around [[ADDRESS]]." default="back" actionOnEnd="actionSetLocation;
+5-&gt;active=true;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="I'm around 1st street 135" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="I'm around 2nd avenue 246" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="I'm around Pine street 389" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="18" operator="Caller:" texten="Thank you, I'll be waiting." actionOnEnd="actionHangup" />
+ <dialogOption id="19" operator="Caller:" emotions="resigned" texten="Just hurry.... for god's sake, it hurts...." actionOnEnd="actionHangup" />
+ <dialogOption id="reminder" operator="Caller:" texten="So? Can you help me?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Here... Kitty-kitty..." />
+ <dialogOption id="20" operator="Operator:" texten="{I CAN'T HELP YOU} Excuse me sir, we can't help you at the moment." default="21" />
+ <dialogOption elementProperties="option=5;" id="21" operator="Caller:" texten="So?" default="22" option2="6" option3="address" />
+ <dialogOption id="22" operator="Operator:" texten="{NOT AN EMERGENCY} Your matter is not life-threatening, we cannot help you right now." default="23" actionOnEnd="opinionEffect = -1" />
+ <dialogOption id="23" operator="Caller:" texten="Thank you..." actionOnEnd="actionHangup" />
+ </dialog>
+ <aar>
+ <reportElement id="broken" texten="The caller has fallen down the tree and broken his leg." />
+ <reportElement id="taken" texten="Cat was taken down from the tree." />
+ <reportElement id="compain" texten="A formal complaint about operator's actions was made by the caller." />
+ </aar>
+ </conversation>
+</conversations></data>

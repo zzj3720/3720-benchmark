@@ -1,0 +1,57 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="ks300" texten="Drone attack" COMMENT="RECORDED">
+ <scene>
+ <passerby elementProperties="type = White;
+sex = W;" id="caller" texten="Nellie Watson (caller)" />
+ <suspect elementProperties="type = White;
+sex = M;
+type=Children;
+fightRisk=0;
+prisonChance=0;" id="dronepilot" texten="Drone pilot" />
+ <suspect elementProperties="fightRisk=0;
+prisonChance=0;
+photo=Icons\OnSitePictures\OnSitePic_DangerousDron" id="drone1" texten="Drone" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 2;" />
+ <dialogOption elementProperties="bgsound=cks300_0_back;" id="2" operator="Caller:" emotions="female, any, older than 20" texten="Uh, hi, umm ... I need to report something a little strange." default="name" option2="address" />
+ <dialogOption id="name" operator="Operator:" texten="{WHAT'S YOUR NAME?}Ok, what's your name?" default="namea" />
+ <dialogOption id="namea" operator="Caller:" texten="I'm Nellie Watson." default="address" option2="3" />
+ <dialogOption id="3" operator="Operator:" texten="{WHAT HAPPENED?}So Nelly, why did you call 911?" default="4" />
+ <dialogOption id="4" operator="Caller:" texten="There's this... drone that's buzzing around the neighborhood." default="5" option3="address" addToAAR="drone" />
+ <dialogOption id="5" operator="Operator:" texten="{IT'S NORMAL} Well, that's not uncommon. They are pretty much everywhere nowadays." default="5b" />
+ <dialogOption id="5b" operator="Caller:" texten="Maybe but it shouldn't attack people!" default="6" option2="15" option3="address" />
+ <dialogOption id="6" operator="Operator:" texten="{ATTACK?} Attack people?! Is this an emergency situation?" default="7" />
+ <dialogOption id="7" operator="Caller:" emotions="enraged" texten="Well, I don't know if it's an emergency, but it's... swooping on things! Like next door's cat!" default="15" option2="8" option3="19" />
+ <dialogOption id="8" operator="Operator:" texten="{IS IT AGGRESSIVE?} Swooping'. I see. So someone is flying this drone aggressively then?" default="9" />
+ <dialogOption elementProperties="bgsound=cks300_0;" id="9" operator="Caller:" emotions="exasperated, SOUND OF DRONE" texten="Yeah, I guess so. I dunno who though? Maybe that damned Henderson kid... AAAH!" default="10" option2="address" actionOnEnd="bgsound=cks300_0_loud;" />
+ <dialogOption id="10" operator="Operator:" texten="{HELLO?}Hello? Ma'am what happened?" default="12" />
+ <dialogOption id="12" operator="Caller:" emotions="Doubtful, wary" texten="It snuck up from behind me. It's right above my head now. This is spooky, this is wrong. I don't like this." default="13" option2="address" />
+ <dialogOption id="13" operator="Operator:" emotions="iritated" texten="{IS IT A PRANK?}Sounds like someone is playing a prank." default="14" actionOnEnd="opinionEffect = 0;" addToAAR="droneprank" />
+ <dialogOption id="14" operator="Caller:" emotions="Indignant" texten="Well I don't find it funny. This thing has blades. It can hurt. What about the children? Think of the children!" default="15" option2="address" option3="24" />
+ <dialogOption id="15" operator="Operator:" texten="{I'LL SEND THE POLICE} Alright I'm sending the police. They will be there shortly." default="18" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?}What's your address?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="I'm in [[ADDRESS]]." default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="I' am at 35 Pine Street" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="I' am at 255 Oak Street" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="I' am at 54 1st Street" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="18" operator="Caller:" texten="Ok, thank you, be quick please." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="So? Can you help me get rid of this thing? Please?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Are you there? It's still flying around." />
+ <dialogOption id="19" operator="Operator:" texten="{DID IT ATTACK YOU?} Ma'am did the drone attack you or anyone around you?" default="19a" />
+ <dialogOption elementProperties="bgsound=cks300_0_louder1;" id="19a" operator="Caller:" emotions="Squeal, shouting" texten="No bu.. EEEP! It's chasing me! NO! Go AWAY!" default="20" actionOnEnd="bgsound=cks300_0_louder;" />
+ <dialogOption id="20" operator="Operator:" texten="{STAY CALM} Please try to stay calm." default="21" />
+ <dialogOption id="21" operator="Caller:" emotions="Footsteps, panting, panic" texten="Wwaah arrgh I don't like this." default="22" option2="15" addToAAR="dronedanger" />
+ <dialogOption id="22" operator="Operator:" texten="{HIDE} Ma'am can you inside somewhere take shelter from the somewhere?" default="23" actionOnEnd="opinionEffect = 3;" addToAAR="hide" />
+ <dialogOption id="23" operator="Caller:" texten="Ok � a shed, I'll hide in there." default="15" option2="24" actionOnEnd="bgsound=cks300_0_back;" />
+ <dialogOption id="24" operator="Operator:" texten="{IT'S NOT AN EMERGENCY} Ma'am, your matter is not life threatening and doesn't require emergency assistance. Please deal with the drone yourself." default="25" />
+ <dialogOption id="25" operator="Caller:" emotions="irritated" texten="I do need help! But you don't want to help me! Goodbye!" actionOnEnd="actionHangup;" />
+ </dialog>
+ <aar>
+ <reportElement id="drone" texten="Caller reported dangerous drone flying in proximity." />
+ <reportElement id="dronedanger" texten="Machine endangered locals, the police unit was dispatched to take care of the situation." />
+ <reportElement id="droneprank" texten="Operator ignored the drone situation. No unit was dispatched." />
+ <reportElement id="hide" texten="The operator provided caller with instructions to hide from dangerous situation. Police unit was dispatched." />
+ </aar>
+ </conversation>
+</conversations></data>

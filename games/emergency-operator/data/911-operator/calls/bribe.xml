@@ -1,0 +1,61 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="bribe" texten="Factory incident" COMMENT="RECORDED">
+ <scene COMMENT="134 words of caller">
+ <suspect elementProperties="sex=M;
+type=White;
+isActive=false;
+bill = 1000;" id="susemp" texten="Factory owner (caller)" COMMENT="GM edited and redone, was not playable. " />
+ <criminal elementProperties="isActive=false;
+prisonChance = 1;
+fightRisk=0;
+bill = 2000;" id="crimemp" texten="Factory owner (caller)" />
+ <injuried elementProperties="hp=75;
+hpChange = -0.1;" id="worker" texten="Injured worker" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" />
+ <dialogOption id="2" operator="Caller" texten="There was an incident in my factory. One of my employees got stabbed by sharp tool." default="3" option2="address" option3="9" actionOnEnd="opinionEffect=3;" addToAAR="inc" />
+ <dialogOption id="3" operator="Operator:" texten="{ARE YOU IN DANGER?}Are you in danger? Do you need police assistance?" default="4" />
+ <dialogOption id="4" operator="Caller" emotions="Very nervous, hidding something" texten="Police!? No, no police! We just need an ambulance." default="back" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?}What's the address you're calling from?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller" texten="[[ADDRESS]]" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="1st street 135" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="2nd avenue 246" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="Pine street 389" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="9" operator="Operator:" texten="{WHAT HAPPENED?}What exactly happened to your employee?" default="10" />
+ <dialogOption id="10" operator="Caller" emotions="nervous" texten="He fell off a ladder and stabbed himself with knife while falling." default="polmed" option2="med" option3="3" />
+ <dialogOption id="polmed" operator="Operator:" texten="{I'LL SEND AMBULANCE AND POLICE} I understand. I'll send an ambulance and police to your location." default="12" />
+ <dialogOption id="med" operator="Operator:" texten="{I'LL SEND AN AMBULANCE} I understood. I will send an ambulance there." default="iwait" />
+ <dialogOption id="12" operator="Caller" emotions="unsure" texten="Could you... not send the police??" default="13" actionOnEnd="susemp.isActive=true;" />
+ <dialogOption id="13" operator="Operator:" texten="I am sorry, what?!" default="14" />
+ <dialogOption id="14" operator="Caller" emotions="slow emphasis on second 'very'" texten="I would be grateful if you didn't inform the police about it. I would be very, VERY grateful indeed." default="15" option2="why" option3="address" />
+ <dialogOption id="15" operator="Operator:" texten="{WHAT DO YOU MEAN} What do you mean by very grateful?" default="16" />
+ <dialogOption id="16" operator="Caller" texten="I mean $5 000 grateful..." default="17" option2="bribeok" />
+ <dialogOption id="17" operator="Operator:" texten="{A BRIBE?} Are you offering me money for silence?" default="18" />
+ <dialogOption id="18" operator="Caller" texten="Yes." default="bribeno" option2="bribemore" option3="bribeok" />
+ <dialogOption id="bribeno" operator="Operator:" texten="{NO WAY} Sir, I would like to inform bribery is a very serious crime." default="20" option2="26" actionOnEnd="opinionEffect+=2;" />
+ <dialogOption id="bribemore" operator="Operator:" texten="{I WANT MORE} Five thousand? It's not enough... I want ten thousand." default="26" />
+ <dialogOption id="bribeok" operator="Operator:" texten="{OK, NO POLICE} Ok, I won't send the police if you say that it's not necessary." default="27" actionOnEnd="susemp.isActive=false; opinionEffect=-100; onIgnore=-100;" addToAAR="bribecrime" COMMENT="TODO: Doda� +5000 po du�urze" />
+ <dialogOption id="20" operator="Caller" emotions="Quieter voice, stressed" texten="Listen, I have a family... wife... three children... and a factory that I really need to run." default="stop" option2="why" option3="back" />
+ <dialogOption id="26" operator="Caller" texten=". . . . . . . . . Okay, let's make it $7 000." default="bribeok" option3="stop" COMMENT="TODO: Doda� +5000 po du�urze" />
+ <dialogOption id="27" operator="Caller" texten="Ok, you can collect the money in my office." default="28" option2="address" actionOnEnd="addCash=7000;" />
+ <dialogOption id="28" operator="Operator:" texten="{WAIT FOR PARAMEDICS} Please wait for the ambulance, sir." />
+ <dialogOption id="28ok" operator="Caller:" texten="Ok" actionOnEnd="actionHangup;" />
+ <dialogOption id="why" operator="Operator:" texten="{WHY?}Why are you asking me to do this?" default="31" option2="33" />
+ <dialogOption id="31" operator="Caller" emotions="scared" texten="All those health and safety regulations are expensive. We skipped some of them and the fine would ruin us." default="back" option2="32" actionOnEnd="susemp.isActive=true;" />
+ <dialogOption id="32" operator="Operator:" texten="{SOME OF THEM?}Some of them??" default="33" />
+ <dialogOption id="33" operator="Caller" emotions="irritated" texten="Whatever, just don't send the police okay?" default="back" option2="address" option3="40" actionOnEnd="crimemp.isActive=true;" COMMENT="jesli nie przyjmiemy �ap�wki� inie poinformujemy� o ofercie przekupstwa kierownik trafi do wiezienia" />
+ <dialogOption id="40" operator="Operator:" texten="{I'LL SEND AMBULANCE}Ok, just wait for the ambulance." default="iwait" actionOnEnd="opinionEffect=-3; onIgnore=-9;" />
+ <dialogOption id="stop" operator="Operator:" texten="{I'VE HEARD ENOUGH} Enough! Sir, police is going to attend the ambulance. You'll have to explain the situation." default="end" actionOnEnd="crimemp.isActive=true;" addToAAR="bribeprop" COMMENT="stop?�a nie �enough! z akcentem" />
+ <dialogOption id="iwait" operator="Caller" texten="Ok." actionOnEnd="actionHangup " />
+ <dialogOption id="end" operator="Caller" emotions="[end sound] " texten="...." actionOnEnd="actionHangup " />
+ <dialogOption id="reminder" operator="Caller" texten="So?" actionOnEnd="actionHangup " />
+ <dialogOption id="reminder2" operator="Caller" texten="Are you there?" actionOnEnd="actionHangup " />
+ </dialog>
+ <aar>
+ <reportElement id="bribeprop" texten="A bribe was proposed to the operator and was immediately rejected." />
+ <reportElement id="inc" texten="There was an accident at a production site." />
+ <reportElement id="bribecrime" texten="The operator committed a crime by accepting the bribe. Recording of the conversation will be send as a evidence to proper institution." />
+ </aar>
+ </conversation>
+</conversations></data>

@@ -1,0 +1,67 @@
+<data><conversations>
+<conversation id="wa_b4" texten="Bomber" COMMENT="RECORDED">
+ <scene COMMENT="262">
+ <criminal elementProperties="weapon=e_rifle;
+fightRisk=1.0;
+prisonChance=1;
+sex=M;
+photo=Photos/_Bomber;" id="bomber" texten="The bomber" />
+ <witness elementProperties="isActive=false;
+photo=Icons/OnSitePictures/OnSitePic_Wan;" id="car" texten="Abandoned car" addToAAR="check" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect=30;
+onIgnore=-30;
+speed=80;
+bgsound=cwa_b4_00;" />
+ <dialogOption id="2" operator="Caller:" emotions="villan voice, sarcastic. quite psychopath, but with litte reason" texten="You should listen to my demands, or you will have much bigger problems than you already have..." default="opnot" option2="opcons" option3="opdem" />
+ <dialogOption id="opnot" operator="Operator:" texten="{WE WON'T NEGOTIATE} We do not negotiate with terrorists!" default="shame" />
+ <dialogOption id="opcons" operator="Operator:" texten="{STOP IT!} Stop it right now or you will face serious consequences!" default="opconsa" />
+ <dialogOption id="opdem" operator="Operator:" texten="{WHAT DO YOU WANT} Ok, what are your demands?" default="opdema" />
+ <dialogOption id="shame" operator="Caller:" texten="That is too bad. You will have some blood on your hands very soon..." actionOnEnd="bomber.isActive=false;
+car.isActive=true;
+opinionEffect=-20;
+onIgnore=-30;
+speed=0;
+actionHangup;" addToAAR="fail" />
+ <dialogOption id="opconsa" operator="Caller:" emotions="aggressive at the end!" texten="Oh, I know the consequences and you should also know the consequences of NOT LISTENING TO ME!" default="opdem" option2="opnot" />
+ <dialogOption id="opdema" operator="Caller:" texten="I want my demands presented to the media: All the deportations of the so called 'illegal immigrants' must stop now, or more bombs will follow. If you want to send us back to the warzone, I will bring the warzone to you. I want to see my demands on every TV station in the city in 5 minutes." default="opok" option2="opgoon" option3="forthem" />
+ <dialogOption id="opdemav2" texten="I want my demands presented to the media: all the military activity of US Army outside its territory must stop now, or more bombs will follow. If you want to operate in the warzone, I will bring the warzone to you. I want to see my demands on every TV station in the city in 5 minutes." default="opok" option2="opgoon" option3="forthem" />
+ <dialogOption id="forthem" operator="Operator:" texten="{IS IT A POLITICAL REASON?} So you're doing this for political reasons?" default="forthema" />
+ <dialogOption id="forthema" operator="Caller:" texten="Yes, I do it for all the refugees that are not welcome here, for all those that have no voice. I am the one that you have to reckon with!" default="back" option2="onlyworse" />
+ <dialogOption id="forthemav2" operator="Caller:" texten="Yes, people from my country have suffered enough. Those countless wars caused by US interference. . . It's about time that you start minding your own business, my fellow Americans!" default="back" option2="onlyworse" />
+ <dialogOption id="onlyworse" operator="Operator:" texten="{YOU'RE MAKING IT WORSE!} You will only make the things worse this way - far, far worse. You have to stop it now for the sake of your cause" default="onlyworsea" />
+ <dialogOption id="onlyworsea" operator="Caller:" emotions="angry again" texten="I WILL TAKE THE BLAME...Don't you get it??? SOMETHING has to be done...something radical... only RADICAL actions can bring RADICAL CHANGE" default="back" option2="opnot" />
+ <dialogOption id="onlyworsea2" operator="Caller:" emotions="angry again, strong accents on the capitals" texten="I WILL TAKE THE BLAME...Don't you get it??? SOMETHING has to be done... something radical... only RADICAL actions can bring RADICAL CHANGE in this country!" default="back" option2="opnot" />
+ <dialogOption id="opok" operator="Operator:" texten="{OK, I WILL} Ok, I'll do what I can to arrange what you asking for." default="opoka" />
+ <dialogOption id="opgoon" operator="Operator:" texten="{I CAN'T!} But I can't do that, I don't have the authority to make that decision!" default="opgoona" />
+ <dialogOption id="opoka" operator="Caller:" emotions="slightly relieved, easier [car noises in background]" texten="Good boy. Then, I want a public declaration from the president that not a single person will be departed from the country." default="insane" option2="oktoo" option3="repeat" />
+ <dialogOption id="opokav2" operator="Caller:" texten="Good boy. Then, I want a public declaration from the president that not a single American soldier will remain outside of the US borders." default="insane" option2="oktoo" option3="repeat" />
+ <dialogOption id="repeat" operator="Operator:" texten="{REPEAT PLEASE} I'm sorry, could you repeat that?" default="repeata" />
+ <dialogOption id="repeata" operator="Caller:" emotions="angrier again" texten="I said, I want THE PRESIDENT to say that NO ONE will be DEPORTED!!!" default="back" />
+ <dialogOption id="repeatav2" operator="Caller:" texten="I said, I want THE PRESIDENT to say that NO American soldier will remain OUTSIDE YOUR BORDERS!!!" />
+ <dialogOption id="opgoona" operator="Caller:" texten="Of course you can. Just pass it on to your supervisor." default="back" />
+ <dialogOption id="insane" operator="Operator:" texten="{YOU'RE INSANE} That's insane, it's impossible!" default="insanea" />
+ <dialogOption id="insanea" operator="Caller:" emotions="aggressive at the end!" texten="Just DO AS I SAY!!!" default="back" option2="noboms" />
+ <dialogOption id="noboms" operator="Operator:" texten="{IT MAKES NO SENSE} Really, a few bombs aren't gonna force the government to do what you want." default="shame" />
+ <dialogOption id="oktoo" operator="Operator:" texten="{I WILL PASS THAT ON} Ok, I will pass that on too." default="goodwait" />
+ <dialogOption id="goodwait" operator="Caller:" emotions="strict" texten="You have 5 minutes. I will talk to you later." actionOnEnd="actionHangup;" />
+ <dialogOption id="iknow" operator="Operator:" texten="{WE KNOW THE BOMB'S LOCATION} We already know where the bomb is!" default="iknowa" />
+ <dialogOption id="iknowa" operator="Operator:" emotions="quiet... click!" texten=". . . . . . . . ." actionOnEnd="bomber.isActive=false;
+car.isActive=true;
+opinionEffect=-20;
+onIgnore=-30;
+speed=0;
+actionHangup; " addToAAR="deton" />
+ <dialogOption id="reminder" operator="Caller:" texten="Play for time again and you won't get a warning for the next bomb." default="back" />
+ <dialogOption id="reminder2" operator="Caller:" texten="I mean it!" default="back" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="The bomber has called again to make his demands." />
+ <reportElement id="explode" texten="The bomb blew up." />
+ <reportElement id="deton" texten="The caller has detonated the bomb, probably in panic." />
+ <reportElement id="fail" texten="The operator has failed to persuade nor talk the bomber out." />
+ <reportElement id="check" texten="A cell phone was found in the car. Both were found out to be stolen." />
+ </aar>
+ </conversation>
+</conversations></data>

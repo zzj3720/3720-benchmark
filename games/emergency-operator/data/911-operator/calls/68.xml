@@ -1,0 +1,47 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="68" texten="Developer" COMMENT="RECORDED">
+ <scene>
+ <suspect elementProperties="sex=M;
+photo=Photos/_0004_Bartek" id="caller" emotions="Bartek himself" texten="Bartek Gajewski (caller)" addToAAR="unnec" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = -1;
+" addToAAR="story" />
+ <dialogOption elementProperties="option=5" id="2" operator="Caller" texten="Hello, I don't have any emergency, but I am making a computer game about your work, and I would like to possibly talk for a moment, can I?" default="3" option2="7" option3="6" />
+ <dialogOption id="3" operator="Operator:" texten="{DO YOU HAVE EMERGENCY?}Sir, do you have an emergency?" default="4" />
+ <dialogOption id="4" operator="Caller" texten="No, I do not, I'm sorry, but can we speak?" default="5" option2="6" option3="7" />
+ <dialogOption id="5" operator="Operator:" texten="{NO} No sir, please do not block the line." default="8" />
+ <dialogOption id="6" operator="Operator:" texten="{CALL THE OFFICE} Sir, you should contact the Emergency Services Department with your case." default="9" />
+ <dialogOption id="7" operator="Operator:" texten="{OK} Well, we can talk for a moment." default="14" />
+ <dialogOption id="8" operator="Caller" texten="Ok, I'm sorry, bye." actionOnEnd="actionHangup; opinionEffect = -1;" />
+ <dialogOption id="9" operator="Caller" texten="Okay, how can I reach it?" default="10" />
+ <dialogOption id="10" operator="Operator:" texten="{THROUGH A WEBSITE} Please visit the department's website and post a request to meet with the dispatchers." default="11" />
+ <dialogOption id="11" operator="Caller" texten="Ok, can I ask for your name, so I can put it in the request?" default="12" />
+ <dialogOption id="12" operator="Operator:" texten="{DON'T BLOCK THE LINE} Sorry but you can not. Please do not block the line." default="13" />
+ <dialogOption id="13" operator="Caller" texten="Ok, I'm sorry, thanks and bye." actionOnEnd="actionHangup; opinionEffect = -3;" />
+ <dialogOption id="14" operator="Caller" texten="Ok, but maybe we shall meet after your work so I do not block the line?" default="15" option2="16" />
+ <dialogOption id="15" operator="Operator:" texten="{WE CAN TALK NOW} No, it's fine now." default="19" />
+ <dialogOption id="16" operator="Operator:" texten="{CALL ME LATER} Yeah that's a better idea. Call me at +48 502 344 222 tomorrow afternoon, OK?" default="17" />
+ <dialogOption id="17" operator="Caller" texten="Sure, that sounds great! I will call you tomorrow afternoon then, thank you so much!" default="18" />
+ <dialogOption id="18" operator="Operator:" texten="{YOU'RE WELCOME} You are welcome!" actionOnEnd="actionHangup;
+opinionEffect = -7;" />
+ <dialogOption id="19" operator="Caller" texten="Ok, then tell me please: what's most challenging about your work?" default="20" option2="21" option3="22" />
+ <dialogOption id="20" operator="Operator:" texten="{TOO MANY ELEMENTS} Hmm, there are just so many reports and teams, its really hard to handle." default="23" />
+ <dialogOption id="21" operator="Operator:" texten="{NERVES} Talking with all those people sometimes make me nervous." default="23" />
+ <dialogOption id="22" operator="Operator:" texten="{IT'S EASY} Nothing at all, it's quite an easy job" default="23" />
+ <dialogOption id="23" operator="caller" texten="Then, what is most satisfying or entertaining about it?" default="24" option2="25" option3="26" />
+ <dialogOption id="24" operator="Operator:" texten="{HELPING} Helping people, saving lives." default="27" />
+ <dialogOption id="25" operator="Operator:" texten="{MANAGEMENT} The management is quite challenging. Air controllers can learn a lot from us, and can tell you!" default="27" />
+ <dialogOption id="26" operator="Operator:" texten="{I DON'T KNOW} It's just my duty..." default="27" />
+ <dialogOption id="27" operator="Caller" texten="Ok, I would like to ask a couple of technical questions, but maybe I should send you an email with those so you can reply in text in your free time?" default="28" />
+ <dialogOption id="28" operator="Operator:" texten="Sure, however you prefer it. Send them to operator@jutsugames.com." default="29" actionOnEnd="achiv=smile;" />
+ <dialogOption id="29" operator="Caller:" texten="Ok, Thank You so much! I will write right away!" default="18" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hello? Are you there?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Seems I am interrupting something, sorry." />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="A game developer has called with questions concerning the operator's work" />
+ <reportElement id="unnec" texten="Numerous negative articles appeared in social media after intruding the developer's house." />
+ </aar>
+ </conversation>
+</conversations></data>

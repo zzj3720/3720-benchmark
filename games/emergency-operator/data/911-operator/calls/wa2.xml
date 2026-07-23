@@ -1,0 +1,92 @@
+<data><conversations>
+<conversation id="wa2" texten="Letter with poison" COMMENT="RECORDED">
+ <scene COMMENT="346">
+ <injuried elementProperties="isActive = false;
+sex=W;
+type=White;
+hp = 80;" blockedBy="decont" id="jour" emotions="25-40 years old, self-confident, a bit blase" texten="Caller" />
+ <injuried elementProperties="sex=W;
+type=White;" blockedBy="decont" id="jourw" texten="Journalist" />
+ <injuried elementProperties="hp = 60;
+sex=M;
+hpchange=-0.5;" blockedBy="decont" id="boss" texten="Office manager" />
+ <injuried elementProperties="sex=M;
+type=White;" blockedBy="decont" id="jour2" texten="Journalist" />
+ <injuried elementProperties="sex=W;
+type=White;" blockedBy="decont" id="jour3" texten="Journalist" />
+ <criminal elementProperties="prisonChance=1;
+photo=Icons/OnSitePictures/OnSitePic_Letter;" blockedBy="decont" id="ricin" texten="Poisoned letter" addToAAR="policef" />
+ <tech elementProperties="isActive=false;
+work=250;
+icon=OnSitePic_Decontamination;" id="decont" texten="Decontamination" actionOnEnd="opinionEffect+=3;" addToAAR="decontdone" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" option2="2_2" actionOnEnd="police-&gt;active=false;
+opinionEffect=6;" addToAAR="story" />
+ <dialogOption id="2" operator="Caller:" emotions="calm" texten="I'm calling from the Charlie Herald editorial office. We've received a death threat again." default="again" option2="why" option3="how" />
+ <dialogOption id="2_2" operator="Caller:" emotions="calm" texten="I'm calling from the Washington Scoffers editorial office. We've received a death threat again." default="again" option2="why" option3="how" />
+ <dialogOption id="name" operator="Operator:" texten="{NAME?}What is your name?" default="name1" />
+ <dialogOption id="name1" operator="Caller:" texten="I am Kate Barne." />
+ <dialogOption id="again" operator="Operator:" texten="{AGAIN?}Again? So you had this happen before?" default="again1" />
+ <dialogOption id="why" operator="Operator:" texten="{WHY WOULD YOU GET IT?} Ma'am, do you have any idea why someone would be sending threats to your organization?" default="why1" />
+ <dialogOption id="how" operator="Operator:" texten="{HOW?}How did you receive the threat?" default="letter" />
+ <dialogOption id="again1" operator="Caller:" emotions="quite annoyed by the fact" texten="I don't remember exactly. Maybe two weeks ago? We're political journalists, we're used to it. According to our policy we report all threats to 911... but in my opinion it's usually unnecessary." default="back" />
+ <dialogOption elementProperties="option=nopolice;" id="why1" operator="Caller:" emotions="obviously!" texten="Probably someone doesn't like our writing style!" default="why2" option2="nojoke" option3="address" />
+ <dialogOption id="why2" operator="Operator:" emotions="suprised" texten="{EXCUSE ME?}Excuse me?" default="why3" />
+ <dialogOption id="nojoke" operator="Operator:" texten="{IT IS SERIOUS} Ma'am, you shouldn't joke about these things. You could be in real danger." default="why3" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS} What's the address for your office?" default="addressa0" actionOnEnd="police-&gt;active=true;
+decont-&gt;active=true;" />
+ <dialogOption id="addressa0" operator="Caller:" texten="[[ADDRESS]]" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="943 West Place" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="20 Fortigs Boulevard" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="223A Osmond Street" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption elementProperties="option=nopolice;" id="why3" operator="Caller:" texten="Honestly, I'm not surprised. You know... journalism is about printing what someone else does not want printed. Yesterday, we wrote about a suspicious suicide, two days ago about terrorists among illegal immigrants..." default="how" option2="address" option3="why" />
+ <dialogOption id="letter" operator="Caller:" emotions="sarcastic" texten="The letter came to our office. Who send paper letters these days?. Usually, we receive death threats by e-mail." default="read" />
+ <dialogOption id="read" operator="Caller:" texten="Do you want me to read it?" default="yes" option2="no" />
+ <dialogOption id="yes" operator="Operator:" texten="{YES} Yes, please." default="readb" option2="readb2" actionOnEnd="opinionEffect=-4; onIgnore=-6;" />
+ <dialogOption id="no" operator="Operator:" emotions="strict" texten="{NO!} No! Do not touch the letter." default="no1" actionOnEnd="jour.isActive = true;
+jourw.isActive = false;" />
+ <dialogOption elementProperties="option=address;" id="no1" operator="Caller:" emotions="frightened" texten="Oh my... I already did it... Do you think there could be a poison on it?" default="decont" option2="en" option3="whoelse" />
+ <dialogOption id="decont" operator="Operator:" texten="{DECONTAMINATION} I am sending emergency services to put the office in quarantine and decontaminate it. Just wait for them and everything will be fine." default="end" actionOnEnd="decont.isActive = true;" addToAAR="quar" />
+ <dialogOption id="en" operator="Operator:" texten="{LOOK FOR POISON} It's possible. I want you to check the envelope." default="en1" actionOnEnd="opinionEffect+=-1;
+onIgnore=-7;" />
+ <dialogOption id="en1" operator="Caller:" emotions="[searching in a drawer]" texten="Em... wait a second . . . . . . . . . . . ." default="got" />
+ <dialogOption id="got" operator="Caller:" texten="Ok, I have it." default="open" />
+ <dialogOption id="open" operator="Operator:" texten="{SLOWLY OPEN}Great. Now, slowly open the envelope and look into it. Is there any powder or another substance?" default="open1" addToAAR="badopen" />
+ <dialogOption id="open1" operator="Caller:" emotions="[paper sound]" texten="Okay. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ." default="open2" />
+ <dialogOption id="open2" operator="Caller:" emotions="frightened, scaried!" texten="Jesus... I see some white powder. And it smells odd. Oh shit! Please send the ambulance right away! I think I've just exposed myself to whatever's in this envelope." default="stop" option2="whoelse" option3="decont" actionOnEnd="jour.hpchange=-0.6;" />
+ <dialogOption id="stop" operator="Operator:" texten="{PUT IT AWAY!} Put it away immediately and don't spill it!" default="stopp" actionOnEnd="jour.hpchange=-0.4;" />
+ <dialogOption id="stopp" operator="Caller:" emotions="frightened" texten="Will I die? Please, help me..." default="back" option2="address" />
+ <dialogOption id="whoelse" operator="Operator:" texten="{WHO ELSE TOUCHED IT?} Was there anybody else in your office who touched the letter?" default="bosss" />
+ <dialogOption id="bosss" operator="Caller:" texten="Yes, I showed it to my editor-in-chief. He said he felt a little sick, so he lay down in his office. I think he's asleep. Should I wake him up?" default="wake" option2="nwake" option3="address" />
+ <dialogOption id="nwake" operator="Operator:" texten="{WAIT FOR HELP}No, stay where you are and wait for the help." default="end" />
+ <dialogOption id="wake" operator="Operator:" texten="{WAKE HIM UP}Yes. Go to his office now, check him, see if he's conscious." default="check" />
+ <dialogOption id="check" operator="Caller:" texten="Ok, I'm going." default="check1" />
+ <dialogOption id="check1" operator="Caller:" emotions="[sound of steps, opening the door]" texten=". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ." default="check2" />
+ <dialogOption id="check2" operator="Caller:" emotions="muffled" texten="Greg, are you okay? Greg!" default="greg" />
+ <dialogOption id="greg" operator="Caller:" emotions="crying" texten="I can't wake him up. Please, tell me what to do..." default="pulse" option2="breath" option3="decont" />
+ <dialogOption id="pulse" operator="Operator:" texten="{CHECK HIS PULSE}Check his pulse." default="pulse1" actionOnEnd="opinionEffect=4; onIgnore = -3;" />
+ <dialogOption id="breath" operator="Operator:" texten="{IS HE BREATHING?}Is he breathing?" default="feel" actionOnEnd="opinionEffect=4; onIgnore = -3;" />
+ <dialogOption id="pulse1" operator="Caller:" emotions="with relief" texten="Yes, I can feel it!" default="back" option2="decont" option3="address" />
+ <dialogOption id="feel" operator="Caller" emotions="with relief" texten="Wait... yes, he is breathing." default="back" option2="decont" option3="address" />
+ <dialogOption id="readb" operator="Caller:" emotions="unemotional, a readout" texten="It's rather short: 'Curiosity killed the cat, do you have nine lives, too? You better have, because today you will lose the first one'" default="police" option2="nopolice" option3="address" actionOnEnd="jour.hpchange=-0.5;" />
+ <dialogOption id="readb2" operator="Caller:" texten="It's rather short: 'Curiosity is a fatal sin'" default="police" option2="nopolice" option3="address" actionOnEnd="jour.hpchange=-0.5;" />
+ <dialogOption id="police" operator="Operator:" texten="{I'LL SEND THE POLICE} Okay, I'll have officers attend and look into it." default="policewait" />
+ <dialogOption id="nopolice" operator="Operator:" texten="{I WON'T SEND THE POLICE} It doesn't sound like something serious. If the threats happen again, please report them. For now, you should remain calm and be careful." default="same" actionOnEnd="opinionEffect=3;" />
+ <dialogOption id="same" operator="Caller:" emotions="relief" texten="Yep, I agree. I have to report it, because of our company's policy, but it's probably nothing. Thanks for your time, bye!" actionOnEnd="actionHangup;" addToAAR="nosend" />
+ <dialogOption id="policewait" operator="Caller:" texten="I don't think that is necessary, but it's your call. I will wait for them with the letter." actionOnEnd="actionHangup;" addToAAR="noquar" />
+ <dialogOption id="end" operator="Caller:" emotions="frightened" texten="I'll wait. Please come as soon as it possible..." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hello?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Are you there?" />
+ </dialog>
+ <aar>
+ <reportElement id="decontdone" texten="Decontamination was performed, which saved a possible pathogen from spreading." />
+ <reportElement id="story" texten="An editorial office has received a death threat letter. The letter contained a dangerous poison." />
+ <reportElement id="nosend" texten="The operator should have sent the emergency services and put the office in quarantine." />
+ <reportElement id="badopen" texten="The operator told the caller to check the letter, which confirmed presence of toxic powder, but also exposed the journalist for the effect of the poison." />
+ <reportElement id="quar" texten="The office was put in quarantine. Police found ricin inside the envelope." />
+ <reportElement id="noquar" texten="The operator should have put office in quarantine and decontaminate it." />
+ <reportElement id="policef" texten="The police have examined the letter. It will serve as an evidence" />
+ </aar>
+ </conversation>
+</conversations></data>

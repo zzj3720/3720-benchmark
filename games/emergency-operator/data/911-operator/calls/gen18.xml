@@ -1,0 +1,170 @@
+<data><conversations>
+<conversation elementProperties="type=generable;" id="gen18" texten="Loud neighbors" COMMENT="RECORDED">
+ <scene COMMENT="642">
+ <witness elementProperties="sex=W;
+type=White;" id="caller" operator="Caller:" emotions="woman, 40 yo" texten="Caller" />
+ <suspect elementProperties="isActive = false;
+prisonChance = 0.05;
+fightRisk = 0.05;
+bill= 1000;" id="host" texten="Party host" />
+ <witness elementProperties="isActive = false; sex = M;" id="party1" texten="Student" />
+ <witness elementProperties="isActive = false; sex = W;" id="party2" texten="Student" />
+ <witness elementProperties="isActive = false;
+sex = M;" id="party3" texten="Student" />
+ <suspect elementProperties="isActive = false;
+hp = 90; fightRisk = 0.4; prisonChance = 0.5; sex=M;" id="fighterA" texten="Aggressive man" />
+ <suspect elementProperties="isActive = false;
+hp = 80; fightRisk = 0.3; prisonChance = 0.5; sex=M;" id="fighterB" texten="Aggressive man" />
+ <criminal elementProperties="isActive = false; fightRisk = 0.7;
+weapon = e_pistol;
+prisonChance = 1; sex=M;" id="fighterW" texten="Aggressive man with a gun" />
+ <criminal elementProperties="isActive = false; fightRisk = 0.7;
+prisonChance = 1; sex=M;" id="burglar" texten="Burglar" />
+ <criminal elementProperties="isActive = false;
+prisonChance = 1; weapon = e_knife;
+fightRisk = 0.6; sex=M;" id="drugd" texten="Drug dealer" />
+ <injured elementProperties="isActive = false;
+hp = 50;
+hpchange = -0.5; sex=M;" id="shot" texten="Victim with gunshot wound" />
+ <injured elementProperties="isActive = false;
+hp = 60; sex=M;" id="drunken" texten="Drunk man" />
+ <injured elementProperties="isActive = false; type=Children; hp = 90;" id="child1" texten="Scared child" />
+ <injured elementProperties="isActive = false; type=Children; hp = 90;" id="child2" texten="Scared child" />
+ <dead elementProperties="isActive = false; sex = M;" id="olddead" texten="Dead old man" />
+ <witness elementProperties="isActive = false; sex = M;" id="oldalive" texten="Old man" />
+ <injured elementProperties="isActive = false;
+hp = 50;
+hpchange = -0.5; sex=M;" blockedBy="fighterW" id="father" texten="Father" />
+ <witness elementProperties="isActive = false; sex = W;" blockedBy="fighterW" id="mother" texten="Mother" />
+ <injured elementProperties="isActive = false; type=Children; hp = 90;" blockedBy="fighterW" id="child3" texten="Scared child" />
+ <injured elementProperties="isActive = false; type=Children; hp = 90;" blockedBy="fighterW" id="child4" texten="Scared child" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" option2="3" option3="4" addToAAR="story" />
+ <dialogOption elementProperties="bgsound=cgen18_0kids;" id="2" operator="Caller:" emotions="tired mother, irritated and slightly anxious" texten="Hello, I hear a lot of noise coming from the apartment next door. It's keeping my kids up... they can't get to sleep. Can you do something about it?" default="address" option2="what" option3="who" />
+ <dialogOption id="3" operator="Caller:" emotions="tired mother, irritated and slightly anxious" texten="I want to complain about my neighbors. They're being noisy." default="address" option2="what" option3="who" />
+ <dialogOption id="4" operator="Caller:" emotions="tired mother, irritated and slightly anxious" texten="Hello, I hear loud noises from the neighboring flat. Can you send somebody to check it?" default="address" option2="what" option3="who" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?} What's the address you're calling from?" default="addressa0" option2="addressa1" option3="addressa2" />
+ <dialogOption id="addressa0" operator="Caller:" texten="My house is at [[ADDRESS]], I'm in unit 6." default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="My house is at [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="[[ADDRESS]]" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="39A Porcupine Plaza" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="name" operator="Operator:" texten="What's your name?" default="name1" />
+ <dialogOption id="name1" operator="Caller:" texten="I'm Marianne Fates." default="back" />
+ <dialogOption id="name2" operator="Caller:" texten="I'm Chloe Smith" default="back" />
+ <dialogOption id="name3" operator="Caller:" texten="I'm Jessy Taylor" default="back" />
+ <dialogOption id="what" operator="Operator:" texten="{WHAT'S GOING ON?} Do you know what is happening at your neighbor's place?" default="party" option2="fight" option3="noises" />
+ <dialogOption elementProperties="bgsound=cgen18_0party1;" id="party" operator="Caller:" texten="Some kind of a party, I guess. I hear a lot of voices and loud music." default="danger" option2="talking" option3="who" actionOnEnd="family-&gt;active = false;
+idk-&gt;active = false;
+host.isActive = true;
+party1.isActive = true;
+party2.isActive = true; party3.isActive = true;
+bgsound=cgen18_0party2;" />
+ <dialogOption id="danger" operator="Operator:" texten="{ARE YOU IN DANGER?} Do you feel threatened in any way?" default="yesdanger" option2="nodanger" option3="noneed" />
+ <dialogOption elementProperties="bgsound=cgen18_0partyL;" id="nodanger" operator="Caller:" emotions="irritated" texten="No, but my kids can't sleep because of the loud music. I can clearly hear every single word of the songs they're playing." default="sendp" option2="back" option3="nosendf" />
+ <dialogOption id="yesdanger" operator="Caller:" emotions="anxious" texten="Honestly? Yes, I don't feel safe." default="why" option2="who" option3="address" />
+ <dialogOption id="noneed" operator="Caller:" emotions="irritated" texten="No, but the noise is driving me crazy. I mean, it wouldn't be so bad if they listened to decent music..." default="aresure" option2="sendn" option3="nosendp" actionOnEnd="host.bill = 0;" />
+ <dialogOption id="aresure" operator="Operator:" texten="{IS IT REALLY TOO LOUD?} Are you sure they are breaking noise bylaws? Is this music really too loud or ...or you just not like it?" default="too" option2="dubstep" />
+ <dialogOption elementProperties="option=address;" id="too" operator="Caller:" emotions="irritated" texten="Yes, it's far too loud!" default="sendn" option2="nosendp" option3="talking" />
+ <dialogOption elementProperties="option=address;" id="dubstep" operator="Caller:" emotions="irritated" texten="That music violates the law! It's dubstep!" default="sendn" option2="nosendp" option3="talking" />
+ <dialogOption id="nosendp" operator="Operator:" texten="{NOT AN EMERGENCY} Ma'am, I'm afraid that this isn't 911 call. 911 is for emergencies only." default="nosend1" actionOnEnd="opinionEffect += 2;" addToAAR="partycalm" />
+ <dialogOption id="fightn" operator="Operator:" texten="{NOT AN EMERGENCY} Ma'am, I'm afraid that this isn't 911 call. 911 is for emergencies only." default="nosend1" actionOnEnd="opinionEffect -= 2;" addToAAR="partycalmneg" />
+ <dialogOption id="nosendf" operator="Operator:" texten="{NOT AN EMERGENCY} Ma'am, I'm afraid that this isn't 911 call. 911 is for emergencies only." default="nosend1" actionOnEnd="opinionEffect -= 2;" addToAAR="shouldsend" />
+ <dialogOption id="nosend1" operator="Caller:" emotions="angry, with disbelief" texten="Really? I don't know what I pay my taxes for if you can't send even one police officer! Ehh... Bye." actionOnEnd="actionHangup;" />
+ <dialogOption elementProperties="bgsound=cgen18_0endparty;" id="why" operator="Operator:" texten="{WHY?} Could you tell me why you are not feeling safely?" default="fight" option2="drugs" />
+ <dialogOption elementProperties="bgsound=cgen18_0fight1;" id="fight" operator="Caller:" emotions="anxious" texten="I've heard some aggressive voices, maybe an argument. I think they might start fighting at any moment." default="serious" option2="weapon" />
+ <dialogOption id="drugs" operator="Caller:" emotions="unsure, " texten="While I was going to my apartment, I saw a guy leaving my neighbor's place. He was acting weird. Very weird. Like, maybe, he was on drugs." default="senddrug" option2="noweird" option3="address" actionOnEnd="drugd.isActive = true;" />
+ <dialogOption id="noweird" operator="Operator:" texten="{I WON'T SEND POLICE} Madam, strange behavior doesn't necessarily mean somebody's taking drugs. It's not a case for 911. If you think they're dealing or using drugs call your local police department. They will put you in touch with their drug squad. You can give them the information, they will check it out." default="nosend1" actionOnEnd="opinionEffect -= 2;" addToAAR="drugsn" />
+ <dialogOption id="sendn" operator="Operator:" texten="{I'LL SEND THE POLICE} I will send a couple of officers over to calm your neighbors down." default="okthx" actionOnEnd="opinionEffect -= 1;" addToAAR="partyhardn" />
+ <dialogOption id="sendp" operator="Operator:" texten="{I'LL SEND THE POLICE} I will send a couple of officers over to calm your neighbors down." default="okthx" actionOnEnd="opinionEffect += 2;" addToAAR="partyhardch" />
+ <dialogOption id="sendfight" operator="Operator:" texten="{I'LL SEND THE POLICE} I will send a couple of officers over to check things out and see what's going on." default="okthx" actionOnEnd="opinionEffect += 2;" addToAAR="fightch" />
+ <dialogOption id="serious" operator="Operator:" texten="{WHAT ARGUMENT?} Are we talking about a really serious argument where there could be fight? Because we can't send police to every little argument." default="soserious" option2="idkserious" />
+ <dialogOption id="weapon" operator="Operator:" texten="{DO THEY HAVE WEAPONS?} Do you think they might have any weapons? Did you hear something that might indicate that they might be armed?" default="noidea" option2="gun" />
+ <dialogOption elementProperties="chance=15;
+bgsound=cgen18_0;" id="soserious" operator="Caller: " emotions="[distant gunshot], frightened, shouting last words" texten="Yes! I told you... Wait! I just heard a sound of gunshot. Somebody is screaming! Please send the ambulance quickly!" default="senda" option2="check" option3="address" actionOnEnd="fighterW.isActive = true; shot.isActive = true;
+bgsound=cgen18_0fight2;" />
+ <dialogOption id="idkserious" operator="Caller:" emotions="irritated" texten="How should I know that? They're having a fight, so I called 911 so the police can deal with it." default="sendfight" option2="nosendf" option3="address" actionOnEnd="fighterA.isActive = true; fighterB.isActive = true;" />
+ <dialogOption id="noidea" operator="Caller:" texten="I have no idea." default="sendfight" option2="nosendf" option3="address" actionOnEnd="fighterA.isActive = true; fighterB.isActive = true;" />
+ <dialogOption id="gun" operator="Caller:" emotions="frightened" texten="Yes, somebody's shouting threats about pulling out a gun." default="senda" option2="check" option3="address" actionOnEnd="fighterW.isActive = true; shot.isActive = true;" />
+ <dialogOption id="check" operator="Operator:" texten="{GO AND CHECK!} Can you go there and check if somebody is hurt?" default="check1" />
+ <dialogOption id="check1" operator="Caller:" emotions="angry" texten="Are you out of your mind? You're the cops, that's your job." default="check2" option2="back" option3="address" actionOnEnd="opinionEffect -= 1;" />
+ <dialogOption id="check2" operator="Operator:" texten="{I'LL SEND THE POLICE} I understand madam. You don't have to go there if you are afraid. I'm sending police unit right now." default="okthx" />
+ <dialogOption id="senda" operator="Operator:" texten="{I'LL SEND HELP} I'm sending the emergency services. Stay at your apartment and stay calm." default="okthx" actionOnEnd="opinionEffect += 3;" addToAAR="gunch" />
+ <dialogOption id="senddrug" operator="Operator:" texten="{I'LL SEND HELP} I have emergency services on the way. Stay at your apartment and stay calm." default="okthx" actionOnEnd="opinionEffect += 2;" addToAAR="drugsch" />
+ <dialogOption id="okthx" operator="Caller:" texten="Thank you. I'll be waiting at my place. Bye." actionOnEnd="actionHangup;" />
+ <dialogOption id="talking" operator="Operator:" texten="{ASK THEM TO CALM} Did you try asking them if they could turn down the music?" default="yestalk" option2="notalk" option3="notalkdanger" />
+ <dialogOption id="yestalk" operator="Caller:" texten="Yes, I tried, but nobody answered the door." default="back" />
+ <dialogOption id="notalk" operator="Caller:" texten="No, I don't want to leave my kids alone." default="back" />
+ <dialogOption elementProperties="chance=15;" id="notalkdanger" operator="Caller:" emotions="anxious" texten="Um... Are you sure it's safe? They don't sound like reasonable people. To be honest, I'm a bit scared of them." default="why" />
+ <dialogOption elementProperties="bgsound=cgen18_0tv1;" id="noises" operator="Caller:" texten="The TV is very loud." default="who" option2="anyelse" actionOnEnd="students-&gt;active = false;
+party-&gt;active = false;
+notalkdanger-&gt;active = false;
+bgsound=cgen18_0tv2;" />
+ <dialogOption id="anyelse" operator="Operator:" texten="{ANY OTHER NOISES?}Do you hear anything else?" default="furnit" option2="cry" option3="tvonly" />
+ <dialogOption id="furnit" operator="Caller:" emotions="unsure" texten="Hmm... from time to time I hear strange noises. Like someone is moving furniture. But I don't know why they'd rearrange their room in the middle of the night." default="back" option2="susp" option3="address" actionOnEnd="ofteny-&gt;active = false;
+fighterW.isActive = true;
+burglar.isActive = true;
+idk-&gt; active = false;" />
+ <dialogOption id="cry" operator="Caller:" emotions="anxious" texten="It may just be the TV, but I think I can hear a child crying." default="back" option2="address" actionOnEnd="idk-&gt;active = false; oftenn-&gt;active = false; " />
+ <dialogOption id="tvonly" operator="Caller:" emotions="irritated" texten="I can't hear anything other than the TV. It's really, really loud." default="back"/>
+ <dialogOption id="who" operator="Operator:" texten="{WHO LIVES THERE?}Do you know who lives there?" default="idk" option2="students" option3="family" />
+ <dialogOption id="idk" operator="Caller:" texten="Some old man. He looks like he's 60 or 70 years old. I don't know him very well, we don't really talk to each other." default="normal" option2="alone" option3="address" actionOnEnd="cry-&gt;active = false;
+party-&gt;active = false;
+fight-&gt;active = false;
+home-&gt;active = false;
+furnit-&gt;active = false;" />
+ <dialogOption id="students" operator="Caller:" texten="Students. There are four of them, one couple and two guys." default="back" actionOnEnd="noises-&gt;active = false;
+host.isActive = true;
+party1.isActive = true;
+party2.isActive = true;
+party3.isActive = true;" />
+ <dialogOption id="family" operator="Caller:" texten="A family with two children." default="often" option2="address" actionOnEnd="tvonly-&gt;active = false; party-&gt;active = false; fight-&gt;active = false;" />
+ <dialogOption id="often" operator="Operator:" texten="{HOW OFTEN DOES IT HAPPEN?} Are they loud like this all the time or is this an exception?" default="oftenn" option2="ofteny" />
+ <dialogOption id="oftenn" operator="Caller:" texten="No, they have little children, so normally they're really quiet during the night." default="back" option2="anyelse" option3="susp" actionOnEnd="cry-&gt;active = false; " />
+ <dialogOption id="ofteny" operator="Caller:" emotions="embarrassed, anxious" texten="Yes.... I hear the parents fight all the time. I don't want to be cruel, but I would call that family pathological. They drink a lot, and it doesn't look like they take care of their children. Maybe you should send somebody to check on their kids." default="back" option2="sendcheckpath" option3="nosendfam" actionOnEnd="drunken.isActive = true; child1.isActive = true; child2.isActive = true;" />
+ <dialogOption id="alone" operator="Operator:" texten="{IS HE ALONE?}Does he live alone?" default="alone1" />
+ <dialogOption id="alone1" operator="Caller:" texten="I think so." default="back" option2="visit" option3="anyelse" actionOnEnd="cry-&gt;active = false; " />
+ <dialogOption id="normal" operator="Operator:" texten="{IS HE OFTEN THAT LOUD?}Is he often loud like this?" default="normaly" option2="normaln" actionOnEnd="cry-&gt;active = false; " />
+ <dialogOption id="normaly" operator="Caller:" emotions="irritated" texten="Yes, he turns his TV up loud, probably because he's hard of hearing. I get used to it when it happens during the day, but I won't tolerate that at night. My children need to sleep." default="back" option2="visit" option3="anyelse" />
+ <dialogOption id="normaln" operator="Caller:" texten="No, he's rather quiet, especially at night." default="back" option2="visit" option3="anyelse" />
+ <dialogOption id="visit" operator="Operator:" texten="{ANY VISITORS?} Do you know if anybody visits his apartment?" default="visit1" option2="visit2" actionOnEnd="cry-&gt;active = false; " />
+ <dialogOption elementProperties="chance=20;" id="visit1" operator="Caller:" emotions="concerned" texten="I've never seen anyone who comes to visit him. Do you think something has happened to him?" default="sendcheck" option2="nosendcheck" actionOnEnd="olddead.isActive = true; opinionEffect+=1;" addToAAR="deadold" />
+ <dialogOption id="visit2" operator="Caller:" emotions="concerned" texten="I've never seen anyone who comes to visit him. Do you think something has happened to him?" default="sendcheck" option2="nosendcheck" actionOnEnd="oldalive.isActive = true;" addToAAR="aliveold" />
+ <dialogOption id="sendcheck" operator="Operator:" texten="{I'LL SEND THE POLICE} I will send a police officer to check on it." default="okthx" actionOnEnd="opinionEffect += 2;" />
+ <dialogOption id="sendcheckpath" operator="Operator:" texten="{I'LL SEND THE POLICE} I will send a police officer to check on it." default="okthx" actionOnEnd="opinionEffect += 2;" addToAAR="path" />
+ <dialogOption id="nosendcheck" operator="Operator:" texten="{NO} That seems to ordinary situation, ma'am. He probably fell asleep in front of TV. Wait until the morning and if his TV would be still running, please contact the nearest police department." default="nosend1" actionOnEnd="opinionEffect -= 2;" addToAAR="shouldsend" />
+ <dialogOption id="nosendfam" operator="Operator:" texten="{IT'S NOT URGENT} I don't think what you've got here is urgent enough for 911. Just call your local police department talk to them they will help you out." default="nosend1" actionOnEnd="opinionEffect -= 2;" addToAAR="shouldsend" />
+ <dialogOption id="susp" operator="Operator:" texten="{ANYBODY SUSPICIOUS?} Have you seen anybody suspicious in your neighborhood lately?" default="susp1" />
+ <dialogOption id="susp1" operator="Caller:" emotions="unsure, concerned" texten="Well... maybe. Few hours ago, my intercom was ringing, but when I answered nobody said anything." default="home" option2="address" />
+ <dialogOption id="home" operator="Operator:" texten="{ARE NEIGHBORS HOME?}Are you sure that your neighbors are home?" default="weekends" option2="stay" />
+ <dialogOption id="weekends" operator="Caller:" emotions="frightened" texten="Oh my God, do you think somebody else might be there?! They sometimes leave the city during weekends, as far as I know." default="sendcheck" option2="nosendfam" option3="address" actionOnEnd="fighterW.isActive = true;
+burglar.isActive = true;" addToAAR="familyout" />
+ <dialogOption elementProperties="chance=15;" id="stay" operator="Caller:" emotions="frightened" texten="Oh my God, do you think somebody else might be there?! They don't get out a lot, because of their little children." default="sendcheck" option2="nosendf" option3="address" actionOnEnd="father.isActive = true;
+child3.isActive = true;
+child4.isActive = true;
+mother.isActive = true;
+fighterW.isActive = true;
+burglar.isActive = true;" addToAAR="familyinv" />
+ <dialogOption id="end" operator="Caller:" texten=". . . . . . . . . . ." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" emotions="irritated" texten="Can you do something about that noise?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Are you there?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="Caller's neighbors were behaving very loudly." />
+ <reportElement id="partycalm" texten="The party was not very loud and there was no ground for police intervention." />
+ <reportElement id="partycalmneg" texten="The music was not very loud and there was no ground for police intervention. The police was sent unnecessarily." />
+ <reportElement id="partyhardch" texten="Police officers calmed down the party." />
+ <reportElement id="partyhardn" texten="The operator should send police officer to calm down the party." />
+ <reportElement id="drugsn" texten="The caller suspects that drugs could be found in neighboring apartment. The police should have check that place." />
+ <reportElement id="drugsch" texten="The police found the drug dealer in neighboring apartment." />
+ <reportElement id="gunch" texten="The argument ends with shooting in the neighboring flat. The shooter was arrested and the victim with gunshot wound was taken to hospital." />
+ <reportElement id="fightch" texten="When police arrived two men were fighting in the neighboring flat." />
+ <reportElement id="shouldsend" texten="The operator should have sent the police to investigate the case." />
+ <reportElement id="familyout" texten="During absence of flat's owners, the burglars have entered the place. They have been caught in the act by the police." />
+ <reportElement id="familyinv" texten="Neighboring flat was invaded by two burglars. The householder was heavily beaten and the rest of his family was imprisoned in one of the rooms." />
+ <reportElement id="path" texten="The police officers, who came to the scene, found unconscious drunken man with two scared, neglected children." />
+ <reportElement id="deadold" texten="The police found dead old man. His TV was still running, but he probably had died several hours before police's arrival." />
+ <reportElement id="aliveold" texten="The old man was surprised by police's arrival. He didn't hear how loudly his TV was playing, because of dead battery in his hearing aid." />
+ </aar>
+ </conversation>
+</conversations></data>

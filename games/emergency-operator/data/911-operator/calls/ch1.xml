@@ -1,0 +1,49 @@
+<data><conversations>
+<conversation id="ch1" texten="Prison escape" COMMENT="RECORDED">
+ <scene elementProperties="onRun" COMMENT="0">
+ <criminal elementProperties="fightRisk = 0.8;
+prisonChance=1;" id="criminal1" texten="Fugitive" />
+ <criminal elementProperties="fightRisk = 0.8;
+prisonChance=1;" id="criminal2" texten="Fugitive" />
+ <criminal elementProperties="fightRisk = 0.8;
+prisonChance=1;" id="criminal3" texten="Fugitive" />
+ <criminal elementProperties="fightRisk = 0.8;
+prisonChance=1;" id="criminal4" texten="Fugitive" />
+ <injuried elementProperties="hp = 80" blockedBy="criminal4" id="kidnaped" texten="Kidnapped driver" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 5;
+speed=80;" />
+ <dialogOption id="2" operator="Caller:" emotions="Male ~30, suprised" texten="Hey, I live near the jail, and I think I just saw someone escaping it!" default="what" option2="address" addToAAR="story" />
+ <dialogOption id="what" operator="Operator:" texten="{WHAT DID YOU SEE?}Ok, tell me what you saw sir." default="whata" />
+ <dialogOption id="whata" operator="Caller:" emotions="excited" texten="I noticed some men going out through the window by a rope... Like in a movie!" default="many" option2="address" option3="imp" />
+ <dialogOption id="address" operator="Operator:" texten="{WHICH PRISON?}Which prison are we talking about sir?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="Fox River, at the [[ADDRESS]]" default="many" option2="back" option3="imp" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="Fox River, at the 702 Jefferson Street." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="Fox River, at the 332 Green Drive." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="Fox River, at the 85 Second Avenue." default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="many" operator="Operator:" texten="{HOW MANY ESCAPED?}Did you count how many prisoners escaped?" default="manya" />
+ <dialogOption id="manya" operator="Caller:" texten="There were four of them!" default="where" option2="way" option3="address" />
+ <dialogOption id="where" operator="Operator:" texten="Where are they now?" default="wherea" />
+ <dialogOption id="wherea" operator="Caller:" emotions="sorry" texten="I don't know, they drove away quickly, heading north." default="vehicle" option2="way" option3="imp" />
+ <dialogOption id="vehicle" operator="Operator:" texten="{SOMEONE WAITED FOR THEM?}Did they have someone waiting for them?" default="vehiclea" />
+ <dialogOption id="vehiclea" operator="Caller:" texten="No, it seemed like they've stolen a car." default="driver" option2="kind" option3="way" />
+ <dialogOption id="driver" operator="Operator:" texten="{ANYBODY IN THE CAR?}Was there someone in the car?" default="drivera" />
+ <dialogOption id="drivera" operator="Caller:" texten="Yes, the driver... They dragged him out of the car, hit a few times and threw him in the trunk." default="kind" option2="way" option3="driver" />
+ <dialogOption id="kind" operator="Operator:" texten="{DESCRIBE THE CAR} Did you get a look at the car? Make, model, color that kind of thing." default="kinda" />
+ <dialogOption id="kinda" operator="Caller:" emotions="wondering" texten="Well... it was a... a white car, I believe it was sedan. A white sedan." default="driver" option2="way" option3="address" />
+ <dialogOption id="way" operator="Operator:" texten="{POLICE WILL LOOK FOR THEM}Ok, thanks for the call, the police will start looking for them." default="gl" />
+ <dialogOption id="imp" operator="Operator:" texten="{NOT POSSIBLE}That's not possible sir." default="impa" />
+ <dialogOption id="impa" operator="Caller:" emotions="annoyed" texten="I saw it with my own eyes! Who gave you this job? I guess I'll better call the news!" actionOnEnd="actionHangup;
+opinionEffect=3;
+onIgnore=-6;" addToAAR="compl" />
+ <dialogOption id="gl" operator="Caller:" emotions="excited" texten="Good luck!" actionOnEnd="actionHangup" />
+ <dialogOption id="reminder" operator="Caller:" texten="Will you do something with this?" />
+ <dialogOption id="reminder2" operator="Caller:" emotions="angry" texten="Hello!" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="A few prisoners escaped from the jail." />
+ <reportElement id="compl" texten="The caller recalled 911, got through to another dispatcher who took the report and later filed a complaint on the operator's incompetence." />
+ </aar>
+ </conversation>
+</conversations></data>

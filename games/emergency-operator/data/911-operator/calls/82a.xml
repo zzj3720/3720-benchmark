@@ -1,0 +1,58 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="82a" texten="Fire at construction site" COMMENT="RECORDED">
+ <scene>
+ <work elementProperties="icon=OnSitePic_Valve" id="gas" texten="Gas valve" actionOnEnd="explosion.isActive=false;" addToAAR="gasoff" />
+ <fire elementProperties="work = 100;
+workChange = 2;" id="fire" texten="House on fire" actionOnEnd="explosion.isActive=false;" />
+ <timer elementProperties="time = 120" id="explosion" texten="There was a blast!" actionOnEnd="fire.work += 500" addToAAR="explode" />
+ <injuried elementProperties="sex=M;
+hp = 70; hpChange = -0.1" blockedBy="fire" id="worker1" texten="Worker" />
+ <injuried elementProperties="sex=M;
+hp = 70; hpChange = -0.1" blockedBy="fire" id="worker2" texten="Worker" />
+ <injuried elementProperties="sex=M;
+hp = 70; hpChange = -0.1" blockedBy="fire" id="worker3" texten="Worker" />
+ <injuried elementProperties="sex=M;
+hp = 70; hpChange = -0.1" blockedBy="fire" id="worker4" texten="Worker" />
+ <injuried elementProperties="sex=M;
+hp = 70; hpChange = -0.1" blockedBy="fire" id="worker5" texten="Worker" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 2; onIgnore = 5;" />
+ <dialogOption id="2" operator="Caller:" emotions="male, polite, ~60, simple, not very emotional, rather suprised" texten="Hello? Uh, I'm a watchman at a construction site and I just noticed that there is fire." default="3" option2="address" />
+ <dialogOption id="address" operator="Operator:" texten="{WHERE ARE YOU?} Where is it, sir?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="At [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="It's 34 Oak Street" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="It's 765 Jefferson Avenue" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="At 34 Maple Street" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="3" operator="Operator:" texten="{WHAT'S ON FIRE?} Sir, what's on fire?" default="4" />
+ <dialogOption id="4" operator="Caller:" emotions="surprised" texten="One of the building's roof, it's on fire. I don't know what happened." default="inside1" option2="address" option3="alarm1" />
+ <dialogOption id="inside1" operator="Operator:" texten="{IS ANYONE INSIDE?} Is there anyone inside the building?" default="inside2" />
+ <dialogOption elementProperties="option=address;" id="inside2" operator="Caller:" texten="I don't know... I think the workers." default="alarm1" option2="gas1" option3="evacuate1" COMMENT="(Aga - co� mi nie pasuje)" />
+ <dialogOption id="alarm1" operator="Operator:" texten="{ACTIVATE FIRE ALARM} Here is what I want you to do. Find the nearest fire alarm station and activate the alarm." default="alarm2" actionOnEnd="opinionEffect+=1;" />
+ <dialogOption elementProperties="option=help;" id="alarm2" operator="Caller:" texten="Ok, fire alarm... sure thing! Get here fast! . . . . . . . . . . . . . . . . . . . ." default="gas1" option2="evacuate1" option3="address" actionOnEnd="bgsound=c82a_0_1;" />
+ <dialogOption id="gas1" operator="Operator:" texten="{CHECK GAS SUPPLY} Is the building connected to a gas supply?" default="gas2" />
+ <dialogOption elementProperties="option=alarm1" id="gas2" operator="Caller:" texten="It might be... I'm not sure." default="gas3" option2="address" option3="evacuate1" />
+ <dialogOption id="gas3" operator="Operator:" texten="{CUT OFF THE GAS} What I want you to do Sir is get help from the workers, try to locate the main gas valve for the area and cut off the gas." default="gas4" />
+ <dialogOption id="gas4" operator="Caller:" texten="Ok, ok, I know where that is. I'll do it right now." default="help" option2="address" actionOnEnd="explosion.isActive = false;
+gas.isActive=false;
+opinionEffect+=2;" addToAAR="gasoffcal" />
+ <dialogOption id="evacuate1" operator="Operator:" texten="{EVACUATE} Sir, evacuate everyone from the area and wait for the fire department to arrive. Ok?" default="evacuate2" />
+ <dialogOption elementProperties="bgsound=c82a_0_2;" id="evacuate2" operator="Caller:" texten=". . . . . . . . . . . . . . . . . . . . . . . Ok, they evacuated." default="help" option2="address" actionOnEnd="worker1.isActive=false;
+worker2.isActive=false;
+worker3.isActive=false;
+worker4.isActive=false;
+worker5.isActive=false;
+opinionEffect+=1;" />
+ <dialogOption id="help" operator="Operator:" texten="{I'LL SEND HELP} I am sending the emergency services, please wait for them." default="endwait" />
+ <dialogOption id="endwait" operator="Caller:" texten="I will, thank you!" actionOnEnd="actionHangup" />
+ <dialogOption id="end" operator="Caller:" texten="..." actionOnEnd="actionHangup" />
+ <dialogOption id="reminder" operator="Caller:" texten="Hello?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="We need help, the fire's spreading!" />
+ </dialog>
+ <aar>
+ <reportElement id="gasoff" texten="The gas valve was cut off." />
+ <reportElement id="gasoffcal" texten="The caller was instructed to turn off the gas valve." />
+ <reportElement id="explode" texten="The gas exploded, causing the fire to be much bigger." />
+ </aar>
+ </conversation>
+</conversations></data>

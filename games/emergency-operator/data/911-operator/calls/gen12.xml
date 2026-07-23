@@ -1,0 +1,167 @@
+<data><conversations>
+<conversation elementProperties="type=generable;" id="gen12" texten="Empty call" COMMENT="RECORDED">
+ <scene>
+ <passerby elementProperties="sex=M;" id="caller" emotions="male or female" texten="Caller" />
+ <passerby elementProperties="isActive = false;
+type=Children;" id="child" texten="Child" />
+ <witness elementProperties="isActive = false;" id="caretaker" texten="Child's caretaker" />
+ <criminal elementProperties="isActive = false;
+prisonChance = 1;
+weapon=e_pistol;
+fightRisk = 0.5;" id="robber1" texten="Terrorist" />
+ <criminal elementProperties="isActive = false;
+prisonChance = 1;
+weapon=e_pistol;
+fightRisk = 0.5;" id="robber2" texten="Terrorist" />
+ <criminal elementProperties="isActive = false;
+prisonChance = 1;
+weapon=e_pistol;
+fightRisk = 0.5;" id="robber3" texten="Terrorist" />
+ <injuried elementProperties="type=Old;
+isActive = false;
+hp = 80; " blockedBy="door" id="injuriedA" texten="Paralyzed" />
+ <work elementProperties="isActive = false;
+work = 50;
+icon = OnSitePic_Door;" id="door" texten="Closed door" />
+ <injuried elementProperties="isActive = false;
+hp = 60;
+hpchange = -0.2; " blockedBy="robber1" id="beaten" texten="Beaten up caller" />
+ </scene>
+ <dialog>
+ <dialogOption elementProperties="option=emptymed;" id="1" operator="Operator:" texten="911, what's your emergency?" default="buttcall" option2="child" option3="empty" />
+ <dialogOption elementProperties="chance=0.45;
+bgsound=cgen12_buttcallbg;" id="buttcall" operator="Caller:" emotions="steps in a distant" texten=". . . . ." default="digit" option2="redial" option3="ask" actionOnEnd="opinionEffect=-1;
+digit2-&gt;active=false;
+digit3-&gt;active=false;
+ask2-&gt;active=false;
+ask3-&gt;active=false;
+shout2-&gt;active=false;
+redialhost-&gt;active=false;
+redialmed-&gt;active=false;" addToAAR="buttcall" />
+ <dialogOption elementProperties="chance=0.33;
+bgsound=cgen12_childbg;" id="child" operator="Caller:" emotions="child playing in a distant" texten=". . . . ." default="digit" option2="redial" option3="ask" actionOnEnd="opinionEffect=0; onIgnore = 1;
+shout1-&gt;active=false;
+redialhost-&gt;active=false;
+redialmed-&gt;active=false;
+caller.isActive=false;
+child.isActive=true;
+caretaker.isActive=true;
+digit1-&gt;active=false;
+digit3-&gt;active=false;
+ask1-&gt;active=false;
+ask3-&gt;active=false;" addToAAR="childcall" />
+ <dialogOption elementProperties="chance=0.1;
+bgsound=cgen12_0_hostage1;" id="empty" operator="Caller:" emotions="just silence" texten=". . . . ." default="digit" option2="redial" option3="ask" actionOnEnd="opinionEffect = 7;
+digit1-&gt;active=false;
+digit2-&gt;active=false;
+ask1-&gt;active=false;
+ask2-&gt;active=false;
+shout1-&gt;active=false;
+shout2-&gt;active=false;
+redialmed-&gt;active=false;
+no1no-&gt;active=false;" addToAAR="hostcall" />
+ <dialogOption elementProperties="chance=0.1;
+cgen12_redialmedbg;" id="emptymed" operator="Caller:" emotions="just silence" texten=". . . . ." default="digit" option2="redial" option3="ask" actionOnEnd="opinionEffect = 4;
+digit1-&gt;active=false;
+digit2-&gt;active=false;
+ask1-&gt;active=false;
+ask2-&gt;active=false;
+shout1-&gt;active=false;
+shout2-&gt;active=false;
+redialhost-&gt;active=false;
+no2no-&gt;active=false;
+hostage-&gt;active=false;" addToAAR="medcall" />
+ <dialogOption id="ask" operator="Operator:" texten="{HELLO?} Hello? Anyone there?" default="ask1" option2="ask2" option3="ask3" />
+ <dialogOption id="ask1" operator="Caller:" emotions="steps in a distant" texten=". . . . . . . . . . . . ." default="digit" option2="redial" />
+ <dialogOption id="ask2" operator="Caller:" emotions="child playing in a distant" texten=". . . . . . . . . . . . ." default="digit" option2="redial" />
+ <dialogOption id="ask3" operator="Caller:" emotions="still silence" texten=". . . . . . . . . . . . ." default="digit" option2="redial" />
+ <dialogOption elementProperties="option=redialhost;" id="shout" operator="Operator:" emotions="shouting" texten="HELLO, ANYONE THERE!?" default="shout1" option2="shout2" option3="redialmed" COMMENT="stupid but lets do it" />
+ <dialogOption elementProperties="option=redialhost;
+bgsound=0;" id="redial" operator="Operator:" emotions="[[no recording]]" texten="[HANGUP AND REDIAL]" default="shout1" option2="shout2" option3="redialmed" COMMENT="wrong in case of hostage situation" />
+ <dialogOption elementProperties="bgsound=cgen12_streetbg;" id="shout1" operator="Caller:" emotions="lady or man, few versions" texten="[call answer] . . . . . . . . . . . . . Hello?" default="butcall2" actionOnEnd="opinionEffect=-1;
+caller.isActive=true;" COMMENT="they could be more suprised" />
+ <dialogOption id="butcall2" operator="Operator:" texten="{YOU'VE CALLED} Hello sir, we've got a 911 call from your phone. Do you have an emergency?" default="butcall3" />
+ <dialogOption id="butcall2F" operator="Operator:" texten="{YOU'VE CALLED} Hello ma'am, this is 911, we've got a call from your phone. Do you have an emergency?" default="butcall3" />
+ <dialogOption id="butcall3" operator="Caller:" emotions="suprised! lady or man, few versions" texten="Oh? Excuse me! It's my phone. I accidentally called 911!" default="isinemerg" />
+ <dialogOption elementProperties="bgsound=cgen12_childbg" id="shout2" operator="Caller:" emotions="child laughing" texten="[call answer] . . . . . . . . . . . . ." actionOnEnd="opinionEffect=-1;
+actionHangup;" />
+ <dialogOption id="shout3" operator="Caller:" texten="[call answer] . . . . . . . . . . . . ." default="redialmed" option2="redialhost" />
+ <dialogOption elementProperties="bgsound=cgen12_redialmedbg;" id="redialmed" operator="Caller:" emotions="respirator in background" texten=". . . . . . . . . . . . ." default="digit" option2="ask" actionOnEnd="hostage-&gt;active=false;
+no2no-&gt;active=false;" />
+ <dialogOption id="redialhost" operator="Caller:" emotions="something like what the fuck? and fight in background" texten=". . . . . . . . . . . . ." actionOnEnd="opinionEffect=5;
+onIgnore = -7;
+actionHangup;
+robber1.isActive=true;
+robber2.isActive=true;
+caller.isActive=false;
+beaten.isActive=true;" addToAAR="recalwrong" COMMENT="MAKE AN ATTACK!" />
+ <dialogOption id="digit" operator="Operator:" texten="{PRESS A DIGIT} If you can't talk, please press any digit on your phone." default="digit1" option2="digit2" option3="digit3" />
+ <dialogOption id="digit1" operator="Caller:" texten=". . . . . . . . . . . . ." default="back" />
+ <dialogOption id="digit2" operator="Caller:" texten=". . . . . . . . . . . . ." default="back" />
+ <dialogOption id="digit3" operator="Caller:" texten=". . . . . . . . . . . . . . [tone]" default="no1" option2="no2" />
+ <dialogOption id="no1" operator="Operator:" texten="{ONE FOR HOSTAGE} All right, please press the button once if you are in a hostage situation and can't talk." default="no1no" option2="hostage" />
+ <dialogOption id="no1no" operator="Caller:" texten=". . . . . . . . . . . . ." default="back" actionOnEnd="no2no-&gt;active=false;" />
+ <dialogOption elementProperties="bgsound=cgen12_0_hostage1;" id="hostage" operator="Caller:" texten=". . . . . . . . . . . . . . [tone]" default="attack" option2="weapons" option3="terror" actionOnEnd="no2-&gt;active=false;
+opinionEffect=4;
+bgsound=cgen12_0_hostage2;" />
+ <dialogOption id="attack" operator="Operator:" texten="{HOW MANY OF THEM?} Ok, I want you to press the button on the phone for each person there who's threatening you." default="attack1" option2="attack2" option3="attack3" />
+ <dialogOption id="attack1" operator="Caller:" texten=". . . . . . . . . . . . . . [tone]" default="back" actionOnEnd="robber1.isActive=true;" />
+ <dialogOption id="attack2" operator="Caller:" texten=". . . . . . . . . . . . . . [tone] . . [tone]" default="back" actionOnEnd="robber1.isActive=true;
+robber2.isActive=true;" />
+ <dialogOption id="attack3" operator="Caller:" texten=". . . . . . . . . . . . . . [tone] . . [tone] . . [tone]" default="back" actionOnEnd="robber1.isActive=true;
+robber2.isActive=true;
+robber3.isActive=true;" />
+ <dialogOption id="weapons" operator="Operator:" texten="{ANY WEAPONS?} Do they have any weapons? Press once for yes and twice for no." default="weapons1" option2="weapons2" />
+ <dialogOption id="weapons1" operator="Caller:" texten=". . . . [tone]" default="back" />
+ <dialogOption id="weapons2" operator="Caller:" texten=". . . . [tone] . . [tone]" default="back" actionOnEnd="terror-&gt;active=false;" />
+ <dialogOption id="terror" operator="Operator:" texten="{ARE THEY TERRORISTS?} Is this a terrorist attack? Press once for yes and twice for no." default="terror1" option2="terror2" />
+ <dialogOption id="terror1" operator="Caller:" texten=". . . . [tone]" default="back" actionOnEnd="opinionEffect=7;
+robber1.fightRisk=1;
+robber2.fightRisk=1;
+robber3.fightRisk=1;
+robber1.weapon=e_rifle;
+robber2.weapon=e_rifle;
+robber3.weapon=e_rifle;
+weapons2-&gt;active=false;" />
+ <dialogOption id="terror2" operator="Caller:" texten=". . . . [tone] . . [tone]" default="back" actionOnEnd="opinionEffect=4;" />
+ <dialogOption id="end" operator="Operator:" texten="All right, we have your location, is it [[ADDRESS]]?" default="enda" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="end1" operator="Operator:" texten="All right, we have your location, is it 321 Main street?" default="enda" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="end2" operator="Operator:" texten="All right, we have your location, is it 456 Washington Avenue?" default="enda" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="end3" operator="Operator:" texten="All right, we have your location, is it 789 Oak boulevard?" default="enda" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="enda" operator="Caller:" texten=". . . . [tone]" default="prot" option2="waitm" />
+ <dialogOption id="prot" operator="Operator:" texten="{TURN OFF YOUR PHONE} For your own safety we should hang up. Please turn off your phone or put it in silent mode so they can't hear it. Remain calm and wait for the police to get there!" default="prota" />
+ <dialogOption id="prota" operator="Caller:" texten=". . . ." actionOnEnd="actionHangup;" />
+ <dialogOption id="no2" operator="Operator:" texten="{TWO FOR MEDICAL} Press twice if you are in a medical condition and are unable to speak." default="no2no" option2="medyes" />
+ <dialogOption id="no2no" operator="Caller:" texten=". . . . . . . . . . . . ." default="back" actionOnEnd="no1no-&gt;active=false;
+opinionEffect=3;" />
+ <dialogOption id="medyes" operator="Caller:" texten=". . . . . . . . . . . . . . [tone] . . [tone]" default="door" option2="life" actionOnEnd="no1-&gt;active=false;
+prot-&gt;active=false;
+injuriedA.isActive=true;
+caller.isActive=false;
+opinionEffect=3;" />
+ <dialogOption id="life" operator="Operator:" texten="{IS YOUR LIFE IN DANGER?} Is your life in danger? Press once for yes and twice for no" default="lifey" option2="lifen" />
+ <dialogOption id="lifey" operator="Caller:" texten=". . . . [tone]" default="back" actionOnEnd="injuriedA.hpchange=-0.1;" />
+ <dialogOption id="lifen" operator="Caller:" texten=". . . . [tone] . . [tone]" default="back" />
+ <dialogOption id="door" operator="Operator:" texten="{ARE THE DOORS OPEN?} The place where you are, are the doors open? Press once for yes and twice for no." default="doory" option2="doorn" COMMENT="IAN HELP!!" />
+ <dialogOption id="doory" operator="Caller:" texten=". . . . [tone]" default="back" />
+ <dialogOption id="doorn" operator="Caller:" texten=". . . . [tone] . . [tone]" default="back" actionOnEnd="door.isActive=true;" />
+ <dialogOption id="waitm" operator="Operator:" texten="{WAIT FOR SERVICES!} Ok, please wait for the emergency services! They will be there soon!" default="waitma" />
+ <dialogOption id="waitma" operator="Caller:" texten=". . . ." actionOnEnd="actionHangup" />
+ <dialogOption id="isinemerg" operator="Operator:" texten="{EMERGENCY?}Sir, are you having an emergency?" default="15" />
+ <dialogOption id="isinemergF" operator="Operator:" texten="{EMERGENCY?}Ma'am are you having an emergency?" default="15" />
+ <dialogOption id="15" operator="Caller:" texten="No! No I'm not!" default="16" actionOnEnd="opinionEffect=-1;" />
+ <dialogOption id="16" operator="Operator:" texten="{LOCK YOUR PHONE}Ok, please lock your phone and make sure you won't call 911 by accident, that way you won't block the line for important calls." default="17" />
+ <dialogOption id="17" operator="Caller:" texten="Of course! I'm sorry!" actionOnEnd="actionHangup;
+opinionEffect=-2;" />
+ <dialogOption id="reminder" operator="Caller:" texten=". . . . . . . . . . . . ." />
+ <dialogOption id="reminder2" operator="Caller:" texten=". . . . . . . . . . . . ." />
+ </dialog>
+ <aar>
+ <reportElement id="buttcall" texten="This call was made by unlocked phone." />
+ <reportElement id="medcall" texten="A person that called could not speak due to his/her medical condition" />
+ <reportElement id="hostcall" texten="The caller was taken hostage." />
+ <reportElement id="recalwrong" texten="The operator made a mistake by redialing a person in danger. We have learned about a hostage situation when it was too late." />
+ <reportElement id="childcall" texten="Those were kids playing with a phone." />
+ </aar>
+ </conversation>
+</conversations></data>

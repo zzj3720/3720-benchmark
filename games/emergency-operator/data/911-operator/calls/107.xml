@@ -1,0 +1,67 @@
+<data><conversations>
+<conversation elementProperties="type=generableonce;" id="107" texten="Home invade" COMMENT="RECORDED">
+ <scene>
+ <criminal elementProperties="fightRisk = 0.9;
+weapon = e_knife;
+sex=M;
+type=White;" id="attacker" texten="Ray" />
+ <witness elementProperties="weapon = e_pistol;
+sex=W;
+type=White;" id="caller" texten="Caller" />
+ <injured elementProperties="isActive=false;
+weapon = e_knife;
+sex=M;
+type=White;
+hp = 30;
+hpchange = -0.2;" id="attackerinj" texten="Ray" />
+ <injured elementProperties="weapon = e_pistol;
+sex=W;
+type=White;
+isActive=false;
+hp = 70;
+hpchange = -0.2;" id="callerinj" texten="Caller" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 4;" />
+ <dialogOption id="2" operator="Caller:" emotions="women around 25, scared" texten="Hello? I have a problem ... someone is trying to get into my house through the back door." default="3" option2="address" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?} Where do you live?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="I live at [[ADDRESS]]." default="3" option2="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" texten="I live at 243 1st street" default="3" option2="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" texten="I live at 756 Long street" default="3" option2="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" texten="I live at 391 9th street" default="3" option2="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="3" operator="Operator:" texten="{WHAT HAPPENED?} So tell me what's happening?" default="4" />
+ <dialogOption elementProperties="bgsound=c107_0_4;" id="4" operator="Caller:" texten="It's probably that crazy Ray, my ex-boyfriend ... I heard knocking at the door. He's probably drunk again. God, what should I do?" default="5" option2="7" option3="address" />
+ <dialogOption id="5" operator="Operator:" texten="{ANY WEAPON?} I am sending the police right now. Is it possible that Ray has a weapon?" default="6" />
+ <dialogOption id="6" operator="Caller:" emotions="scared, [distant glass break]" texten="Yes, he usually carries a knife . . . . . . . . . . . . . . . . . . . oh my God! He broke down the door! What should I do?!" default="7" option2="address" />
+ <dialogOption id="7" operator="Operator:" texten="{HIDE YOURSELF} Hang on for a sec ok? I want you to find a room that you can lock the door on. And then get in there shut it and lock it ok?" default="8" />
+ <dialogOption elementProperties="bgsound=c107_0_8;" id="8" operator="Caller:" texten="Ok . . . . . . . . . . . . . . . . God, he knows I'm here!" default="16" />
+ <dialogOption id="16" operator="Operator:" texten="{POLICE ARE ON THE WAY}Hold on, I know you can do this, police are on their way." default="9" actionOnEnd="bgsound=c107_0_88;" />
+ <dialogOption id="9" operator="Caller:" emotions="[door banging and angry shouting]" texten="What should I do ?! I have my father's gun ... should I shoot him?" default="10" option2="11" option3="12" />
+ <dialogOption id="10" operator="Operator:" texten="{SHOOT HIM} You have to defend yourself the best way you can. I can't let him hurt you." default="13" COMMENT="just shoot him!" />
+ <dialogOption id="11" operator="Operator:" texten="{DON'T SHOOT} No! Do not shoot him! Put down the gun. The police will be there shortly, nothing's gonna happen to you." default="14" />
+ <dialogOption id="12" operator="Operator:" texten="{IT'S YOUR CALL} I cannot tell you what to do, you have to decide alone... but remember - the law allows you to self-defense in your own home!" default="15" />
+ <dialogOption elementProperties="bgsound=c107_0;" id="13" operator="Caller:" emotions="dramatic" texten="Sure, I will! Ray! Ray, get the fuck out of my house, because I will shoot! I tell you! . . . . . . . . . . . Aaaah! I think I killed him! I killed him!!! RAAAY !!!" actionOnEnd="actionHangup;
+attacker.isActive=false;
+attackerinj.isActive=true;
+opinionEffect = 2;
+onIgnore = -5;" addToAAR="shot" />
+ <dialogOption elementProperties="bgsound=c107_0;" id="14" operator="Caller:" texten="Oh... I'll put the weapon down. Ray!!! . . . . . . . . . . . . . . . . . . . . . . . Ray, calm down, stop! STOP!!! AAAHH!!" actionOnEnd="actionHangup;
+caller.isActive=false;
+callerinj.isActive=true;
+opinionEffect = 1;
+onIgnore = -5;
+attacker.prisonChance=1;" addToAAR="attack" />
+ <dialogOption elementProperties="bgsound=c107_0;" id="15" operator="Caller:" texten=". . . . . Ray! Ray, I have a gun! Please stop! Ray, I will shoot you! Get away from the door . . . . . . . . . . . I think I calmed him down. Come here quickly!" actionOnEnd="actionHangup;
+attacker.fightRisk=0.3;
+opinionEffect +=1;
+onIgnore = -5;" addToAAR="warn" />
+ <dialogOption id="reminder" operator="Caller:" texten="What should I do? Please send someone!" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Please DO SOMETHING!" />
+ </dialog>
+ <aar>
+ <reportElement id="shot" texten="Attacker was deadly shot by flat owner." />
+ <reportElement id="attack" texten="Armed attacker injured the flat owner with knife." />
+ <reportElement id="warn" texten="After being scared of fire arm attacker began escape. Officers pursued and captured the attacker." />
+ </aar>
+ </conversation>
+</conversations></data>

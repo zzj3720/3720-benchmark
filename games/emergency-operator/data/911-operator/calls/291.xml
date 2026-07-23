@@ -1,0 +1,72 @@
+<data><conversations>
+<conversation id="291" texten="Flooded flat" COMMENT="RECORDED">
+ <scene>
+ <passerby elementProperties="type = Old;
+sex = W;" id="caller" emotions="female 82 yo, speaks loud, screechy and grumbly" texten="Caller" />
+ <injured elementProperties="isActive=false;
+type = Old;
+sex = W;
+hp = 70;
+hpChange = -0.5;" id="callerinj" texten="Caller" />
+ <timer elementProperties="time = 180;" id="bzyk" texten="The caller was electrocuted!" actionOnEnd="caller.isActive=false;
+callerinj.isActive=true;
+" addToAAR="electrocut" />
+ <work elementProperties="200" id="water" texten="Water" actionOnEnd="bzyk.isActive = false;" />
+ <work elementProperties="20" id="ele" texten="Electrical installation" actionOnEnd="bzyk.isActive = false;" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 1;
+onIgnore = -4;" />
+ <dialogOption id="2" operator="Caller:" emotions="[woman 82 years old]" texten="Hello? Hello! Anybody there?!" default="3" />
+ <dialogOption id="3" operator="Operator:" texten="Ma'am you've reached 911 what's your emergency?" default="4" />
+ <dialogOption id="4" operator="Caller:" texten="Sir, there is plenty of water here... damn it..." default="5" option2="address" option3="9" addToAAR="flood" />
+ <dialogOption id="5" operator="Operator:" texten="{WHAT HAPPENED?} What happened ma'am?" default="6" />
+ <dialogOption id="6" operator="Caller:" emotions="[shouting]" texten="What? Speak up, I have problems with hearing." default="7" />
+ <dialogOption id="7" operator="Operator:" texten="I asked: what happened?" default="8" />
+ <dialogOption id="8" operator="Caller:" texten="I just told you, there is water everywhere." default="9" option2="15" />
+ <dialogOption id="9" operator="Operator:" texten="{IS A PIPE BROKEN?} Where is it coming from? Do you have something wrong with your pipes?" default="10" />
+ <dialogOption elementProperties="option=17" id="10" operator="Caller:" texten="Pardon? Pipes? No!" default="11" option2="33" option3="address" />
+ <dialogOption id="11" operator="Operator:" texten="{ARE YOU SURE?} Are you sure? " default="12" />
+ <dialogOption id="12" operator="Caller:" texten="Yeah! When the shaking started I hid under the table, you know. A very solid one, made out of wood not like the ones they make these days." default="13" />
+ <dialogOption id="13" operator="Operator:" texten="{WHAT ABOUT THE WATER?}Ok, but what about the water?" default="14" />
+ <dialogOption id="14" operator="Caller:" texten="It flows from the top and on the side. Almost like a river. Maybe some pipe cracked? Or maybe it's coming from the house that started collapsing when the shaking began, a bit higher." default="15" option2="33" option3="address" />
+ <dialogOption id="15" operator="Operator:" texten="{HOW MUCH WATER?}How much water is there?" default="16" />
+ <dialogOption id="16" operator="Caller:" texten="I don't know about the basement, but it keeps flowing down there, right through the middle of my room! And there is mud too! I live downstairs where it's flat, so it all stays here. Sometimes even when it's raining... but now..." default="17" option2="33" option3="address" />
+ <dialogOption id="17" operator="Operator:" texten="{TURN OFF BREAKER BOX} Ok ma'am you're gonna have to shut down your breaker box." default="18" />
+ <dialogOption id="18" operator="Caller:" emotions="[shouting]" texten="What?" default="19" />
+ <dialogOption id="19" operator="Operator:" texten="The breaker box ma'am, so you don't get electrocuted." default="20" />
+ <dialogOption id="20" operator="Caller:" texten="But we don't have power at the moment. Nothing's working! When it was shaking, it must have damaged the cables or something. It happens sometimes." default="21" option2="35" />
+ <dialogOption id="21" operator="Operator:" texten="{I INSIST} I insist you turn off the breaker box." default="22" />
+ <dialogOption id="22" operator="Caller:" texten="But I told you that..." default="23" />
+ <dialogOption id="23" operator="Operator:" texten="They could restore power at any moment. If water hits the electricity you could get electrocuted." default="24" />
+ <dialogOption id="24" operator="Caller:" texten="Get what?" default="25" />
+ <dialogOption id="25" operator="Operator:" emotions="[louder]" texten="Electrocuted." default="26" />
+ <dialogOption id="26" operator="Caller:" texten="Oh... ok, what should I do then?" default="27" option2="33" option3="address" />
+ <dialogOption id="27" operator="Operator:" texten="{SHUT OFF BREAKER BOX}Shut off your breaker box." default="28" />
+ <dialogOption id="28" operator="Caller:" texten="Alright, where are those?" default="29" />
+ <dialogOption id="29" operator="Operator:" texten="Usually they are in a box near the entrance to the building." default="30" COMMENT="or in the basement" />
+ <dialogOption id="30" operator="Caller:" emotions="[shouting]" texten="Ah, I know I know, I'm not THAT old." default="31" actionOnEnd="opinionEffect += 3;
+onIgnore = 0;
+bzyk.isActive = false;
+ele.isActive = false;" addToAAR="poweroff" />
+ <dialogOption id="31" operator="Operator:" texten="Of course not." default="32" />
+ <dialogOption id="32" operator="Caller:" texten="Can you send someone over anyway? I can't sit here all day wet and without electricity. That's unbearable..." default="33" option2="address" />
+ <dialogOption id="33" operator="Operator:" texten="{I'LL SEND SOMEONE} I will send a team as soon as I can. " default="34" />
+ <dialogOption id="34" operator="Caller:" emotions="[screechy]" texten="Ok, but better be quick. The water is cold." actionOnEnd="actionHangup" />
+ <dialogOption id="35" operator="Operator:" texten="{AS SOON AS IT POSSIBLE}As soon as I can get them there ma'am." default="36" />
+ <dialogOption id="36" operator="Caller:" texten="What about the water?" default="33" />
+ <dialogOption id="address" operator="Operator:" texten="{WHERE?} Where are you calling from? Could you please give me your address?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="It's [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="At 342 Columbus Avenue" />
+ <dialogOption id="addressa2" operator="Caller:" texten="At 135 Oak street" />
+ <dialogOption id="addressa3" operator="Caller:" texten="At 89 7th street" />
+ <dialogOption id="reminder" operator="Caller:" texten="Will you do something about this water?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Hello?" />
+ </dialog>
+ <aar>
+ <reportElement id="poweroff" texten="The operator convinced the caller to turn off a breaker box, which prevented from electrocution." />
+ <reportElement id="electrocut" texten="The caller was electrocuted. The operator should have instructed the caller to turn off a breaker box." />
+ <reportElement id="flood" texten="The caller's apartment was flooded." />
+ </aar>
+ </conversation>
+</conversations></data>

@@ -1,0 +1,121 @@
+<data><conversations>
+<conversation elementProperties="type=generable;" id="gen14" texten="Kitchen on fire" COMMENT="RECORDED">
+ <scene>
+ <injuried elementProperties="isActive = false;
+hp = 70;
+sex=W;
+hpChange = -0.2;" blockedBy="fiyah" id="boom" texten="Burnt caller" />
+ <injuried elementProperties="isActive = false;
+hp = 60;
+sex=W;
+hpChange = -0.1;" blockedBy="fiyah" id="elec" texten="Electrocuted caller" />
+ <passerby elementProperties="isActive = true;
+sex=W;" id="caller" texten="Caller" />
+ <fire elementProperties="isActive = true;
+work = 100;
+workchange = 0.5;" id="fiyah" texten="Fire" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" actionOnEnd="opinionEffect = 3;
+firfia2-&gt;active =false;" />
+ <dialogOption id="name" operator="Operator:" emotions="panicky" texten="{NAME?}What's your name?" default="namea0" />
+ <dialogOption id="namea0" operator="Caller:" emotions="panicky" texten="I'm [[NAME]]" default="back" />
+ <dialogOption id="namea1" operator="Caller:" emotions="panicky" texten="I'm Callie Douglas" default="back" />
+ <dialogOption id="namea2" operator="Caller:" emotions="panicky" texten="I'm Mary Smith" default="back" />
+ <dialogOption id="namea3" operator="Caller:" emotions="panicky" texten="I'm Karen Wetson" default="back" />
+ <dialogOption elementProperties="chance=0.2;" id="2" operator="Caller:" emotions="panicky" texten="Help! My kitchen is on fire." default="address" option2="wht" option3="firfi" />
+ <dialogOption elementProperties="chance=0.8;" id="2b" operator="Caller:" emotions="panicky" texten="Help! My kitchen is on fire." default="address" option2="wht" option3="firfi" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?}Where are you calling from?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" emotions="almost screaming" texten="[[ADDRESS]]" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa1" operator="Caller:" emotions="almost screaming" texten="34 Oak Street" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa2" operator="Caller:" emotions="almost screaming" texten="765 Jefferson Avenue" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="addressa3" operator="Caller:" emotions="almost screaming" texten="34 Maple Street" default="back" actionOnEnd="actionSetLocation" />
+ <dialogOption id="wht" operator="Operator:" texten="{WHAT'S ON FIRE?}What's on fire?" default="w1" option2="w2" option3="w3" />
+ <dialogOption elementProperties="option=firfi;" id="w1" operator="Caller:" emotions="panicky, almost screaming" texten="Oil in the frying pan!" default="a1" option2="a2" option3="a3" actionOnEnd="
+w2-&gt;active = false;
+w3-&gt;active = false;
+countg-&gt;active=false;
+toastbw-&gt;active=false;
+toastb-&gt;active=false;" />
+ <dialogOption elementProperties="option=firfi;" id="w2" operator="Caller:" emotions="panicky, almost screaming" texten="My toaster! And the fire's spreading!" default="a1" option2="a2" option3="a3" actionOnEnd="
+w1-&gt;active = false;
+w3-&gt;active = false;
+oilg-&gt;active=false;
+oilbe-&gt;active=false;
+oilbw-&gt;active=false;
+countb-&gt;active=false;
+countg -&gt;active=false;" />
+ <dialogOption elementProperties="option=firfi;" id="w3" operator="Caller:" emotions="panicky, almost screaming" texten="The counter! I accidentally threw a cloth on the burner... And the fire spreads quickly!" default="a1" option2="a2" option3="a3" actionOnEnd="
+w2-&gt;active = false;
+w3-&gt;active = false;
+oilg-&gt;active = false;
+toastb-&gt;active = false;
+oilbe-&gt;active=false;
+oilbw-&gt;active = false;
+toastbw-&gt;active = false;" />
+ <dialogOption id="a3" operator="Operator:" texten="{USE A DAMP TOWEL} I want you to stay calm. Carefully cover the fire with a damp towel." default="oilg" option2="countb" option3="toastb" />
+ <dialogOption id="a1" operator="Operator:" texten="{USE WATER} Try to put out the fire with water." default="oilbw" option2="toastbw" option3="countg" />
+ <dialogOption id="a2" operator="Operator:" texten="{USE AN EXTINGUISHER} Ok, do you have an extinguisher?" default="ex1" option2="ex2" />
+ <dialogOption id="ex1" operator="Caller:" emotions="more calm" texten="Yeah..." default="ex1a" />
+ <dialogOption id="ex1a" operator="Operator:" texten="{PUT OUT THE FIRE}Ok, use it to put out the fire." default="oilbe" option2="exg" />
+ <dialogOption id="oilbe" operator="Caller:" emotions="noise in the background, completely panicked, screaming" texten=". . . . . . . . . . . . . . . . . . . . . . Oh my god! It blew up! The hood started to burn too! Help!" default="address" option2="firfi" actionOnEnd="fiyah.work = 200;
+fiyah.workchange = 1;
+opinionEffect = 1;
+onIgnore=-4;
+firfia-&gt;active = false;
+firfia2-&gt;active =true;" addToAAR="badinstr" />
+ <dialogOption elementProperties="option=address;" id="ex2" operator="Caller:" emotions="nervous" texten="No..." default="a3" option2="a1" option3="firfi" addToAAR="necc" />
+ <dialogOption elementProperties="chance=0.2;" id="countb" operator="Caller:" emotions="nervous" texten="It didn't help! What should I do?!" default="address" option2="firfi" option3="a2" />
+ <dialogOption id="toastbw" operator="Caller:" emotions="pause, water flush sound, then scream" texten="Okay . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Aaaah!" default="toastbwa" actionOnEnd="elec.isActive = true;
+caller.isActive= false;
+firfia-&gt;active = false;" />
+ <dialogOption id="toastb" operator="Caller:" emotions="the same as toastbw but with pause-faucet sound-pause instead of a flush" texten="Okay . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Aaaah!" default="toastbwa" actionOnEnd="elec.isActive = true;
+caller.isActive= false;
+firfia-&gt;active = false;" />
+ <dialogOption id="toastbwa" operator="Operator:" texten="Ma'am? Hello?" default="end" actionOnEnd="
+fiyah.isActive = true;
+opinionEffect = 0;
+onIgnore=-4;" addToAAR="electro" />
+ <dialogOption id="end" operator="Caller:" emotions="[call end]" texten="..." actionOnEnd="actionHangup;
+" />
+ <dialogOption id="oilbw" operator="Caller:" emotions="small explosion sound, completely panicked, screaming" texten=". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Aaah! It blew up! My skin! I got burned! Everything's on fire!" default="firamb" option2="address" actionOnEnd="fiyah.work = 100;
+fiyah.workchange = 1;
+caller.isActive = false;
+boom.isActive = true;
+opinionEffect = 1;
+onIgnore=-4;
+firfia-&gt;active = false;
+firfia2-&gt;active =true;" addToAAR="badinstr" />
+ <dialogOption id="firamb" operator="Operator:" texten="{I'LL SEND FIREFIGHTERS AND AMBULANCE} Get out of the kitchen, get out of the house ma'am and make sure everybody else is out with you. The ambulance will be there soon." default="firfia" option2="firfia2" actionOnEnd="
+fiyah.isActive = true;
+opinionEffect = 2;
+onIgnore=-4;" />
+ <dialogOption id="firfi" operator="Operator:" texten="{I'LL SEND FIREFIGHTERS} Ok, get yourself and anyone else that's in the house out of the house now. The fire department will be there soon." default="firfia" option2="firfia2" actionOnEnd="fiyah.isActive = true;
+opinionEffect = 2;
+onIgnore=-4;" />
+ <dialogOption id="firfia" operator="Caller:" texten="Ok." actionOnEnd="actionHangup;
+" />
+ <dialogOption id="firfia2" operator="Caller:" emotions="terrified, crying" texten="Help!" actionOnEnd="actionHangup;
+" />
+ <dialogOption elementProperties="chance=0.8;" id="oilg" operator="Caller:" emotions="nervous, after ok - from distance, faucet sound, pause then normal again." texten="Okay! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . done. I guess everything's fine! Thank you!" default="np" actionOnEnd="fiyah.isActive = false;
+onIgnore=2;" addToAAR="goodinstr" />
+ <dialogOption id="exg" operator="Caller:" emotions="pause after wait, extinguisher sound, then relieved" texten="Okay... Wait . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Phew. The fire's gone. Thank you!" default="np" actionOnEnd="fiyah.isActive = false;
+caller.isActive=true;
+onIgnore=2;" addToAAR="goodinstr" />
+ <dialogOption id="countg" operator="Caller:" emotions="faucet/water sound, splash, relieved" texten=". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Phew... It's gone, I guess... I panicked... Thank you!" default="np" actionOnEnd="firfia2-&gt;active = false;
+onIgnore=2;" addToAAR="goodinstr" />
+ <dialogOption id="np" operator="Operator:" texten="No problem. Just doing my job." default="npa" actionOnEnd="opinionEffect = 0;
+onIgnore=2;" />
+ <dialogOption id="npa" operator="Caller:" texten="Bye!" actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Are you there?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Help me!" />
+ </dialog>
+ <aar>
+ <reportElement id="goodinstr" texten="The operator gave the right instructions to the caller. Thanks to that, the situation was easily controlled and there was no need to dispatch the fire fighting team." />
+ <reportElement id="badinstr" texten="The operator failed to give the right instructions to the caller, which made the situation worse." />
+ <reportElement id="electro" texten="Due to the operator's wrong instructions, the caller got electrocuted and needed both firefighters' and paramedics' intervention." />
+ <reportElement id="unnec" texten="The caller would've managed the situation by herself if the operator gave her the right instructions. The firefighters' intervention could've been avoided." />
+ <reportElement id="necc" texten="Firefighters' intervention was needed." />
+ </aar>
+ </conversation>
+</conversations></data>

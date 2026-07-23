@@ -1,0 +1,116 @@
+<data><conversations>
+<conversation elementProperties="type=generable;" id="gen21" texten="Street fight">
+ <scene COMMENT="40">
+ <witness elementProperties="sex=W;" id="caller" operator="Caller:" texten="Caller" />
+ <criminal elementProperties="fightRisk = 0.5;
+prisonChance = 0.5; sex=M;" id="fighter1" texten="Fighting man" />
+ <criminal elementProperties="fightRisk = 0.5;
+prisonChance = 0.5; sex=M;" id="fighter2" texten="Fighting man" />
+ <criminal elementProperties="isActive = false; fightRisk = 0.5;
+prisonChance = 0.5; sex=M;" id="fighter3" texten="Fighting man" />
+ <criminal elementProperties="isActive = false; fightRisk = 0.5;
+prisonChance = 0.5; sex=M;" id="fighter4" texten="Fighting man" />
+ <injured elementProperties="isActive = false; hp=60; sex=M;" id="injuredf" texten="Injured man" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" option2="2a" addToAAR="story" />
+ <dialogOption id="2" operator="Caller:" emotions="Woman, 40-50 yo, slightly concerned, but trying to talk in briefly, professional way" texten="Hello, there is a fight out in the street! Please, send the police quickly!" default="who" option2="weapons" option3="injured" actionOnEnd="opinionEffect = 3;" />
+ <dialogOption id="2a" operator="Caller:" emotions="quite irritated" texten="Hello? There're some guys here fighting... can you do something about it?" default="who" option2="weapons" option3="injured" actionOnEnd="opinionEffect = 3;" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS?} Could you give me precise address of the incident?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="Yes, of course. It's at [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="345 Fordon Road" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="124 5nd Alley" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="504 Roderick Square" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="name" operator="Operator:" texten="{WHAT'S YOUR NAME?} What's your name, ma'am?" default="name1" option2="name2" option3="name3" />
+ <dialogOption id="namemale" operator="Operator:" texten="{WHAT'S YOUR NAME?} What's your name, sir?" default="name1" option2="name2" option3="name3" />
+ <dialogOption id="name1" operator="Caller:" texten="My name is Anna Godder." default="back" />
+ <dialogOption id="name2" operator="Caller:" texten="I'm Marla Sanger." default="back" />
+ <dialogOption id="name3" operator="Caller:" texten="My name's Rita Scoof." default="back" />
+ <dialogOption id="who" operator="Operator:" texten="{HOW MANY ARE INVOLVED?} How many of them there are?" default="two" option2="four" option3="running" />
+ <dialogOption id="two" operator="Caller:" texten="There are two of them!" default="back" option2="address" />
+ <dialogOption id="three" operator="Caller:" texten="There are three of them!" default="back" option2="address" actionOnEnd="fighter3.isActive = true;" />
+ <dialogOption id="four" operator="Caller:" texten="Four men are fighting!" default="back" option2="address" actionOnEnd="fighter3.isActive = true;
+fighter4.isActive = true;
+heavy-&gt;active=false;
+opinionEffect = 4;" />
+ <dialogOption elementProperties="chance=0.15;
+bgsound=cgen21_0_stopfight;" id="running" operator="Caller:" emotions="concerned" texten="Two men are... oh wait... they're not fighting anymore... one of them is lying in the street now. I think the second man left..." default="checkq" option2="where" option3="address" actionOnEnd="fighter1.isActive = false;
+fighter2.isActive = false;
+injuredf.isActive = true;
+opinionEffect = 4;" addToAAR="injured" />
+ <dialogOption id="checkq" operator="Operator:" texten="{CHECK UP ON HIM} Could you check his medical condition?" default="check" option2="notgo" />
+ <dialogOption id="check" operator="Caller:" texten="I'll do that. What should I do?" default="breath" option2="wounds" />
+ <dialogOption elementProperties="chance=0.15;" id="notgo" operator="Caller:" emotions="frightened" texten="I'd prefer not to go there, it might be dangerous!" default="notgosend" option2="pers" />
+ <dialogOption id="pers" operator="Operator:" texten="{YOU HAVE TO HELP HIM} Ma'am, those people who are fighting went away and in these kind of cases they usually never come back to the crime scene. Your life isn't in danger in contrast to life of that guy lying there on the street. He might die without your intervention." default="check" />
+ <dialogOption id="notgosend" operator="Operator:" texten="{I'LL SEND AN AMBULANCE} Of course, ma'am. Your own safety is the most important. I'll send the ambulance immediately." default="thanks" actionOnEnd="opinionEffect = 1; onIgnore=-3;" />
+ <dialogOption id="breath" operator="Operator:" texten="{IS HE BREATHING?}Is he breathing?" default="breath1" />
+ <dialogOption id="breath1" operator="Caller:" texten="One second.... Yes." default="back" option2="send" option3="address" />
+ <dialogOption id="wounds" operator="Operator:" texten="{ANY INJURIES?} Does he have any injuries that you can see?" default="lightw" option2="knifew" />
+ <dialogOption id="lightw" operator="Caller:" texten="His face doesn't look good, but apart from bruises and bleeding lip, I don't see any serious wounds." default="send" option2="dontsend" option3="address" />
+ <dialogOption elementProperties="chance=0.15;" id="knifew" operator="Caller:" emotions="very concerned" texten="Just let me look... God. He has a knife in the stomach. There is a lot of blood around it. Should I pull the knife out?" default="55" option2="66" actionOnEnd="injuredf.hp=40;
+injuredf.hpchange =-0.3;" />
+ <dialogOption id="55" operator="Operator:" texten="{YES} Yes, pull the knife out." default="bleeding" actionOnEnd="injuredf.hp=40;
+injuredf.hpchange =-1;
+opinionEffect = 1;
+onIgnore=-3;" addToAAR="knifeout" />
+ <dialogOption id="66" operator="Operator:" texten="{NO} No, leave it, don't pull the knife out." default="nok1" />
+ <dialogOption id="bleeding" operator="Caller:" texten="Oh my God, the bleeding is even worse than before. What should I do?" default="stopa" />
+ <dialogOption id="nok1" operator="Caller:" texten="Okay, so what should I do?" default="stopb" option2="waitamb" option3="address" />
+ <dialogOption id="waitamb" operator="Operator:" texten="{WAIT FOR AN AMBULANCE} Just wait with him until the ambulance arrives. It's on the way." default="okwait" />
+ <dialogOption id="stopb" operator="Operator:" texten="{STOP THE BLEEDING} Do you have anything what you can use to stop the bleeding? You know, something to wrap around the knife. You should dress the wound around the knife as best you can. Be careful though, don't move the knife." default="scarf" actionOnEnd="opinionEffect = 3;
+injuredf.hpchange=-0.2;" />
+ <dialogOption id="stopa" operator="Operator:" texten="{STOP THE BLEEDING} Do you have anything what you can use to stop the bleeding?" default="scarf" actionOnEnd="injuredf.hpchange=-0.6;
+" />
+ <dialogOption id="scarf" operator="Caller:" texten="I can use a scarf. Wait a second . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . Okay, it's done." default="waitamb" option2="address" />
+ <dialogOption id="okwait" operator="Caller:" texten="Okay, I'll wait." actionOnEnd="actionHangup;" />
+ <dialogOption id="where" operator="Operator:" texten="{WHAT ABOUT THE OTHER GUYS?} So these other guys who were fighting, did you see where they went?" default="where1" />
+ <dialogOption id="where1" operator="Caller:" emotions="little suprised" texten="I've no idea..." default="back" />
+ <dialogOption id="weapons" operator="Operator:" texten="{DO THEY HAVE ANY WEAPONS?} Do you see if they have any weapons?" default="noweapons" option2="bottle" option3="knife" />
+ <dialogOption id="noweapons" operator="Caller:" texten="No, I don't see any." default="back" option2="dontsend" option3="send" />
+ <dialogOption id="bottle" operator="Caller:" emotions="baseball as alternate?" texten="One of them picked up some kind of a club." default="back" option2="send" option3="address" actionOnEnd="fighter1.weapon = e_baseball;" />
+ <dialogOption elementProperties="chance=0.20" id="knife" operator="Caller:" texten="Yes, they have knives." default="back" option2="send" option3="address" actionOnEnd="fighter1.weapon = e_knife;
+fighter2.weapon = e_knife;" />
+ <dialogOption id="injured" operator="Operator:" texten="{IS ANYONE INJURED?} Is anybody injured?" default="started" option2="light" option3="heavy" />
+ <dialogOption id="started" operator="Caller:" texten="I don't think so. They've just started and they're mostly shouting and pushing each other." default="calm" option2="back" option3="dontsend" actionOnEnd="running-&gt;isActive=false;" />
+ <dialogOption id="light" operator="Caller:" texten="It's hard to tell, but one of them has taken a lot of punches. I can't believe he's still standing after that!" default="back" option2="send" option3="address" actionOnEnd="fighter1 = injuried;
+fighter1.hp = 50;" />
+ <dialogOption id="heavy" operator="Caller:" emotions="concerned" texten="Oh my... one of them just fell down... he's not moving..." default="checkq" option2="where" option3="address" actionOnEnd="fighter1.isActive = false;
+fighter2.isActive = false;
+fighter3.isActive = false;
+fighter4.isActive = false;
+injuredf.isActive = true;
+four-&gt;active=false;" />
+ <dialogOption id="calm" operator="Operator:" texten="{CALM THEM DOWN} Maybe it is possible to calm them down? Do you think you could do it, ma'am?" default="calmno" option2="calmyes" />
+ <dialogOption id="calmno" operator="Caller:" emotions="suprised, dislike" texten="Me?... No, I'd rather not... Can't you just send the police here?" default="oksend" option2="dontsend" option3="address" />
+ <dialogOption id="calmyes" operator="Caller:" texten="Hmm... I could try. What should I do?" default="police" />
+ <dialogOption elementProperties="chance=0.15;" id="police" operator="Operator:" texten="{THE POLICE IS ON THE WAY} You could tell them that the police are on the way and if they don't stop they will get arrested." default="police1n" option2="police1y" />
+ <dialogOption id="separate" operator="Operator:" texten="{SEPARATE THEM}Try to separate them." default="separate1" actionOnEnd="opinionEffect = 1; onIgnore=-2;" />
+ <dialogOption id="police1n" operator="Caller:" texten="Hey! You! Stop fighting! The police are on their way! . . . . . . . I don't know if they didn't hear me or they don't care about the police, but they're still fighting." default="send" option2="dontsend" option3="address" />
+ <dialogOption elementProperties="chance=0.10;
+bgsound=cgen21_0_stopfight;" id="police1y" operator="Caller:" emotions="suprised" texten="Hey! You! Stop fighting! The police are on their way! . . . . . . . Oh! It worked! They've stopped fighting and look like they're just talking now." default="goodj" actionOnEnd="fighter1.isActive = false;
+fighter2.isActive = false;
+fighter3.isActive = false;
+fighter4.isActive = false;
+opinionEffect = 1;
+onIgnore=1;" />
+ <dialogOption id="goodj" operator="Operator:" texten="Good job, ma'am." default="goodj1" addToAAR="talking" />
+ <dialogOption id="goodj1" operator="Caller:" texten="Thank you! Bye." actionOnEnd="actionHangup;" />
+ <dialogOption id="separate1" operator="Caller:" emotions="sceptical" texten="And what if they attack me? No...I'm going to stay here. It's a job for the police." default="dontsend" option2="oksend" option3="address" />
+ <dialogOption id="oksend" operator="Operator:" texten="{I'M SENDING HELP} Of course, your own safety is the most important. I'm sending the emergency services right now." default="thanks" actionOnEnd="opinionEffect = 2;" />
+ <dialogOption id="send" operator="Operator:" texten="{I'M SENDING HELP} I'm sending the emergency services right now." default="thanks" actionOnEnd="opinionEffect = 2;" />
+ <dialogOption id="dontsend" operator="Operator:" texten="{IT'S NOT AN EMERGENCY} Ma'am according to your description, this isn't a life-threatening situation, I don't have any police units available." default="nothanks" actionOnEnd="opinionEffect = 2;" addToAAR="nosend" />
+ <dialogOption id="thanks" operator="Caller:" texten="Thank you. Bye." actionOnEnd="actionHangup;" />
+ <dialogOption id="nothanks" operator="Caller:" texten="Really? I thought the police were supposed to protect and serve.... apparently I was wrong!" actionOnEnd="actionHangup;" />
+ <dialogOption id="end" operator="Caller:" texten=". . . . . . . . . . ." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Are you there, sir?" />
+ <dialogOption id="reminder2" operator="Caller:" texten="Hello?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="Men were fighting on a street." />
+ <reportElement id="talking" texten="The caller broke up the fight thanks to operator's instructions." />
+ <reportElement id="injured" texten="In the result of the fight one man was injured." />
+ <reportElement id="nosend" texten="The operator decided that sending the emergency units is not necessary." />
+ <reportElement id="knifeout" texten="The operator gave the caller wrong medical instruction." />
+ </aar>
+ </conversation>
+</conversations></data>

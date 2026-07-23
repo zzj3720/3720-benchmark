@@ -1,0 +1,115 @@
+<data><conversations>
+<conversation elementProperties="type=generable;" id="gen16" texten="Stolen car" COMMENT="RECORDED">
+ <scene COMMENT="379">
+ <witness elementProperties="sex=M;" id="caller" operator="Caller:" texten="Car owner (caller)" />
+ <criminal elementProperties="isActive = false; sex=M; fightRisk = 0.6;
+prisonChance = 1; sex=M; weapon = e_pistol;" id="thief1" texten="Thief" />
+ <criminal elementProperties="isActive = false; fightRisk = 0.6;
+prisonChance = 1; sex=M;" id="thief2" texten="Thief" />
+ <criminal elementProperties="isActive = false; fightRisk = 0.6;
+prisonChance = 1; sex=M;" id="thief3" texten="Thief" />
+ </scene>
+ <dialog>
+ <dialogOption id="1" operator="Operator:" texten="911, what's your emergency?" default="2" addToAAR="story" />
+ <dialogOption elementProperties="bgsound=cgen16_0;" id="2" operator="Caller:" texten="My car was stolen!" default="when" option2="where" />
+ <dialogOption elementProperties="bgsound=cgen16_00;" id="2b" operator="Caller:" texten="They stole my car!" default="when" option2="where" />
+ <dialogOption elementProperties="bgsound=cgen16_0;" id="2c" operator="Caller:" texten="Hey! My car is gone!" default="when" option2="where" />
+ <dialogOption id="address" operator="Operator:" texten="{ADDRESS} What's the address of where this happened, sir?" default="addressa0" />
+ <dialogOption id="addressa0" operator="Caller:" texten="It happened at [[ADDRESS]]" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa1" operator="Caller:" texten="345 Oxygen Road" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa2" operator="Caller:" texten="124 2nd Alley" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="addressa3" operator="Caller:" texten="504 Basic Square" default="back" actionOnEnd="actionSetLocation;" />
+ <dialogOption id="name" operator="Operator:" texten="What's your name, sir?" default="name1" option2="name2" option3="name3" />
+ <dialogOption id="name1" operator="Caller:" texten="My name is John Belloic." default="back" />
+ <dialogOption id="name2" operator="Caller:" texten="I'm Richard Swenty." default="back" />
+ <dialogOption id="name3" operator="Caller:" texten="My name's Robert Fortier." default="back" />
+ <dialogOption id="when" operator="Operator:" texten="{WHEN?} When was your car stolen?" default="now" option2="idk" option3="hour" />
+ <dialogOption id="now" operator="Caller:" emotions="angry" texten="Just now! I saw the thieves driving away in my car! Send somebody to catch them!" default="many" option2="where" option3="aboutc" actionOnEnd="speed=50;
+else-&gt;active=false;
+shop-&gt;active=false;
+parking-&gt;active=false;" />
+ <dialogOption id="idk" operator="Caller:" texten="I just saw that my car is gone, but I've no idea when it happened." default="back" option2="where" option3="toolate" actionOnEnd="sendchase-&gt;active=false;
+gta-&gt;active=false;" />
+ <dialogOption id="hour" operator="Caller:" texten="I don't know. I've left my car about an hour ago." default="back" option2="legal" option3="toolate" actionOnEnd="sendchase-&gt;active=false;
+sendchase-&gt;active=false;
+gta-&gt;active=false;" />
+ <dialogOption id="toolate" operator="Operator:" texten="{IT'S NOT AN EMERGENCY} Sir, it isn't an emergency case, please report the theft to the nearest police station." default="ok" option2="asshole" actionOnEnd="opinionEffect=1;" />
+ <dialogOption id="ok" operator="Caller:" texten="Of course... Thank you for the help and sorry for blocking the line. Goodbye." actionOnEnd="actionHangup;" addToAAR="noturgent" />
+ <dialogOption id="ok2" operator="Caller:" emotions="disapointed" texten="Awww, come on....." actionOnEnd="actionHangup;" addToAAR="noturgent" />
+ <dialogOption id="asshole" operator="Caller" emotions="irritated" texten="This is the number to the police, isn't it? Just send somebody, ok? I haven't got time to go looking for cops." default="warn" option2="sendass" option3="address" />
+ <dialogOption id="warn" operator="Operator:" texten="{DON'T BLOCK THE LINE} Sir, please do not block the line. Your case is not urgent enough to call 911." default="complain" />
+ <dialogOption id="complain" operator="Caller:" emotions="angry" texten="Oh, really? Somebody stole my car and this is nothing for you? You're responsible for sending police here! I'll file a complaint. Maybe that will be urgent enough for you!" default="notafraid" option2="sendass" option3="angryop" addToAAR="complain" />
+ <dialogOption id="notafraid" operator="Operator:" emotions="calmly" texten="{LET ME EXPLAIN} Excuse me, sir, but we've a limited number of police vehicles available. Because of that, I can only send units to cases, which require immediate response. Yours is not one of them." default="notafraid1" actionOnEnd="opinionEffect=-2;" addToAAR="calm" />
+ <dialogOption id="notafraid1" operator="Caller:" emotions="[sigh], still angry but discouraged" texten="Eh.... what a bullshit. I want to talk with your supervisor right now." actionOnEnd="actionHangup; " />
+ <dialogOption id="angryop" operator="Operator:" texten="{YOU'RE BLOCKING THE LINE} Let me decide, what I'm responsible for, okay? You're wasting time of 911 operator and tying up emergency lines. Goodbye." actionOnEnd="actionHangup;
+opinionEffect=1;" addToAAR="provoked" />
+ <dialogOption id="sendass" operator="Operator:" texten="{I'LL SEND POLICE}Ok, I will send a police patrol." default="thanks" actionOnEnd="opinionEffect-=2;" addToAAR="pressure" />
+ <dialogOption id="send" operator="Operator:" texten="{POLICE WILL COME} Ok, I will send an officer when I have one available." default="thanks" actionOnEnd="opinionEffect=0;" />
+ <dialogOption id="thanks" operator="Caller:" texten="Thank you. I'll wait for them." actionOnEnd="actionHangup;" addToAAR="policesend" />
+ <dialogOption id="where" operator="Operator:" texten="{WHERE?} Where did it happen?" default="shop" option2="gta" option3="parking" />
+ <dialogOption elementProperties="option=address" id="shop" operator="Caller:" texten="In front of the shopping mall." default="address" option2="legal" option3="back" />
+ <dialogOption elementProperties="option=address" id="gta" operator="Caller:" emotions="angry" texten="In the middle of a street! While I was waiting at the red light, he just dragged me out of my car and drove away!" default="back" option2="many" option3="aboutc" actionOnEnd="speed=50;
+idk-&gt;active=false;
+hour-&gt;active=false;" />
+ <dialogOption elementProperties="option=address" id="parking" operator="Caller:" texten="The car was in the parking lot of my apartment building." default="legal" option2="address" option3="back" actionOnEnd="legal-&gt; active=false; sendchase-&gt;active = false;" />
+ <dialogOption id="else" operator="Operator:" texten="{MAYBE IT WAS ELSEWHERE?} Maybe you left your car somewhere else?" default="noelse" option2="notsure" option3="yesforgot" />
+ <dialogOption elementProperties="option=address" id="noelse" operator="Caller:" texten="No, I always park here." default="sure" option2="send" option3="sorrytl" />
+ <dialogOption elementProperties="option=address" id="notsure" operator="Caller:" texten="No, rather not." default="sure" option2="send" option3="sorrytl" actionOnEnd="noidiot-&gt; active=false;" />
+ <dialogOption elementProperties="chance=0.15;" id="yesforgot" operator="Caller:" texten="Hmmm... I don't think so... No, wait! How could I forget that?! It is a wrong row. Sorry!" default="yesforgot1" actionOnEnd="opinionEffect-=1;" />
+ <dialogOption id="yesforgot1" operator="Operator:" texten="{NO PROBLEM} No problem, sir. Everyone makes mistakes. But next time before calling 911, please check twice if it's really necessary." default="end" actionOnEnd="onIgnore=1;" addToAAR="ignore" />
+ <dialogOption id="sure" operator="Operator:" texten="{ARE YOU SURE?} Sir, are you completely sure that your car is not at another parking space?" default="noidiot" option2="yesyes" option3="yesforgot" actionOnEnd="now-&gt;active=false;" />
+ <dialogOption id="noidiot" operator="Caller:" emotions="irritated" texten="Please, don't treat me like an idiot. I just said I'm sure." default="sorrytl" option2="when" option3="send" actionOnEnd="ok-&gt;active=false;" />
+ <dialogOption id="yesyes" operator="Caller:" texten="Yes, yes, I'm 100% sure." default="sorrytl" option2="when" option3="send" />
+ <dialogOption id="sorrytl" operator="Operator:" texten="{CONTACT LOCAL POLICE STATION} I'm sorry to hear that your car was stolen, but I can't do anything about that. This is not an emergency case and you should contact your local police station. They will help you out." default="ok" option2="asshole" />
+ <dialogOption id="legal" operator="Operator:" texten="{WERE YOU PARKING LEGALLY?} Sir, are you sure you didn't park your car in no parking zone, a driveway or a bus stop?" default="yeslegal" option2="nolegal" />
+ <dialogOption elementProperties="option=address" id="yeslegal" operator="Caller:" texten="I'm sure I didn't. It was a normal parking place." default="else" option2="sorrytl" option3="send" />
+ <dialogOption id="nolegal" operator="Caller:" emotions="embarrassed" texten="Emm . . . . . . . . . I was . . . . . . . . . Damn it . . . . . . . . . There is a 'No Parking' sign... I just realized that. Sorry. How can I get my car back?" default="nolegal1" actionOnEnd="opinionEffect=-1;" />
+ <dialogOption id="nolegal1" operator="Operator:" texten="{YOUR CAR WAS TOWED}Your car was towed to the police impound yard. Just contact the police on their non emergency number, they will help you out." default="end" addToAAR="ignore" />
+ <dialogOption id="end" operator="Caller:" texten="Thank you. Goodbye." actionOnEnd="actionHangup;" />
+ <dialogOption id="sendchase" operator="Operator:" texten="{THE POLICE WILL COME} We're notifying the officers in the area now. They will see if they can find your car." default="end" actionOnEnd="thief1.isActive=true;
+thief2.isActive=true;
+caller.isActive=false;
+speed=50;
+opinionEffect=3;" addToAAR="chase" />
+ <dialogOption id="many" operator="Operator:" texten="{HOW MANY?} So how many suspects did you see?" default="two" option2="three" option3="whathapp" />
+ <dialogOption id="two" operator="Caller:" texten="There were two of them." default="back" option2="address" actionOnEnd="thief1.isActive=true;
+thief2.isActive=true;
+caller.isActive = false;" />
+ <dialogOption id="three" operator="Caller:" emotions="unsure" texten="Three... I guess." default="back" option2="address" actionOnEnd="thief1.isActive=true;
+thief2.isActive=true;
+thief3.isActive=true;
+caller.isActive=false" />
+ <dialogOption id="whathapp" operator="Caller:" texten="It's hard to say, it all happened really fast. I didn't even know what was going on." default="back" option2="address" actionOnEnd="thief1.isActive = true;
+thief2.isActive = true;
+caller.isActive = false" />
+ <dialogOption id="aboutc" operator="Operator:" texten="{PLATES?} I am gonna need your license plates number, could you give it to me, please?" default="plates1" option2="plates2" option3="plates3" />
+ <dialogOption id="plates0" operator="Caller:" texten="It's [[PLATES]]." default="color" option2="address" />
+ <dialogOption id="plates1" operator="Caller:" texten="It's [[PLATES]]." default="color" option2="address" />
+ <dialogOption id="plates2" operator="Caller:" texten="It's [[PLATES]]." default="color" option2="address" />
+ <dialogOption id="plates3" operator="Caller:" texten="It's [[PLATES]]." default="color" option2="address" />
+ <dialogOption id="color" operator="Operator:" texten="{COLOR?} What is the color of your car?" default="color1" option2="color2" option3="color3" />
+ <dialogOption id="color1" operator="Caller:" texten="Red." default="type" option2="address" />
+ <dialogOption id="color2" operator="Caller:" texten="Blue." default="type" option2="address" />
+ <dialogOption id="color3" operator="Caller:" texten="Purple." default="type" option2="address" />
+ <dialogOption id="type" operator="Operator:" texten="{CAR TYPE?} What is the type of your car?" default="type1" option2="type2" option3="type3" />
+ <dialogOption id="type1" operator="Caller: " texten="It was a van." default="many" option2="address" option3="sendchase" />
+ <dialogOption id="type2" operator="Caller:" texten="Just a 4 door family sedan." default="many" option2="address" option3="sendchase" />
+ <dialogOption id="type3" operator="Caller:" texten="Muscle car. Expensive one!" default="many" option2="address" option3="sendchase" />
+ <dialogOption id="end" operator="Caller:" texten="Thank you. Goodbye." actionOnEnd="actionHangup;" />
+ <dialogOption id="reminder" operator="Caller:" texten="Do you know where my car is?" />
+ <dialogOption id="reminder2" operator="Caller:" emotions="irritated" texten="Hey, are you still talking with me?" />
+ <dialogOption id="reminder3" operator="Caller:" emotions="irritated" texten="Hello?" />
+ </dialog>
+ <aar>
+ <reportElement id="story" texten="Caller's car has gone missing." />
+ <reportElement id="noturgent" texten="The operator decided that the case is not urgent enough to send an emergency unit." />
+ <reportElement id="complain" texten="The caller disagreed with operator's decision and filed a claim." />
+ <reportElement id="calm" texten="Despite the aggressive caller, the operator remained calm and thanks to that the supervisor finds the complaint unfounded." />
+ <reportElement id="provoked" texten="The operator was provoked by the caller and ended the call." />
+ <reportElement id="pressure" texten="Under the caller's pressure, the operator agreed to send the police for a non-emergency situation." />
+ <reportElement id="policesend" texten="The operator decided to send the police to the place, where the car was stolen." />
+ <reportElement id="ignore" texten="During the conversation the operator discovered that the car was not stolen and help is unnecessary." />
+ <reportElement id="chase" texten="The operator sent the police unit to chase thieves." />
+ </aar>
+ </conversation>
+</conversations></data>
