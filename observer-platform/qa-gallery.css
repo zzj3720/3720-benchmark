@@ -115,6 +115,10 @@
   grid-template-columns: 1fr;
 }
 
+.kitchen-qa .qa-gallery {
+  grid-template-columns: 1fr;
+}
+
 .operator-qa .qa-card {
   min-width: 0;
 }
