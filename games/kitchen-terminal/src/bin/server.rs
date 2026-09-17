@@ -1,14 +1,12 @@
 use std::env;
 use std::fs::{self, File, OpenOptions};
-use std::io::{Read, Write};
+use std::io::{BufRead, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Condvar, Mutex};
 use std::thread;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-use kitchen_terminal::{
-    API_VERSION, Command, Direction, GameData, Session, SessionConfig, execute,
-};
+use kitchen_terminal::{API_VERSION, Command, GameData, Session, SessionConfig, execute};
 use serde::Deserialize;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -25,6 +23,7 @@ struct Inner {
     started_at: Option<Instant>,
     sequence: u64,
     events: Vec<Value>,
+    last_observer_score: i64,
     last_observer_elapsed_ms: Option<u64>,
 }
 
@@ -37,12 +36,32 @@ struct App {
     content_hash: String,
     level: u8,
     scene: String,
+    restored_commands: u64,
 }
 
 #[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
-struct DirectionBody {
-    direction: Direction,
+struct AuditHeader {
+    schema: String,
+    api_version: String,
+    content_sha256: String,
+    level: u8,
+    scene: String,
+    time_scale: u32,
+    seed: u64,
+}
+
+#[derive(Deserialize)]
+struct AuditRecord {
+    sequence: u64,
+    elapsed_ms: u64,
+    command: Command,
+    response: Value,
+}
+
+struct Restored {
+    session: Session<'static>,
+    audit_sequence: u64,
+    command_count: u64,
 }
 
 #[derive(Deserialize)]
@@ -100,14 +119,30 @@ fn serve() -> Result<(), String> {
     ensure_parent(&event_path)?;
     let data = Box::leak(Box::new(GameData::load(&data_root, level)?));
     let content_hash = content_hash(&data_root, data, config)?;
-    initialize_files(&audit_path, &event_path, data, config, &content_hash)?;
+    let restored = load_or_initialize(&audit_path, &event_path, data, config, &content_hash)?;
+    let events = load_observer_events(&recorder_inbox_path, &event_path);
+    let observer_sequence = events
+        .iter()
+        .filter_map(|event| event["sequence"].as_u64())
+        .max()
+        .unwrap_or(0);
+    let sequence = restored.audit_sequence.max(observer_sequence);
+    let elapsed_ms = restored.session.elapsed_ms();
+    let started_at = restored
+        .session
+        .started()
+        .then(|| Instant::now().checked_sub(Duration::from_millis(elapsed_ms)))
+        .flatten();
+    let last_observer_score = restored.session.snapshot().campaign.score;
+    let restored_commands = restored.command_count;
     let app = Arc::new(App {
         inner: Mutex::new(Inner {
-            session: Session::new(data, config)?,
-            started_at: None,
-            sequence: 0,
-            events: Vec::new(),
-            last_observer_elapsed_ms: None,
+            session: restored.session,
+            started_at,
+            sequence,
+            events,
+            last_observer_score,
+            last_observer_elapsed_ms: Some(elapsed_ms),
         }),
         changed: Condvar::new(),
         audit_path,
@@ -116,8 +151,16 @@ fn serve() -> Result<(), String> {
         content_hash,
         level,
         scene: data.layout.scene.clone(),
+        restored_commands,
     });
-    record_lifecycle(&app, "sidecar_started")?;
+    record_lifecycle(
+        &app,
+        if restored_commands == 0 {
+            "sidecar_started"
+        } else {
+            "sidecar_restored"
+        },
+    )?;
     start_clock_publisher(Arc::clone(&app));
 
     let address = env::var("KITCHEN_LISTEN_ADDR").unwrap_or_else(|_| "0.0.0.0:3720".to_owned());
@@ -167,16 +210,10 @@ fn handle(mut request: Request, app: &Arc<App>) -> Result<(), String> {
                 require_empty_body(&mut request)?;
                 Command::Start
             }
-            (&Method::Post, "/v1/move") => {
-                let body: DirectionBody = read_json_body(&mut request)?;
-                Command::Move {
-                    direction: body.direction,
-                }
-            }
-            (&Method::Post, "/v1/dash") => {
-                let body: DirectionBody = read_json_body(&mut request)?;
-                Command::Dash {
-                    direction: body.direction,
+            (&Method::Post, "/v1/go") => {
+                let body: TargetBody = read_json_body(&mut request)?;
+                Command::Go {
+                    target: body.target,
                 }
             }
             (&Method::Post, "/v1/switch") => {
@@ -307,10 +344,10 @@ fn wait_for_alarm(app: &Arc<App>, wait_ms: u64) -> Result<(), String> {
             return Ok(());
         }
         let elapsed = inner.session.elapsed_ms();
-        match inner.session.next_pending_alarm_ms() {
+        match inner.session.next_attention_ms() {
             Some(due) if due <= elapsed => 0,
             Some(due) => wait_ms.min(due - elapsed),
-            None => 0,
+            None => wait_ms,
         }
         .min(inner.session.duration_ms().saturating_sub(elapsed))
     };
@@ -347,8 +384,9 @@ fn record_command(
             "response": response,
         }),
     )?;
-    let score = inner.session.snapshot().campaign.score;
-    let previous_score = last_observer_score(inner);
+    let snapshot = inner.session.snapshot();
+    let score = snapshot.campaign.score;
+    let previous_score = inner.last_observer_score;
     let event = json!({
         "schema": EVENT_SCHEMA,
         "sequence": inner.sequence,
@@ -356,7 +394,7 @@ fn record_command(
         "task": task_identity(app),
         "type": if command.is_game_action() { "action" } else { "command" },
         "action": command,
-        "state": response_state(response),
+        "state": snapshot,
         "result": {
             "ok": response["ok"],
             "command": response["command"],
@@ -368,12 +406,14 @@ fn record_command(
     });
     append_observer_event(app, &event)?;
     inner.events.push(event);
+    inner.last_observer_score = score;
     inner.last_observer_elapsed_ms = Some(elapsed_ms);
     Ok(())
 }
 
 fn record_lifecycle(app: &Arc<App>, event_type: &str) -> Result<(), String> {
     let mut inner = app.inner.lock().map_err(|_| "state lock poisoned")?;
+    let score = inner.session.snapshot().campaign.score;
     inner.sequence += 1;
     let event = json!({
         "schema": EVENT_SCHEMA,
@@ -383,8 +423,12 @@ fn record_lifecycle(app: &Arc<App>, event_type: &str) -> Result<(), String> {
         "type": event_type,
         "action": Value::Null,
         "state": inner.session.snapshot(),
-        "result": {"ok": true, "content_sha256": app.content_hash},
-        "score": 0,
+        "result": {
+            "ok": true,
+            "content_sha256": app.content_hash,
+            "restored_commands": app.restored_commands,
+        },
+        "score": score,
         "score_delta": 0,
     });
     append_observer_event(app, &event)?;
@@ -415,7 +459,7 @@ fn publish_clock(app: &Arc<App>) -> Result<(), String> {
         return Ok(());
     }
     let score = inner.session.snapshot().campaign.score;
-    let previous_score = last_observer_score(&inner);
+    let previous_score = inner.last_observer_score;
     inner.sequence += 1;
     let event = json!({
         "schema": EVENT_SCHEMA,
@@ -431,48 +475,108 @@ fn publish_clock(app: &Arc<App>) -> Result<(), String> {
     });
     append_observer_event(app, &event)?;
     inner.events.push(event);
+    inner.last_observer_score = score;
     inner.last_observer_elapsed_ms = Some(elapsed_ms);
     drop(inner);
     app.changed.notify_all();
     Ok(())
 }
 
-fn last_observer_score(inner: &Inner) -> i64 {
-    inner
-        .events
-        .last()
-        .and_then(|event| event.get("score"))
-        .and_then(Value::as_i64)
-        .unwrap_or(0)
-}
-
-fn initialize_files(
+fn load_or_initialize(
     audit_path: &Path,
     event_path: &Path,
-    data: &GameData,
+    data: &'static GameData,
     config: SessionConfig,
     content_hash: &str,
-) -> Result<(), String> {
-    if audit_path.exists() || event_path.exists() {
-        return Err(
-            "kitchen audit/event files already exist; use a fresh run directory".to_owned(),
-        );
+) -> Result<Restored, String> {
+    if !audit_path.exists() {
+        append_json_line(
+            audit_path,
+            &json!({
+                "schema": AUDIT_SCHEMA,
+                "api_version": API_VERSION,
+                "content_sha256": content_hash,
+                "level": data.level.number,
+                "scene": data.layout.scene,
+                "time_scale": config.time_scale,
+                "seed": config.seed,
+            }),
+        )?;
+        if !event_path.exists() {
+            File::create(event_path)
+                .map_err(|error| format!("could not create {}: {error}", event_path.display()))?;
+        }
+        return Ok(Restored {
+            session: Session::new(data, config)?,
+            audit_sequence: 0,
+            command_count: 0,
+        });
     }
-    append_json_line(
-        audit_path,
-        &json!({
-            "schema": AUDIT_SCHEMA,
-            "api_version": API_VERSION,
-            "content_sha256": content_hash,
-            "level": data.level.number,
-            "scene": data.layout.scene,
-            "time_scale": config.time_scale,
-            "seed": config.seed,
-        }),
-    )?;
-    File::create(event_path)
-        .map_err(|error| format!("could not create {}: {error}", event_path.display()))?;
-    Ok(())
+
+    let file = File::open(audit_path)
+        .map_err(|error| format!("could not open {}: {error}", audit_path.display()))?;
+    let mut lines = BufReader::new(file).lines();
+    let header_line = lines
+        .next()
+        .ok_or_else(|| "kitchen audit is empty".to_owned())?
+        .map_err(|error| format!("could not read kitchen audit header: {error}"))?;
+    let header: AuditHeader = serde_json::from_str(&header_line)
+        .map_err(|error| format!("invalid kitchen audit header: {error}"))?;
+    if header.schema != AUDIT_SCHEMA
+        || header.api_version != API_VERSION
+        || header.content_sha256 != content_hash
+        || header.level != data.level.number
+        || header.scene != data.layout.scene
+        || header.time_scale != config.time_scale
+        || header.seed != config.seed
+    {
+        return Err("existing kitchen audit does not match this game/configuration".to_owned());
+    }
+    let mut session = Session::new(data, config)?;
+    let mut previous_sequence = 0;
+    let mut previous_elapsed = 0;
+    let mut command_count = 0;
+    for (index, line) in lines.enumerate() {
+        let line = line.map_err(|error| format!("could not read kitchen audit: {error}"))?;
+        let record: AuditRecord = serde_json::from_str(&line)
+            .map_err(|error| format!("invalid kitchen audit line {}: {error}", index + 2))?;
+        if record.sequence <= previous_sequence {
+            return Err(format!(
+                "kitchen audit sequence {} is not greater than {previous_sequence}",
+                record.sequence
+            ));
+        }
+        if record.elapsed_ms < previous_elapsed || record.elapsed_ms > session.duration_ms() {
+            return Err(format!(
+                "invalid kitchen elapsed time {} at sequence {}",
+                record.elapsed_ms, record.sequence
+            ));
+        }
+        if session.started() {
+            session.advance_to(record.elapsed_ms)?;
+        } else if record.elapsed_ms != 0 {
+            return Err("kitchen audit advances time before the shift starts".to_owned());
+        }
+        let actual = execute(&mut session, &record.command);
+        if actual != record.response {
+            return Err(format!(
+                "kitchen audit response mismatch at sequence {}",
+                record.sequence
+            ));
+        }
+        previous_sequence = record.sequence;
+        previous_elapsed = record.elapsed_ms;
+        command_count += 1;
+    }
+    if !event_path.exists() {
+        File::create(event_path)
+            .map_err(|error| format!("could not create {}: {error}", event_path.display()))?;
+    }
+    Ok(Restored {
+        session,
+        audit_sequence: previous_sequence,
+        command_count,
+    })
 }
 
 fn content_hash(root: &Path, data: &GameData, config: SessionConfig) -> Result<String, String> {
@@ -493,15 +597,21 @@ fn content_hash(root: &Path, data: &GameData, config: SessionConfig) -> Result<S
     Ok(format!("{:x}", digest.finalize()))
 }
 
-fn response_state(response: &Value) -> Value {
-    if response["ok"] == false {
-        return response["state"].clone();
-    }
-    if response["data"]["schema"].as_str() == Some("overcooked-state-v1") {
-        response["data"].clone()
+fn load_observer_events(recorder_path: &Path, fallback_path: &Path) -> Vec<Value> {
+    let path = if recorder_path.exists() {
+        recorder_path
     } else {
-        response["data"]["state"].clone()
-    }
+        fallback_path
+    };
+    let Ok(file) = File::open(path) else {
+        return Vec::new();
+    };
+    BufReader::new(file)
+        .lines()
+        .map_while(Result::ok)
+        .filter_map(|line| serde_json::from_str::<Value>(&line).ok())
+        .filter(|event| event["schema"] == EVENT_SCHEMA && event["task"]["id"] == "overcooked")
+        .collect()
 }
 
 fn task_identity(app: &App) -> Value {

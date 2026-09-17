@@ -2,7 +2,8 @@ use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use serde::{Deserialize, Serialize};
+use serde::ser::SerializeStruct;
+use serde::{Deserialize, Serialize, Serializer};
 use serde_json::Value;
 
 pub const CAMPAIGN_SCHEMA: &str = "overcooked-campaign-v1";
@@ -224,11 +225,25 @@ pub struct Point3 {
     pub Z: i32,
 }
 
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize)]
 pub struct Vector3 {
     pub x: f64,
     pub y: f64,
     pub z: f64,
+}
+
+impl Serialize for Vector3 {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let quantize = |value: f64| (value * 1_000_000.0).round() / 1_000_000.0;
+        let mut state = serializer.serialize_struct("Vector3", 3)?;
+        state.serialize_field("x", &quantize(self.x))?;
+        state.serialize_field("y", &quantize(self.y))?;
+        state.serialize_field("z", &quantize(self.z))?;
+        state.end()
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

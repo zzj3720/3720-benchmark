@@ -30,6 +30,11 @@ for architecture in amd64 arm64; do
   install -m 755 \
     "$source_dir/kitchen-verifier" \
     "$task_dir/tests/bin/$architecture/kitchen-verifier"
+
+  install -d "$task_dir/solution/bin/$architecture"
+  install -m 755 \
+    "$source_dir/kitchen-oracle" \
+    "$task_dir/solution/bin/$architecture/kitchen-oracle"
 done
 
 for destination in environment/game/data tests/data; do
@@ -39,8 +44,8 @@ for destination in environment/game/data tests/data; do
   install -m 644 "$data_dir/manifest.json" "$task_dir/$destination/manifest.json"
   install -m 644 "$data_dir/README.md" "$task_dir/$destination/README.md"
   install -m 644 \
-    "$data_dir/levels/4P_Hell.json" \
-    "$task_dir/$destination/levels/4P_Hell.json"
+    "$data_dir/levels/1P_SoupKitchenCircle.json" \
+    "$task_dir/$destination/levels/1P_SoupKitchenCircle.json"
 done
 
 echo "Packaged kitchen-terminal for linux/amd64 and linux/arm64"

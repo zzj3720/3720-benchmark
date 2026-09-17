@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -10,6 +10,8 @@ use crate::campaign::{
 
 pub const STATE_SCHEMA: &str = "overcooked-state-v1";
 const INTERACTION_DISTANCE: f64 = 2.05;
+const MAX_HELD_INPUT_TIME_SCALE: u32 = 4;
+const TRAVEL_MS_PER_CELL: u64 = 1_000;
 
 #[derive(Clone, Copy, Debug)]
 pub struct SessionConfig {
@@ -26,7 +28,7 @@ impl Default for SessionConfig {
     }
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Direction {
     North,
@@ -53,9 +55,10 @@ pub struct Snapshot {
     pub shift: ShiftView,
     pub active_chef: u8,
     pub chefs: Vec<ChefView>,
+    pub destinations: Vec<DestinationView>,
     pub orders: Vec<OrderView>,
     pub map: MapView,
-    pub work: Option<WorkView>,
+    pub works: Vec<WorkView>,
     pub hazards: Vec<HazardView>,
     pub alarms: Vec<Alarm>,
     pub recent_events: Vec<Event>,
@@ -78,7 +81,6 @@ pub struct ShiftView {
     pub elapsed_ms: u64,
     pub duration_ms: u64,
     pub remaining_ms: u64,
-    pub time_scale: u32,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -91,12 +93,33 @@ pub struct ChefView {
     pub facing: Direction,
     pub held: Option<Item>,
     pub respawning_ms: Option<u64>,
+    pub travel: Option<TravelView>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct TravelView {
+    pub target: String,
+    pub due_ms: u64,
+    pub remaining_ms: u64,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct DestinationView {
+    pub target: String,
+    pub name: String,
+    pub kind: &'static str,
+    pub position: Coordinate,
+    pub stand_position: Coordinate,
+    pub steps: usize,
+    pub travel_ms: u64,
+    pub arrival_ms: u64,
 }
 
 #[derive(Clone, Debug, Serialize)]
 pub struct OrderView {
     pub id: String,
     pub recipe: String,
+    pub cooking_step: Option<String>,
     pub requirements: Vec<RecipeRequirementView>,
     pub opened_ms: u64,
     pub deadline_ms: u64,
@@ -106,6 +129,7 @@ pub struct OrderView {
 #[derive(Clone, Debug, Serialize)]
 pub struct RecipeRequirementView {
     pub id: String,
+    pub quantity: u32,
     pub kind: String,
     pub required: Vec<String>,
     pub cooking_step: Option<String>,
@@ -124,6 +148,7 @@ pub struct CellView {
     pub position: Coordinate,
     pub world: Vector3,
     pub moving: bool,
+    pub blocked: bool,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -152,6 +177,7 @@ pub struct SystemView {
     pub position: Coordinate,
     pub world: Vector3,
     pub target: Option<String>,
+    pub target_world: Option<Vector3>,
     pub active: bool,
     pub progress: Option<f64>,
 }
@@ -170,6 +196,8 @@ pub struct HazardView {
     pub id: String,
     pub kind: &'static str,
     pub world: Vector3,
+    pub from: Option<Vector3>,
+    pub to: Option<Vector3>,
     pub due_ms: u64,
     pub remaining_ms: u64,
 }
@@ -259,6 +287,14 @@ struct Chef {
     facing: Direction,
     held: Option<Item>,
     respawn_due_ms: Option<u64>,
+    travel: Option<Travel>,
+}
+
+#[derive(Clone)]
+struct Travel {
+    target: String,
+    destination: usize,
+    due_ms: u64,
 }
 
 struct ActiveOrder {
@@ -268,10 +304,21 @@ struct ActiveOrder {
     deadline_ms: u64,
 }
 
+#[derive(Clone)]
 enum Work {
     Chop { chef: usize, target: String },
     Wash { chef: usize, target: String },
     Extinguish { chef: usize, target: String },
+}
+
+impl Work {
+    fn target(&self) -> &str {
+        match self {
+            Self::Chop { target, .. }
+            | Self::Wash { target, .. }
+            | Self::Extinguish { target, .. } => target,
+        }
+    }
 }
 
 struct PlateStack {
@@ -384,7 +431,8 @@ pub struct Session<'a> {
     loose_items: HashMap<String, LooseItem>,
     stacks: HashMap<String, PlateStack>,
     sinks: HashMap<String, Sink>,
-    work: Option<Work>,
+    cooking_stations: Vec<(String, i64)>,
+    works: Vec<Option<Work>>,
     pending_plates: Vec<PendingPlate>,
     orders: Vec<ActiveOrder>,
     next_order_ms: u64,
@@ -449,12 +497,25 @@ impl<'a> Session<'a> {
                     facing: Direction::South,
                     held: None,
                     respawn_due_ms: None,
+                    travel: None,
                 })
             })
             .collect::<Result<Vec<_>, String>>()?;
         if chefs.len() != 2 {
             return Err("single-player requires the original two chef avatars".to_owned());
         }
+        let cooking_stations = data
+            .layout
+            .objects
+            .iter()
+            .filter_map(|object| {
+                object
+                    .feature("CookingStation")?
+                    .get("stationType")?
+                    .as_i64()
+                    .map(|station_type| (object.id.clone(), station_type))
+            })
+            .collect();
 
         let mut session = Self {
             data,
@@ -468,7 +529,8 @@ impl<'a> Session<'a> {
             loose_items: HashMap::new(),
             stacks: HashMap::new(),
             sinks: HashMap::new(),
-            work: None,
+            cooking_stations,
+            works: vec![None, None],
             pending_plates: Vec::new(),
             orders: Vec::new(),
             next_order_ms: 0,
@@ -564,7 +626,6 @@ impl<'a> Session<'a> {
 
     pub fn switch(&mut self) -> Result<(), String> {
         self.require_running()?;
-        self.work = None;
         self.active_chef = 1 - self.active_chef;
         self.event(
             "chef_switched",
@@ -579,7 +640,8 @@ impl<'a> Session<'a> {
     pub fn move_chef(&mut self, direction: Direction, dash: bool) -> Result<(), String> {
         self.require_running()?;
         self.require_active_chef()?;
-        if self.work.is_some() {
+        self.require_idle_travel()?;
+        if self.works[self.active_chef].is_some() {
             return Err("stop the current work before moving".to_owned());
         }
         let steps = if dash { 2 } else { 1 };
@@ -606,10 +668,42 @@ impl<'a> Session<'a> {
         Ok(())
     }
 
+    pub fn go(&mut self, target: &str) -> Result<u64, String> {
+        self.require_running()?;
+        self.require_active_chef()?;
+        self.require_idle_travel()?;
+        if self.works[self.active_chef].is_some() {
+            return Err("stop the current work before travelling".to_owned());
+        }
+        let (destination, steps) = self
+            .route_near(self.active_chef, target)?
+            .ok_or_else(|| format!("target {target} is not currently reachable"))?;
+        if steps == 0 {
+            return Err(format!("chef is already at {target}"));
+        }
+        let due_ms = self
+            .elapsed_ms
+            .saturating_add((steps as u64).saturating_mul(TRAVEL_MS_PER_CELL));
+        self.chefs[self.active_chef].travel = Some(Travel {
+            target: target.to_owned(),
+            destination,
+            due_ms,
+        });
+        self.event(
+            "travel_started",
+            format!(
+                "Chef {} started travelling to {target}; arrival is due at {due_ms} ms.",
+                self.active_chef().id
+            ),
+        );
+        Ok(due_ms)
+    }
+
     pub fn interact(&mut self, target: &str) -> Result<(), String> {
         self.require_running()?;
         self.require_active_chef()?;
-        if self.work.is_some() {
+        self.require_idle_travel()?;
+        if self.works[self.active_chef].is_some() {
             return Err("stop the current work before interacting".to_owned());
         }
         if let Some(loose) = self.loose_items.get(target) {
@@ -661,8 +755,17 @@ impl<'a> Session<'a> {
     pub fn start_work(&mut self, target: &str) -> Result<u64, String> {
         self.require_running()?;
         self.require_active_chef()?;
-        if self.work.is_some() {
-            return Err("a work input is already being held".to_owned());
+        self.require_idle_travel()?;
+        if self.works[self.active_chef].is_some() {
+            return Err("the active chef is already holding a work input".to_owned());
+        }
+        if self
+            .works
+            .iter()
+            .flatten()
+            .any(|work| work.target() == target)
+        {
+            return Err("the other chef is already working at that target".to_owned());
         }
         let object = self.object(target)?;
         if let Some(Item {
@@ -691,7 +794,7 @@ impl<'a> Session<'a> {
             if let Some(fire) = self.fires.get_mut(target) {
                 fire.recovery_suppressed_ms = suppression;
             }
-            self.work = Some(Work::Extinguish {
+            self.works[self.active_chef] = Some(Work::Extinguish {
                 chef: self.active_chef,
                 target: target.to_owned(),
             });
@@ -715,7 +818,7 @@ impl<'a> Session<'a> {
                 return Err("that item cannot be processed here".to_owned());
             };
             let remaining = process.required_ms.saturating_sub(*work_progress_ms);
-            self.work = Some(Work::Chop {
+            self.works[self.active_chef] = Some(Work::Chop {
                 chef: self.active_chef,
                 target: target.to_owned(),
             });
@@ -730,7 +833,7 @@ impl<'a> Session<'a> {
                 return Err("the sink has no dirty plates".to_owned());
             }
             let remaining = sink.clean_ms.saturating_sub(sink.progress_ms);
-            self.work = Some(Work::Wash {
+            self.works[self.active_chef] = Some(Work::Wash {
                 chef: self.active_chef,
                 target: target.to_owned(),
             });
@@ -741,10 +844,10 @@ impl<'a> Session<'a> {
 
     pub fn stop_work(&mut self) -> Result<(), String> {
         self.require_running()?;
-        self.work
+        self.works[self.active_chef]
             .take()
             .map(|_| ())
-            .ok_or_else(|| "no work input is being held".to_owned())
+            .ok_or_else(|| "the active chef is not holding a work input".to_owned())
     }
 
     pub fn set_alarm(&mut self, id: &str, after_ms: u64, note: &str) -> Result<u64, String> {
@@ -794,6 +897,17 @@ impl<'a> Session<'a> {
         self.alarms.first().map(|alarm| alarm.due_ms)
     }
 
+    pub fn next_attention_ms(&self) -> Option<u64> {
+        self.next_pending_alarm_ms()
+            .into_iter()
+            .chain(
+                self.chefs
+                    .iter()
+                    .filter_map(|chef| chef.travel.as_ref().map(|travel| travel.due_ms)),
+            )
+            .min()
+    }
+
     pub fn snapshot(&self) -> Snapshot {
         let mut loose_items = self.loose_items.iter().collect::<Vec<_>>();
         loose_items.sort_by_key(|(id, _)| id.as_str());
@@ -820,7 +934,6 @@ impl<'a> Session<'a> {
                 elapsed_ms: self.elapsed_ms,
                 duration_ms: self.duration_ms(),
                 remaining_ms: self.duration_ms().saturating_sub(self.elapsed_ms),
-                time_scale: self.config.time_scale,
             },
             active_chef: self.chefs[self.active_chef].id,
             chefs: self
@@ -840,15 +953,29 @@ impl<'a> Session<'a> {
                         respawning_ms: chef
                             .respawn_due_ms
                             .map(|due| due.saturating_sub(self.elapsed_ms)),
+                        travel: chef.travel.as_ref().map(|travel| TravelView {
+                            target: travel.target.clone(),
+                            due_ms: travel.due_ms,
+                            remaining_ms: travel.due_ms.saturating_sub(self.elapsed_ms),
+                        }),
                     }
                 })
                 .collect(),
+            destinations: self.destinations(),
             orders: self
                 .orders
                 .iter()
                 .map(|order| OrderView {
                     id: order.id.clone(),
                     recipe: order.entry.order.clone().unwrap_or_default(),
+                    cooking_step: order.entry.order.as_deref().and_then(|recipe| {
+                        self.data
+                            .campaign
+                            .orders
+                            .iter()
+                            .find(|node| node.id == recipe)
+                            .and_then(|node| node.cooking_step.clone())
+                    }),
                     requirements: order
                         .entry
                         .order
@@ -871,6 +998,7 @@ impl<'a> Session<'a> {
                         position: cell_coordinate(cell),
                         world: self.cell_world(index),
                         moving: cell.motion.is_some(),
+                        blocked: self.cell_blocked(index),
                     })
                     .collect(),
                 objects: self
@@ -908,6 +1036,7 @@ impl<'a> Session<'a> {
                         position: system.grid,
                         world: system.world,
                         target: system.target_object.clone(),
+                        target_world: system.target_world,
                         active: self.occupied_zones.contains(&system.id)
                             || self.conveyor_transfers.iter().any(|transfer| {
                                 system.object.as_deref() == Some(transfer.source.as_str())
@@ -925,7 +1054,7 @@ impl<'a> Session<'a> {
                     })
                     .collect(),
             },
-            work: self.work_view(),
+            works: self.work_views(),
             hazards: self
                 .meteors
                 .iter()
@@ -933,13 +1062,34 @@ impl<'a> Session<'a> {
                     id: meteor.id.clone(),
                     kind: "meteor",
                     world: meteor.world,
+                    from: None,
+                    to: Some(meteor.world),
                     due_ms: meteor.impact_ms,
                     remaining_ms: meteor.impact_ms.saturating_sub(self.elapsed_ms),
                 })
+                .chain(self.fireball_spawners.iter().filter_map(|spawner| {
+                    let system = self
+                        .data
+                        .layout
+                        .systems
+                        .iter()
+                        .find(|system| system.id == spawner.system)?;
+                    Some(HazardView {
+                        id: format!("{}-next", spawner.system),
+                        kind: "fireball_warning",
+                        world: system.world,
+                        from: Some(system.world),
+                        to: system.target_world,
+                        due_ms: spawner.next_spawn_ms,
+                        remaining_ms: spawner.next_spawn_ms.saturating_sub(self.elapsed_ms),
+                    })
+                }))
                 .chain(self.fireballs.iter().map(|fireball| HazardView {
                     id: fireball.id.clone(),
                     kind: "fireball",
                     world: fireball_position(fireball, self.elapsed_ms),
+                    from: Some(fireball.from),
+                    to: Some(fireball.to),
                     due_ms: fireball.due_ms,
                     remaining_ms: fireball.due_ms.saturating_sub(self.elapsed_ms),
                 }))
@@ -953,6 +1103,8 @@ impl<'a> Session<'a> {
                             id: id.clone(),
                             kind: "fire",
                             world: self.object_world(object),
+                            from: None,
+                            to: None,
                             due_ms: 0,
                             remaining_ms: 0,
                         })
@@ -963,8 +1115,7 @@ impl<'a> Session<'a> {
             controls: vec![
                 "show",
                 "start",
-                "move",
-                "dash",
+                "go",
                 "switch",
                 "interact",
                 "start_work",
@@ -1620,7 +1771,15 @@ impl<'a> Session<'a> {
     }
 
     fn object_world(&self, object: &GridObject) -> Vector3 {
-        let Some(motion_id) = object.motion.as_deref() else {
+        let motion = object.motion.as_deref().or_else(|| {
+            self.data
+                .layout
+                .grid_managers
+                .iter()
+                .find(|manager| manager.id == object.grid_manager)
+                .and_then(|manager| manager.motion.as_deref())
+        });
+        let Some(motion_id) = motion else {
             return object.world;
         };
         let Some(transform_id) = object.motion_transform.as_deref() else {
@@ -1680,7 +1839,8 @@ impl<'a> Session<'a> {
                     .insert(object.id.clone(), PlateStack { clean, count });
             }
             if let Some(feature) = object.feature("WashingStation") {
-                let clean_ms = self.scale(seconds_to_ms(number(feature, "cleanPlateTime")?));
+                let clean_ms =
+                    self.scale_held_input(seconds_to_ms(number(feature, "cleanPlateTime")?));
                 let drying_station = string(feature, "dryingStation")?;
                 self.sinks.insert(
                     object.id.clone(),
@@ -1731,7 +1891,8 @@ impl<'a> Session<'a> {
             let item = self.item(
                 extinguisher.name.clone(),
                 ItemBody::Extinguisher {
-                    extinguish_ms: self.scale(seconds_to_ms(extinguisher.extinguish_seconds)),
+                    extinguish_ms: self
+                        .scale_held_input(seconds_to_ms(extinguisher.extinguish_seconds)),
                     spray_distance: extinguisher.spray_distance,
                 },
             );
@@ -2035,15 +2196,7 @@ impl<'a> Session<'a> {
         if self.chefs[index].respawn_due_ms.is_some() {
             return Ok(());
         }
-        if matches!(
-            self.work,
-            Some(Work::Chop { chef, .. })
-                | Some(Work::Wash { chef, .. })
-                | Some(Work::Extinguish { chef, .. })
-                if chef == index
-        ) {
-            self.work = None;
-        }
+        self.works[index] = None;
         let chef_world = self.cell_world(self.chefs[index].cell);
         let held = self.chefs[index].held.take();
         let mut dropped_at = None;
@@ -2096,6 +2249,7 @@ impl<'a> Session<'a> {
             }
         }
         let chef_id = self.chefs[index].id;
+        self.chefs[index].travel = None;
         let spawn = self
             .data
             .layout
@@ -2147,17 +2301,22 @@ impl<'a> Session<'a> {
         let Some(config) = self.data.variant.config.fire.as_ref() else {
             return;
         };
-        let sprayed = match self.work.as_ref() {
-            Some(Work::Extinguish { target, .. }) => Some(target.as_str()),
-            _ => None,
-        };
+        let sprayed = self
+            .works
+            .iter()
+            .flatten()
+            .filter_map(|work| match work {
+                Work::Extinguish { target, .. } => Some(target.as_str()),
+                _ => None,
+            })
+            .collect::<HashSet<_>>();
         let recovery = self.scale(seconds_to_ms(config.recovery_seconds)).max(1);
         let suppression = self.scale(seconds_to_ms(config.encouragement_suppressed_seconds));
         for (id, fire) in &mut self.fires {
             if fire.strength >= 1.0 {
                 continue;
             }
-            if sprayed == Some(id.as_str()) {
+            if sprayed.contains(id.as_str()) {
                 fire.recovery_suppressed_ms = suppression;
                 continue;
             }
@@ -2419,7 +2578,7 @@ impl<'a> Session<'a> {
                         })?,
                         self.config.time_scale,
                     )?,
-                    required_ms: self.scale(source_ms),
+                    required_ms: self.scale_held_input(source_ms),
                 })
             }
             None => None,
@@ -2796,6 +2955,28 @@ impl<'a> Session<'a> {
             .map(|node| node.id.clone())
     }
 
+    fn cooking_ready(&self, id: &str, station_type: i64) -> bool {
+        let Some(Item {
+            body:
+                ItemBody::Container {
+                    base_order,
+                    contents,
+                    cooking: Some(cooking),
+                    ..
+                },
+            ..
+        }) = self.slots.get(id)
+        else {
+            return false;
+        };
+        if cooking.station_type != station_type {
+            return false;
+        }
+        let mut ingredients = contents.clone();
+        ingredients.extend(base_order.iter().cloned());
+        self.resolve_cooked(&ingredients, &cooking.step).is_some()
+    }
+
     fn matches_recipe(&self, recipe: &str, contents: &[String]) -> bool {
         let Some(node) = self
             .data
@@ -2859,6 +3040,11 @@ impl<'a> Session<'a> {
             {
                 next = next.min(due_ms);
             }
+            if let Some(travel) = &chef.travel
+                && travel.due_ms > self.elapsed_ms
+            {
+                next = next.min(travel.due_ms);
+            }
         }
         if let Some(BossTransition::Intermission { due_ms }) = &self.boss_transition
             && *due_ms > self.elapsed_ms
@@ -2873,36 +3059,75 @@ impl<'a> Session<'a> {
                 next = next.min(transfer.due_ms);
             }
         }
-        let work_remaining = match self.work.as_ref() {
-            Some(Work::Chop { target, .. }) => {
-                self.slots.get(target).and_then(|item| match &item.body {
-                    ItemBody::Food {
-                        process: Some(process),
-                        work_progress_ms,
-                        ..
-                    } => Some(process.required_ms.saturating_sub(*work_progress_ms)),
-                    _ => None,
-                })
+        for work in self.works.iter().flatten() {
+            if let Some(remaining) = self
+                .work_remaining_ms(work)
+                .filter(|remaining| *remaining > 0)
+            {
+                next = next.min(self.elapsed_ms.saturating_add(remaining));
             }
-            Some(Work::Wash { target, .. }) => self
-                .sinks
-                .get(target)
-                .map(|sink| sink.clean_ms.saturating_sub(sink.progress_ms)),
-            Some(Work::Extinguish { chef, target }) => self.fires.get(target).and_then(|fire| {
-                self.chefs[*chef]
-                    .held
-                    .as_ref()
-                    .and_then(|item| match item.body {
-                        ItemBody::Extinguisher { extinguish_ms, .. } => {
-                            Some((fire.strength * extinguish_ms as f64).ceil() as u64)
-                        }
-                        _ => None,
-                    })
-            }),
-            None => None,
-        };
-        if let Some(remaining) = work_remaining.filter(|remaining| *remaining > 0) {
-            next = next.min(self.elapsed_ms.saturating_add(remaining));
+        }
+        for (id, station_type) in &self.cooking_stations {
+            if !self.cooking_ready(id, *station_type) {
+                continue;
+            }
+            let Some(Item {
+                body:
+                    ItemBody::Container {
+                        cooking: Some(cooking),
+                        ..
+                    },
+                ..
+            }) = self.slots.get(id)
+            else {
+                continue;
+            };
+            let ignition_progress = cooking.duration_ms.saturating_mul(2).saturating_add(1);
+            if cooking.progress_ms < ignition_progress {
+                next = next.min(
+                    self.elapsed_ms
+                        .saturating_add(ignition_progress - cooking.progress_ms),
+                );
+            }
+        }
+        if let Some(config) = self.data.variant.config.fire.as_ref()
+            && !self.fires.is_empty()
+        {
+            let active = self
+                .data
+                .layout
+                .objects
+                .iter()
+                .filter(|object| self.fires.contains_key(&object.id))
+                .map(|object| {
+                    (
+                        object.grid_manager.as_str(),
+                        object.grid.x,
+                        object.grid.y,
+                        object.grid.z,
+                    )
+                })
+                .collect::<Vec<_>>();
+            let threshold = self.scale(seconds_to_ms(config.flammability_seconds));
+            for object in
+                self.data.layout.objects.iter().filter(|object| {
+                    object.has("Flammable") && !self.fires.contains_key(&object.id)
+                })
+            {
+                let encouraged = active.iter().any(|(manager, x, y, z)| {
+                    *manager == object.grid_manager
+                        && (*x - object.grid.x).abs() <= 1
+                        && *y == object.grid.y
+                        && (*z - object.grid.z).abs() <= 1
+                });
+                let progress = self.fire_exposure_ms.get(&object.id).copied().unwrap_or(0);
+                if encouraged && progress < threshold {
+                    next = next.min(
+                        self.elapsed_ms
+                            .saturating_add(threshold.saturating_sub(progress).max(1)),
+                    );
+                }
+            }
         }
         for (id, runtime) in &self.motions {
             for scheduled in &runtime.scheduled {
@@ -2933,53 +3158,43 @@ impl<'a> Session<'a> {
         if delta == 0 {
             return;
         }
-        let cooking_stations = self
-            .data
-            .layout
-            .objects
-            .iter()
-            .filter_map(|object| {
-                let station_type = object
-                    .feature("CookingStation")?
-                    .get("stationType")?
-                    .as_i64()?;
-                Some((object.id.clone(), station_type))
-            })
-            .collect::<Vec<_>>();
+        self.advance_fire(delta);
         let mut burning = Vec::new();
-        for (id, station_type) in cooking_stations {
+        for (id, station_type) in &self.cooking_stations {
+            if !self.cooking_ready(id, *station_type) {
+                continue;
+            }
             if let Some(Item {
                 body:
                     ItemBody::Container {
-                        contents,
                         cooking: Some(cooking),
                         ..
                     },
                 ..
-            }) = self.slots.get_mut(&id)
-                && !contents.is_empty()
-                && cooking.station_type == station_type
+            }) = self.slots.get_mut(id)
             {
+                let was_burnt = cooking.progress_ms > cooking.duration_ms.saturating_mul(2);
                 cooking.progress_ms = cooking
                     .progress_ms
                     .saturating_add(delta)
                     .min(cooking.duration_ms.saturating_mul(2).saturating_add(1));
-                if cooking.progress_ms > cooking.duration_ms.saturating_mul(2) {
-                    burning.push(id);
+                if !was_burnt && cooking.progress_ms > cooking.duration_ms.saturating_mul(2) {
+                    burning.push(id.clone());
                 }
             }
         }
         for id in burning {
             self.ignite(&id);
         }
-        self.advance_fire(delta);
-        let work = self.work.as_ref().map(|work| match work {
-            Work::Chop { chef, target } => (0, *chef, target.clone()),
-            Work::Wash { chef, target } => (1, *chef, target.clone()),
-            Work::Extinguish { chef, target } => (2, *chef, target.clone()),
-        });
+        for chef in 0..self.works.len() {
+            self.advance_work(chef, delta);
+        }
+    }
+
+    fn advance_work(&mut self, chef: usize, delta: u64) {
+        let work = self.works[chef].clone();
         match work {
-            Some((0, chef, target)) => {
+            Some(Work::Chop { target, .. }) => {
                 let mut finished = None;
                 if let Some(Item {
                     name,
@@ -3006,14 +3221,14 @@ impl<'a> Session<'a> {
                         item.name = result_name;
                         item.body = item_from_properties(properties, None);
                     }
-                    self.work = None;
+                    self.works[chef] = None;
                     self.event(
                         "food_processed",
                         format!("Chef {} finished processing food.", self.chefs[chef].id),
                     );
                 }
             }
-            Some((1, chef, target)) => {
+            Some(Work::Wash { target, .. }) => {
                 let mut cleaned = 0;
                 let mut drying = None;
                 if let Some(sink) = self.sinks.get_mut(&target) {
@@ -3026,7 +3241,7 @@ impl<'a> Session<'a> {
                     drying = Some(sink.drying_station.clone());
                     if sink.count == 0 {
                         sink.progress_ms = 0;
-                        self.work = None;
+                        self.works[chef] = None;
                     }
                 }
                 if cleaned > 0 {
@@ -3039,7 +3254,7 @@ impl<'a> Session<'a> {
                     );
                 }
             }
-            Some((2, chef, target)) => {
+            Some(Work::Extinguish { target, .. }) => {
                 let required_ms = self.chefs[chef]
                     .held
                     .as_ref()
@@ -3055,7 +3270,7 @@ impl<'a> Session<'a> {
                 }
                 if extinguished {
                     self.fires.remove(&target);
-                    self.work = None;
+                    self.works[chef] = None;
                     self.event(
                         "fire_extinguished",
                         format!("Chef {} extinguished {target}.", self.chefs[chef].id),
@@ -3145,6 +3360,7 @@ impl<'a> Session<'a> {
         self.process_motion_due()?;
         self.process_conveyor_due()?;
         self.process_hazard_due()?;
+        self.process_travel_due()?;
         self.refresh_trigger_zones()?;
         self.process_boss_due()?;
         let lifetime = self.order_lifetime_ms();
@@ -3202,6 +3418,42 @@ impl<'a> Session<'a> {
             }
         }
         self.refresh_conveyors()?;
+        Ok(())
+    }
+
+    fn process_travel_due(&mut self) -> Result<(), String> {
+        let arrivals = self
+            .chefs
+            .iter()
+            .enumerate()
+            .filter_map(|(index, chef)| {
+                chef.travel
+                    .as_ref()
+                    .filter(|travel| travel.due_ms <= self.elapsed_ms)
+                    .map(|travel| (index, travel.destination, travel.target.clone()))
+            })
+            .collect::<Vec<_>>();
+        for (index, destination, target) in arrivals {
+            self.chefs[index].travel = None;
+            let occupied = self.chefs.iter().enumerate().any(|(other, chef)| {
+                other != index && chef.respawn_due_ms.is_none() && chef.cell == destination
+            });
+            if self.cell_blocked(destination) || occupied {
+                self.event(
+                    "travel_blocked",
+                    format!(
+                        "Chef {} could not finish travelling to {target}.",
+                        self.chefs[index].id
+                    ),
+                );
+                continue;
+            }
+            self.chefs[index].cell = destination;
+            self.event(
+                "travel_completed",
+                format!("Chef {} arrived at {target}.", self.chefs[index].id),
+            );
+        }
         Ok(())
     }
 
@@ -3301,6 +3553,98 @@ impl<'a> Session<'a> {
             .map(|(index, _)| index)
     }
 
+    fn destinations(&self) -> Vec<DestinationView> {
+        if self.chefs[self.active_chef].respawn_due_ms.is_some()
+            || self.chefs[self.active_chef].travel.is_some()
+        {
+            return Vec::new();
+        }
+        let mut destinations = self
+            .data
+            .layout
+            .objects
+            .iter()
+            .filter(|object| !matches!(object_kind(object), "structure" | "moving_barrier"))
+            .filter_map(|object| {
+                let (destination, steps) = self.route_near(self.active_chef, &object.id).ok()??;
+                Some(DestinationView {
+                    target: object.id.clone(),
+                    name: object.name.clone(),
+                    kind: object_kind(object),
+                    position: object.grid,
+                    stand_position: cell_coordinate(&self.data.layout.walkable[destination]),
+                    steps,
+                    travel_ms: (steps as u64).saturating_mul(TRAVEL_MS_PER_CELL),
+                    arrival_ms: self
+                        .elapsed_ms
+                        .saturating_add((steps as u64).saturating_mul(TRAVEL_MS_PER_CELL)),
+                })
+            })
+            .chain(self.loose_items.iter().filter_map(|(id, loose)| {
+                let (destination, steps) = self.route_near(self.active_chef, id).ok()??;
+                Some(DestinationView {
+                    target: id.clone(),
+                    name: loose.item.name.clone(),
+                    kind: "loose_item",
+                    position: loose.grid,
+                    stand_position: cell_coordinate(&self.data.layout.walkable[destination]),
+                    steps,
+                    travel_ms: (steps as u64).saturating_mul(TRAVEL_MS_PER_CELL),
+                    arrival_ms: self
+                        .elapsed_ms
+                        .saturating_add((steps as u64).saturating_mul(TRAVEL_MS_PER_CELL)),
+                })
+            }))
+            .collect::<Vec<_>>();
+        destinations.sort_by(|left, right| {
+            left.travel_ms
+                .cmp(&right.travel_ms)
+                .then_with(|| left.target.cmp(&right.target))
+        });
+        destinations
+    }
+
+    fn route_near(
+        &self,
+        chef_index: usize,
+        target: &str,
+    ) -> Result<Option<(usize, usize)>, String> {
+        let target_world = if let Some(loose) = self.loose_items.get(target) {
+            loose.world
+        } else {
+            self.object_world(self.object(target)?)
+        };
+        let start = self.chefs[chef_index].cell;
+        let mut queue = VecDeque::from([(start, 0_usize)]);
+        let mut visited = HashSet::from([start]);
+        while let Some((current, steps)) = queue.pop_front() {
+            if distance(self.cell_world(current), target_world) <= INTERACTION_DISTANCE {
+                return Ok(Some((current, steps)));
+            }
+            for direction in [
+                Direction::North,
+                Direction::South,
+                Direction::East,
+                Direction::West,
+            ] {
+                if self.is_fall_edge(current, direction) {
+                    continue;
+                }
+                let Some(next) = self.movement_neighbor(current, direction) else {
+                    continue;
+                };
+                if self.chefs.iter().enumerate().any(|(index, chef)| {
+                    index != chef_index && chef.respawn_due_ms.is_none() && chef.cell == next
+                }) || !visited.insert(next)
+                {
+                    continue;
+                }
+                queue.push_back((next, steps + 1));
+            }
+        }
+        Ok(None)
+    }
+
     fn is_fall_edge(&self, current: usize, direction: Direction) -> bool {
         let cell = &self.data.layout.walkable[current];
         if cell.motion.is_some() {
@@ -3376,6 +3720,18 @@ impl<'a> Session<'a> {
         Ok(())
     }
 
+    fn require_idle_travel(&self) -> Result<(), String> {
+        if let Some(travel) = &self.active_chef().travel {
+            return Err(format!(
+                "chef {} is travelling to {} for {} more milliseconds",
+                self.active_chef().id,
+                travel.target,
+                travel.due_ms.saturating_sub(self.elapsed_ms)
+            ));
+        }
+        Ok(())
+    }
+
     fn active_chef(&self) -> &Chef {
         &self.chefs[self.active_chef]
     }
@@ -3386,6 +3742,12 @@ impl<'a> Session<'a> {
 
     fn scale(&self, source_ms: u64) -> u64 {
         source_ms.saturating_mul(u64::from(self.config.time_scale))
+    }
+
+    fn scale_held_input(&self, source_ms: u64) -> u64 {
+        source_ms.saturating_mul(u64::from(
+            self.config.time_scale.min(MAX_HELD_INPUT_TIME_SCALE),
+        ))
     }
 
     fn order_lifetime_ms(&self) -> u64 {
@@ -3457,32 +3819,91 @@ impl<'a> Session<'a> {
     }
 
     fn recipe_requirements(&self, recipe: &str) -> Vec<RecipeRequirementView> {
-        let mut pending = vec![recipe.to_owned()];
-        let mut seen = HashSet::new();
-        let mut requirements = Vec::new();
-        while let Some(id) = pending.pop() {
-            if !seen.insert(id.clone()) {
-                continue;
+        fn collect(
+            id: &str,
+            nodes: &[crate::campaign::OrderNode],
+            visiting: &mut HashSet<String>,
+            quantities: &mut HashMap<String, u32>,
+        ) {
+            if !visiting.insert(id.to_owned()) {
+                return;
             }
-            let Some(node) = self.data.campaign.orders.iter().find(|node| node.id == id) else {
-                continue;
-            };
-            pending.extend(node.required.iter().cloned());
-            if id != recipe {
-                requirements.push(RecipeRequirementView {
+            if let Some(node) = nodes.iter().find(|node| node.id == id) {
+                for child in &node.required {
+                    *quantities.entry(child.clone()).or_default() += 1;
+                    collect(child, nodes, visiting, quantities);
+                }
+            }
+            visiting.remove(id);
+        }
+
+        let mut quantities = HashMap::new();
+        collect(
+            recipe,
+            &self.data.campaign.orders,
+            &mut HashSet::new(),
+            &mut quantities,
+        );
+        let mut requirements = quantities
+            .into_iter()
+            .filter_map(|(id, quantity)| {
+                let node = self
+                    .data
+                    .campaign
+                    .orders
+                    .iter()
+                    .find(|node| node.id == id)?;
+                Some(RecipeRequirementView {
                     id: node.id.clone(),
+                    quantity,
                     kind: node.kind.clone(),
                     required: node.required.clone(),
                     cooking_step: node.cooking_step.clone(),
-                });
-            }
-        }
+                })
+            })
+            .collect::<Vec<_>>();
         requirements.sort_by(|left, right| left.id.cmp(&right.id));
         requirements
     }
 
-    fn work_view(&self) -> Option<WorkView> {
-        match self.work.as_ref()? {
+    fn work_remaining_ms(&self, work: &Work) -> Option<u64> {
+        match work {
+            Work::Chop { target, .. } => self.slots.get(target).and_then(|item| match &item.body {
+                ItemBody::Food {
+                    process: Some(process),
+                    work_progress_ms,
+                    ..
+                } => Some(process.required_ms.saturating_sub(*work_progress_ms)),
+                _ => None,
+            }),
+            Work::Wash { target, .. } => self
+                .sinks
+                .get(target)
+                .map(|sink| sink.clean_ms.saturating_sub(sink.progress_ms)),
+            Work::Extinguish { chef, target } => self.fires.get(target).and_then(|fire| {
+                self.chefs[*chef]
+                    .held
+                    .as_ref()
+                    .and_then(|item| match item.body {
+                        ItemBody::Extinguisher { extinguish_ms, .. } => {
+                            Some((fire.strength * extinguish_ms as f64).ceil() as u64)
+                        }
+                        _ => None,
+                    })
+            }),
+        }
+    }
+
+    fn work_views(&self) -> Vec<WorkView> {
+        self.works
+            .iter()
+            .flatten()
+            .filter_map(|work| self.work_view(work))
+            .collect()
+    }
+
+    fn work_view(&self, work: &Work) -> Option<WorkView> {
+        match work {
             Work::Chop { chef, target } => {
                 let ItemBody::Food {
                     process: Some(process),
@@ -4097,7 +4518,7 @@ mod tests {
 
     fn fight_fires_until(session: &mut Session<'_>, deadline: u64) {
         while session.elapsed_ms < deadline {
-            if session.work.is_some() {
+            if session.works[session.active_chef].is_some() {
                 session.stop_work().expect("release extinguisher");
             }
             let reachable = {
@@ -4122,7 +4543,7 @@ mod tests {
             session
                 .advance_to(due.min(deadline))
                 .expect("spray active fire");
-            if due > deadline && session.work.is_some() {
+            if due > deadline && session.works[session.active_chef].is_some() {
                 session.stop_work().expect("release extinguisher");
             }
         }
@@ -4177,6 +4598,14 @@ mod tests {
         assert_eq!(session.snapshot().orders[0].recipe, "Salad_Tomato");
         session.advance_to(100_000).expect("advance");
         assert_eq!(session.snapshot().shift.status, "complete");
+        assert_eq!(session.snapshot().campaign.score, -10);
+        assert!(
+            session
+                .snapshot()
+                .recent_events
+                .iter()
+                .any(|event| event.kind == "order_overdue")
+        );
     }
 
     #[test]
@@ -4209,6 +4638,34 @@ mod tests {
                 .recent_events
                 .iter()
                 .any(|event| event.kind == "order_overdue")
+        );
+    }
+
+    #[test]
+    fn soup_level_exposes_quantity_cooking_step_and_real_deadline_pressure() {
+        let data = data(6);
+        let mut session = Session::new(
+            &data,
+            SessionConfig {
+                time_scale: 5,
+                seed: 448_516,
+            },
+        )
+        .expect("session");
+        session.start().expect("start");
+        let snapshot = session.snapshot();
+        let order = snapshot.orders.first().expect("authored soup order");
+        assert_eq!(order.recipe, "OnionSoup");
+        assert_eq!(order.cooking_step.as_deref(), Some("Pot"));
+        assert_eq!(order.deadline_ms, 750_000);
+        assert!(order.deadline_ms < snapshot.shift.duration_ms);
+        assert_eq!(
+            order
+                .requirements
+                .iter()
+                .find(|requirement| requirement.id == "Onion")
+                .map(|requirement| requirement.quantity),
+            Some(3)
         );
     }
 
@@ -4282,6 +4739,148 @@ mod tests {
         assert!(requirements.contains("Tortilla"));
         assert!(requirements.contains("BoiledRice"));
         assert!(requirements.contains("Rice"));
+    }
+
+    #[test]
+    fn go_exposes_and_pays_the_shortest_semantic_travel_time() {
+        let data = data(1);
+        let mut session = Session::new(
+            &data,
+            SessionConfig {
+                time_scale: 1,
+                seed: 1,
+            },
+        )
+        .expect("session");
+        session.start().expect("start");
+        let board = session
+            .snapshot()
+            .destinations
+            .into_iter()
+            .find(|destination| destination.steps > 0)
+            .expect("non-local reachable destination");
+        assert_eq!(board.travel_ms, board.steps as u64 * TRAVEL_MS_PER_CELL);
+
+        let due = session.go(&board.target).expect("start semantic travel");
+        assert_eq!(due, board.arrival_ms);
+        assert_eq!(session.next_attention_ms(), Some(due));
+        assert!(session.interact(&board.target).is_err());
+        session.advance_to(due).expect("arrive");
+        let active = session
+            .snapshot()
+            .chefs
+            .into_iter()
+            .find(|chef| chef.active)
+            .expect("active chef");
+        assert!(active.travel.is_none());
+        assert!(
+            distance(
+                active.world,
+                session.object_world(session.object(&board.target).unwrap())
+            ) <= INTERACTION_DISTANCE
+        );
+    }
+
+    #[test]
+    fn held_input_stretch_is_capped_below_passive_shift_scale() {
+        let data = data(1);
+        let mut session = Session::new(
+            &data,
+            SessionConfig {
+                time_scale: 12,
+                seed: 1,
+            },
+        )
+        .expect("session");
+        session.start().expect("start");
+
+        let source = data
+            .layout
+            .objects
+            .iter()
+            .find(|object| {
+                object
+                    .feature("PickupItemSpawner")
+                    .is_some_and(|feature| feature.get("processed_item").is_some())
+            })
+            .expect("processable ingredient supply");
+        let feature = source
+            .feature("PickupItemSpawner")
+            .expect("ingredient feature");
+        let stages = feature
+            .get("work_stages")
+            .and_then(Value::as_u64)
+            .expect("work stages");
+        let source_ms = (data.campaign.scoring.chop_impact_seconds * 1_000.0).round() as u64
+            * stages.saturating_sub(1)
+            * u64::from(data.campaign.scoring.single_player_chops_per_stage);
+        let board = data
+            .layout
+            .objects
+            .iter()
+            .find(|object| object.has("Workstation"))
+            .expect("workstation");
+
+        walk_near(&mut session, &source.id);
+        session.interact(&source.id).expect("take ingredient");
+        walk_near(&mut session, &board.id);
+        session.interact(&board.id).expect("put ingredient down");
+        session.start_work(&board.id).expect("start chopping");
+
+        assert_eq!(
+            session.snapshot().works[0].required_ms,
+            source_ms * u64::from(MAX_HELD_INPUT_TIME_SCALE)
+        );
+        assert_eq!(
+            session.duration_ms(),
+            seconds_to_ms(100.0) * u64::from(session.config.time_scale)
+        );
+    }
+
+    #[test]
+    fn both_chefs_can_hold_independent_work_inputs_after_switching() {
+        let data = data(1);
+        let mut session = Session::new(&data, SessionConfig::default()).expect("session");
+        session.start().expect("start");
+
+        walk_near(&mut session, "object-1117");
+        session.interact("object-1117").expect("take lettuce");
+        walk_near(&mut session, "object-1178");
+        session.interact("object-1178").expect("place lettuce");
+        let lettuce_done = session.start_work("object-1178").expect("chop lettuce");
+
+        session.switch().expect("control second chef");
+        assert_eq!(session.snapshot().works.len(), 1);
+        walk_near(&mut session, "object-681");
+        session.interact("object-681").expect("take tomato");
+        walk_near(&mut session, "object-1239");
+        session.interact("object-1239").expect("place tomato");
+        let tomato_done = session.start_work("object-1239").expect("chop tomato");
+
+        let snapshot = session.snapshot();
+        assert_eq!(snapshot.works.len(), 2);
+        assert_eq!(
+            snapshot
+                .works
+                .iter()
+                .map(|work| work.chef)
+                .collect::<HashSet<_>>(),
+            HashSet::from([0, 1])
+        );
+
+        session
+            .advance_to(lettuce_done.max(tomato_done))
+            .expect("finish both held inputs");
+        assert!(session.snapshot().works.is_empty());
+        assert!(
+            session
+                .snapshot()
+                .recent_events
+                .iter()
+                .filter(|event| event.kind == "food_processed")
+                .count()
+                >= 2
+        );
     }
 
     #[test]
@@ -4733,6 +5332,11 @@ mod tests {
             .position(|cell| cell.grid_manager == "grid-2170")
             .expect("shuttle floor");
         let initial = session.cell_world(moving_cell);
+        let initial_rice = session.object_world(
+            session
+                .object("object-1988")
+                .expect("authored shuttle rice supply"),
+        );
 
         walk_near(&mut session, "object-2086");
         session.interact("object-2086").expect("press west switch");
@@ -4742,6 +5346,16 @@ mod tests {
         session.advance_to(4_000).expect("shuttle is travelling");
         let moving = session.cell_world(moving_cell);
         assert!(distance(initial, moving) > 1.0);
+        assert!(
+            distance(
+                initial_rice,
+                session.object_world(
+                    session
+                        .object("object-1988")
+                        .expect("authored shuttle rice supply"),
+                ),
+            ) > 1.0
+        );
 
         session.advance_to(8_000).expect("shuttle reaches east");
         assert!(session.switch_enabled["object-2005"]);
@@ -5227,6 +5841,168 @@ mod tests {
                 .recent_events
                 .iter()
                 .any(|event| event.kind == "fire_extinguished")
+        );
+    }
+
+    #[test]
+    fn cooking_fire_and_spread_are_independent_of_clock_step_size() {
+        fn run(step_ms: u64) -> Value {
+            let data = data(6);
+            let mut session = Session::new(
+                &data,
+                SessionConfig {
+                    time_scale: 5,
+                    seed: 448_516,
+                },
+            )
+            .expect("session");
+            session.start().expect("start");
+            let cooker = session
+                .data
+                .layout
+                .objects
+                .iter()
+                .find(|object| {
+                    object.feature("CookingStation").is_some()
+                        && matches!(
+                            session.slots.get(&object.id),
+                            Some(Item {
+                                body: ItemBody::Container { .. },
+                                ..
+                            })
+                        )
+                })
+                .expect("authored cooker")
+                .id
+                .clone();
+            let burn_after = match &mut session.slots.get_mut(&cooker).expect("cooking pot").body {
+                ItemBody::Container {
+                    contents,
+                    cooking: Some(cooking),
+                    ..
+                } => {
+                    contents.extend(["Onion".to_owned(), "Onion".to_owned(), "Onion".to_owned()]);
+                    cooking.duration_ms.saturating_mul(2).saturating_add(1)
+                }
+                _ => panic!("authored cooking pot"),
+            };
+            let spread_after = session.scale(seconds_to_ms(
+                session
+                    .data
+                    .variant
+                    .config
+                    .fire
+                    .as_ref()
+                    .expect("fire config")
+                    .flammability_seconds,
+            ));
+            let target = burn_after + spread_after;
+            while session.elapsed_ms < target {
+                session
+                    .advance_to((session.elapsed_ms + step_ms).min(target))
+                    .expect("advance kitchen");
+            }
+            serde_json::to_value(session.snapshot()).expect("serialize snapshot")
+        }
+
+        assert_eq!(run(u64::MAX), run(1_000));
+    }
+
+    #[test]
+    fn incomplete_recipe_does_not_cook_or_burn() {
+        let data = data(2);
+        let mut session = Session::new(
+            &data,
+            SessionConfig {
+                time_scale: 1,
+                seed: 1,
+            },
+        )
+        .expect("session");
+        session.start().expect("start");
+        let duration = match &mut session
+            .slots
+            .get_mut("object-3526")
+            .expect("authored pot")
+            .body
+        {
+            ItemBody::Container {
+                contents,
+                cooking: Some(cooking),
+                ..
+            } => {
+                contents.push("Onion".to_owned());
+                cooking.duration_ms
+            }
+            _ => panic!("authored pot on cooker"),
+        };
+        session
+            .advance_to(duration.saturating_mul(3))
+            .expect("time passes with an incomplete soup");
+        assert!(session.fires.is_empty());
+        assert!(matches!(
+            &session.slots["object-3526"].body,
+            ItemBody::Container {
+                cooking: Some(Cooking { progress_ms: 0, .. }),
+                ..
+            }
+        ));
+    }
+
+    #[test]
+    fn extinguished_burnt_pot_does_not_ignite_again_without_new_food() {
+        let data = data(6);
+        let mut session = Session::new(
+            &data,
+            SessionConfig {
+                time_scale: 5,
+                seed: 448_516,
+            },
+        )
+        .expect("session");
+        session.start().expect("start");
+        let cooker = session
+            .data
+            .layout
+            .objects
+            .iter()
+            .find(|object| {
+                object.feature("CookingStation").is_some()
+                    && matches!(
+                        session.slots.get(&object.id),
+                        Some(Item {
+                            body: ItemBody::Container { .. },
+                            ..
+                        })
+                    )
+            })
+            .expect("authored cooker")
+            .id
+            .clone();
+        let ignition = match &mut session.slots.get_mut(&cooker).expect("cooking pot").body {
+            ItemBody::Container {
+                contents,
+                cooking: Some(cooking),
+                ..
+            } => {
+                contents.extend(["Onion".to_owned(), "Onion".to_owned(), "Onion".to_owned()]);
+                cooking.duration_ms.saturating_mul(2).saturating_add(1)
+            }
+            _ => panic!("authored cooking pot"),
+        };
+        session.advance_to(ignition).expect("pot catches fire");
+        assert!(session.fires.remove(&cooker).is_some());
+        session
+            .advance_to(ignition + 10_000)
+            .expect("time passes after extinguishing");
+        assert!(!session.fires.contains_key(&cooker));
+        assert_eq!(
+            session
+                .events
+                .iter()
+                .filter(|event| event.kind == "fire_ignited" && event.message.contains(&cooker))
+                .count(),
+            1
         );
     }
 

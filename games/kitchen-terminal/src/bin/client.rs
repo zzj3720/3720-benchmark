@@ -16,10 +16,10 @@ fn main() {
             ("GET", format!("/v1/{command}"), None)
         }
         "start" if arguments.len() == 1 => ("POST", "/v1/start".into(), None),
-        "move" | "dash" if arguments.len() == 2 => (
+        "go" if arguments.len() == 2 => (
             "POST",
-            format!("/v1/{command}"),
-            Some(json!({"direction": arguments[1]})),
+            "/v1/go".into(),
+            Some(json!({"target": arguments[1]})),
         ),
         "switch" if arguments.len() == 1 => ("POST", "/v1/switch".into(), None),
         "interact" if arguments.len() == 2 => (
@@ -35,17 +35,18 @@ fn main() {
         "stop" if arguments.len() == 1 => ("POST", "/v1/work/stop".into(), None),
         "alarm" if (3..=4).contains(&arguments.len()) => {
             let seconds = arguments[2]
-                .parse::<u64>()
-                .unwrap_or_else(|_| fail("after_seconds must be an integer"));
-            if seconds == 0 {
-                fail("after_seconds must be at least 1");
+                .parse::<f64>()
+                .unwrap_or_else(|_| fail("after_seconds must be a positive number"));
+            if !seconds.is_finite() || seconds <= 0.0 {
+                fail("after_seconds must be a positive number");
             }
+            let after_ms = (seconds * 1_000.0).ceil().min(u64::MAX as f64) as u64;
             (
                 "POST",
                 "/v1/alarm".into(),
                 Some(json!({
                     "id": arguments[1],
-                    "after_ms": seconds.saturating_mul(1_000),
+                    "after_ms": after_ms,
                     "note": arguments.get(3).map(String::as_str).unwrap_or(""),
                 })),
             )
@@ -57,7 +58,7 @@ fn main() {
         ),
         "wait" if arguments.len() == 1 => ("GET", "/v1/wake".into(), None),
         _ => fail(
-            "commands: show, start, move DIR, dash DIR, switch, interact ID, \
+            "commands: show, start, go ID, switch, interact ID, \
              work ID, stop, alarm ID SECONDS [NOTE], cancel ID, wait, submit",
         ),
     };
