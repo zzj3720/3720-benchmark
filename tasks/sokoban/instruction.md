@@ -50,4 +50,4 @@ solvers, scripts, loops, macros, direct HTTP calls, or other automation, and do
 not use online solutions or hints. You may keep concise non-executable planning
 notes under `/app`.
 
-You have 7200 seconds to complete this task. Do not cheat by using online solutions or hints specific to this task.
+You have 864000 seconds to complete this task. Do not cheat by using online solutions or hints specific to this task.

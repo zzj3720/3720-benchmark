@@ -41,3 +41,11 @@ available.
 Run `vp node games/sokoban/scripts/import_campaign.mjs` to reproducibly refresh
 the normalized campaign from the SLC source files listed in
 `data/campaign/source.json`.
+
+The development Oracle covers all 305 levels. Rebuild the public-solution
+portion with `vp node games/sokoban/scripts/import_solutions.mjs`, then merge it
+with the locally generated Novoban solutions using
+`vp node games/sokoban/scripts/merge_oracle.mjs <solutions.sok>`. The merged
+ordinary-move traces and their provenance live under `data/oracle/`; the Rust
+`oracle` integration test replays every trace through the same `Session` used
+by the sidecar.

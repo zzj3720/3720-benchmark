@@ -1,0 +1,26 @@
+{
+  "schema": "sokoban-oracle-source-v1",
+  "generated_on": "2026-07-23",
+  "level_count": 305,
+  "sources": [
+    {
+      "campaign_scope": [
+        "novoban"
+      ],
+      "generator": "Festival 3.1",
+      "source": "https://sourceforge.net/projects/festival3os/",
+      "method": "Solutions generated locally with a 600 second per-level limit and eight solver cores."
+    },
+    {
+      "campaign_scope": [
+        "microban",
+        "sasquatch",
+        "sasquatch-iii"
+      ],
+      "source": "https://ksokoban.online/",
+      "solution_bundles": "https://ksokoban.online/solutions/bunch10_0.js through bunch10_38.js",
+      "method": "Public coordinate-and-push records expanded into ordinary LURD moves after exact layout comparison."
+    }
+  ],
+  "verification": "Every expanded LURD sequence is replayed by the benchmark's Rust rules engine before packaging."
+}

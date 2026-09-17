@@ -79,12 +79,22 @@ fn request(method: &str, path: &str, body: Option<&Value>) -> Value {
         .as_deref()
         .map(|value| vec![value.trim_end_matches('/').to_owned()])
         .unwrap_or_else(|| vec!["http://127.0.0.1:3720".into(), "http://game:3720".into()]);
+    let base = wait_until_ready(&urls);
+    http(method, &base, path, body).unwrap_or_else(|error| {
+        fail(&format!(
+            "sokoban request outcome is unknown; the command was not retried: {error}"
+        ))
+    })
+}
+
+fn wait_until_ready(urls: &[String]) -> String {
     let mut last_error = String::new();
     for attempt in 0..40 {
-        for base in &urls {
-            match http(method, base, path, body) {
-                Ok(value) => return value,
-                Err(error) => last_error = error,
+        for base in urls {
+            match http("GET", base, "/health", None) {
+                Ok(value) if value["ok"] == true => return base.clone(),
+                Ok(_) => last_error = format!("{base} returned an unhealthy response"),
+                Err(error) => last_error = format!("{base}: {error}"),
             }
         }
         if attempt != 39 {

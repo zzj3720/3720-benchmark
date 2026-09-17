@@ -3,6 +3,7 @@ use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Output, Stdio};
+use std::sync::mpsc;
 use std::thread;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
@@ -18,7 +19,7 @@ impl Drop for ServerGuard {
 }
 
 #[test]
-fn public_http_client_observer_and_offline_replay_cover_a_solved_level() {
+fn public_http_client_observer_resume_and_offline_replay_cover_a_solved_level() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
     let campaign = root.join("data/campaign/sokoban.json");
     let run_dir = unique_run_dir();
@@ -29,17 +30,7 @@ fn public_http_client_observer_and_offline_replay_cover_a_solved_level() {
     fs::File::create(&recorder_inbox).expect("create recorder inbox");
     let port = unused_port();
     let address = format!("127.0.0.1:{port}");
-    let child = Command::new(env!("CARGO_BIN_EXE_sokoban-server"))
-        .env("SOKOBAN_CAMPAIGN", &campaign)
-        .env("SOKOBAN_AUDIT", &audit)
-        .env("SOKOBAN_EVENTS", &events)
-        .env("BENCHMARK_OBSERVER_INBOX", &recorder_inbox)
-        .env("SOKOBAN_LISTEN_ADDR", &address)
-        .stdout(Stdio::null())
-        .stderr(Stdio::piped())
-        .spawn()
-        .expect("start sokoban server");
-    let mut server = ServerGuard(child);
+    let mut server = start_server(&campaign, &audit, &events, &recorder_inbox, &address);
     wait_until_healthy(port, &mut server);
 
     let client = Command::new(env!("CARGO_BIN_EXE_sokoban"))
@@ -75,6 +66,7 @@ fn public_http_client_observer_and_offline_replay_cover_a_solved_level() {
     let oracle = Command::new("bash")
         .arg(root.join("../../tasks/sokoban/solution/solve.sh"))
         .env("SOKOBAN_URL", format!("http://127.0.0.1:{port}"))
+        .env("SOKOBAN_ORACLE_LIMIT", "25")
         .env("PATH", executable_path)
         .output()
         .expect("run reference solution through the packaged client");
@@ -97,12 +89,30 @@ fn public_http_client_observer_and_offline_replay_cover_a_solved_level() {
                     .is_some_and(|count| count > 1)
         })
     }));
+    let sequence_before_restart = batch["latest_sequence"]
+        .as_u64()
+        .expect("latest event sequence");
+    drop(server);
+
+    let mut server = start_server(&campaign, &audit, &events, &recorder_inbox, &address);
+    wait_until_healthy(port, &mut server);
+    let restored = request(port, "GET", "/v1/observe/snapshot", None);
+    assert_eq!(restored["state"]["campaign"]["score"], 25);
+    assert_eq!(restored["state"]["level"]["id"], "novoban-025");
+    let resumed = request(
+        port,
+        "GET",
+        &format!("/v1/observe/events?after={sequence_before_restart}"),
+        None,
+    );
+    assert_eq!(resumed["events"][0]["type"], "sidecar_resumed");
+    assert_eq!(resumed["events"][0]["score"], 25);
     let submit = assert_ok(request(port, "GET", "/v1/submit", None));
     assert_eq!(submit["data"]["score"], 25);
     assert_eq!(submit["data"]["max_score"], 305);
 
     drop(server);
-    assert!(fs::read(&events).expect("read fallback events").is_empty());
+    assert!(!fs::read(&events).expect("read event history").is_empty());
     assert!(
         !fs::read(&recorder_inbox)
             .expect("read recorder events")
@@ -132,6 +142,150 @@ fn public_http_client_observer_and_offline_replay_cover_a_solved_level() {
         .expect("run verifier against tampered audit");
     assert!(!rejected.status.success(), "tampered audit was accepted");
     fs::remove_dir_all(run_dir).expect("remove test run directory");
+}
+
+#[test]
+fn client_does_not_retry_a_mutation_after_losing_its_response() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let campaign = root.join("data/campaign/sokoban.json");
+    let run_dir = unique_run_dir();
+    fs::create_dir_all(&run_dir).expect("create test run directory");
+    let audit = run_dir.join("audit.jsonl");
+    let events = run_dir.join("events.jsonl");
+    let recorder_inbox = run_dir.join("game-inbox.jsonl");
+    fs::File::create(&recorder_inbox).expect("create recorder inbox");
+    let game_port = unused_port();
+    let game_address = format!("127.0.0.1:{game_port}");
+    let mut server = start_server(&campaign, &audit, &events, &recorder_inbox, &game_address);
+    wait_until_healthy(game_port, &mut server);
+    assert_ok(request(
+        game_port,
+        "POST",
+        "/v1/select",
+        Some(json!({"level": "novoban-001"})),
+    ));
+
+    let proxy = TcpListener::bind("127.0.0.1:0").expect("bind response-loss proxy");
+    let proxy_port = proxy.local_addr().expect("proxy address").port();
+    proxy
+        .set_nonblocking(true)
+        .expect("nonblocking response-loss proxy");
+    let (count_sender, count_receiver) = mpsc::channel();
+    let proxy_thread = thread::spawn(move || {
+        let deadline = Instant::now() + Duration::from_secs(3);
+        let mut connections = 0;
+        let mut second_connection_at = None;
+        while Instant::now() < deadline {
+            match proxy.accept() {
+                Ok((mut client, _)) => {
+                    connections += 1;
+                    let request = read_http_request(&mut client);
+                    if connections <= 2 {
+                        let mut game =
+                            TcpStream::connect(("127.0.0.1", game_port)).expect("connect game");
+                        game.write_all(&request).expect("forward request");
+                        game.flush().expect("flush forwarded request");
+                        let mut response = Vec::new();
+                        game.read_to_end(&mut response).expect("read game response");
+                        if connections == 1 {
+                            client.write_all(&response).expect("return health response");
+                        } else {
+                            second_connection_at = Some(Instant::now());
+                        }
+                    }
+                }
+                Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {
+                    if second_connection_at
+                        .is_some_and(|at| at.elapsed() >= Duration::from_millis(300))
+                    {
+                        break;
+                    }
+                    thread::sleep(Duration::from_millis(10));
+                }
+                Err(error) => panic!("accept response-loss proxy connection: {error}"),
+            }
+        }
+        count_sender
+            .send(connections)
+            .expect("send connection count");
+    });
+
+    let client = Command::new(env!("CARGO_BIN_EXE_sokoban"))
+        .args(["move", "down"])
+        .env("SOKOBAN_URL", format!("http://127.0.0.1:{proxy_port}"))
+        .output()
+        .expect("run client through response-loss proxy");
+    assert!(
+        !client.status.success(),
+        "lost response was reported as success"
+    );
+    assert!(
+        String::from_utf8_lossy(&client.stderr).contains("command was not retried"),
+        "unexpected client error: {}",
+        String::from_utf8_lossy(&client.stderr)
+    );
+    proxy_thread.join().expect("join response-loss proxy");
+    assert_eq!(
+        count_receiver.recv().expect("receive connection count"),
+        2,
+        "client connected more than once for the mutation"
+    );
+    let snapshot = assert_ok(request(game_port, "GET", "/v1/show", None));
+    assert_eq!(snapshot["data"]["board"]["moves"], 1);
+    drop(server);
+    fs::remove_dir_all(run_dir).expect("remove test run directory");
+}
+
+fn start_server(
+    campaign: &Path,
+    audit: &Path,
+    events: &Path,
+    recorder_inbox: &Path,
+    address: &str,
+) -> ServerGuard {
+    ServerGuard(
+        Command::new(env!("CARGO_BIN_EXE_sokoban-server"))
+            .env("SOKOBAN_CAMPAIGN", campaign)
+            .env("SOKOBAN_AUDIT", audit)
+            .env("SOKOBAN_EVENTS", events)
+            .env("BENCHMARK_OBSERVER_INBOX", recorder_inbox)
+            .env("SOKOBAN_LISTEN_ADDR", address)
+            .stdout(Stdio::null())
+            .stderr(Stdio::piped())
+            .spawn()
+            .expect("start sokoban server"),
+    )
+}
+
+fn read_http_request(stream: &mut TcpStream) -> Vec<u8> {
+    stream
+        .set_read_timeout(Some(Duration::from_secs(2)))
+        .expect("configure proxy read timeout");
+    let mut request = Vec::new();
+    let mut buffer = [0; 4096];
+    let mut expected = None;
+    loop {
+        let read = stream.read(&mut buffer).expect("read proxied request");
+        assert!(read > 0, "client closed before sending a complete request");
+        request.extend_from_slice(&buffer[..read]);
+        if expected.is_none()
+            && let Some(split) = request.windows(4).position(|window| window == b"\r\n\r\n")
+        {
+            let headers = std::str::from_utf8(&request[..split]).expect("UTF-8 request headers");
+            let content_length = headers
+                .lines()
+                .find_map(|line| {
+                    line.to_ascii_lowercase()
+                        .strip_prefix("content-length: ")
+                        .and_then(|value| value.parse::<usize>().ok())
+                })
+                .unwrap_or(0);
+            expected = Some(split + 4 + content_length);
+        }
+        if expected.is_some_and(|expected| request.len() >= expected) {
+            return request;
+        }
+    }
 }
 
 fn unused_port() -> u16 {

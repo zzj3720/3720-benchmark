@@ -1,6 +1,6 @@
 use std::env;
 use std::fs::{self, File, OpenOptions};
-use std::io::{Read, Write};
+use std::io::{BufRead, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Condvar, Mutex};
 use std::thread;
@@ -13,7 +13,9 @@ use flate2::write::GzEncoder;
 use serde::Deserialize;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
-use sokoban_benchmark::{API_VERSION, Campaign, Command, Direction, Session, execute_observed};
+use sokoban_benchmark::{
+    API_VERSION, Campaign, Command, Direction, Session, execute, execute_observed,
+};
 use tiny_http::{Header, Method, Request, Response, Server, StatusCode};
 
 const AUDIT_SCHEMA: &str = "sokoban-audit-v1";
@@ -35,6 +37,28 @@ struct App {
     event_path: PathBuf,
     recorder_inbox_path: PathBuf,
     campaign_hash: String,
+}
+
+#[derive(Deserialize)]
+struct AuditHeader {
+    schema: String,
+    api_version: String,
+    campaign: String,
+    campaign_sha256: String,
+}
+
+#[derive(Deserialize)]
+struct AuditRecord {
+    sequence: u64,
+    command: Command,
+    response: Value,
+}
+
+struct Restored {
+    session: Session<'static>,
+    audit_sequence: u64,
+    events: Vec<Value>,
+    resumed: bool,
 }
 
 #[derive(Deserialize)]
@@ -86,13 +110,24 @@ fn serve() -> Result<(), String> {
     ensure_parent(&event_path)?;
     let campaign_hash = sha256_file(&campaign_path)?;
     let campaign = Box::leak(Box::new(Campaign::load(&campaign_path)?));
-    initialize_files(&audit_path, &event_path, campaign, &campaign_hash)?;
+    let restored = initialize_or_restore(&audit_path, &event_path, campaign, &campaign_hash)?;
+    let event_sequence = restored
+        .events
+        .last()
+        .and_then(|event| event.get("sequence"))
+        .and_then(Value::as_u64)
+        .unwrap_or(0);
+    let lifecycle = if restored.resumed {
+        "sidecar_resumed"
+    } else {
+        "sidecar_started"
+    };
     let app = Arc::new(App {
         inner: Mutex::new(Inner {
-            session: Session::new(campaign),
-            audit_sequence: 0,
-            event_sequence: 0,
-            events: Vec::new(),
+            session: restored.session,
+            audit_sequence: restored.audit_sequence,
+            event_sequence,
+            events: restored.events,
         }),
         changed: Condvar::new(),
         audit_path,
@@ -100,7 +135,7 @@ fn serve() -> Result<(), String> {
         recorder_inbox_path,
         campaign_hash,
     });
-    record_lifecycle(&app)?;
+    record_lifecycle(&app, lifecycle)?;
 
     let address = env::var("SOKOBAN_LISTEN_ADDR").unwrap_or_else(|_| "0.0.0.0:3720".to_owned());
     let server = Server::http(&address)
@@ -325,19 +360,24 @@ fn encoded_instruction_trace(steps: &[Value]) -> Result<Value, String> {
     }))
 }
 
-fn record_lifecycle(app: &Arc<App>) -> Result<(), String> {
+fn record_lifecycle(app: &Arc<App>, lifecycle: &str) -> Result<(), String> {
     let mut inner = app.inner.lock().map_err(|_| "state lock poisoned")?;
     inner.event_sequence += 1;
+    let score = inner.session.score();
     let event = json!({
         "schema": EVENT_SCHEMA,
         "sequence": inner.event_sequence,
         "timestamp_ms": timestamp_ms()?,
         "task": task_identity(),
-        "type": "sidecar_started",
+        "type": lifecycle,
         "action": Value::Null,
         "state": inner.session.snapshot(),
-        "result": {"ok": true, "campaign_sha256": app.campaign_hash},
-        "score": 0,
+        "result": {
+            "ok": true,
+            "campaign_sha256": app.campaign_hash,
+            "restored_commands": inner.audit_sequence,
+        },
+        "score": score,
         "score_delta": 0,
     });
     append_observer_event(app, &event)?;
@@ -345,29 +385,112 @@ fn record_lifecycle(app: &Arc<App>) -> Result<(), String> {
     Ok(())
 }
 
-fn initialize_files(
+fn initialize_or_restore(
     audit_path: &Path,
     event_path: &Path,
-    campaign: &Campaign,
+    campaign: &'static Campaign,
     campaign_hash: &str,
-) -> Result<(), String> {
-    if audit_path.exists() || event_path.exists() {
-        return Err(
-            "sokoban audit/event files already exist; use a fresh run directory".to_owned(),
-        );
+) -> Result<Restored, String> {
+    match (audit_path.exists(), event_path.exists()) {
+        (false, false) => {
+            append_json_line(
+                audit_path,
+                &json!({
+                    "schema": AUDIT_SCHEMA,
+                    "api_version": API_VERSION,
+                    "campaign": campaign.id,
+                    "campaign_sha256": campaign_hash,
+                }),
+            )?;
+            File::create(event_path)
+                .map_err(|error| format!("could not create {}: {error}", event_path.display()))?;
+            Ok(Restored {
+                session: Session::new(campaign),
+                audit_sequence: 0,
+                events: Vec::new(),
+                resumed: false,
+            })
+        }
+        (true, true) => {
+            let (session, audit_sequence) = restore_audit(audit_path, campaign, campaign_hash)?;
+            Ok(Restored {
+                session,
+                audit_sequence,
+                events: load_events(event_path)?,
+                resumed: true,
+            })
+        }
+        _ => Err("sokoban audit and event history must either both exist or both be absent".into()),
     }
-    append_json_line(
-        audit_path,
-        &json!({
-            "schema": AUDIT_SCHEMA,
-            "api_version": API_VERSION,
-            "campaign": campaign.id,
-            "campaign_sha256": campaign_hash,
-        }),
-    )?;
-    File::create(event_path)
-        .map_err(|error| format!("could not create {}: {error}", event_path.display()))?;
-    Ok(())
+}
+
+fn restore_audit(
+    path: &Path,
+    campaign: &'static Campaign,
+    campaign_hash: &str,
+) -> Result<(Session<'static>, u64), String> {
+    let file =
+        File::open(path).map_err(|error| format!("could not open {}: {error}", path.display()))?;
+    let mut lines = BufReader::new(file).lines();
+    let header_line = lines
+        .next()
+        .ok_or_else(|| "sokoban audit is empty".to_owned())?
+        .map_err(|error| format!("could not read audit header: {error}"))?;
+    let header: AuditHeader = serde_json::from_str(&header_line)
+        .map_err(|error| format!("invalid audit header: {error}"))?;
+    if header.schema != AUDIT_SCHEMA
+        || header.api_version != API_VERSION
+        || header.campaign != campaign.id
+        || header.campaign_sha256 != campaign_hash
+    {
+        return Err("audit header does not describe this frozen campaign".into());
+    }
+
+    let mut session = Session::new(campaign);
+    let mut previous_sequence = 0;
+    for (index, line) in lines.enumerate() {
+        let line = line.map_err(|error| format!("could not read audit: {error}"))?;
+        let record: AuditRecord = serde_json::from_str(&line)
+            .map_err(|error| format!("invalid audit line {}: {error}", index + 2))?;
+        if record.sequence != previous_sequence + 1 {
+            return Err(format!(
+                "audit sequence {} does not follow {previous_sequence}",
+                record.sequence
+            ));
+        }
+        if execute(&mut session, &record.command) != record.response {
+            return Err(format!(
+                "audit response mismatch at sequence {}",
+                record.sequence
+            ));
+        }
+        previous_sequence = record.sequence;
+    }
+    Ok((session, previous_sequence))
+}
+
+fn load_events(path: &Path) -> Result<Vec<Value>, String> {
+    let file =
+        File::open(path).map_err(|error| format!("could not open {}: {error}", path.display()))?;
+    let mut events = Vec::new();
+    let mut previous_sequence = 0;
+    for (index, line) in BufReader::new(file).lines().enumerate() {
+        let line = line.map_err(|error| format!("could not read event history: {error}"))?;
+        let event: Value = serde_json::from_str(&line)
+            .map_err(|error| format!("invalid event line {}: {error}", index + 1))?;
+        let sequence = event
+            .get("sequence")
+            .and_then(Value::as_u64)
+            .ok_or_else(|| format!("event line {} has no sequence", index + 1))?;
+        if event.get("schema").and_then(Value::as_str) != Some(EVENT_SCHEMA)
+            || sequence != previous_sequence + 1
+        {
+            return Err(format!("invalid event history at sequence {sequence}"));
+        }
+        previous_sequence = sequence;
+        events.push(event);
+    }
+    Ok(events)
 }
 
 fn response_state(response: &Value) -> Value {
@@ -462,12 +585,11 @@ fn append_json_line(path: &Path, value: &Value) -> Result<(), String> {
 }
 
 fn append_observer_event(app: &App, value: &Value) -> Result<(), String> {
-    let path = if app.recorder_inbox_path.exists() {
-        &app.recorder_inbox_path
-    } else {
-        &app.event_path
-    };
-    append_json_line(path, value)
+    append_json_line(&app.event_path, value)?;
+    if app.recorder_inbox_path.exists() && app.recorder_inbox_path != app.event_path {
+        append_json_line(&app.recorder_inbox_path, value)?;
+    }
+    Ok(())
 }
 
 fn sha256_file(path: &Path) -> Result<String, String> {

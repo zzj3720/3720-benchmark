@@ -42,4 +42,8 @@ for destination in environment/game/campaign tests/campaign; do
     "$task_dir/$destination/source.json"
 done
 
+install -m 644 \
+  "$data_dir/oracle/solutions.tsv" \
+  "$task_dir/solution/solutions.tsv"
+
 echo "Packaged sokoban for linux/amd64 and linux/arm64"

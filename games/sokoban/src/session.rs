@@ -244,7 +244,11 @@ impl<'a> Session<'a> {
                     solved,
                     total: tier.levels.len(),
                     unlock_after: tier.unlock_after,
-                    remaining_to_unlock_next: tier.unlock_after.saturating_sub(solved),
+                    remaining_to_unlock_next: if index + 1 < self.campaign.tiers.len() {
+                        tier.unlock_after.saturating_sub(solved)
+                    } else {
+                        0
+                    },
                 }
             })
             .collect();
@@ -389,5 +393,14 @@ mod tests {
         session
             .select("hard-1")
             .expect("select newly unlocked tier");
+        assert_eq!(
+            session
+                .snapshot()
+                .tiers
+                .last()
+                .expect("last tier")
+                .remaining_to_unlock_next,
+            0
+        );
     }
 }
