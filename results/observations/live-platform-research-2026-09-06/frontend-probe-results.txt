@@ -1,0 +1,5 @@
+detail_out_of_order {"expected_sequence":2,"actual_sequence":1}
+lease_change_same_sequence {"detail_fetches":1,"summary_live":false,"detail_refetched":false}
+failed_detail_no_new_events {"fetches":1,"connection":"live","detail":null}
+sse_error_payload {"connection":"live","run_count":0}
+return_live_during_replay_fetch {"expected_replay":null,"actual_attempt":8}

@@ -1,5 +1,11 @@
 # 3720 Live Operations
 
+The supported deployment is now `compose.yaml`: immutable web/gateway images,
+read-only history mounts, and a separate disposable query-cache volume. See
+[`docs/live-platform-v2.md`](../docs/live-platform-v2.md) for the storage/API
+contract, memory budgets, migration, and rollback.
+
+
 `observer-platform/` is the public, read-only live console for 3720 game
 benchmarks. It shows real Harbor runs rather than browser fixtures:
 
@@ -13,26 +19,30 @@ benchmarks. It shows real Harbor runs rather than browser fixtures:
   messages, and recent append-only events;
 - both active trials and the most recent saved result for each game/model.
 
-The browser holds one Server-Sent Events subscription. Selecting a run replaces
-the stream with one that carries only that run's revision alongside the compact
-scoreboard:
+The browser holds one versioned Server-Sent Events subscription:
 
 ```text
-GET /api/live/subscribe
-GET /api/live/subscribe?run_id=<run-id>
+GET /api/live/v1/subscribe?protocol=2
+GET /api/live/v1/subscribe?protocol=2&run_id=<run-id>
 ```
 
-When the revision changes, the browser reads the selected run detail once.
-Replay frames are loaded only after an attempt is selected. Large immutable
-game data is exposed through content-addressed assets and cached independently,
-so it never rides along with SSE updates or every replay response.
+The first message is a snapshot. Later messages contain changed runs, removed
+IDs, and appended score points. The browser preserves the last valid snapshot
+on errors, retries detail independently of new game events, and serializes
+revision updates. The v1 full-snapshot feed remains available for older pages.
 
-The Rust gateway wakes subscribers from filesystem notifications on the one
-chain journal. Compressed replay traces and immutable scenes live beside it as
-content-addressed objects and are read only for the latest state or selected
-attempt. Historical runs come from an immutable local archive. With no source
-event it sends only an SSE keepalive; there is no timed snapshot refresh behind
-the subscription and no Docker or Harbor scan on a request.
+Run detail includes the current state, recent visible Agent activity, and up to
+200 attempts. Older catalog pages and bounded replay windows are fetched on
+demand. Assets are immutable and use a bounded browser cache. The gateway uses
+a disposable SQLite index with a 4 MiB page cache per connection, a 32 MiB
+weighted detail cache, and at most two simultaneous projection/replay jobs.
+The authority remains the journal, not SQLite.
+
+Finalized history is stored in independent zstd segments with a 16 MiB decoded
+limit (32 MiB is supported), indexed by sequence range and SHA-256. Active runs
+rotate at the same limit and retain only the open tail as JSONL. Segment
+boundaries never split an event. Source data is read-only inside Docker; the
+recorder and archive CLI run on the host and own all authoritative writes.
 
 Emergency Operator publishes read-only clock snapshots once per second after a
 shift starts, so calls, ETAs, incident health, alarms, and score remain live
@@ -53,51 +63,43 @@ The runtime ledger and migration boundary are specified in
 [`docs/tracks/live-observability.md`](../docs/tracks/live-observability.md).
 
 The production URL is [live.benchmark.3720.org](https://live.benchmark.3720.org).
-A Cloudflare Worker accepts only `GET` and `HEAD`, forwards to the named Tunnel
-origin, and the application route again allowlists only the two live endpoints.
+A Cloudflare Worker accepts only `GET` and `HEAD`, rewrites `/api/live/v1/*` to
+the gateway's `/v1/*`, and forwards to the named Tunnel origin. The Vinext
+application route applies the same read-only allowlist (`/v1/runs`,
+`/v1/assets/<id>`, `/v1/subscribe`) and streams responses through, so a
+self-hosted `vinext start` serves the same endpoints without the Worker in
+front.
 
-## Local operation
+## Docker operation
 
-Node.js 22.13 or newer and Rust are required. Docker is needed only to launch
-benchmark tasks, not to serve the live console.
-
-```bash
-vp install
-cargo run --release \
-  --manifest-path ../tools/observer/runtime/Cargo.toml \
-  --bin live-gateway -- --root ..
-vp run test
-vp run start
-```
-
-The host service is published from an immutable, versioned release rather than
-the mutable `dist/` directory. After a successful build and test run, publish
-the current output atomically with:
+Docker Compose, Node.js 24+ (for host checks), and Rust (for the host recorder)
+are required. From the repository root:
 
 ```bash
-vp run publish:local
+npm --prefix observer-platform ci
+npm --prefix observer-platform test
+cargo test --manifest-path tools/observer/runtime/Cargo.toml
+python3 observer-platform/scripts/publish_docker.py --preview
+python3 observer-platform/scripts/publish_docker.py
 ```
 
-The release keeps content-addressed chunks from the previous version so an HTML
-document already cached at the edge cannot reference a file removed during the
-switch. It also installs the release's Rust gateway binary and reloads its
-LaunchAgent definition, so a runtime migration cannot accidentally restart an
-older gateway command. The Cloudflare Worker serves static chunks and observer
-assets from its immutable cache, preserves HTTP compression for JSON, and
-routes the small SSE feed directly to the read-only gateway.
+Publication builds versioned images and the host recorder, verifies the
+candidate on ports 14000/14740, compares run identities/scores with the current
+service, and only then switches ports 3000/3740. Failure restores the previous
+Docker release or the existing macOS LaunchAgents. The native services are
+disabled only during the first successful switch. Public content-hashed chunks
+are retained across releases so cached HTML remains usable.
 
-The defaults are:
+The web and gateway each have a 256 MiB container limit, with swap disabled.
+Only loopback ports are published. The gateway's `/health` becomes ready after
+its query index has been rebuilt; startup can take longer with a cold cache.
+A writer heartbeat lets the Docker gateway observe the host recorder without
+assuming that macOS and the Linux VM share file-lock ownership.
 
-```text
-live gateway  http://127.0.0.1:3740
-Vinext         http://127.0.0.1:3000
-```
-
-Set `LIVE_GATEWAY_ORIGIN` when the server-side proxy targets a different
-gateway. For a local browser preview, set `VITE_LIVE_GATEWAY_ORIGIN` on the
-Vinext dev process as well; this keeps an isolated fixture gateway separate
-from the default live data on port 3740. `GET /health` on the gateway is the
-process health check.
+For development, use `npm run dev` inside this directory and start the Rust
+gateway separately. The browser normally uses the same-origin API route.
+Set `LIVE_GATEWAY_ORIGIN` on the Node process for an alternate gateway;
+`VITE_LIVE_GATEWAY_ORIGIN` is an explicit browser override for isolated fixtures.
 
 ## Render QA
 

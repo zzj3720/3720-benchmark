@@ -66,12 +66,12 @@ function Gallery() {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return response.json();
       })
-      .then((payload) => setSamples(payload.samples))
+      .then((payload) => setSamples((payload as { samples: Sample[] }).samples))
       .catch((reason) => setError(String(reason)));
   }, [game]);
   const visible = useMemo(
-    () => game === "sausage" ? samples.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE) : samples,
-    [game, page, samples],
+    () => samples.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE),
+    [page, samples],
   );
   const pageCount = Math.max(1, Math.ceil(samples.length / PAGE_SIZE));
 
@@ -105,8 +105,8 @@ function Gallery() {
           加载失败：{error}。请在 observer-platform 运行 `vp run {game === "sausage" ? "qa:sausage:data" : game === "operator" ? "qa:operator:data" : game === "kitchen" ? "qa:kitchen:data" : "qa:parabox:data"}`。
         </p>
       ) : null}
-      {game === "sausage" ? (
-        <nav className="qa-pagination" aria-label="Sausage QA 分页">
+      {samples.length > PAGE_SIZE ? (
+        <nav className="qa-pagination" aria-label="渲染 QA 分页">
           <button disabled={page === 0} onClick={() => setPage((value) => Math.max(0, value - 1))}>← PREV</button>
           <span>PAGE {page + 1} / {pageCount} · SAMPLES {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, samples.length || PAGE_SIZE)}</span>
           <button disabled={page + 1 >= pageCount} onClick={() => setPage((value) => Math.min(pageCount - 1, value + 1))}>NEXT →</button>
@@ -114,7 +114,7 @@ function Gallery() {
       ) : null}
       <section className="qa-gallery">
         {visible.map((sample, visibleIndex) => {
-          const index = game === "sausage" ? page * PAGE_SIZE + visibleIndex : visibleIndex;
+          const index = page * PAGE_SIZE + visibleIndex;
           return (
             <article className="qa-card" key={`${sample.reference}:${sample.step}`}>
               <header>

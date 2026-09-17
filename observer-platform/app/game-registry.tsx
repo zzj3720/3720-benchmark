@@ -2,6 +2,7 @@ import { memo } from "react";
 
 import operator from "../../games/emergency-operator/observer";
 import kitchen from "../../games/kitchen-terminal/observer";
+import minesweeper from "../../games/minesweeper/observer";
 import parabox from "../../games/parabox-intro/observer";
 import sausage from "../../games/sausage-roll/observer";
 import sokoban from "../../games/sokoban/observer";
@@ -20,6 +21,7 @@ export const GAME_OBSERVERS = {
   swarm,
   sausage,
   sokoban,
+  minesweeper,
   operator,
   kitchen,
 } as const;
@@ -39,13 +41,18 @@ export const GameState = memo(function GameState({
   state: State;
   previousState?: State | null;
 }) {
-  const StateView = GAME_OBSERVERS[game].State;
+  const StateView = GAME_OBSERVERS[game].State as GameObserverModule["State"];
   return <StateView state={state} previousState={previousState} />;
 });
 
 export function gameStateContext(game: GameId, state: State) {
   const observer = GAME_OBSERVERS[game] as GameObserverModule;
   return observer.stateContext?.(state) ?? null;
+}
+
+export function resolveGameFrameState(game: GameId, frameState: State, latestState: State) {
+  const observer = GAME_OBSERVERS[game] as GameObserverModule;
+  return observer.resolveFrameState?.(frameState, latestState) ?? frameState;
 }
 
 export function describeGameEvent(

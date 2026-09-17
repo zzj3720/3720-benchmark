@@ -38,7 +38,16 @@ export type GameObserverModule<Game extends string = string> = {
   State: ComponentType<{ state: GameState; previousState?: GameState | null }>;
   stateContext?: (state: GameState) => string | null;
   describeEvent?: (event: ObserverEvent, previous?: ObserverEvent | null) => EventDescription;
+  /**
+   * Merge anything a historical replay frame is missing from the latest
+   * authoritative state (e.g. a large shared map stored only once). Defaults
+   * to the frame state unchanged.
+   */
+  resolveFrameState?: (frameState: GameState, latestState: GameState) => GameState;
 };
+
+/** Attribute a game observer puts on the DOM node captured by replay export. */
+export const REPLAY_CAPTURE_ATTRIBUTE = "data-replay-capture";
 
 export function asRecord(value: Json | undefined): GameState | null {
   return value && typeof value === "object" && !Array.isArray(value)

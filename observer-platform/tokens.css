@@ -1,0 +1,31 @@
+/* Hallmark · macrostructure: Workbench · theme: Terminal · tone: quiet observation · anchor hue: green */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R5 V4 */
+:root {
+  --color-paper: oklch(17% .009 165);
+  --color-paper-2: oklch(20% .009 165);
+  --color-paper-3: oklch(24% .012 165);
+  --color-ink: oklch(94% .008 150);
+  --color-ink-2: oklch(72% .014 155);
+  --color-rule: oklch(33% .014 160);
+  --color-accent: oklch(86% .17 140);
+  --color-focus: oklch(86% .17 140);
+  --font-display: var(--font-geist-sans);
+  --font-body: var(--font-geist-sans);
+  --font-data: var(--font-geist-mono);
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 14px;
+  --text-lg: 16px;
+  --radius-control: 6px;
+  --radius-panel: 8px;
+}
+:root {
+  --color-control-shadow: oklch(8% .01 160 / .5);
+  --color-control-ring: oklch(86% .17 140 / .16);
+}

@@ -1,5 +1,12 @@
 # Live observability architecture
 
+The current storage/deployment details are in [Live platform v2](../live-platform-v2.md).
+The authority now consists of 16 MiB (or configured 32 MiB) decoded zstd
+segments plus an open JSONL tail. A disposable disk index replaces the old
+in-memory live projection. Logical identity and effective-time ownership below
+remain unchanged.
+
+
 The live system must represent one logical benchmark run across pauses,
 continuations, infrastructure failures, and multiple Harbor trials. A game
 sidecar owns game truth and the Agent runtime owns execution truth, but those
@@ -58,12 +65,14 @@ state on every action:
 
 The recorder removes those already-compressed traces, snapshots, and assets
 from the hot JSONL journal and stores them once under
-`.harbor/run-journals/<chain_id>/objects/<sha256>.json.gz`. Journal records keep
+`.harbor/run-journals/<chain_id>/objects/<sha256>.json.zst`. Journal records keep
 only their content-addressed metadata. The gateway materializes the latest
 state or one selected attempt on demand; listing runs and following live score
 changes never reads every replay object.
 
-The browser never downloads a run's complete replay during live viewing. The
+The browser never downloads a run's complete replay during live viewing. Catalogs
+and long attempts are paged with bounded decoded input; immutable objects remain
+independently cached. The
 subscription carries summaries plus the selected run's revision, detail is
 read after that revision changes, immutable assets are cached independently,
 and one attempt replay is fetched only when selected. HTTP gzip is the wire
@@ -84,8 +93,8 @@ writer for that chain; `tools/observer/run_journal.py` is a thin Harbor hook
 adapter that forwards lifecycle messages over a JSON-lines control pipe.
 Runtime lifecycle changes enter it directly; sidecar observer events enter
 through the trial-scoped `/logs/artifacts/observer/game-inbox.jsonl` transport.
-The recorder follows that file as a long-lived append stream, so new durable
-lines wake ingestion without polling game state. The file remains the recovery
+The recorder tails that durable transport incrementally; it never polls game
+state, and it retries uncommitted inbox records after a failed append. The file remains the recovery
 buffer if the recorder must catch up after interruption.
 The inbox is not a second authority: it is drained idempotently into the same
 journal before Harbor seals the trial, then cleared after environment teardown.
@@ -134,10 +143,19 @@ not also write a local observer history. Their private scoring audit remains a
 separate recovery artifact. This permits recovery from a brief recorder outage
 without creating two public authorities.
 
-The implementation is an append-only JSONL journal under
-`.harbor/run-journals/<chain_id>/journal.jsonl`, not a database. The current
-scale does not justify another persistence system. A SQLite projection can be
-added later only if replaying the journal becomes measurably expensive.
+The authority is the append-only event sequence under
+`.harbor/run-journals/<chain_id>/`: indexed zstd segments and an open
+`journal.jsonl` tail. The gateway streams it into a disposable SQLite query index
+in its separate cache volume, following only complete appended records. This
+keeps historical state out of RAM and permits bounded catalog/replay queries.
+Deleting the index changes no score, replay, or continuation identity.
+
+Agent session files are a source, not a second event log. The recorder copies
+only visible messages and explicit workspace notes, and remembers source-line
+digests for the lifetime of a segment. If a native session is compacted,
+truncated, or rewritten in place, previously ingested lines are not appended to
+the journal again. Game actions remain authoritative through the sidecar event
+stream instead of being duplicated from Agent tool calls.
 
 All scored benchmark launches use `tools/observer/harbor-run`. A first segment
 defaults its chain id to the Harbor job name. A continuation sets
@@ -145,6 +163,14 @@ defaults its chain id to the Harbor job name. A continuation sets
 identity. Parallel writers for the same chain are invalid; continuation is a
 sequential append to the sealed prior segment. The recorder holds an exclusive
 process lock for the chain and rejects a second active writer.
+The process-scoped lock protects writers on the recorder host. The native gateway
+can inspect it directly; the Docker gateway uses the recorder's versioned,
+freshness-checked `writer-lease.json` heartbeat instead:
+an unsealed segment is `live` only while its recorder still holds the lock.
+If the recorder disappears without appending `segment_finished`, the gateway
+projects the segment as `orphaned` instead of `running`. A small lease monitor
+invalidates the SSE summary when the lock owner changes; it does not poll game
+state or infer identity from Docker or Harbor names.
 
 ### 3. Live projection plane
 
@@ -163,9 +189,13 @@ remains only as the thin Harbor plugin interface that starts the recorder and
 for Harbor's Agent implementations; there is no Python replay, projection,
 scoring, or gateway path.
 
-The browser subscribes only to this projection. The gateway is read-only, has
-no game mutation credentials, and does not combine runtime results with game
-logs. Game-specific normalization metadata and UI renderers remain under
+The browser subscribes only to this projection. One scoreboard projection is shared by SSE subscribers. Each v2 connection
+receives changes and appended score points after its initial snapshot. Selected
+detail is invalidated by sequence and lifecycle/lease state rather than unrelated
+filesystem updates.
+The gateway is read-only, has no game mutation credentials, and does not
+combine runtime results with game logs. Game-specific normalization metadata
+and UI renderers remain under
 `games/<game>/observer`; the gateway does not contain a branch per model or per
 continuation generation.
 
@@ -241,10 +271,11 @@ manifest.
    creates a trial manifest and ingestion inbox before environment startup;
    sidecars inherit that host mount and append their native observer records.
    The gateway discovers the manifest and journal, not a container name.
-4. **Event-driven ingestion (complete):** recorder-aware sidecars durably append
-   to the trial inbox while the recorder follows its append stream. The browser
-   and gateway use SSE, and neither live path polls game state. A pipe or direct
-   sidecar stream can replace the inbox later without changing the journal.
+4. **Incremental ingestion:** sidecars append to the durable inbox; the recorder
+   drains complete lines and commits its cursor after durable writes. The browser
+   uses SSE and the gateway uses filesystem notifications with a metadata-only
+   fallback for VM mounts. Neither path polls game state. A direct sidecar stream
+   can replace the inbox without changing the authoritative event contract.
 5. **Retire inference (complete):** existing runs are archived and the Rust
    gateway has no recovery-path, checkpoint-path, Docker, or container-name
    lineage inference.

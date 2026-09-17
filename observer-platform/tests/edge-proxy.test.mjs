@@ -78,7 +78,7 @@ test("edge proxy streams live subscriptions without buffering", async () => {
 
   try {
     const response = await worker.fetch(
-      new Request("https://live.benchmark.3720.org/api/live/subscribe?run_id=abc"),
+      new Request("https://live.benchmark.3720.org/api/live/v1/subscribe?run_id=abc"),
     );
     assert.equal(forwarded, "https://benchmark-live-origin.3720.org/v1/subscribe?run_id=abc");
     assert.match(response.headers.get("content-type") ?? "", /^text\/event-stream/);

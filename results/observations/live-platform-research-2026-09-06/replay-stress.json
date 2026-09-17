@@ -1,0 +1,113 @@
+[
+  {
+    "game": "operator",
+    "bytes": 1145606,
+    "frames": 129,
+    "next": 170,
+    "seconds": 0.09,
+    "next_page_frames": 80
+  },
+  {
+    "game": "kitchen",
+    "bytes": 1078412,
+    "frames": 32,
+    "next": 47,
+    "seconds": 0.162,
+    "next_page_frames": 32
+  },
+  {
+    "game": "parabox",
+    "bytes": 108684,
+    "frames": 15,
+    "next": null,
+    "seconds": 0.061
+  },
+  {
+    "game": "sokoban",
+    "bytes": 168605,
+    "frames": 84,
+    "next": null,
+    "seconds": 0.028
+  },
+  {
+    "game": "minesweeper",
+    "bytes": 25417,
+    "frames": 5,
+    "next": null,
+    "seconds": 0.016
+  },
+  {
+    "game": "operator",
+    "bytes": 1145606,
+    "frames": 129,
+    "next": 170,
+    "seconds": 0.064,
+    "next_page_frames": 80
+  },
+  {
+    "game": "kitchen",
+    "bytes": 1078412,
+    "frames": 32,
+    "next": 47,
+    "seconds": 0.094,
+    "next_page_frames": 32
+  },
+  {
+    "game": "parabox",
+    "bytes": 108684,
+    "frames": 15,
+    "next": null,
+    "seconds": 0.049
+  },
+  {
+    "game": "sokoban",
+    "bytes": 168605,
+    "frames": 84,
+    "next": null,
+    "seconds": 0.011
+  },
+  {
+    "game": "minesweeper",
+    "bytes": 25417,
+    "frames": 5,
+    "next": null,
+    "seconds": 0.009
+  },
+  {
+    "game": "operator",
+    "bytes": 1145606,
+    "frames": 129,
+    "next": 170,
+    "seconds": 0.055,
+    "next_page_frames": 80
+  },
+  {
+    "game": "kitchen",
+    "bytes": 1078412,
+    "frames": 32,
+    "next": 47,
+    "seconds": 0.094,
+    "next_page_frames": 32
+  },
+  {
+    "game": "parabox",
+    "bytes": 108684,
+    "frames": 15,
+    "next": null,
+    "seconds": 0.048
+  },
+  {
+    "game": "sokoban",
+    "bytes": 168605,
+    "frames": 84,
+    "next": null,
+    "seconds": 0.007
+  },
+  {
+    "game": "minesweeper",
+    "bytes": 25417,
+    "frames": 5,
+    "next": null,
+    "seconds": 0.007
+  }
+]

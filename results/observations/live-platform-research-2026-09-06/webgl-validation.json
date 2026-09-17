@@ -1,0 +1,39 @@
+{
+  "games": 7,
+  "browser_regressions": 11,
+  "existing_web_tests": 17,
+  "typecheck": "passed",
+  "build": "passed",
+  "lint_errors": 0,
+  "lint_preexisting_warnings": 1,
+  "viewport_widths": [
+    320,
+    375,
+    768,
+    1440
+  ],
+  "webgl_context_restore_games": 7,
+  "gif_export_games": 7,
+  "export_cancel": {
+    "status": "passed",
+    "downloads": 0
+  },
+  "benchmark": {
+    "run": "parabox-v14-logic-gpt-terra-xhigh-r2-fresh-240h",
+    "group": "c9",
+    "attempt": 23,
+    "speed": 4,
+    "before_gif_ms": 13611,
+    "after_gif_ms": 809,
+    "after_gif_bytes": 436289,
+    "video_ms": 834,
+    "video_bytes": 126782,
+    "video_duration_seconds": 8.776,
+    "video_dimensions": [
+      900,
+      308
+    ],
+    "video_first_pixel_hash": 1329743149,
+    "video_last_pixel_hash": 2463762420
+  }
+}

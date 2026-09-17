@@ -1,0 +1,11 @@
+{
+  "release": "live-v2-webgl-20260906",
+  "public_runs": 48,
+  "matching_public_assets": 7,
+  "health": {
+    "ok": true,
+    "ready": true,
+    "runtime": "rust",
+    "storage": "segmented-zstd-v2"
+  }
+}

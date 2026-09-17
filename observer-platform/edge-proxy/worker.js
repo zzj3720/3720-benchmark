@@ -5,9 +5,7 @@ const CACHE_VERSION = "2026-07-22-v5";
 function upstreamUrl(request) {
   const upstream = new URL(request.url);
   upstream.hostname = ORIGIN;
-  if (upstream.pathname === "/api/live/subscribe") {
-    upstream.pathname = "/v1/subscribe";
-  } else if (upstream.pathname.startsWith("/api/live/v1/")) {
+  if (upstream.pathname.startsWith("/api/live/v1/")) {
     upstream.pathname = upstream.pathname.slice("/api/live".length);
   }
   return upstream;

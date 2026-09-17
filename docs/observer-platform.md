@@ -1,5 +1,11 @@
 # Benchmark live observation
 
+The current storage and deployment contract is documented in
+[Live platform v2](live-platform-v2.md). Historical authority is segmented zstd;
+Docker serves the UI and read-only gateway, with a separate disposable SQLite
+query index. The recorder continues to run beside Harbor on the host.
+
+
 The live platform has two read-only layers: a common per-game observer schema
 inside sidecars, and a host gateway that projects all current Harbor trials into
 one multi-run feed.
@@ -37,6 +43,9 @@ tool actions, and workspace notes therefore arrive with one identity, one
 sequence, and an already-stamped effective Agent time. Runs created before the
 recorder are frozen in the local `.harbor/live-archive`; request handling never
 scans Docker or joins live Harbor artifacts.
+An unsealed segment is reported as live only while its recorder owns the
+chain's process-scoped writer lease. Losing that lease without a durable
+`segment_finished` record produces `orphaned`, not a false `running` state.
 
 Recorder-aware sidecars append to a durable trial inbox. The Rust recorder
 tails it incrementally and drains it idempotently by source sequence; the file
@@ -52,10 +61,12 @@ GET /v1/runs
 GET /v1/runs/<run-id>
 GET /v1/runs/<run-id>?replay_attempt=<attempt-id>
 GET /v1/assets/<sha256>
-GET /v1/subscribe?run_id=<run-id>
+GET /v1/subscribe?protocol=2&run_id=<run-id>
+GET /v1/runs/<run-id>?catalog_before=<attempt-id>
+GET /v1/runs/<run-id>?replay_attempt=<attempt-id>&after_sequence=<sequence>
 ```
 
-The SSE feed contains only run summaries and a selected-run revision. The
+The v2 SSE feed starts with a snapshot, then contains only changed run summaries, appended score points, removals, and a selected-run revision. The
 browser fetches detail after that revision changes; it does not receive the
 complete current state on every SSE notification. A detail read adds the
 authoritative dynamic game state, compact replay catalog, and explicit Agent
@@ -71,7 +82,7 @@ current active segment until the next gateway refresh.
 ## Public path
 
 The console at [live.benchmark.3720.org](https://live.benchmark.3720.org) holds
-one `/api/live/subscribe` connection. JSON detail and replay responses use HTTP
+one `/api/live/v1/subscribe` connection. JSON detail and replay responses use HTTP
 gzip; immutable assets use year-long content-hash caching. Vinext forwards the
 strict read-only allowlist to the loopback gateway on port 3740. A named
 Cloudflare Tunnel connects the local site to
