@@ -1,7 +1,7 @@
 # Sausage Terminal
 
 This directory is the source of truth for the complete Stephen's Sausage Roll
-benchmark game, including its Rust terminal rules adaptation and locally owned
+benchmark game, including its Rust terminal rules adaptation and the campaign
 data under `data/`.
 
 The implementation combines these owned inputs and clean-room components:
@@ -93,5 +93,8 @@ Build the self-contained Linux task artifacts with:
 games/sausage-roll/scripts/package_task.sh
 ```
 
-The original level data remains copyrighted by its owner and must not be
-redistributed without permission.
+`data/campaign/` is extracted from a locally owned Stephen's Sausage Roll
+installation and is committed here so that a clone can replay the campaign
+without external assets. `data/oracle/all.dem` comes from the Apache-2.0
+`jbzdarkid/SSRDecompile` project at the revision pinned in
+`data/oracle/UPSTREAM.md`.
