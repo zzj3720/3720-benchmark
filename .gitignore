@@ -22,3 +22,6 @@ task-proposal-results/
 /runs/
 /results/harbor/
 /.hallmark/
+
+# Prebuilt task artifacts are produced by games/<game>/scripts/package_task.sh.
+/tasks/*/**/bin/
