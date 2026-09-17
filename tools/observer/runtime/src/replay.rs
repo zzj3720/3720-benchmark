@@ -4,6 +4,7 @@ use base64::Engine as _;
 use base64::engine::general_purpose::STANDARD as BASE64;
 use flate2::read::GzDecoder;
 use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
 
 use crate::canonical_json;
 
@@ -57,7 +58,7 @@ pub fn replay_projection(normalized: &[Value], start: usize, end: usize) -> Resu
         let traced_steps = operation
             .get("steps")
             .and_then(Value::as_array)
-            .cloned()
+            .map(Vec::as_slice)
             .unwrap_or_default();
         let steps = traced_steps
             .iter()
@@ -65,7 +66,6 @@ pub fn replay_projection(normalized: &[Value], start: usize, end: usize) -> Resu
                 step.get("state").is_some_and(Value::is_object)
                     || truthy_number(step.get("score_delta"))
             })
-            .cloned()
             .collect::<Vec<_>>();
         let argument_count = action
             .get("directions")
@@ -83,7 +83,7 @@ pub fn replay_projection(normalized: &[Value], start: usize, end: usize) -> Resu
             traced_steps.len()
         };
         let visible = if steps.is_empty() {
-            vec![Value::Null]
+            vec![&Value::Null]
         } else {
             steps
         };
@@ -176,43 +176,35 @@ pub fn replay_projection(normalized: &[Value], start: usize, end: usize) -> Resu
         }
     }
 
-    let mut output: Vec<Value> = Vec::new();
-    let mut redo: Vec<Vec<Value>> = Vec::new();
+    // Undo/redo manipulates indices, not copies of every retained game state.
+    let fingerprints = candidates
+        .iter()
+        .map(|frame| frame.pointer("/event/state").map(fingerprint).transpose())
+        .collect::<Result<Vec<_>, _>>()?;
+    let mut output = Vec::<usize>::new();
+    let mut redo = Vec::<Vec<usize>>::new();
     let mut index = 0;
     while index < candidates.len() {
-        let sequence = candidates[index].get("operation_sequence").cloned();
+        let sequence = candidates[index].get("operation_sequence");
         let mut boundary = index + 1;
         while boundary < candidates.len()
-            && candidates[boundary].get("operation_sequence") == sequence.as_ref()
+            && candidates[boundary].get("operation_sequence") == sequence
         {
             boundary += 1;
         }
-        let operation_frames = candidates[index..boundary].to_vec();
-        let command = operation_frames[0]
+        let command = candidates[index]
             .pointer("/operation_action/command")
             .and_then(Value::as_str)
             .unwrap_or_default()
             .to_ascii_lowercase();
-        let target = operation_frames
-            .last()
-            .and_then(|frame| frame.pointer("/event/state"))
-            .map(fingerprint)
-            .transpose()?;
+        let target = fingerprints[boundary - 1].as_ref();
         match command.as_str() {
             "undo" => {
-                let matching = target.as_ref().and_then(|target| {
-                    output.iter().rposition(|frame| {
-                        frame
-                            .pointer("/event/state")
-                            .map(fingerprint)
-                            .transpose()
-                            .ok()
-                            .flatten()
-                            .as_ref()
-                            == Some(target)
-                    })
-                });
-                if let Some(matching) = matching {
+                if let Some(matching) = target.and_then(|target| {
+                    output
+                        .iter()
+                        .rposition(|index| fingerprints[*index].as_ref() == Some(target))
+                }) {
                     let removed = output.split_off(matching + 1);
                     if !removed.is_empty() {
                         redo.push(removed);
@@ -222,18 +214,10 @@ pub fn replay_projection(normalized: &[Value], start: usize, end: usize) -> Resu
             "redo" => {
                 if let Some(restored) = redo.pop() {
                     let matching = target
-                        .as_ref()
                         .and_then(|target| {
-                            restored.iter().position(|frame| {
-                                frame
-                                    .pointer("/event/state")
-                                    .map(fingerprint)
-                                    .transpose()
-                                    .ok()
-                                    .flatten()
-                                    .as_ref()
-                                    == Some(target)
-                            })
+                            restored
+                                .iter()
+                                .position(|index| fingerprints[*index].as_ref() == Some(target))
                         })
                         .unwrap_or(restored.len().saturating_sub(1));
                     output.extend(restored.into_iter().take(matching + 1));
@@ -241,26 +225,24 @@ pub fn replay_projection(normalized: &[Value], start: usize, end: usize) -> Resu
             }
             _ => {
                 redo.clear();
-                output.extend(operation_frames);
+                output.extend(index..boundary);
             }
         }
         index = boundary;
     }
-
-    let frames = output
-        .into_iter()
-        .filter(|frame| {
-            !matches!(
-                frame
-                    .pointer("/operation_action/command")
-                    .and_then(Value::as_str)
-                    .unwrap_or_default()
-                    .to_ascii_lowercase()
-                    .as_str(),
-                "restart" | "reset" | "undo" | "redo"
-            )
-        })
-        .collect::<Vec<_>>();
+    let candidate_count = candidates.len();
+    let mut frames = Vec::new();
+    for index in output {
+        let command = candidates[index]
+            .pointer("/operation_action/command")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_ascii_lowercase();
+        if !matches!(command.as_str(), "restart" | "reset" | "undo" | "redo") {
+            frames.push(std::mem::take(&mut candidates[index]));
+        }
+    }
+    drop(candidates);
     let mut operations: Vec<Value> = Vec::new();
     for frame in &frames {
         if frame
@@ -303,56 +285,55 @@ pub fn replay_projection(normalized: &[Value], start: usize, end: usize) -> Resu
         }));
     }
 
-    Ok(json!({
-        "frames": frames,
-        "operations": operations,
-        "skipped_unchanged": skipped,
-        "eliminated_history_frames": candidates.len().saturating_sub(frames.len())
-    }))
+    let mut result = json!({"skipped_unchanged":skipped,"eliminated_history_frames":candidate_count.saturating_sub(frames.len())});
+    result["frames"] = Value::Array(frames);
+    result["operations"] = Value::Array(operations);
+    Ok(result)
 }
 
-fn expanded_events(normalized: &[Value], start: usize, end: usize) -> Vec<Value> {
+fn expanded_events(
+    normalized: &[Value],
+    start: usize,
+    end: usize,
+) -> impl Iterator<Item = Value> + '_ {
     let mut current_state = normalized[..start].iter().rev().find_map(event_state);
-    normalized[start..end]
-        .iter()
-        .map(|event| {
-            let mut expanded = event.as_object().cloned().unwrap_or_default();
-            let has_steps = expanded
-                .get("steps")
-                .and_then(Value::as_array)
-                .is_some_and(|steps| !steps.is_empty());
-            if !has_steps {
-                expanded.insert(
-                    "steps".into(),
-                    Value::Array(decode_instruction_trace(
-                        expanded.get("instruction_trace"),
-                        expanded.get("score"),
-                    )),
-                );
-            }
-            if let Some(last_state) = expanded
-                .get("steps")
-                .and_then(Value::as_array)
-                .filter(|steps| !steps.is_empty())
-                .and_then(|steps| steps.last())
-                .and_then(|step| step.get("state"))
-                .cloned()
-            {
-                current_state = Some(last_state.clone());
-                expanded.insert("state".into(), last_state);
-            } else if let Some(snapshot) = decode_state_snapshot(expanded.get("state_snapshot")) {
-                current_state = Some(snapshot.clone());
-                expanded.insert("state".into(), snapshot);
-            } else if expanded.get("state").is_some_and(nonempty_object) {
-                current_state = expanded.get("state").cloned();
-            } else if let Some(state) = current_state.clone() {
-                expanded.insert("state".into(), state);
-            }
-            expanded.remove("instruction_trace");
-            expanded.remove("state_snapshot");
-            Value::Object(expanded)
-        })
-        .collect()
+    normalized[start..end].iter().map(move |event| {
+        let mut expanded = event.as_object().cloned().unwrap_or_default();
+        let has_steps = expanded
+            .get("steps")
+            .and_then(Value::as_array)
+            .is_some_and(|steps| !steps.is_empty());
+        if !has_steps {
+            expanded.insert(
+                "steps".into(),
+                Value::Array(decode_instruction_trace(
+                    expanded.get("instruction_trace"),
+                    expanded.get("score"),
+                )),
+            );
+        }
+        if let Some(last_state) = expanded
+            .get("steps")
+            .and_then(Value::as_array)
+            .filter(|steps| !steps.is_empty())
+            .and_then(|steps| steps.last())
+            .and_then(|step| step.get("state"))
+            .cloned()
+        {
+            current_state = Some(last_state.clone());
+            expanded.insert("state".into(), last_state);
+        } else if let Some(snapshot) = decode_state_snapshot(expanded.get("state_snapshot")) {
+            current_state = Some(snapshot.clone());
+            expanded.insert("state".into(), snapshot);
+        } else if expanded.get("state").is_some_and(nonempty_object) {
+            current_state = expanded.get("state").cloned();
+        } else if let Some(state) = current_state.clone() {
+            expanded.insert("state".into(), state);
+        }
+        expanded.remove("instruction_trace");
+        expanded.remove("state_snapshot");
+        Value::Object(expanded)
+    })
 }
 
 fn event_state(event: &Value) -> Option<Value> {
@@ -433,7 +414,7 @@ fn decode_gzip_json(encoded: Option<&Value>) -> Option<Value> {
 }
 
 fn fingerprint(value: &Value) -> Result<Vec<u8>, String> {
-    canonical_json(value)
+    canonical_json(value).map(|bytes| Sha256::digest(bytes).to_vec())
 }
 
 fn nonempty_object(value: &Value) -> bool {

@@ -4,6 +4,7 @@ import asyncio
 import base64
 import gzip
 import json
+import subprocess
 import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
@@ -12,6 +13,12 @@ from types import SimpleNamespace
 from uuid import uuid4
 
 from tools.observer.run_journal import RUN_EVENT_SCHEMA, RunJournalPlugin
+
+
+def journal_rows(path: Path):
+    archive = Path(__file__).parent / "runtime/target/release/run-archive"
+    decoded = subprocess.check_output([str(archive), "--cat", str(path.parent)], text=True)
+    return [json.loads(line) for line in decoded.splitlines()]
 
 
 class FakeJob:
@@ -158,7 +165,7 @@ class RunJournalPluginTests(unittest.IsolatedAsyncioTestCase):
             )
             await asyncio.sleep(0.5)
             journal = root / "journals/journal-e2e/journal.jsonl"
-            live_rows = [json.loads(line) for line in journal.read_text().splitlines()]
+            live_rows = journal_rows(journal)
             self.assertTrue(any(row["source"] == "game" for row in live_rows))
             await job.hooks["agent-end"](
                 event("agent-end", start + timedelta(seconds=5), trial_id)
@@ -166,7 +173,7 @@ class RunJournalPluginTests(unittest.IsolatedAsyncioTestCase):
             await job.hooks["end"](event("end", start + timedelta(seconds=6), trial_id))
             await plugin.on_job_end(None)
 
-            rows = [json.loads(line) for line in journal.read_text().splitlines()]
+            rows = journal_rows(journal)
             self.assertTrue(all(row["schema"] == RUN_EVENT_SCHEMA for row in rows))
             self.assertEqual(
                 [row["sequence"] for row in rows], list(range(1, len(rows) + 1))
@@ -175,10 +182,10 @@ class RunJournalPluginTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(game["type"], "score_changed")
             self.assertEqual(game["effective_elapsed_ms"], 2_000)
             trace = game["payload"]["instruction_trace"]
-            self.assertEqual(trace["encoding"], "gzip")
+            self.assertEqual(trace["encoding"], "zstd")
             self.assertNotIn("data", trace)
             snapshot = game["payload"]["state_snapshot"]
-            self.assertEqual(snapshot["encoding"], "gzip")
+            self.assertEqual(snapshot["encoding"], "zstd")
             self.assertNotIn("state", game["payload"])
             self.assertNotIn("scene", game["payload"])
             self.assertEqual(len(list((journal.parent / "objects").iterdir())), 2)
@@ -232,7 +239,7 @@ class RunJournalPluginTests(unittest.IsolatedAsyncioTestCase):
             await job.hooks["start"](event("start", now, trial_id))
             await job.hooks["end"](event("end", now, trial_id))
             await plugin.on_job_end(None)
-            rows = [json.loads(line) for line in journal.read_text().splitlines()]
+            rows = journal_rows(journal)
             self.assertEqual(rows[-2]["sequence"], 8)
             self.assertEqual(rows[-2]["effective_elapsed_ms"], 12_000)
             self.assertEqual(rows[-2]["payload"]["parent_segment_id"], "parent")

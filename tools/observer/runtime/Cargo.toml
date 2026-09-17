@@ -19,7 +19,10 @@ serde_json = "1"
 sha2 = "0.10"
 tokio = { version = "1", features = ["macros", "net", "rt-multi-thread", "signal", "sync", "time"] }
 tokio-stream = { version = "0.1", features = ["sync"] }
+tower-http = { version = "0.6", features = ["compression-gzip"] }
 walkdir = "2"
+zstd = "0.13"
+rusqlite = { version = "0.37", features = ["bundled"] }
 
 [[bin]]
 name = "run-recorder"
@@ -36,6 +39,10 @@ path = "src/gateway_main.rs"
 [[bin]]
 name = "run-audit"
 path = "src/audit_main.rs"
+
+[[bin]]
+name = "run-archive"
+path = "src/archive_main.rs"
 
 [profile.release]
 strip = true

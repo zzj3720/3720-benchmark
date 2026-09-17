@@ -263,3 +263,30 @@ def test_restore_large_event_stream_uses_bounded_exec_chunks(tmp_path):
     assert max(map(len, environment.commands)) < 45_000
     assert environment.commands[0].startswith("umask 077; : >")
     assert environment.commands[-1].startswith('test "$(wc -c <')
+
+
+def test_restore_publishes_authoritative_resumed_state(tmp_path):
+    state = tmp_path / "state.txt"
+    state.write_text(
+        "parabox-state-v4\n"
+        "campaign parabox-complete-364-v11\n"
+        "selected b7\n"
+        "solved a1\n"
+    )
+    fixture = _ResumeFixture(state)
+
+    class Environment:
+        def __init__(self):
+            self.calls = []
+
+        async def service_exec(self, command, **kwargs):
+            self.calls.append((command, kwargs))
+            return SimpleNamespace(return_code=0, stderr="")
+
+    environment = Environment()
+    asyncio.run(fixture._restore_parabox(environment))
+
+    assert (
+        "/usr/local/bin/parabox show >/dev/null",
+        {"service": "main", "user": 0},
+    ) in environment.calls

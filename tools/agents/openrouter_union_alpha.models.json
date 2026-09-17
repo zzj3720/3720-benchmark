@@ -1,0 +1,26 @@
+{
+  "providers": {
+    "openrouter": {
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKey": "$OPENROUTER_API_KEY",
+      "authHeader": true,
+      "api": "openai-completions",
+      "models": [
+        {
+          "id": "stealth/union-alpha",
+          "name": "Union Alpha (OpenRouter)",
+          "reasoning": false,
+          "input": ["text", "image"],
+          "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
+          "contextWindow": 262144,
+          "maxTokens": 131072,
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "maxTokensField": "max_tokens"
+          }
+        }
+      ]
+    }
+  }
+}

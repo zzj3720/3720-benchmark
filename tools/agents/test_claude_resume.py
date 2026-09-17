@@ -1,4 +1,5 @@
 import asyncio
+import json
 
 from claude_resume import ClaudeSessionResume
 
@@ -67,3 +68,34 @@ def test_claude_resume_rejects_missing_workspace(tmp_path):
         assert "resume_workspace_dir is not a directory" in str(error)
     else:
         raise AssertionError("missing workspace was accepted")
+
+
+def test_trim_after_last_compact_keeps_its_summary(tmp_path):
+    session = tmp_path / "session.jsonl"
+    rows = [
+        {"type": "user", "uuid": "old"},
+        {
+            "type": "system",
+            "subtype": "compact_boundary",
+            "uuid": "boundary",
+        },
+        {
+            "type": "user",
+            "uuid": "summary",
+            "parentUuid": "boundary",
+            "message": {"content": "summary"},
+        },
+        {"type": "assistant", "uuid": "discard", "parentUuid": "summary"},
+    ]
+    session.write_text(
+        "\n".join(json.dumps(row) for row in rows) + "\n",
+        encoding="utf-8",
+    )
+
+    ClaudeSessionResume._trim_after_last_compact(session)
+
+    assert [json.loads(line)["uuid"] for line in session.read_text().splitlines()] == [
+        "old",
+        "boundary",
+        "summary",
+    ]

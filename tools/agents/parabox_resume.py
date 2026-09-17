@@ -258,6 +258,21 @@ class ParaboxResume:
             events,
             "/var/lib/parabox/parabox-events.jsonl",
         )
+        # The sidecar emits its initial observer snapshot before agent setup.
+        # Restoring state after that point must therefore publish a new
+        # authoritative snapshot through the normal game API; otherwise the
+        # runtime journal keeps advertising the fresh zero-score state until
+        # the resumed agent happens to make its first game request.
+        published = await environment.service_exec(
+            "/usr/local/bin/parabox show >/dev/null",
+            service="main",
+            user=0,
+        )
+        if published.return_code != 0:
+            raise RuntimeError(
+                "failed to publish restored Parabox state: "
+                f"{published.stderr}"
+            )
         logs_dir = getattr(self, "logs_dir", None)
         if isinstance(logs_dir, Path):
             logs_dir.mkdir(parents=True, exist_ok=True)
