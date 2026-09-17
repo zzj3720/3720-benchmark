@@ -41,7 +41,11 @@ next-env.d.ts
 /outputs/
 /work/
 /public/parabox-render-qa-64.json
+/public/sausage-render-qa-64.json
 /public/operator-render-qa.json
 /public/kitchen-render-qa.json
 __pycache__/
 *.pyc
+
+/test-results/
+/playwright-report/
