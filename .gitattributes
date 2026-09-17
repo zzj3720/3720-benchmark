@@ -1,0 +1,5 @@
+# Replay dumps and campaign archives are consumed byte-for-byte by the game
+# engines and verifiers, so git must never rewrite their line endings.
+*.dem -text
+*.sav -text
+*.gz -text
