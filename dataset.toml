@@ -24,8 +24,16 @@ digest = "sha256:a8e810ae99547eabf7df3f43571089e9dc9315c92be868f7ed0d9dfe0b45d55
 
 [[tasks]]
 name = "3720/emergency-operator"
-digest = "sha256:f41c727947e63f8f7ef4e891bf345eec40ad1a1d42914d80003268878349a66c"
+digest = "sha256:a7a69bf74367e72cc7401e134672758037d0c4588d81bbf80fce369fc2af09d0"
 
 [[tasks]]
 name = "3720/sokoban"
-digest = "sha256:0e6619a4606360cb14ae2f8cea5fdf73cdb1a7368bb9323c00206d6dcb443e16"
+digest = "sha256:e5dadb66123ab29a487147f76c366605a3f2c360e931d7ca3b77950f4631a14a"
+
+[[tasks]]
+name = "3720/minesweeper"
+digest = "sha256:da37a08a43f055d372edce0c9ae213f4f34980eadede747031afdd750c95393c"
+
+[[tasks]]
+name = "3720/kitchen-terminal"
+digest = "sha256:e5f19b36446d9e89904a19cfba0aa0a4fc45a955e15521597648f7160faaea98"

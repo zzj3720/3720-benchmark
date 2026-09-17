@@ -1,4 +1,7 @@
 .git
+.harbor
+.env*
+run-journals
 **/target
 jobs
 results

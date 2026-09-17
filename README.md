@@ -103,12 +103,16 @@ workflow.
 
 ## Dataset status
 
-The root `dataset.toml` contains five game-reasoning cases: the complete
+The root `dataset.toml` contains six game-reasoning cases: the complete
 364-puzzle `3720/parabox-intro` campaign, the model-controlled-clock
 `3720/swarm-farming` time-planning pilot, and the complete 86-puzzle
 `3720/sausage-roll` three-dimensional spatial-planning campaign, plus the
 continuous-wall-clock `3720/emergency-operator` dispatch shift and the
-progressive 305-level `3720/sokoban` classic box-pushing campaign.
+progressive 305-level `3720/sokoban` classic box-pushing campaign, and the
+fifty-level `3720/minesweeper` deduction campaign whose first-click-dependent
+boards are machine-checked to require no guessing, stay inside per-level
+opening bands, and keep each tier's mean and median opening sizes inside frozen
+distribution bands.
 `tasks/hello-world` only verifies the Harbor and CI plumbing and is deliberately
 excluded from benchmark results.
 

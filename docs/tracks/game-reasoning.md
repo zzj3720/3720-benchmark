@@ -170,6 +170,36 @@ redistribution without permission.
 Acceptance evidence is recorded in
 [`results/observations/sausage-roll-acceptance.md`](../../results/observations/sausage-roll-acceptance.md).
 
+## No-Guess Minesweeper
+
+`minesweeper` adds partial observation and explicit constraint deduction through
+an original fifty-level campaign. Cadet, Operator, Specialist, Expert, and
+Master tiers increase proof length, coupled-frontier width, board size, and mine
+density while preserving ordinary Minesweeper rules.
+
+The first reveal and its surrounding 3×3 area are always safe. Its coordinates
+become part of deterministic generation: the Rust engine samples candidate
+layouts from the frozen level seed and accepts the first layout that its
+`local-subset-v1` proof procedure can finish using adjacent-count deductions
+and subset differences. The proof must also satisfy the level's frozen
+`proof-profile-v1`: initial expansion stays inside a lower/upper band while
+deduction rounds, subset rounds, and maximum constraint frontier meet their
+minimums. `tier-opening-distribution-v1` additionally bounds the weighted mean
+and upper median opening ratios over every possible first click in each tier.
+Tests exhaust all 7,038 possible first reveals on every campaign level, so an
+Agent never needs luck, an unverified guess, or an easier or anomalously hard
+first-click loophole.
+
+The thin `minesweeper` client exposes zero-based reveal, flag, chord, reset,
+level selection, and submission commands. The Rust sidecar owns hidden mines,
+progress, the append-only command audit, and observer events. The isolated
+verifier reconstructs each first-click-dependent board and requires every
+recorded response to replay exactly before awarding one point per uniquely
+cleared level.
+
+Acceptance evidence is recorded in
+[`results/observations/minesweeper-acceptance.md`](../../results/observations/minesweeper-acceptance.md).
+
 ## Live observation
 
 All current game sidecars expose the same read-only snapshot and cursor-based
