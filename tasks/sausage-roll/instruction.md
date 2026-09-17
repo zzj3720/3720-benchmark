@@ -61,8 +61,9 @@ reports:
 
 - `kind`, `pos`, `direction`, and every occupied coordinate in `cells`;
 - `attached_to` when a fork or sausage is attached to another entity;
-- `cooked_faces` for sausages, with four values that must each become exactly
-  `1`; a value of `2` is burned and cannot be repaired without undo or restart.
+- `cooked_faces` for sausages, with four values: `0` is raw, `1` and `2` are
+  both correctly cooked (the grill orientation determines which), and `3` is
+  burned. Every face must be `1` or `2`; burned faces require undo or restart.
 
 Tiles report `land`, `ground`, `grill`, `ladder`, or another static kind.
 Multiple elevations may share the same `x,y`, so always account for `z`.
