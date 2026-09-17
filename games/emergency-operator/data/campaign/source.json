@@ -6,5 +6,10 @@
   "source_title": "911 Operator",
   "steam_app_id": "503560",
   "build_id": "7533741",
+  "time_scale": {
+    "source_duration_ms": 9330000,
+    "benchmark_duration_ms": 1800000,
+    "method": "All absolute times and durations are scaled by 60/311; travel speed and health-decay rates use the reciprocal scale."
+  },
   "notes": "Includes English dialogue, scene rules, report definitions, career duty layout, and road graphs. Excludes audio, images, UI, models, non-English localization, saves, and account data."
 }

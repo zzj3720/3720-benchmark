@@ -7,8 +7,10 @@ alarms that can wake an Agent but can never execute an action for it.
 
 `data/campaign/911-career.json` is the packaged five-chapter career: 14 duties,
 60 fixed phone calls, 42 overlapping CAD reports, and 102 dispatch scenes over
-a 155.5-minute real-time shift. It is deterministically compiled from the
-owned-install extraction with:
+a 30-minute real-time shift. The original 155.5-minute event schedule is
+uniformly scaled during compilation; arrival and action windows, scene timers,
+responder work, travel, and health pressure retain their relative timing. It is
+deterministically compiled from the owned-install extraction with:
 
 ```bash
 uv run games/emergency-operator/scripts/build_911_campaign.py

@@ -5,7 +5,7 @@
 set -euo pipefail
 
 operator start
-operator alarm first-call 30 "answer the first Kapolei call"
+operator alarm first-call 6 "answer the first Kapolei call"
 operator wait
 call=chapter-1-duty-1-call-1-97
 operator answer "$call"

@@ -1,106 +1,96 @@
-# Emergency Operator real-time acceptance
+# Emergency Operator acceptance
 
-Date: 2026-07-21
+Date: 2026-07-23
 
-## Scope
+## Frozen benchmark
 
 - Task: `3720/emergency-operator`
-- Final dataset digest:
-  `sha256:239d0fcac2d68a77489784188f63d4385cf3a5b9bc998f0be601405eba071b76`
-- Final task checksum:
-  `a8720a6389441b90350a9f409ab1452394c81f2785edb64944a2d21de1ec870a`
-- Frozen campaign SHA-256:
-  `ce687bdf8a99216a1b24d94715ce84bb763d01e58e91f417c24e0b371f4eac5e`
-- Campaign: one original 25-minute shift, three calls, three incidents, and
-  five response units
-- Reward: deterministic integer score from 0 through the 660-point campaign
-  upper bound
+- Dataset digest:
+  `sha256:a7a69bf74367e72cc7401e134672758037d0c4588d81bbf80fce369fc2af09d0`
+- Harbor task checksum:
+  `a52bc1b85f652364ffa02eb57f97f2d41fae88b85566a34f5ec66b3268482f19`
+- Campaign SHA-256:
+  `2b3ef5c5326e693e65c24d62e308bb8a60fc9e25f424e495c69fc9ce4dadc9b2`
+- Campaign: five chapters, 14 duties, 60 phone calls, 42 CAD reports,
+  six response units, and a generated score ceiling of 34,405
+- Runtime: one continuous 30-minute monotonic wall-clock shift
 
-The pilot campaign is original benchmark content and contains no levels,
-dialogue, art, audio, or other data from 911 Operator. The campaign provenance
-file records that boundary in both the development crate and frozen task.
+The campaign compiler maps the owned-install career's 9,330,000 ms schedule
+onto 1,800,000 ms with the exact ratio `60/311`. Absolute arrivals, duty
+boundaries, action windows, responder work, and scene timers use that ratio.
+Vehicle speed and health-decay rates use its reciprocal. Work-growth rates are
+unchanged because both work and elapsed time scale together. The generated
+campaign and both isolated task copies are byte-identical.
 
-## Real-time and action-policy gates
+## Behavior and replay gates
 
 - A run remains idle until the Agent explicitly starts it.
-- The live server uses a monotonic wall clock. After start, calls arrive, health
-  decays, and units travel and work while the Agent reasons or disconnects.
-- The client cannot pause, change speed, advance time, or supply a timestamp.
-  Unknown request fields, including an injected `at_ms`, are rejected.
-- Every mutating request contains one immediate atomic game action. The API has
-  no batch, queue, future action, conditional trigger, callback, script, or
-  macro surface.
-- An alarm stores only its deadline and reminder text. It can wake the Agent
-  but cannot inspect state or execute an action. The Agent must observe and
-  issue a separate command after waking.
-- The packaged client exposes ordinary one-command invocations and a blocking
-  alarm wait. Its acceptance E2E measured a real one-second wait before the
-  alarm was delivered.
+- The client cannot pause, change speed, advance time, submit a future action,
+  or batch operations. Every mutation is one immediate command.
+- Reminder alarms can wake the Agent but cannot inspect state or execute an
+  action.
+- The GoalPi lifecycle accepts completion only after terminal evidence already
+  observed in a successful Operator tool response. A final answer before that
+  point is recorded as a premature stop and resumes the same native Pi session;
+  an API/provider interruption is recorded separately. Continuation starts only
+  after the current Pi process has actually exited, never while it is active.
+- The Rust server uses monotonic wall time. The isolated Rust verifier replays
+  every audited command at its recorded elapsed millisecond without sleeping,
+  requires exact response equality, and advances to the fixed 1,800,000 ms
+  deadline before scoring.
+- Fifteen engine tests, the owned-content consistency test, the real HTTP
+  alarm/observer/verifier E2E, strict Clippy, deterministic import/build checks,
+  and all repository task checks pass.
+- The reference scheduler enters all 102 event graphs without wall-clock sleep.
+  Its intentionally greedy resource policy resolves 43 incidents, loses 59,
+  and scores 8,244/34,405; it is a coverage harness, not a maximum-score Oracle.
+- Render QA derives all samples from campaign arrivals, ETAs, and timers rather
+  than fixed pre-scale timestamps.
 
-## Engine, API, and replay gates
-
-- The Rust engine covers scheduled and ringing calls, branching dialogue,
-  hidden incidents, continuous health decay, role-specific dispatch, unit
-  travel/work/return, recall, alarms, terminal scoring, and missed outcomes.
-- Eight engine tests and the live HTTP E2E pass. The HTTP E2E performs seven
-  separate commands, waits on real time, checks the common observer stream,
-  and verifies the resulting audit.
-- The isolated verifier starts a fresh frozen campaign, advances directly to
-  each server-recorded elapsed millisecond without sleeping, applies one
-  command, and requires exact response equality.
-- After the final command, replay advances to the fixed shift deadline before
-  scoring. A run cannot avoid later losses merely by exiting early.
-- A response-tampered audit is rejected by the permanent E2E.
-- All repository static task checks pass, and strict Rust Clippy passes for the
-  complete crate.
-- The packaged server SHA-256 values are
-  `3f74684bcab3871e2b35d03f5d39c1180a6fa6e7b48bc6bab8de022a19ab1909`
-  (`amd64`) and
-  `d51fbb1e42e2f9b7abab6e0cd24e3e1e79152c2daec6936d8de9f1c4ff1cacc7`
-  (`arm64`). The verifier values are
-  `2b6a152877f5a20de514d65138e9a85b81c6cb839b4de51a0e5e07a1e0df6b39`
-  and
-  `99011de9a49f707fdd22f6232e6ef6425c0bd07fd49e6b1761b9468dd878f95f`.
+The packaged server SHA-256 values are
+`4dc5fea0b21eee19f5fc7d01640216c305d7d29f50af1aeebfdeb8d484633be5`
+(`amd64`) and
+`449c5021af6553b4e25ab79124c6b1b0cc384aeca54b7dd077ba6dc2a07142ff`
+(`arm64`). The verifier values are
+`341019f690161b0762ac76a87a33274df3f3f1afbfe3f0a5509f45dbd526cde8`
+and
+`69eaa271b90ec8abe76defac175b701a0d298c250530cda7d9941e474a107c99`.
 
 ## Harbor acceptance
 
-| Job | Agent | Reward | Commands | Exceptions |
+| Job | Agent | Reward | Replayed commands | Exceptions |
 |---|---|---:|---:|---:|
-| `2026-07-21__21-11-18/emergency-operator__DSNuT9j` | Oracle | 614 | 21 | 0 |
-| `2026-07-21__21-32-05/emergency-operator__DQXZkzV` | Nop | 0 | 0 | 0 |
+| `operator-30m-accepted-oracle-20260723/emergency-operator__2v8C2ge` | Oracle | 120 | 15 | 0 |
+| `operator-30m-accepted-nop-20260723/emergency-operator__2akvn7J` | Nop | 0 | 0 | 0 |
+| `operator-30m-goal-pi-deepseek-v4-flash-xhigh-r3/emergency-operator__Q2aoNee` | Pi / DeepSeek V4 Flash | 9,528 | 386 | 0 |
 
-The Oracle used only the model-facing `operator` client. Its Agent phase ran
-for 14 minutes 25 seconds of real time, resolved all three incidents, and the
-isolated verifier reported `score: 614`, `max_score: 660`, and 21 exact replayed
-commands.
+The positive Oracle uses only the model-facing `operator` client and a real
+alarm wait. It proves the packaged Agent, game sidecar, wall clock, artifact
+collection, and separate verifier path; it is not presented as an optimal
+34,405-point policy. Nop verifies that an untouched run scores zero.
 
-The Oracle preceded the final observer-clock publisher and therefore has task
-checksum `c9a56b53c1aa0a9930d0863202938f8974fa8922c1b6c24081bcd473b78b1143`.
-That additive publisher neither enters the score audit nor changes game state,
-the client, campaign, command responses, or verifier. The final package was
-then exercised through Compose with the real client: a reminder caused a real
-wait, and an autonomous `clock` observer event appeared without adding an
-audited Agent command. The final-checksum Nop job above rebuilt and verified
-the complete package with reward zero and no exception.
+The Pi trial completed the full authoritative 1,800,000 ms shift before its
+final answer. Its Goal lifecycle recorded `completed: true` and zero premature
+finals; `operator submit` supplied both `complete: true` and
+`shift.status: complete`. Pi auto-compacted once with no context error. Harbor
+recorded 912,900 ordinary input tokens, 174,731,648 cache-read tokens, 55,157
+output tokens, and a provider-reported cost of $0.6324985744.
 
-## Live observer
+An earlier diagnostic run exposed that full historical calls, transcripts,
+incidents, and alarms were repeated in every state response until the request
+exceeded the model's 1,048,565-token context limit. State projection now keeps
+the current duty, unresolved cross-duty incidents, active calls, and pending
+alarms; the terminal response is under 4 KB. GoalPi also reserves 65,536 tokens
+for proactive Pi compaction and recognizes both raw API JSON and a successful
+concise terminal projection already observed by the model. Six adapter tests
+cover terminal proof, premature-final continuation, current-segment stop
+attribution, interrupted segments, concise successful projections, and
+failed/nonterminal projections.
 
-The sidecar publishes the common read-only snapshot and cursor event schemas.
-Once a shift starts, one observer-only clock event per second keeps calls,
-health, units, alarms, and score current without delivering an Agent alarm or
-manufacturing an Agent action.
+## Remaining benchmark-readiness work
 
-The gateway normalized a live Oracle container and exposed its score and
-objective state. Six Python gateway tests, the frontend build, and six Node
-tests pass. Observer commit `85af8d3` is pushed to `sites/main`; private Sites
-version 6 is deployed at
-`https://benchmark-live-ops-3720.zuozijian1994.chatgpt.site`.
-
-## Kitchen-family continuation
-
-The same boundary has been applied to the first fixed-station kitchen engine.
-Its original 20-minute pilot has four staggered orders and four stations.
-Starting, finishing, discarding, assembling, and serving are separate manual
-actions; food progresses and burns continuously between calls. Five engine
-tests and strict Clippy pass. The live sidecar and frozen Harbor package are
-the next implementation slice.
+The server currently starts only with new audit and observer files; it does not
+resume an interrupted live shift from a saved authoritative snapshot. A
+30-minute trial is playable and verifiable as packaged, but production runs
+should not be auto-resumed after a sidecar restart until state recovery is
+implemented and tested.

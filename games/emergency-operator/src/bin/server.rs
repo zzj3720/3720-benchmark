@@ -484,7 +484,7 @@ fn task_identity() -> Value {
         "id": "emergency-operator",
         "label": "Emergency Operator",
         "kind": "game",
-        "campaign": "emergency-operator-pilot-v1",
+        "campaign": "911-operator-base-career-v1",
     })
 }
 

@@ -368,6 +368,7 @@ mod tests {
             .expect("compiled 911 Operator career");
         assert_eq!(campaign.shift.duties.len(), 14);
         assert_eq!(campaign.shift.calls.len(), 102);
+        assert_eq!(campaign.shift.duration_ms, 30 * 60_000);
         assert_eq!(campaign.max_score, 34_405);
         assert_eq!(
             campaign

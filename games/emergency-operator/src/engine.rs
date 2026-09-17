@@ -663,6 +663,18 @@ impl<'a> Session<'a> {
                     .max(0);
                 }
             }
+            "time" => {
+                if let Some(index) = exact
+                    && let Some(current) = elements[index].remaining_timer_ms
+                {
+                    let next =
+                        apply_number(current as i64, &property[field_end..], 1_000)?.max(0) as u64;
+                    elements[index].remaining_timer_ms = Some(next);
+                    if next > 0 {
+                        elements[index].completed = false;
+                    }
+                }
+            }
             "weapon" => {
                 if let Some(index) = exact {
                     elements[index].weapon = property[field_end + 1..]
@@ -827,6 +839,13 @@ impl<'a> Session<'a> {
     }
 
     pub fn snapshot(&self) -> Snapshot {
+        let current_duty_id = self
+            .campaign
+            .shift
+            .duties
+            .iter()
+            .find(|duty| self.elapsed_ms >= duty.start_ms && self.elapsed_ms < duty.end_ms)
+            .map(|duty| duty.id.as_str());
         let calls = self
             .campaign
             .shift
@@ -834,14 +853,25 @@ impl<'a> Session<'a> {
             .iter()
             .zip(&self.calls)
             .enumerate()
-            .filter(|(_, (_, runtime))| runtime.phase != CallPhase::Scheduled)
+            .filter(|(_, (definition, runtime))| {
+                runtime.phase != CallPhase::Scheduled
+                    && (definition.duty_id.is_none()
+                        || definition.duty_id.as_deref() == current_duty_id
+                        || matches!(runtime.phase, CallPhase::Ringing | CallPhase::Active))
+            })
             .map(|(index, (definition, runtime))| self.call_view(index, definition, runtime))
             .collect();
         let incidents = self
             .incidents
             .iter()
             .enumerate()
-            .filter(|(_, runtime)| runtime.phase != IncidentPhase::Hidden)
+            .filter(|(_, runtime)| {
+                let definition = &self.campaign.shift.calls[runtime.call_index];
+                runtime.phase != IncidentPhase::Hidden
+                    && (definition.duty_id.is_none()
+                        || definition.duty_id.as_deref() == current_duty_id
+                        || runtime.phase == IncidentPhase::Reported)
+            })
             .map(|(_, runtime)| self.incident_view(runtime))
             .collect();
         let units = self
@@ -898,7 +928,12 @@ impl<'a> Session<'a> {
             calls,
             incidents,
             units,
-            alarms: self.alarms.iter().map(alarm_view).collect(),
+            alarms: self
+                .alarms
+                .iter()
+                .filter(|alarm| matches!(alarm.phase, AlarmPhase::Pending | AlarmPhase::Due))
+                .map(alarm_view)
+                .collect(),
             next_alarm_ms: self.next_pending_alarm_ms(),
             controls: vec![
                 "start", "show", "answer", "say", "dispatch", "recall", "alarm", "cancel", "wait",
@@ -1831,6 +1866,30 @@ mod tests {
     }
 
     #[test]
+    fn career_snapshot_drops_inactive_history_at_the_terminal_boundary() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let campaign = Campaign::load(root.join("data/campaign/911-career.json"))
+            .expect("compiled 911 Operator career");
+        let mut session = Session::new(&campaign);
+        session.start().expect("start");
+        session
+            .advance_to(campaign.shift.duration_ms)
+            .expect("advance to terminal boundary");
+
+        let snapshot = session.snapshot();
+        assert_eq!(snapshot.shift.status, "complete");
+        assert!(snapshot.calls.is_empty());
+        assert!(snapshot.incidents.is_empty());
+        assert!(snapshot.alarms.is_empty());
+        assert!(
+            serde_json::to_vec(&snapshot)
+                .expect("serialize compact snapshot")
+                .len()
+                < 4_000
+        );
+    }
+
+    #[test]
     fn graph_dialogue_matches_original_option_and_action_semantics() {
         let campaign = graph_campaign();
         let mut session = Session::new(&campaign);
@@ -1957,6 +2016,28 @@ mod tests {
             .iter()
             .position(|call| call.id == call_id)
             .expect("small car fire call");
+        let call = &campaign.shift.calls[call_index];
+        let incident = call.incident.as_ref().expect("small car fire incident");
+        let fire = incident
+            .elements
+            .iter()
+            .find(|element| element.id == "fire")
+            .expect("fire work");
+        let work_growth_ms_per_minute =
+            u64::try_from(fire.work_growth_ms_per_minute).expect("non-negative fire growth");
+        let net_work_per_minute = 60_000_u64
+            .checked_sub(work_growth_ms_per_minute)
+            .expect("one fire crew can make progress");
+        let fire_completion_ms = fire
+            .work_ms
+            .saturating_mul(60_000)
+            .div_ceil(net_work_per_minute);
+        let smoke_timer_ms = incident
+            .elements
+            .iter()
+            .find(|element| element.id == "smoke")
+            .and_then(|element| element.timer_ms)
+            .expect("smoke timer");
         let incident_index = Session::new(&campaign)
             .incidents
             .iter()
@@ -1965,7 +2046,9 @@ mod tests {
 
         let mut expired = Session::new(&campaign);
         expired.start().expect("start");
-        expired.advance_to(180_000).expect("expire smoke timer");
+        expired
+            .advance_to(call.arrival_ms + smoke_timer_ms)
+            .expect("expire smoke timer");
         let caller = expired.incidents[incident_index]
             .elements
             .iter()
@@ -1989,7 +2072,9 @@ mod tests {
 
         let mut extinguished = Session::new(&campaign);
         extinguished.start().expect("start");
-        extinguished.advance_to(120_000).expect("fire call arrival");
+        extinguished
+            .advance_to(call.arrival_ms)
+            .expect("fire call arrival");
         extinguished.incidents[incident_index].phase = IncidentPhase::Reported;
         let fire_unit = campaign
             .shift
@@ -1999,7 +2084,7 @@ mod tests {
             .expect("fire unit");
         extinguished.units[fire_unit] = UnitPhase::OnScene { incident_index };
         extinguished
-            .advance_to(180_000)
+            .advance_to(call.arrival_ms + fire_completion_ms)
             .expect("extinguish before smoke timer");
         let smoke = extinguished.incidents[incident_index]
             .elements
@@ -2031,7 +2116,14 @@ mod tests {
         let incident = "chapter-1-duty-1-call-1-97-incident";
         let mut session = Session::new(&campaign);
         session.start().expect("start");
-        session.advance_to(30_000).expect("first call arrival");
+        let arrival_ms = campaign
+            .shift
+            .calls
+            .iter()
+            .find(|definition| definition.id == call)
+            .expect("packaged call")
+            .arrival_ms;
+        session.advance_to(arrival_ms).expect("first call arrival");
         session.answer(call).expect("answer first call");
         for choice in ["3", "address", "7c", "7e", "9", "11", "13", "20", "17"] {
             session

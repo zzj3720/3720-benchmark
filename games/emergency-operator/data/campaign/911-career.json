@@ -7,7 +7,7 @@
   "shift": {
     "id": "base-career",
     "title": "Five chapters · 14 duties",
-    "duration_ms": 9330000,
+    "duration_ms": 1800000,
     "duties": [
       {
         "id": "chapter-1-duty-1",
@@ -16,7 +16,7 @@
         "city": "Kapolei",
         "map_id": "150921582",
         "start_ms": 0,
-        "end_ms": 630000
+        "end_ms": 121543
       },
       {
         "id": "chapter-2-duty-1",
@@ -24,8 +24,8 @@
         "number": 1,
         "city": "Albuquerque",
         "map_id": "151364049",
-        "start_ms": 630000,
-        "end_ms": 1260000
+        "start_ms": 121543,
+        "end_ms": 243087
       },
       {
         "id": "chapter-2-duty-2",
@@ -33,8 +33,8 @@
         "number": 2,
         "city": "Albuquerque",
         "map_id": "151364049",
-        "start_ms": 1260000,
-        "end_ms": 1890000
+        "start_ms": 243087,
+        "end_ms": 364630
       },
       {
         "id": "chapter-2-duty-3",
@@ -42,8 +42,8 @@
         "number": 3,
         "city": "Albuquerque",
         "map_id": "151364049",
-        "start_ms": 1890000,
-        "end_ms": 2520000
+        "start_ms": 364630,
+        "end_ms": 486174
       },
       {
         "id": "chapter-3-duty-1",
@@ -51,8 +51,8 @@
         "number": 1,
         "city": "Chicago",
         "map_id": "153388690",
-        "start_ms": 2520000,
-        "end_ms": 3150000
+        "start_ms": 486174,
+        "end_ms": 607717
       },
       {
         "id": "chapter-3-duty-2",
@@ -60,8 +60,8 @@
         "number": 2,
         "city": "Chicago",
         "map_id": "153388690",
-        "start_ms": 3150000,
-        "end_ms": 3780000
+        "start_ms": 607717,
+        "end_ms": 729260
       },
       {
         "id": "chapter-3-duty-3",
@@ -69,8 +69,8 @@
         "number": 3,
         "city": "Chicago",
         "map_id": "153388690",
-        "start_ms": 3780000,
-        "end_ms": 4500000
+        "start_ms": 729260,
+        "end_ms": 868167
       },
       {
         "id": "chapter-4-duty-1",
@@ -78,8 +78,8 @@
         "number": 1,
         "city": "San Francisco",
         "map_id": "26819236",
-        "start_ms": 4500000,
-        "end_ms": 5220000
+        "start_ms": 868167,
+        "end_ms": 1007074
       },
       {
         "id": "chapter-4-duty-2",
@@ -87,8 +87,8 @@
         "number": 2,
         "city": "San Francisco",
         "map_id": "26819236",
-        "start_ms": 5220000,
-        "end_ms": 5940000
+        "start_ms": 1007074,
+        "end_ms": 1145981
       },
       {
         "id": "chapter-4-duty-3",
@@ -96,8 +96,8 @@
         "number": 3,
         "city": "San Francisco",
         "map_id": "26819236",
-        "start_ms": 5940000,
-        "end_ms": 6840000
+        "start_ms": 1145981,
+        "end_ms": 1319614
       },
       {
         "id": "chapter-5-duty-1",
@@ -105,8 +105,8 @@
         "number": 1,
         "city": "Washington",
         "map_id": "158368533",
-        "start_ms": 6840000,
-        "end_ms": 7560000
+        "start_ms": 1319614,
+        "end_ms": 1458521
       },
       {
         "id": "chapter-5-duty-2",
@@ -114,8 +114,8 @@
         "number": 2,
         "city": "Washington",
         "map_id": "158368533",
-        "start_ms": 7560000,
-        "end_ms": 8190000
+        "start_ms": 1458521,
+        "end_ms": 1580064
       },
       {
         "id": "chapter-5-duty-3",
@@ -123,8 +123,8 @@
         "number": 3,
         "city": "Washington",
         "map_id": "158368533",
-        "start_ms": 8190000,
-        "end_ms": 8910000
+        "start_ms": 1580064,
+        "end_ms": 1718971
       },
       {
         "id": "chapter-5-duty-4",
@@ -132,8 +132,8 @@
         "number": 4,
         "city": "Washington",
         "map_id": "158368533",
-        "start_ms": 8910000,
-        "end_ms": 9330000
+        "start_ms": 1718971,
+        "end_ms": 1800000
       }
     ],
     "units": [
@@ -145,7 +145,7 @@
           "x": -1,
           "y": 0
         },
-        "speed_cells_per_minute": 5
+        "speed_cells_per_minute": 26
       },
       {
         "id": "police-2",
@@ -155,7 +155,7 @@
           "x": -1,
           "y": 0
         },
-        "speed_cells_per_minute": 4
+        "speed_cells_per_minute": 21
       },
       {
         "id": "fire-1",
@@ -165,7 +165,7 @@
           "x": 1,
           "y": 0
         },
-        "speed_cells_per_minute": 5
+        "speed_cells_per_minute": 26
       },
       {
         "id": "fire-2",
@@ -175,7 +175,7 @@
           "x": 1,
           "y": 0
         },
-        "speed_cells_per_minute": 4
+        "speed_cells_per_minute": 21
       },
       {
         "id": "medical-1",
@@ -185,7 +185,7 @@
           "x": 0,
           "y": 1
         },
-        "speed_cells_per_minute": 5
+        "speed_cells_per_minute": 26
       },
       {
         "id": "medical-2",
@@ -195,7 +195,7 @@
           "x": 0,
           "y": 1
         },
-        "speed_cells_per_minute": 4
+        "speed_cells_per_minute": 21
       }
     ],
     "calls": [
@@ -204,9 +204,9 @@
         "caller": "Kapolei D1 · Clipped leg",
         "kind": "phone",
         "duty_id": "chapter-1-duty-1",
-        "arrival_ms": 30000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 5788,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -463,7 +463,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "injuried.hpChange = -0.1;"
+              "injuried.hpChange = -0.518333;"
             ],
             "aar": []
           },
@@ -621,8 +621,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 70000,
-              "health_decay_milli_per_minute": 18000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 93300,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -641,9 +641,9 @@
         "caller": "Kapolei D1 · Small car fire",
         "kind": "phone",
         "duty_id": "chapter-1-duty-1",
-        "arrival_ms": 120000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 23151,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -985,7 +985,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 30000,
+              "work_ms": 5788,
               "work_growth_ms_per_minute": 30000,
               "blocked_by": null,
               "weapon": null,
@@ -1034,7 +1034,7 @@
               "fight_risk_milli": 0,
               "prison_chance_milli": 0,
               "bill": null,
-              "timer_ms": 60000,
+              "timer_ms": 11576,
               "actions": [
                 "caller.hp = 80; opinionEffect += -2; onIgnore=-5;"
               ],
@@ -1050,9 +1050,9 @@
         "caller": "Kapolei D1 · Empty call",
         "kind": "phone",
         "duty_id": "chapter-1-duty-1",
-        "arrival_ms": 210000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 40514,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -1669,7 +1669,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "injuriedA.hpchange=-0.1;"
+              "injuriedA.hpchange=-0.518333;"
             ],
             "aar": []
           },
@@ -1897,7 +1897,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -1916,7 +1916,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -1935,7 +1935,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -1954,7 +1954,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "door",
               "weapon": null,
@@ -1973,7 +1973,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 50000,
+              "work_ms": 9646,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -1991,8 +1991,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 60000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "robber1",
               "weapon": null,
@@ -2011,9 +2011,9 @@
         "caller": "Kapolei D1 · Trapped under a car",
         "kind": "phone",
         "duty_id": "chapter-1-duty-1",
-        "arrival_ms": 300000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 57878,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -2223,8 +2223,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 50000,
-              "health_decay_milli_per_minute": 6000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 31100,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "car",
               "weapon": null,
@@ -2243,7 +2243,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 50000,
+              "work_ms": 9646,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -2262,7 +2262,7 @@
         "caller": "CAD · Car Accident",
         "kind": "report",
         "duty_id": "chapter-1-duty-1",
-        "arrival_ms": 75000,
+        "arrival_ms": 14469,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -2284,8 +2284,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -2301,7 +2301,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -2317,7 +2317,7 @@
         "caller": "CAD · Drug Usage",
         "kind": "report",
         "duty_id": "chapter-1-duty-1",
-        "arrival_ms": 210000,
+        "arrival_ms": 40514,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -2339,8 +2339,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 4000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 20733,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -2356,7 +2356,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 180000,
+              "work_ms": 34727,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -2372,7 +2372,7 @@
         "caller": "CAD · Cat",
         "kind": "report",
         "duty_id": "chapter-1-duty-1",
-        "arrival_ms": 345000,
+        "arrival_ms": 66559,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -2395,7 +2395,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -2411,9 +2411,9 @@
         "caller": "Albuquerque D1 · Undercover pizza",
         "kind": "phone",
         "duty_id": "chapter-2-duty-1",
-        "arrival_ms": 660000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 127331,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -2750,7 +2750,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -2769,7 +2769,7 @@
               "role": "medical",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "offender",
               "weapon": null,
@@ -2788,9 +2788,9 @@
         "caller": "Albuquerque D1 · Mathematical problem",
         "kind": "phone",
         "duty_id": "chapter-2-duty-1",
-        "arrival_ms": 750000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 144695,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -3434,9 +3434,9 @@
         "caller": "Albuquerque D1 · Developer",
         "kind": "phone",
         "duty_id": "chapter-2-duty-1",
-        "arrival_ms": 840000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 162058,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -3812,7 +3812,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -3833,9 +3833,9 @@
         "caller": "Albuquerque D1 · Stomach ache",
         "kind": "phone",
         "duty_id": "chapter-2-duty-1",
-        "arrival_ms": 930000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 179421,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -4248,7 +4248,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "headache->active=false; nosymp->active=false; noother->active=false; pale->active=false; caller.hp=40; caller.hpchange=-0.3; opinionEffect=3;"
+              "headache->active=false; nosymp->active=false; noother->active=false; pale->active=false; caller.hp=40; caller.hpchange=-1.555; opinionEffect=3;"
             ],
             "aar": [
               "He ate poisonous mushrooms."
@@ -4573,7 +4573,7 @@
               "role": "medical",
               "health_milli": 60000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -4592,7 +4592,7 @@
         "caller": "CAD · Biting",
         "kind": "report",
         "duty_id": "chapter-2-duty-1",
-        "arrival_ms": 705000,
+        "arrival_ms": 136013,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -4614,8 +4614,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 4000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 20733,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -4631,7 +4631,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -4647,7 +4647,7 @@
         "caller": "CAD · Twist",
         "kind": "report",
         "duty_id": "chapter-2-duty-1",
-        "arrival_ms": 840000,
+        "arrival_ms": 162058,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -4669,8 +4669,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 4000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 20733,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -4686,7 +4686,7 @@
         "caller": "CAD · Trashfire",
         "kind": "report",
         "duty_id": "chapter-2-duty-1",
-        "arrival_ms": 975000,
+        "arrival_ms": 188103,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -4709,7 +4709,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -4725,9 +4725,9 @@
         "caller": "Albuquerque D2 · Singer",
         "kind": "phone",
         "duty_id": "chapter-2-duty-2",
-        "arrival_ms": 1290000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 248875,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -4971,7 +4971,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -4992,9 +4992,9 @@
         "caller": "Albuquerque D2 · Street fight",
         "kind": "phone",
         "duty_id": "chapter-2-duty-2",
-        "arrival_ms": 1380000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 266238,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -5352,7 +5352,7 @@
             ],
             "chance_weight": 150,
             "actions": [
-              "injuredf.hp=40; injuredf.hpchange =-0.3;"
+              "injuredf.hp=40; injuredf.hpchange =-1.555;"
             ],
             "aar": []
           },
@@ -5365,7 +5365,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "injuredf.hp=40; injuredf.hpchange =-1; opinionEffect = 1; onIgnore=-3;"
+              "injuredf.hp=40; injuredf.hpchange =-5.183333; opinionEffect = 1; onIgnore=-3;"
             ],
             "aar": [
               "The operator gave the caller wrong medical instruction."
@@ -5426,7 +5426,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "opinionEffect = 3; injuredf.hpchange=-0.2;"
+              "opinionEffect = 3; injuredf.hpchange=-1.036667;"
             ],
             "aar": []
           },
@@ -5439,7 +5439,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "injuredf.hpchange=-0.6; "
+              "injuredf.hpchange=-3.11; "
             ],
             "aar": []
           },
@@ -5866,7 +5866,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -5885,7 +5885,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -5904,7 +5904,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -5923,7 +5923,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -5942,7 +5942,7 @@
               "role": "medical",
               "health_milli": 60000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -5961,9 +5961,9 @@
         "caller": "Albuquerque D2 · Serious fall",
         "kind": "phone",
         "duty_id": "chapter-2-duty-2",
-        "arrival_ms": 1470000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 283601,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -6433,7 +6433,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -6547,9 +6547,9 @@
         "caller": "Albuquerque D2 · Axe Robbery",
         "kind": "phone",
         "duty_id": "chapter-2-duty-2",
-        "arrival_ms": 1560000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 300965,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -6988,7 +6988,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -7030,7 +7030,7 @@
         "caller": "CAD · Drug Dealer",
         "kind": "report",
         "duty_id": "chapter-2-duty-2",
-        "arrival_ms": 1335000,
+        "arrival_ms": 257556,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -7053,7 +7053,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -7069,7 +7069,7 @@
         "caller": "CAD · Broken",
         "kind": "report",
         "duty_id": "chapter-2-duty-2",
-        "arrival_ms": 1470000,
+        "arrival_ms": 283601,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -7091,8 +7091,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -7108,7 +7108,7 @@
         "caller": "CAD · Suecide Attemp",
         "kind": "report",
         "duty_id": "chapter-2-duty-2",
-        "arrival_ms": 1605000,
+        "arrival_ms": 309646,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -7131,7 +7131,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -7146,8 +7146,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -7163,9 +7163,9 @@
         "caller": "Albuquerque D3 · Bat in a room",
         "kind": "phone",
         "duty_id": "chapter-2-duty-3",
-        "arrival_ms": 1920000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 370418,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -7527,7 +7527,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 50000,
+              "work_ms": 9646,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -7546,9 +7546,9 @@
         "caller": "Albuquerque D3 · Daughter out of control",
         "kind": "phone",
         "duty_id": "chapter-2-duty-3",
-        "arrival_ms": 2010000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 387781,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -7869,7 +7869,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -7911,9 +7911,9 @@
         "caller": "Albuquerque D3 · Bad pizza",
         "kind": "phone",
         "duty_id": "chapter-2-duty-3",
-        "arrival_ms": 2100000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 405145,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -8182,7 +8182,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -8201,9 +8201,9 @@
         "caller": "Albuquerque D3 · Loud neighbors",
         "kind": "phone",
         "duty_id": "chapter-2-duty-3",
-        "arrival_ms": 2190000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 422508,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -9331,7 +9331,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -9407,7 +9407,7 @@
               "role": "police",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -9426,7 +9426,7 @@
               "role": "police",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -9445,7 +9445,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -9464,7 +9464,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -9483,7 +9483,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_knife",
@@ -9501,8 +9501,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 50000,
-              "health_decay_milli_per_minute": 30000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 155500,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -9521,7 +9521,7 @@
               "role": "medical",
               "health_milli": 60000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -9540,7 +9540,7 @@
               "role": "medical",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -9559,7 +9559,7 @@
               "role": "medical",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -9615,8 +9615,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 50000,
-              "health_decay_milli_per_minute": 30000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 155500,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fighterw",
               "weapon": null,
@@ -9654,7 +9654,7 @@
               "role": "medical",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fighterw",
               "weapon": null,
@@ -9673,7 +9673,7 @@
               "role": "medical",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fighterw",
               "weapon": null,
@@ -9692,7 +9692,7 @@
         "caller": "CAD · Pickpocket",
         "kind": "report",
         "duty_id": "chapter-2-duty-3",
-        "arrival_ms": 1965000,
+        "arrival_ms": 379100,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -9715,7 +9715,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -9731,7 +9731,7 @@
         "caller": "CAD · Overuse",
         "kind": "report",
         "duty_id": "chapter-2-duty-3",
-        "arrival_ms": 2100000,
+        "arrival_ms": 405145,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -9753,8 +9753,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -9770,7 +9770,7 @@
         "caller": "CAD · Chemical",
         "kind": "report",
         "duty_id": "chapter-2-duty-3",
-        "arrival_ms": 2235000,
+        "arrival_ms": 431190,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -9793,7 +9793,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -9809,9 +9809,9 @@
         "caller": "Chicago D1 · Stolen car",
         "kind": "phone",
         "duty_id": "chapter-3-duty-1",
-        "arrival_ms": 2550000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 491961,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -10739,7 +10739,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -10758,7 +10758,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -10777,7 +10777,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -10796,9 +10796,9 @@
         "caller": "Chicago D1 · Concerned wife",
         "kind": "phone",
         "duty_id": "chapter-3-duty-1",
-        "arrival_ms": 2640000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 509325,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -11258,8 +11258,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 90000,
-              "health_decay_milli_per_minute": 3000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 15550,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -11278,7 +11278,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -11297,9 +11297,9 @@
         "caller": "Chicago D1 · Unconscious man",
         "kind": "phone",
         "duty_id": "chapter-3-duty-1",
-        "arrival_ms": 2730000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 526688,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -11485,7 +11485,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "drunk.isActive = false; unconscious.isActive = true; unconscious.hpChange=-1; beaten.isActive=false; breathy->active=false;"
+              "drunk.isActive = false; unconscious.isActive = true; unconscious.hpChange=-5.183333; beaten.isActive=false; breathy->active=false;"
             ],
             "aar": []
           },
@@ -11535,7 +11535,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "unconscious.hpChange=-0.5; "
+              "unconscious.hpChange=-2.591667; "
             ],
             "aar": []
           },
@@ -11599,7 +11599,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "unconscious.hpChange=-0.5; "
+              "unconscious.hpChange=-2.591667; "
             ],
             "aar": []
           },
@@ -11626,7 +11626,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "unconscious.hpChange=-0.5; "
+              "unconscious.hpChange=-2.591667; "
             ],
             "aar": []
           },
@@ -12196,8 +12196,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 90000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -12215,8 +12215,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 90000,
-              "health_decay_milli_per_minute": 18000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 93300,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -12235,7 +12235,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -12254,9 +12254,9 @@
         "caller": "Chicago D1 · Dead daughter",
         "kind": "phone",
         "duty_id": "chapter-3-duty-1",
-        "arrival_ms": 2820000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 544051,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -12580,7 +12580,7 @@
         "caller": "CAD · Wrongway",
         "kind": "report",
         "duty_id": "chapter-3-duty-1",
-        "arrival_ms": 2595000,
+        "arrival_ms": 500643,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -12603,7 +12603,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -12619,7 +12619,7 @@
         "caller": "CAD · Unconsu",
         "kind": "report",
         "duty_id": "chapter-3-duty-1",
-        "arrival_ms": 2730000,
+        "arrival_ms": 526688,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -12641,8 +12641,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 4000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 20733,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -12658,7 +12658,7 @@
         "caller": "CAD · Electric",
         "kind": "report",
         "duty_id": "chapter-3-duty-1",
-        "arrival_ms": 2865000,
+        "arrival_ms": 552733,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -12681,7 +12681,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -12697,9 +12697,9 @@
         "caller": "Chicago D2 · Prison escape",
         "kind": "phone",
         "duty_id": "chapter-3-duty-2",
-        "arrival_ms": 3180000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 613505,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -13021,7 +13021,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -13040,7 +13040,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -13059,7 +13059,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -13078,7 +13078,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -13097,7 +13097,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "criminal4",
               "weapon": null,
@@ -13116,9 +13116,9 @@
         "caller": "Chicago D2 · Car wash row",
         "kind": "phone",
         "duty_id": "chapter-3-duty-2",
-        "arrival_ms": 3270000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 630868,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -13541,7 +13541,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -13560,7 +13560,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -13581,9 +13581,9 @@
         "caller": "Chicago D2 · Fire",
         "kind": "phone",
         "duty_id": "chapter-3-duty-2",
-        "arrival_ms": 3360000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 648232,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -13762,7 +13762,7 @@
             ],
             "chance_weight": 400,
             "actions": [
-              "fire.work+=50;"
+              "fire.work+=9.646302;"
             ],
             "aar": []
           },
@@ -13776,7 +13776,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=150; bgsound=cgen20_0_largefire2;"
+              "fire.work+=28.938907; bgsound=cgen20_0_largefire2;"
             ],
             "aar": []
           },
@@ -13790,7 +13790,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=120; bgsound=cgen20_0_midfire2;"
+              "fire.work+=23.151125; bgsound=cgen20_0_midfire2;"
             ],
             "aar": []
           },
@@ -13847,7 +13847,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=-20; vbig->active=false;"
+              "fire.work+=-3.858521; vbig->active=false;"
             ],
             "aar": []
           },
@@ -13913,7 +13913,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=100; burnout->active=false; bgsound=cgen20_0_largefire2;"
+              "fire.work+=19.292605; burnout->active=false; bgsound=cgen20_0_largefire2;"
             ],
             "aar": []
           },
@@ -13929,7 +13929,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=50; burnout->active=false;"
+              "fire.work+=9.646302; burnout->active=false;"
             ],
             "aar": []
           },
@@ -13945,7 +13945,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=-50; spread->active=false; around->active=false;"
+              "fire.work+=-9.646302; spread->active=false; around->active=false;"
             ],
             "aar": []
           },
@@ -14381,8 +14381,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 18000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 93300,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fire",
               "weapon": null,
@@ -14400,8 +14400,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 60000,
-              "health_decay_milli_per_minute": 30000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 155500,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fire",
               "weapon": null,
@@ -14420,7 +14420,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -14439,7 +14439,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -14458,9 +14458,9 @@
         "caller": "Chicago D2 · Home invade",
         "kind": "phone",
         "duty_id": "chapter-3-duty-2",
-        "arrival_ms": 3450000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 665595,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -14759,7 +14759,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_knife",
@@ -14796,8 +14796,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 30000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_knife",
@@ -14815,8 +14815,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 70000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -14835,7 +14835,7 @@
         "caller": "CAD · Pedehit",
         "kind": "report",
         "duty_id": "chapter-3-duty-2",
-        "arrival_ms": 3225000,
+        "arrival_ms": 622186,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -14857,8 +14857,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -14874,7 +14874,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -14890,7 +14890,7 @@
         "caller": "CAD · Epilepsy",
         "kind": "report",
         "duty_id": "chapter-3-duty-2",
-        "arrival_ms": 3360000,
+        "arrival_ms": 648232,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -14912,8 +14912,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 4000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 20733,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -14929,7 +14929,7 @@
         "caller": "CAD · Elevator",
         "kind": "report",
         "duty_id": "chapter-3-duty-2",
-        "arrival_ms": 3495000,
+        "arrival_ms": 674277,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -14952,7 +14952,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -14968,9 +14968,9 @@
         "caller": "Chicago D3 · Factory incident",
         "kind": "phone",
         "duty_id": "chapter-3-duty-3",
-        "arrival_ms": 3810000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 735048,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -15458,7 +15458,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -15477,7 +15477,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -15495,8 +15495,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 75000,
-              "health_decay_milli_per_minute": 6000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 31100,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -15515,9 +15515,9 @@
         "caller": "Chicago D3 · Robbery",
         "kind": "phone",
         "duty_id": "chapter-3-duty-3",
-        "arrival_ms": 3900000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 752412,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -16231,7 +16231,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -16250,7 +16250,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -16269,7 +16269,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -16288,7 +16288,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -16307,9 +16307,9 @@
         "caller": "Chicago D3 · Sports fans fight",
         "kind": "phone",
         "duty_id": "chapter-3-duty-3",
-        "arrival_ms": 3990000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 769775,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -16724,7 +16724,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 30000,
+              "work_ms": 5788,
               "work_growth_ms_per_minute": 30000,
               "blocked_by": null,
               "weapon": null,
@@ -16743,7 +16743,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -16762,7 +16762,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -16781,7 +16781,7 @@
               "role": "medical",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -16800,7 +16800,7 @@
               "role": "medical",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -16818,8 +16818,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 90000,
-              "health_decay_milli_per_minute": 6000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 31100,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -16876,9 +16876,9 @@
         "caller": "Chicago D3 · Kitchen on fire",
         "kind": "phone",
         "duty_id": "chapter-3-duty-3",
-        "arrival_ms": 4080000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 787138,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -17170,7 +17170,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fiyah.work = 200; fiyah.workchange = 1; opinionEffect = 1; onIgnore=-4; firfia->active = false; firfia2->active =true;"
+              "fiyah.work = 38.585209; fiyah.workchange = 1; opinionEffect = 1; onIgnore=-4; firfia->active = false; firfia2->active =true;"
             ],
             "aar": [
               "The operator failed to give the right instructions to the caller, which made the situation worse."
@@ -17267,7 +17267,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fiyah.work = 100; fiyah.workchange = 1; caller.isActive = false; boom.isActive = true; opinionEffect = 1; onIgnore=-4; firfia->active = false; firfia2->active =true;"
+              "fiyah.work = 19.292605; fiyah.workchange = 1; caller.isActive = false; boom.isActive = true; opinionEffect = 1; onIgnore=-4; firfia->active = false; firfia2->active =true;"
             ],
             "aar": [
               "The operator failed to give the right instructions to the caller, which made the situation worse."
@@ -17431,8 +17431,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 70000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fiyah",
               "weapon": null,
@@ -17450,8 +17450,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 60000,
-              "health_decay_milli_per_minute": 6000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 31100,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fiyah",
               "weapon": null,
@@ -17489,7 +17489,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 30000,
               "blocked_by": null,
               "weapon": null,
@@ -17508,9 +17508,9 @@
         "caller": "Chicago D3 · Plane crash",
         "kind": "phone",
         "duty_id": "chapter-3-duty-3",
-        "arrival_ms": 4170000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 804502,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -17845,7 +17845,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 250000,
+              "work_ms": 48232,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -17864,7 +17864,7 @@
               "role": "medical",
               "health_milli": 100000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -17902,7 +17902,7 @@
               "role": "medical",
               "health_milli": 100000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "workk",
               "weapon": null,
@@ -17921,7 +17921,7 @@
               "role": "medical",
               "health_milli": 100000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "workk",
               "weapon": null,
@@ -17940,7 +17940,7 @@
         "caller": "CAD · Bridgejam",
         "kind": "report",
         "duty_id": "chapter-3-duty-3",
-        "arrival_ms": 3855000,
+        "arrival_ms": 743730,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -17963,7 +17963,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -17978,8 +17978,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -17995,7 +17995,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -18011,7 +18011,7 @@
         "caller": "CAD · Firebuilding",
         "kind": "report",
         "duty_id": "chapter-3-duty-3",
-        "arrival_ms": 3990000,
+        "arrival_ms": 769775,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -18034,7 +18034,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -18049,8 +18049,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -18066,7 +18066,7 @@
         "caller": "CAD · Firehouse",
         "kind": "report",
         "duty_id": "chapter-3-duty-3",
-        "arrival_ms": 4125000,
+        "arrival_ms": 795820,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -18089,7 +18089,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -18104,8 +18104,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 16000,
-              "work_ms": 180000,
+              "health_decay_milli_per_minute": 82933,
+              "work_ms": 34727,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -18121,9 +18121,9 @@
         "caller": "San Francisco D1 · Car collision",
         "kind": "phone",
         "duty_id": "chapter-4-duty-1",
-        "arrival_ms": 4530000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 873955,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -18408,7 +18408,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "injuriedA.hpChange = -0.1;"
+              "injuriedA.hpChange = -0.518333;"
             ],
             "aar": []
           },
@@ -18421,7 +18421,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "injuriedA.hpChange = -0.2; opinionEffect += 1;"
+              "injuriedA.hpChange = -1.036667; opinionEffect += 1;"
             ],
             "aar": []
           },
@@ -18625,7 +18625,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -18644,7 +18644,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -18663,7 +18663,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -18682,7 +18682,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -18701,7 +18701,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -18720,7 +18720,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -18739,9 +18739,9 @@
         "caller": "San Francisco D1 · Robbery",
         "kind": "phone",
         "duty_id": "chapter-4-duty-1",
-        "arrival_ms": 4620000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 891318,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -19454,7 +19454,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -19473,7 +19473,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -19492,7 +19492,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -19511,7 +19511,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -19530,9 +19530,9 @@
         "caller": "San Francisco D1 · Murdered wife",
         "kind": "phone",
         "duty_id": "chapter-4-duty-1",
-        "arrival_ms": 4710000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 908682,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -19985,7 +19985,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -20042,9 +20042,9 @@
         "caller": "San Francisco D1 · Unconscious man",
         "kind": "phone",
         "duty_id": "chapter-4-duty-1",
-        "arrival_ms": 4800000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 926045,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -20230,7 +20230,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "drunk.isActive = false; unconscious.isActive = true; unconscious.hpChange=-1; beaten.isActive=false; breathy->active=false;"
+              "drunk.isActive = false; unconscious.isActive = true; unconscious.hpChange=-5.183333; beaten.isActive=false; breathy->active=false;"
             ],
             "aar": []
           },
@@ -20280,7 +20280,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "unconscious.hpChange=-0.5; "
+              "unconscious.hpChange=-2.591667; "
             ],
             "aar": []
           },
@@ -20344,7 +20344,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "unconscious.hpChange=-0.5; "
+              "unconscious.hpChange=-2.591667; "
             ],
             "aar": []
           },
@@ -20371,7 +20371,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "unconscious.hpChange=-0.5; "
+              "unconscious.hpChange=-2.591667; "
             ],
             "aar": []
           },
@@ -20942,8 +20942,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 90000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -20961,8 +20961,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 90000,
-              "health_decay_milli_per_minute": 18000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 93300,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -20981,7 +20981,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -21000,9 +21000,9 @@
         "caller": "San Francisco D1 · Kitchen on fire",
         "kind": "phone",
         "duty_id": "chapter-4-duty-1",
-        "arrival_ms": 4890000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 943408,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -21294,7 +21294,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fiyah.work = 200; fiyah.workchange = 1; opinionEffect = 1; onIgnore=-4; firfia->active = false; firfia2->active =true;"
+              "fiyah.work = 38.585209; fiyah.workchange = 1; opinionEffect = 1; onIgnore=-4; firfia->active = false; firfia2->active =true;"
             ],
             "aar": [
               "The operator failed to give the right instructions to the caller, which made the situation worse."
@@ -21391,7 +21391,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fiyah.work = 100; fiyah.workchange = 1; caller.isActive = false; boom.isActive = true; opinionEffect = 1; onIgnore=-4; firfia->active = false; firfia2->active =true;"
+              "fiyah.work = 19.292605; fiyah.workchange = 1; caller.isActive = false; boom.isActive = true; opinionEffect = 1; onIgnore=-4; firfia->active = false; firfia2->active =true;"
             ],
             "aar": [
               "The operator failed to give the right instructions to the caller, which made the situation worse."
@@ -21556,8 +21556,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 70000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fiyah",
               "weapon": null,
@@ -21575,8 +21575,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 60000,
-              "health_decay_milli_per_minute": 6000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 31100,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fiyah",
               "weapon": null,
@@ -21614,7 +21614,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 30000,
               "blocked_by": null,
               "weapon": null,
@@ -21633,7 +21633,7 @@
         "caller": "CAD · Suecide Attemp",
         "kind": "report",
         "duty_id": "chapter-4-duty-1",
-        "arrival_ms": 4575000,
+        "arrival_ms": 882637,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -21656,7 +21656,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -21671,8 +21671,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -21688,7 +21688,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -21704,7 +21704,7 @@
         "caller": "CAD · House Invade",
         "kind": "report",
         "duty_id": "chapter-4-duty-1",
-        "arrival_ms": 4710000,
+        "arrival_ms": 908682,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -21726,8 +21726,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 4000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 20733,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -21743,7 +21743,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 240000,
+              "work_ms": 46302,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -21759,7 +21759,7 @@
         "caller": "CAD · Tree",
         "kind": "report",
         "duty_id": "chapter-4-duty-1",
-        "arrival_ms": 4845000,
+        "arrival_ms": 934727,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -21782,7 +21782,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -21798,9 +21798,9 @@
         "caller": "San Francisco D2 · Stolen car",
         "kind": "phone",
         "duty_id": "chapter-4-duty-2",
-        "arrival_ms": 5250000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1012862,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -22729,7 +22729,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -22748,7 +22748,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -22767,7 +22767,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -22786,9 +22786,9 @@
         "caller": "San Francisco D2 · Fire",
         "kind": "phone",
         "duty_id": "chapter-4-duty-2",
-        "arrival_ms": 5340000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1030225,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -22967,7 +22967,7 @@
             ],
             "chance_weight": 400,
             "actions": [
-              "fire.work+=50;"
+              "fire.work+=9.646302;"
             ],
             "aar": []
           },
@@ -22981,7 +22981,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=150; bgsound=cgen20_0_largefire2;"
+              "fire.work+=28.938907; bgsound=cgen20_0_largefire2;"
             ],
             "aar": []
           },
@@ -22995,7 +22995,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=120; bgsound=cgen20_0_midfire2;"
+              "fire.work+=23.151125; bgsound=cgen20_0_midfire2;"
             ],
             "aar": []
           },
@@ -23052,7 +23052,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=-20; vbig->active=false;"
+              "fire.work+=-3.858521; vbig->active=false;"
             ],
             "aar": []
           },
@@ -23118,7 +23118,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=100; burnout->active=false; bgsound=cgen20_0_largefire2;"
+              "fire.work+=19.292605; burnout->active=false; bgsound=cgen20_0_largefire2;"
             ],
             "aar": []
           },
@@ -23134,7 +23134,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=50; burnout->active=false;"
+              "fire.work+=9.646302; burnout->active=false;"
             ],
             "aar": []
           },
@@ -23150,7 +23150,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=-50; spread->active=false; around->active=false;"
+              "fire.work+=-9.646302; spread->active=false; around->active=false;"
             ],
             "aar": []
           },
@@ -23589,8 +23589,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 18000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 93300,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fire",
               "weapon": null,
@@ -23608,8 +23608,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 60000,
-              "health_decay_milli_per_minute": 30000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 155500,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fire",
               "weapon": null,
@@ -23628,7 +23628,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -23647,7 +23647,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -23666,9 +23666,9 @@
         "caller": "San Francisco D2 · Childbirth in a traffic jam",
         "kind": "phone",
         "duty_id": "chapter-4-duty-2",
-        "arrival_ms": 5430000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1047588,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -24262,7 +24262,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "child.hpchange=-0.3;"
+              "child.hpchange=-1.555;"
             ],
             "aar": []
           },
@@ -24416,7 +24416,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "child.hpchange=-0.5;"
+              "child.hpchange=-2.591667;"
             ],
             "aar": []
           },
@@ -24724,7 +24724,7 @@
               "role": "medical",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -24743,7 +24743,7 @@
               "role": "medical",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -24762,9 +24762,9 @@
         "caller": "San Francisco D2 · Empty call",
         "kind": "phone",
         "duty_id": "chapter-4-duty-2",
-        "arrival_ms": 5520000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1064952,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -25381,7 +25381,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "injuriedA.hpchange=-0.1;"
+              "injuriedA.hpchange=-0.518333;"
             ],
             "aar": []
           },
@@ -25609,7 +25609,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -25628,7 +25628,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -25647,7 +25647,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -25666,7 +25666,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "door",
               "weapon": null,
@@ -25685,7 +25685,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 50000,
+              "work_ms": 9646,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -25703,8 +25703,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 60000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "robber1",
               "weapon": null,
@@ -25723,9 +25723,9 @@
         "caller": "San Francisco D2 · Loud neighbors",
         "kind": "phone",
         "duty_id": "chapter-4-duty-2",
-        "arrival_ms": 5610000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1082315,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -26853,7 +26853,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -26929,7 +26929,7 @@
               "role": "police",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -26948,7 +26948,7 @@
               "role": "police",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -26967,7 +26967,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -26986,7 +26986,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -27005,7 +27005,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_knife",
@@ -27023,8 +27023,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 50000,
-              "health_decay_milli_per_minute": 30000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 155500,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -27043,7 +27043,7 @@
               "role": "medical",
               "health_milli": 60000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -27062,7 +27062,7 @@
               "role": "medical",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -27081,7 +27081,7 @@
               "role": "medical",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -27137,8 +27137,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 50000,
-              "health_decay_milli_per_minute": 30000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 155500,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fighterw",
               "weapon": null,
@@ -27176,7 +27176,7 @@
               "role": "medical",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fighterw",
               "weapon": null,
@@ -27195,7 +27195,7 @@
               "role": "medical",
               "health_milli": 90000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fighterw",
               "weapon": null,
@@ -27214,7 +27214,7 @@
         "caller": "CAD · Drug Usage",
         "kind": "report",
         "duty_id": "chapter-4-duty-2",
-        "arrival_ms": 5295000,
+        "arrival_ms": 1021543,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -27236,8 +27236,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 4000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 20733,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -27253,7 +27253,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 180000,
+              "work_ms": 34727,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -27269,7 +27269,7 @@
         "caller": "CAD · Amputation",
         "kind": "report",
         "duty_id": "chapter-4-duty-2",
-        "arrival_ms": 5430000,
+        "arrival_ms": 1047588,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -27291,8 +27291,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -27308,7 +27308,7 @@
         "caller": "CAD · Bombing Threat",
         "kind": "report",
         "duty_id": "chapter-4-duty-2",
-        "arrival_ms": 5565000,
+        "arrival_ms": 1073633,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -27331,7 +27331,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -27347,7 +27347,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -27363,9 +27363,9 @@
         "caller": "San Francisco D3 · Street fight",
         "kind": "phone",
         "duty_id": "chapter-4-duty-3",
-        "arrival_ms": 5970000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1151768,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -27723,7 +27723,7 @@
             ],
             "chance_weight": 150,
             "actions": [
-              "injuredf.hp=40; injuredf.hpchange =-0.3;"
+              "injuredf.hp=40; injuredf.hpchange =-1.555;"
             ],
             "aar": []
           },
@@ -27736,7 +27736,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "injuredf.hp=40; injuredf.hpchange =-1; opinionEffect = 1; onIgnore=-3;"
+              "injuredf.hp=40; injuredf.hpchange =-5.183333; opinionEffect = 1; onIgnore=-3;"
             ],
             "aar": [
               "The operator gave the caller wrong medical instruction."
@@ -27797,7 +27797,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "opinionEffect = 3; injuredf.hpchange=-0.2;"
+              "opinionEffect = 3; injuredf.hpchange=-1.036667;"
             ],
             "aar": []
           },
@@ -27810,7 +27810,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "injuredf.hpchange=-0.6; "
+              "injuredf.hpchange=-3.11; "
             ],
             "aar": []
           },
@@ -28235,7 +28235,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -28254,7 +28254,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -28273,7 +28273,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -28292,7 +28292,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -28311,7 +28311,7 @@
               "role": "medical",
               "health_milli": 60000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -28330,9 +28330,9 @@
         "caller": "San Francisco D3 · Stomach ache",
         "kind": "phone",
         "duty_id": "chapter-4-duty-3",
-        "arrival_ms": 6060000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1169132,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -28745,7 +28745,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "headache->active=false; nosymp->active=false; noother->active=false; pale->active=false; caller.hp=40; caller.hpchange=-0.3; opinionEffect=3;"
+              "headache->active=false; nosymp->active=false; noother->active=false; pale->active=false; caller.hp=40; caller.hpchange=-1.555; opinionEffect=3;"
             ],
             "aar": [
               "He ate poisonous mushrooms."
@@ -29074,7 +29074,7 @@
               "role": "medical",
               "health_milli": 60000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -29093,9 +29093,9 @@
         "caller": "San Francisco D3 · Collapsed house",
         "kind": "phone",
         "duty_id": "chapter-4-duty-3",
-        "arrival_ms": 6150000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1186495,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -29557,8 +29557,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 45000,
-              "health_decay_milli_per_minute": 6000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 31100,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -29595,8 +29595,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 50000,
-              "health_decay_milli_per_minute": 6000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 31100,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "gruz",
               "weapon": null,
@@ -29614,8 +29614,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 80000,
-              "health_decay_milli_per_minute": 18000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 93300,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "gruz",
               "weapon": null,
@@ -29634,7 +29634,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 200000,
+              "work_ms": 38585,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -29653,9 +29653,9 @@
         "caller": "San Francisco D3 · Car in a crack",
         "kind": "phone",
         "duty_id": "chapter-4-duty-3",
-        "arrival_ms": 6240000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1203859,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -30093,7 +30093,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "car.isActive=false; injuried1.hpchange=-0.3;"
+              "car.isActive=false; injuried1.hpchange=-1.555;"
             ],
             "aar": []
           },
@@ -30163,8 +30163,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 70000,
-              "health_decay_milli_per_minute": 6000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 31100,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "car",
               "weapon": null,
@@ -30183,7 +30183,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -30202,9 +30202,9 @@
         "caller": "San Francisco D3 · Electrocuted",
         "kind": "phone",
         "duty_id": "chapter-4-duty-3",
-        "arrival_ms": 6330000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1221222,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -30701,8 +30701,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 60000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -30759,9 +30759,9 @@
         "caller": "San Francisco D3 · Power cut",
         "kind": "phone",
         "duty_id": "chapter-4-duty-3",
-        "arrival_ms": 6420000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1238585,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -31173,8 +31173,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 60000,
-              "health_decay_milli_per_minute": 600,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 3110,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -31202,9 +31202,9 @@
               "fight_risk_milli": 0,
               "prison_chance_milli": 0,
               "bill": null,
-              "timer_ms": 120000,
+              "timer_ms": 23151,
               "actions": [
-                "injuried1.hpChange = -1;"
+                "injuried1.hpChange = -5.183333;"
               ],
               "aar": [
                 "The battery has exhausted, causing the person heart to stop."
@@ -31218,7 +31218,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -31241,9 +31241,9 @@
         "caller": "San Francisco D3 · Flooded flat",
         "kind": "phone",
         "duty_id": "chapter-4-duty-3",
-        "arrival_ms": 6510000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1255949,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -31770,8 +31770,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 70000,
-              "health_decay_milli_per_minute": 30000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 155500,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -31797,7 +31797,7 @@
               "fight_risk_milli": 0,
               "prison_chance_milli": 0,
               "bill": null,
-              "timer_ms": 180000,
+              "timer_ms": 34727,
               "actions": [
                 "caller.isActive=false; callerinj.isActive=true; "
               ],
@@ -31813,7 +31813,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 150000,
+              "work_ms": 28939,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -31834,7 +31834,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 150000,
+              "work_ms": 28939,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -31855,7 +31855,7 @@
         "caller": "CAD · Beating",
         "kind": "report",
         "duty_id": "chapter-4-duty-3",
-        "arrival_ms": 6015000,
+        "arrival_ms": 1160450,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -31877,8 +31877,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 4000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 20733,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -31894,7 +31894,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 240000,
+              "work_ms": 46302,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -31910,7 +31910,7 @@
         "caller": "CAD · Hostage",
         "kind": "report",
         "duty_id": "chapter-4-duty-3",
-        "arrival_ms": 6150000,
+        "arrival_ms": 1186495,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -31932,8 +31932,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 4000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 20733,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -31949,7 +31949,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -31965,7 +31965,7 @@
         "caller": "CAD · Carblock",
         "kind": "report",
         "duty_id": "chapter-4-duty-3",
-        "arrival_ms": 6285000,
+        "arrival_ms": 1212540,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -31988,7 +31988,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -32004,9 +32004,9 @@
         "caller": "Washington D1 · Suicide senator",
         "kind": "phone",
         "duty_id": "chapter-5-duty-1",
-        "arrival_ms": 6870000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1325402,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -32567,9 +32567,9 @@
         "caller": "Washington D1 · Car collision",
         "kind": "phone",
         "duty_id": "chapter-5-duty-1",
-        "arrival_ms": 6960000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1342765,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -32854,7 +32854,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "injuriedA.hpChange = -0.1;"
+              "injuriedA.hpChange = -0.518333;"
             ],
             "aar": []
           },
@@ -32867,7 +32867,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "injuriedA.hpChange = -0.2; opinionEffect += 1;"
+              "injuriedA.hpChange = -1.036667; opinionEffect += 1;"
             ],
             "aar": []
           },
@@ -33071,7 +33071,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -33090,7 +33090,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -33109,7 +33109,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -33128,7 +33128,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -33147,7 +33147,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -33166,7 +33166,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -33185,9 +33185,9 @@
         "caller": "Washington D1 · Robbery",
         "kind": "phone",
         "duty_id": "chapter-5-duty-1",
-        "arrival_ms": 7050000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1360129,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -33901,7 +33901,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -33920,7 +33920,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -33939,7 +33939,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -33958,7 +33958,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -33977,9 +33977,9 @@
         "caller": "Washington D1 · Unconscious",
         "kind": "phone",
         "duty_id": "chapter-5-duty-1",
-        "arrival_ms": 7140000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1377492,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -34165,7 +34165,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "drunk.isActive = false; unconscious.isActive = true; unconscious.hpChange=-1; beaten.isActive=false; breathy->active=false;"
+              "drunk.isActive = false; unconscious.isActive = true; unconscious.hpChange=-5.183333; beaten.isActive=false; breathy->active=false;"
             ],
             "aar": []
           },
@@ -34215,7 +34215,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "unconscious.hpChange=-0.5; "
+              "unconscious.hpChange=-2.591667; "
             ],
             "aar": []
           },
@@ -34279,7 +34279,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "unconscious.hpChange=-0.5; "
+              "unconscious.hpChange=-2.591667; "
             ],
             "aar": []
           },
@@ -34306,7 +34306,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "unconscious.hpChange=-0.5; "
+              "unconscious.hpChange=-2.591667; "
             ],
             "aar": []
           },
@@ -34878,8 +34878,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 90000,
-              "health_decay_milli_per_minute": 18000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 93300,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -34897,8 +34897,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 90000,
-              "health_decay_milli_per_minute": 18000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 93300,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -34917,7 +34917,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -34936,9 +34936,9 @@
         "caller": "Washington D1 · Kitchen on fire",
         "kind": "phone",
         "duty_id": "chapter-5-duty-1",
-        "arrival_ms": 7230000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1394855,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -35230,7 +35230,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fiyah.work = 200; fiyah.workchange = 1; opinionEffect = 1; onIgnore=-4; firfia->active = false; firfia2->active =true;"
+              "fiyah.work = 38.585209; fiyah.workchange = 1; opinionEffect = 1; onIgnore=-4; firfia->active = false; firfia2->active =true;"
             ],
             "aar": [
               "The operator failed to give the right instructions to the caller, which made the situation worse."
@@ -35327,7 +35327,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fiyah.work = 100; fiyah.workchange = 1; caller.isActive = false; boom.isActive = true; opinionEffect = 1; onIgnore=-4; firfia->active = false; firfia2->active =true;"
+              "fiyah.work = 19.292605; fiyah.workchange = 1; caller.isActive = false; boom.isActive = true; opinionEffect = 1; onIgnore=-4; firfia->active = false; firfia2->active =true;"
             ],
             "aar": [
               "The operator failed to give the right instructions to the caller, which made the situation worse."
@@ -35491,8 +35491,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 70000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fiyah",
               "weapon": null,
@@ -35510,8 +35510,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 60000,
-              "health_decay_milli_per_minute": 6000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 31100,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fiyah",
               "weapon": null,
@@ -35549,7 +35549,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 30000,
               "blocked_by": null,
               "weapon": null,
@@ -35568,7 +35568,7 @@
         "caller": "CAD · Bank Robbery",
         "kind": "report",
         "duty_id": "chapter-5-duty-1",
-        "arrival_ms": 6915000,
+        "arrival_ms": 1334084,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -35591,7 +35591,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 240000,
+              "work_ms": 46302,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -35607,7 +35607,7 @@
         "caller": "CAD · Rape",
         "kind": "report",
         "duty_id": "chapter-5-duty-1",
-        "arrival_ms": 7050000,
+        "arrival_ms": 1360129,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -35629,8 +35629,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 4000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 20733,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -35646,7 +35646,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -35662,7 +35662,7 @@
         "caller": "CAD · Bridgejam",
         "kind": "report",
         "duty_id": "chapter-5-duty-1",
-        "arrival_ms": 7185000,
+        "arrival_ms": 1386174,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -35685,7 +35685,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -35700,8 +35700,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -35717,7 +35717,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -35733,9 +35733,9 @@
         "caller": "Washington D2 · Stolen car",
         "kind": "phone",
         "duty_id": "chapter-5-duty-2",
-        "arrival_ms": 7590000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1464309,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -36660,7 +36660,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -36679,7 +36679,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -36698,7 +36698,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -36717,9 +36717,9 @@
         "caller": "Washington D2 · Fire",
         "kind": "phone",
         "duty_id": "chapter-5-duty-2",
-        "arrival_ms": 7680000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1481672,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -36896,7 +36896,7 @@
             ],
             "chance_weight": 400,
             "actions": [
-              "fire.work+=50;"
+              "fire.work+=9.646302;"
             ],
             "aar": []
           },
@@ -36910,7 +36910,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=150; bgsound=cgen20_0_largefire2;"
+              "fire.work+=28.938907; bgsound=cgen20_0_largefire2;"
             ],
             "aar": []
           },
@@ -36924,7 +36924,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=120; bgsound=cgen20_0_midfire2;"
+              "fire.work+=23.151125; bgsound=cgen20_0_midfire2;"
             ],
             "aar": []
           },
@@ -36981,7 +36981,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=-20; vbig->active=false;"
+              "fire.work+=-3.858521; vbig->active=false;"
             ],
             "aar": []
           },
@@ -37047,7 +37047,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=100; burnout->active=false; bgsound=cgen20_0_largefire2;"
+              "fire.work+=19.292605; burnout->active=false; bgsound=cgen20_0_largefire2;"
             ],
             "aar": []
           },
@@ -37062,7 +37062,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=50; burnout->active=false;"
+              "fire.work+=9.646302; burnout->active=false;"
             ],
             "aar": []
           },
@@ -37077,7 +37077,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=-50; spread->active=false; aroundy->active=false;"
+              "fire.work+=-9.646302; spread->active=false; aroundy->active=false;"
             ],
             "aar": []
           },
@@ -37611,7 +37611,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -37630,7 +37630,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -37648,8 +37648,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 18000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 93300,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fire",
               "weapon": null,
@@ -37667,8 +37667,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 60000,
-              "health_decay_milli_per_minute": 30000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 155500,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fire",
               "weapon": null,
@@ -37687,7 +37687,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -37706,7 +37706,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -37725,9 +37725,9 @@
         "caller": "Washington D2 · Run over dog",
         "kind": "phone",
         "duty_id": "chapter-5-duty-2",
-        "arrival_ms": 7770000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1499035,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -38136,8 +38136,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 30000,
-              "health_decay_milli_per_minute": 30000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 155500,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -38179,9 +38179,9 @@
         "caller": "Washington D2 · Stomach ache",
         "kind": "phone",
         "duty_id": "chapter-5-duty-2",
-        "arrival_ms": 7860000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1516399,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -38594,7 +38594,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "headache->active=false; nosymp->active=false; noother->active=false; pale->active=false; caller.hp=40; caller.hpchange=-0.3; opinionEffect=3;"
+              "headache->active=false; nosymp->active=false; noother->active=false; pale->active=false; caller.hp=40; caller.hpchange=-1.555; opinionEffect=3;"
             ],
             "aar": [
               "He ate poisonous mushrooms."
@@ -38919,7 +38919,7 @@
               "role": "medical",
               "health_milli": 60000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -38938,7 +38938,7 @@
         "caller": "CAD · Known Terrorist",
         "kind": "report",
         "duty_id": "chapter-5-duty-2",
-        "arrival_ms": 7635000,
+        "arrival_ms": 1472990,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -38961,7 +38961,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 240000,
+              "work_ms": 46302,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -38977,7 +38977,7 @@
         "caller": "CAD · Caraccident",
         "kind": "report",
         "duty_id": "chapter-5-duty-2",
-        "arrival_ms": 7770000,
+        "arrival_ms": 1499035,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -39000,7 +39000,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 200000,
+              "work_ms": 38585,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -39015,8 +39015,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 16000,
-              "work_ms": 180000,
+              "health_decay_milli_per_minute": 82933,
+              "work_ms": 34727,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -39032,7 +39032,7 @@
         "caller": "CAD · Firealarmtru",
         "kind": "report",
         "duty_id": "chapter-5-duty-2",
-        "arrival_ms": 7905000,
+        "arrival_ms": 1525080,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -39055,7 +39055,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -39070,8 +39070,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 8000,
-              "work_ms": 180000,
+              "health_decay_milli_per_minute": 41467,
+              "work_ms": 34727,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -39087,9 +39087,9 @@
         "caller": "Washington D3 · Fire",
         "kind": "phone",
         "duty_id": "chapter-5-duty-3",
-        "arrival_ms": 8220000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1585852,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -39266,7 +39266,7 @@
             ],
             "chance_weight": 400,
             "actions": [
-              "fire.work+=50;"
+              "fire.work+=9.646302;"
             ],
             "aar": []
           },
@@ -39280,7 +39280,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=150; bgsound=cgen20_0_largefire2;"
+              "fire.work+=28.938907; bgsound=cgen20_0_largefire2;"
             ],
             "aar": []
           },
@@ -39294,7 +39294,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=120; bgsound=cgen20_0_midfire2;"
+              "fire.work+=23.151125; bgsound=cgen20_0_midfire2;"
             ],
             "aar": []
           },
@@ -39351,7 +39351,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=-20; vbig->active=false;"
+              "fire.work+=-3.858521; vbig->active=false;"
             ],
             "aar": []
           },
@@ -39417,7 +39417,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=100; burnout->active=false; bgsound=cgen20_0_largefire2;"
+              "fire.work+=19.292605; burnout->active=false; bgsound=cgen20_0_largefire2;"
             ],
             "aar": []
           },
@@ -39432,7 +39432,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=50; burnout->active=false;"
+              "fire.work+=9.646302; burnout->active=false;"
             ],
             "aar": []
           },
@@ -39447,7 +39447,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "fire.work+=-50; spread->active=false; aroundy->active=false;"
+              "fire.work+=-9.646302; spread->active=false; aroundy->active=false;"
             ],
             "aar": []
           },
@@ -39978,7 +39978,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -39997,7 +39997,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -40015,8 +40015,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 18000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 93300,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fire",
               "weapon": null,
@@ -40034,8 +40034,8 @@
               "active": false,
               "role": "medical",
               "health_milli": 60000,
-              "health_decay_milli_per_minute": 30000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 155500,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "fire",
               "weapon": null,
@@ -40054,7 +40054,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -40073,7 +40073,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -40092,9 +40092,9 @@
         "caller": "Washington D3 · Stolen car",
         "kind": "phone",
         "duty_id": "chapter-5-duty-3",
-        "arrival_ms": 8310000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1603215,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -41022,7 +41022,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": "e_pistol",
@@ -41041,7 +41041,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -41060,7 +41060,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -41079,9 +41079,9 @@
         "caller": "Washington D3 · Car collision",
         "kind": "phone",
         "duty_id": "chapter-5-duty-3",
-        "arrival_ms": 8400000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1620579,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -41366,7 +41366,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "injuriedA.hpChange = -0.1;"
+              "injuriedA.hpChange = -0.518333;"
             ],
             "aar": []
           },
@@ -41379,7 +41379,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "injuriedA.hpChange = -0.2; opinionEffect += 1;"
+              "injuriedA.hpChange = -1.036667; opinionEffect += 1;"
             ],
             "aar": []
           },
@@ -41580,7 +41580,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -41599,7 +41599,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -41618,7 +41618,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -41637,7 +41637,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -41656,7 +41656,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -41675,7 +41675,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 100000,
+              "work_ms": 19293,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -41694,9 +41694,9 @@
         "caller": "Washington D3 · Parking violation",
         "kind": "phone",
         "duty_id": "chapter-5-duty-3",
-        "arrival_ms": 8490000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1637942,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -42196,7 +42196,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -42217,7 +42217,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -42238,9 +42238,9 @@
         "caller": "Washington D3 · Letter with poison",
         "kind": "phone",
         "duty_id": "chapter-5-duty-3",
-        "arrival_ms": 8580000,
-        "answer_window_ms": 45000,
-        "conversation_window_ms": 240000,
+        "arrival_ms": 1655305,
+        "answer_window_ms": 8682,
+        "conversation_window_ms": 46302,
         "initial_stage": "1",
         "nodes": [
           {
@@ -42613,7 +42613,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "jour.hpchange=-0.6;"
+              "jour.hpchange=-3.11;"
             ],
             "aar": []
           },
@@ -42626,7 +42626,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "jour.hpchange=-0.4;"
+              "jour.hpchange=-2.073333;"
             ],
             "aar": []
           },
@@ -42797,7 +42797,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "jour.hpchange=-0.5;"
+              "jour.hpchange=-2.591667;"
             ],
             "aar": []
           },
@@ -42812,7 +42812,7 @@
             ],
             "chance_weight": 330,
             "actions": [
-              "jour.hpchange=-0.5;"
+              "jour.hpchange=-2.591667;"
             ],
             "aar": []
           },
@@ -42914,7 +42914,7 @@
               "role": "medical",
               "health_milli": 80000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "decont",
               "weapon": null,
@@ -42933,7 +42933,7 @@
               "role": "medical",
               "health_milli": 100000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "decont",
               "weapon": null,
@@ -42951,8 +42951,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 60000,
-              "health_decay_milli_per_minute": 30000,
-              "work_ms": 120000,
+              "health_decay_milli_per_minute": 155500,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "decont",
               "weapon": null,
@@ -42971,7 +42971,7 @@
               "role": "medical",
               "health_milli": 100000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "decont",
               "weapon": null,
@@ -42990,7 +42990,7 @@
               "role": "medical",
               "health_milli": 100000,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 120000,
+              "work_ms": 23151,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "decont",
               "weapon": null,
@@ -43009,7 +43009,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 90000,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": "decont",
               "weapon": null,
@@ -43030,7 +43030,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 250000,
+              "work_ms": 48232,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -43053,7 +43053,7 @@
         "caller": "CAD · Loud Party",
         "kind": "report",
         "duty_id": "chapter-5-duty-3",
-        "arrival_ms": 8265000,
+        "arrival_ms": 1594534,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -43076,7 +43076,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 360000,
+              "work_ms": 69453,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -43092,7 +43092,7 @@
         "caller": "CAD · Fight",
         "kind": "report",
         "duty_id": "chapter-5-duty-3",
-        "arrival_ms": 8400000,
+        "arrival_ms": 1620579,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -43114,8 +43114,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 16000,
-              "work_ms": 180000,
+              "health_decay_milli_per_minute": 82933,
+              "work_ms": 34727,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -43131,7 +43131,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 360000,
+              "work_ms": 69453,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -43147,7 +43147,7 @@
         "caller": "CAD · Caraccident",
         "kind": "report",
         "duty_id": "chapter-5-duty-3",
-        "arrival_ms": 8535000,
+        "arrival_ms": 1646624,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -43170,7 +43170,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 200000,
+              "work_ms": 38585,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -43185,8 +43185,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 16000,
-              "work_ms": 180000,
+              "health_decay_milli_per_minute": 82933,
+              "work_ms": 34727,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -43202,7 +43202,7 @@
         "caller": "CAD · Gang War",
         "kind": "report",
         "duty_id": "chapter-5-duty-4",
-        "arrival_ms": 8985000,
+        "arrival_ms": 1733441,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -43224,8 +43224,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 32000,
-              "work_ms": 360000,
+              "health_decay_milli_per_minute": 165867,
+              "work_ms": 69453,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -43241,7 +43241,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 360000,
+              "work_ms": 69453,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -43257,7 +43257,7 @@
         "caller": "CAD · Car Accident",
         "kind": "report",
         "duty_id": "chapter-5-duty-4",
-        "arrival_ms": 9120000,
+        "arrival_ms": 1759486,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -43279,8 +43279,8 @@
               "active": true,
               "role": "medical",
               "health_milli": 100000,
-              "health_decay_milli_per_minute": 12000,
-              "work_ms": 90000,
+              "health_decay_milli_per_minute": 62200,
+              "work_ms": 17363,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -43296,7 +43296,7 @@
               "role": "police",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 60000,
+              "work_ms": 11576,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,
@@ -43312,7 +43312,7 @@
         "caller": "CAD · Warehouse",
         "kind": "report",
         "duty_id": "chapter-5-duty-4",
-        "arrival_ms": 9255000,
+        "arrival_ms": 1785531,
         "answer_window_ms": 0,
         "conversation_window_ms": 0,
         "initial_stage": "",
@@ -43335,7 +43335,7 @@
               "role": "fire",
               "health_milli": null,
               "health_decay_milli_per_minute": 0,
-              "work_ms": 200000,
+              "work_ms": 38585,
               "work_growth_ms_per_minute": 0,
               "blocked_by": null,
               "weapon": null,

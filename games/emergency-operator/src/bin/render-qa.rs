@@ -9,18 +9,20 @@ fn main() {
         Campaign::load(root.join("data/campaign/911-career.json")).expect("compiled career");
     let mut session = Session::new(&campaign);
     let mut samples = Vec::new();
-
-    session.start().expect("start");
-    push(&mut samples, &session, "Duty ready");
-    session.advance_to(30_000).expect("first call");
-    push(&mut samples, &session, "First line ringing");
-
     let first_call = campaign
         .shift
         .calls
         .iter()
         .find(|event| event.kind == operator_terminal::campaign::EventKind::Phone)
         .expect("phone call");
+
+    session.start().expect("start");
+    push(&mut samples, &session, "Duty ready");
+    session
+        .advance_to(first_call.arrival_ms)
+        .expect("first call");
+    push(&mut samples, &session, "First line ringing");
+
     session.answer(&first_call.id).expect("answer first call");
     push(&mut samples, &session, "Live conversation");
     for _ in 0..2 {
@@ -40,7 +42,15 @@ fn main() {
         push(&mut samples, &session, "Dialogue branch");
     }
 
-    session.advance_to(75_000).expect("first report");
+    let first_report = campaign
+        .shift
+        .calls
+        .iter()
+        .find(|event| event.kind == operator_terminal::campaign::EventKind::Report)
+        .expect("CAD report");
+    session
+        .advance_to(first_report.arrival_ms)
+        .expect("first report");
     push(&mut samples, &session, "Call and CAD report overlap");
     let reported = session
         .snapshot()
@@ -60,7 +70,16 @@ fn main() {
             .expect("dispatch response");
     }
     push(&mut samples, &session, "Units dispatched");
-    session.advance_to(120_000).expect("overlap");
+    let response_step = session
+        .snapshot()
+        .units
+        .iter()
+        .filter_map(|unit| unit.eta_ms)
+        .min()
+        .map_or(1_000, |eta| eta.max(2) / 2);
+    session
+        .advance_to(session.elapsed_ms() + response_step)
+        .expect("overlap");
     push(&mut samples, &session, "Concurrent response");
 
     let timer_call = campaign
@@ -85,8 +104,16 @@ fn main() {
         &timer_session,
         "Live scene timer after location",
     );
+    let timer_step = timer_session
+        .snapshot()
+        .incidents
+        .iter()
+        .flat_map(|incident| &incident.elements)
+        .filter_map(|element| element.remaining_timer_ms)
+        .min()
+        .map_or(1_000, |remaining| remaining.max(2) / 2);
     timer_session
-        .advance_to(timer_call.arrival_ms + 30_000)
+        .advance_to(timer_session.elapsed_ms() + timer_step)
         .expect("advance scene timer");
     push(&mut samples, &timer_session, "Scene timer under pressure");
 

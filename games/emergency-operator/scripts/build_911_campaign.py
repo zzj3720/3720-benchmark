@@ -13,6 +13,7 @@ import json
 import re
 import tempfile
 import xml.etree.ElementTree as ET
+from fractions import Fraction
 from pathlib import Path
 
 
@@ -22,6 +23,7 @@ OUTPUT = GAME / "data/campaign/911-career.json"
 SCHEMA = "emergency-operator-campaign-v2"
 CALL_GAP_MS = 90_000
 DUTY_TAIL_MS = 240_000
+TARGET_SHIFT_MS = 30 * 60_000
 
 ROLE_BY_SCENE = {
     "criminal": "police",
@@ -35,6 +37,11 @@ ROLE_BY_SCENE = {
 WORK_MS = {"police": 90_000, "medical": 120_000, "fire": 150_000}
 SCORE_ACTION = re.compile(
     r"^(opinioneffect|onignore|score|addcash)(?:\+=|=)([-+]?[0-9]+(?:\.[0-9]+)?)$"
+)
+TIME_ACTION = re.compile(
+    r"(?P<head>\b[\w-]+\.(?P<field>hpchange|chchange|healthdecay|work|time)"
+    r"\s*(?:\+=|-=|=)\s*)(?P<value>[-+]?[0-9]+(?:[.,][0-9]+)?)",
+    re.IGNORECASE,
 )
 MAP_POINTS: dict[str, list[tuple[float, float]]] = {}
 
@@ -459,6 +466,71 @@ def score_ceiling(calls: list[dict]) -> int:
     return score
 
 
+def scaled_integer(value: int, factor: Fraction) -> int:
+    if value == 0:
+        return 0
+    return max(1, round(value * factor))
+
+
+def scaled_number(value: str, factor: Fraction) -> str:
+    result = Fraction(value.replace(",", ".")) * factor
+    rendered = f"{float(result):.6f}".rstrip("0").rstrip(".")
+    return rendered if rendered not in {"", "-0"} else "0"
+
+
+def scale_action(action: str, factor: Fraction) -> str:
+    inverse = 1 / factor
+
+    def replace(match: re.Match[str]) -> str:
+        field = match.group("field").lower()
+        value_factor = inverse if field in {"hpchange", "chchange", "healthdecay"} else factor
+        return match.group("head") + scaled_number(match.group("value"), value_factor)
+
+    return TIME_ACTION.sub(replace, action)
+
+
+def scale_campaign_times(campaign: dict) -> None:
+    shift = campaign["shift"]
+    source_duration = shift["duration_ms"]
+    factor = Fraction(TARGET_SHIFT_MS, source_duration)
+    inverse = 1 / factor
+
+    for duty in shift["duties"]:
+        duty["start_ms"] = scaled_integer(duty["start_ms"], factor)
+        duty["end_ms"] = scaled_integer(duty["end_ms"], factor)
+    duty_by_id = {duty["id"]: duty for duty in shift["duties"]}
+
+    for unit in shift["units"]:
+        unit["speed_cells_per_minute"] = scaled_integer(
+            unit["speed_cells_per_minute"], inverse
+        )
+
+    for call in shift["calls"]:
+        duty = duty_by_id[call["duty_id"]]
+        call["arrival_ms"] = min(
+            scaled_integer(call["arrival_ms"], factor), duty["end_ms"] - 1
+        )
+        call["answer_window_ms"] = scaled_integer(call["answer_window_ms"], factor)
+        call["conversation_window_ms"] = scaled_integer(
+            call["conversation_window_ms"], factor
+        )
+        for node in call["nodes"]:
+            node["actions"] = [scale_action(action, factor) for action in node["actions"]]
+        for element in call.get("incident", {}).get("elements", []):
+            element["health_decay_milli_per_minute"] = scaled_integer(
+                element["health_decay_milli_per_minute"], inverse
+            )
+            element["work_ms"] = scaled_integer(element["work_ms"], factor)
+            if element.get("timer_ms") is not None:
+                element["timer_ms"] = scaled_integer(element["timer_ms"], factor)
+            if "actions" in element:
+                element["actions"] = [
+                    scale_action(action, factor) for action in element["actions"]
+                ]
+
+    shift["duration_ms"] = TARGET_SHIFT_MS
+
+
 def build() -> dict:
     source_campaign = json.loads((SOURCE / "campaign.json").read_text())
     calls = []
@@ -551,6 +623,7 @@ def build() -> dict:
     }
     if len(calls) != 60 + total_duties * 3:
         raise ValueError(f"unexpected career event count: {len(calls)}")
+    scale_campaign_times(campaign)
     return campaign
 
 
