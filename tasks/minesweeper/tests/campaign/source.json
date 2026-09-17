@@ -1,0 +1,10 @@
+{
+  "schema": "minesweeper-source-v3",
+  "kind": "original",
+  "generator": "first-click-difficulty-v1",
+  "solver": "local-subset-v1",
+  "difficulty_metric": "proof-profile-v1",
+  "distribution_metric": "tier-opening-distribution-v1",
+  "description": "Original fifty-level benchmark campaign across five difficulty tiers. Each first reveal deterministically samples boards until the frozen logic solver proves no-guess solvability and a bounded proof profile; exhaustive certification also bounds each tier's weighted-mean and upper-median opening ratios.",
+  "level_count": 50
+}

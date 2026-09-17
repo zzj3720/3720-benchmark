@@ -1,0 +1,106 @@
+{
+  "schema": "minesweeper-campaign-v3",
+  "id": "no-guess-minesweeper-50-v2",
+  "title": "No-Guess Minesweeper",
+  "generator": "first-click-difficulty-v1",
+  "solver": "local-subset-v1",
+  "difficulty_metric": "proof-profile-v1",
+  "distribution_metric": "tier-opening-distribution-v1",
+  "tiers": [
+    {
+      "id": "cadet",
+      "title": "Cadet",
+      "difficulty": "guided openings and short local deductions",
+      "unlock_after": 0,
+      "opening_distribution": {"min_weighted_mean_percent": 40, "max_weighted_mean_percent": 44, "min_upper_median_percent": 42, "max_upper_median_percent": 47},
+      "levels": [
+        {"id": "cadet-01", "title": "Open Ground", "width": 5, "height": 5, "mines": 3, "seed": 372001, "proof": {"min_opening_percent": 10, "max_opening_percent": 75, "min_proof_rounds": 1, "min_subset_rounds": 0, "min_frontier": 4}},
+        {"id": "cadet-02", "title": "First Perimeter", "width": 6, "height": 5, "mines": 4, "seed": 372002, "proof": {"min_opening_percent": 10, "max_opening_percent": 65, "min_proof_rounds": 3, "min_subset_rounds": 1, "min_frontier": 8}},
+        {"id": "cadet-03", "title": "Crosswind", "width": 6, "height": 6, "mines": 5, "seed": 372003, "proof": {"min_opening_percent": 10, "max_opening_percent": 65, "min_proof_rounds": 3, "min_subset_rounds": 1, "min_frontier": 8}},
+        {"id": "cadet-04", "title": "Survey Line", "width": 7, "height": 6, "mines": 6, "seed": 372004, "proof": {"min_opening_percent": 10, "max_opening_percent": 65, "min_proof_rounds": 3, "min_subset_rounds": 1, "min_frontier": 8}},
+        {"id": "cadet-05", "title": "Low Ridge", "width": 7, "height": 7, "mines": 8, "seed": 372005, "proof": {"min_opening_percent": 10, "max_opening_percent": 65, "min_proof_rounds": 3, "min_subset_rounds": 1, "min_frontier": 8}},
+        {"id": "cadet-06", "title": "Side Channel", "width": 8, "height": 7, "mines": 9, "seed": 372006, "proof": {"min_opening_percent": 10, "max_opening_percent": 65, "min_proof_rounds": 3, "min_subset_rounds": 1, "min_frontier": 8}},
+        {"id": "cadet-07", "title": "Clear Signal", "width": 8, "height": 8, "mines": 10, "seed": 372007, "proof": {"min_opening_percent": 10, "max_opening_percent": 65, "min_proof_rounds": 3, "min_subset_rounds": 1, "min_frontier": 8}},
+        {"id": "cadet-08", "title": "Field Notes", "width": 8, "height": 8, "mines": 11, "seed": 372008, "proof": {"min_opening_percent": 10, "max_opening_percent": 65, "min_proof_rounds": 3, "min_subset_rounds": 1, "min_frontier": 8}},
+        {"id": "cadet-09", "title": "Outer Mark", "width": 9, "height": 8, "mines": 12, "seed": 372009, "proof": {"min_opening_percent": 10, "max_opening_percent": 65, "min_proof_rounds": 3, "min_subset_rounds": 1, "min_frontier": 8}},
+        {"id": "cadet-10", "title": "First Watch", "width": 9, "height": 9, "mines": 14, "seed": 372010, "proof": {"min_opening_percent": 10, "max_opening_percent": 65, "min_proof_rounds": 3, "min_subset_rounds": 1, "min_frontier": 8}}
+      ]
+    },
+    {
+      "id": "operator",
+      "title": "Operator",
+      "difficulty": "sustained subset deductions across wider frontiers",
+      "unlock_after": 5,
+      "opening_distribution": {"min_weighted_mean_percent": 25, "max_weighted_mean_percent": 29, "min_upper_median_percent": 25, "max_upper_median_percent": 29},
+      "levels": [
+        {"id": "operator-01", "title": "Quiet Sector", "width": 8, "height": 8, "mines": 10, "seed": 372101, "proof": {"min_opening_percent": 8, "max_opening_percent": 45, "min_proof_rounds": 7, "min_subset_rounds": 5, "min_frontier": 16}},
+        {"id": "operator-02", "title": "Twin Fronts", "width": 9, "height": 8, "mines": 12, "seed": 372102, "proof": {"min_opening_percent": 8, "max_opening_percent": 45, "min_proof_rounds": 7, "min_subset_rounds": 5, "min_frontier": 16}},
+        {"id": "operator-03", "title": "Narrow Margin", "width": 9, "height": 9, "mines": 14, "seed": 372103, "proof": {"min_opening_percent": 8, "max_opening_percent": 45, "min_proof_rounds": 7, "min_subset_rounds": 5, "min_frontier": 16}},
+        {"id": "operator-04", "title": "Signal Field", "width": 10, "height": 9, "mines": 16, "seed": 372104, "proof": {"min_opening_percent": 8, "max_opening_percent": 45, "min_proof_rounds": 7, "min_subset_rounds": 5, "min_frontier": 16}},
+        {"id": "operator-05", "title": "Split Current", "width": 10, "height": 10, "mines": 18, "seed": 372105, "proof": {"min_opening_percent": 8, "max_opening_percent": 45, "min_proof_rounds": 7, "min_subset_rounds": 5, "min_frontier": 16}},
+        {"id": "operator-06", "title": "Relay Grid", "width": 10, "height": 10, "mines": 19, "seed": 372106, "proof": {"min_opening_percent": 8, "max_opening_percent": 45, "min_proof_rounds": 7, "min_subset_rounds": 5, "min_frontier": 16}},
+        {"id": "operator-07", "title": "Long Sweep", "width": 11, "height": 10, "mines": 20, "seed": 372107, "proof": {"min_opening_percent": 8, "max_opening_percent": 45, "min_proof_rounds": 7, "min_subset_rounds": 5, "min_frontier": 16}},
+        {"id": "operator-08", "title": "Echo Line", "width": 11, "height": 11, "mines": 22, "seed": 372108, "proof": {"min_opening_percent": 8, "max_opening_percent": 45, "min_proof_rounds": 7, "min_subset_rounds": 5, "min_frontier": 16}},
+        {"id": "operator-09", "title": "Broken Compass", "width": 12, "height": 10, "mines": 22, "seed": 372109, "proof": {"min_opening_percent": 8, "max_opening_percent": 45, "min_proof_rounds": 7, "min_subset_rounds": 5, "min_frontier": 16}},
+        {"id": "operator-10", "title": "Boundary Shift", "width": 12, "height": 11, "mines": 25, "seed": 372110, "proof": {"min_opening_percent": 8, "max_opening_percent": 45, "min_proof_rounds": 7, "min_subset_rounds": 5, "min_frontier": 16}}
+      ]
+    },
+    {
+      "id": "specialist",
+      "title": "Specialist",
+      "difficulty": "longer coupled chains with constrained openings",
+      "unlock_after": 5,
+      "opening_distribution": {"min_weighted_mean_percent": 19, "max_weighted_mean_percent": 22, "min_upper_median_percent": 19, "max_upper_median_percent": 22},
+      "levels": [
+        {"id": "specialist-01", "title": "Tight Coupling", "width": 10, "height": 10, "mines": 19, "seed": 372151, "proof": {"min_opening_percent": 6, "max_opening_percent": 35, "min_proof_rounds": 10, "min_subset_rounds": 8, "min_frontier": 20}},
+        {"id": "specialist-02", "title": "Crosscheck", "width": 11, "height": 10, "mines": 21, "seed": 372152, "proof": {"min_opening_percent": 6, "max_opening_percent": 35, "min_proof_rounds": 10, "min_subset_rounds": 8, "min_frontier": 20}},
+        {"id": "specialist-03", "title": "Layered Clues", "width": 11, "height": 11, "mines": 23, "seed": 372153, "proof": {"min_opening_percent": 6, "max_opening_percent": 35, "min_proof_rounds": 10, "min_subset_rounds": 8, "min_frontier": 20}},
+        {"id": "specialist-04", "title": "Shared Border", "width": 12, "height": 11, "mines": 25, "seed": 372154, "proof": {"min_opening_percent": 6, "max_opening_percent": 35, "min_proof_rounds": 10, "min_subset_rounds": 8, "min_frontier": 20}},
+        {"id": "specialist-05", "title": "Constraint Web", "width": 12, "height": 12, "mines": 28, "seed": 372155, "proof": {"min_opening_percent": 6, "max_opening_percent": 35, "min_proof_rounds": 10, "min_subset_rounds": 8, "min_frontier": 20}},
+        {"id": "specialist-06", "title": "Double Difference", "width": 13, "height": 11, "mines": 27, "seed": 372156, "proof": {"min_opening_percent": 6, "max_opening_percent": 35, "min_proof_rounds": 10, "min_subset_rounds": 8, "min_frontier": 20}},
+        {"id": "specialist-07", "title": "Deep Frontier", "width": 13, "height": 12, "mines": 31, "seed": 372157, "proof": {"min_opening_percent": 6, "max_opening_percent": 35, "min_proof_rounds": 10, "min_subset_rounds": 8, "min_frontier": 20}},
+        {"id": "specialist-08", "title": "Chain Reaction", "width": 13, "height": 13, "mines": 34, "seed": 372158, "proof": {"min_opening_percent": 6, "max_opening_percent": 35, "min_proof_rounds": 10, "min_subset_rounds": 8, "min_frontier": 20}},
+        {"id": "specialist-09", "title": "Dense Relay", "width": 14, "height": 12, "mines": 34, "seed": 372159, "proof": {"min_opening_percent": 6, "max_opening_percent": 35, "min_proof_rounds": 10, "min_subset_rounds": 8, "min_frontier": 20}},
+        {"id": "specialist-10", "title": "Full Analysis", "width": 14, "height": 13, "mines": 38, "seed": 372160, "proof": {"min_opening_percent": 6, "max_opening_percent": 35, "min_proof_rounds": 10, "min_subset_rounds": 8, "min_frontier": 20}}
+      ]
+    },
+    {
+      "id": "expert",
+      "title": "Expert",
+      "difficulty": "deep proofs across dense multi-region frontiers",
+      "unlock_after": 5,
+      "opening_distribution": {"min_weighted_mean_percent": 15, "max_weighted_mean_percent": 17, "min_upper_median_percent": 15, "max_upper_median_percent": 17},
+      "levels": [
+        {"id": "expert-01", "title": "Deep Scan", "width": 12, "height": 12, "mines": 28, "seed": 372201, "proof": {"min_opening_percent": 5, "max_opening_percent": 25, "min_proof_rounds": 13, "min_subset_rounds": 10, "min_frontier": 24}},
+        {"id": "expert-02", "title": "Black Grid", "width": 12, "height": 12, "mines": 29, "seed": 372202, "proof": {"min_opening_percent": 5, "max_opening_percent": 25, "min_proof_rounds": 13, "min_subset_rounds": 10, "min_frontier": 24}},
+        {"id": "expert-03", "title": "Pressure Map", "width": 13, "height": 12, "mines": 31, "seed": 372203, "proof": {"min_opening_percent": 5, "max_opening_percent": 25, "min_proof_rounds": 13, "min_subset_rounds": 10, "min_frontier": 24}},
+        {"id": "expert-04", "title": "Final Sweep", "width": 13, "height": 13, "mines": 34, "seed": 372204, "proof": {"min_opening_percent": 5, "max_opening_percent": 25, "min_proof_rounds": 13, "min_subset_rounds": 10, "min_frontier": 24}},
+        {"id": "expert-05", "title": "Zero Margin", "width": 14, "height": 12, "mines": 35, "seed": 372205, "proof": {"min_opening_percent": 5, "max_opening_percent": 25, "min_proof_rounds": 13, "min_subset_rounds": 10, "min_frontier": 24}},
+        {"id": "expert-06", "title": "Iron Lattice", "width": 14, "height": 13, "mines": 38, "seed": 372206, "proof": {"min_opening_percent": 5, "max_opening_percent": 25, "min_proof_rounds": 13, "min_subset_rounds": 10, "min_frontier": 24}},
+        {"id": "expert-07", "title": "Deep Pattern", "width": 14, "height": 14, "mines": 41, "seed": 372207, "proof": {"min_opening_percent": 5, "max_opening_percent": 25, "min_proof_rounds": 13, "min_subset_rounds": 10, "min_frontier": 24}},
+        {"id": "expert-08", "title": "Hard Boundary", "width": 15, "height": 13, "mines": 40, "seed": 372208, "proof": {"min_opening_percent": 5, "max_opening_percent": 25, "min_proof_rounds": 13, "min_subset_rounds": 10, "min_frontier": 24}},
+        {"id": "expert-09", "title": "Dark Frontier", "width": 15, "height": 14, "mines": 44, "seed": 372209, "proof": {"min_opening_percent": 5, "max_opening_percent": 25, "min_proof_rounds": 13, "min_subset_rounds": 10, "min_frontier": 24}},
+        {"id": "expert-10", "title": "Last Deduction", "width": 15, "height": 15, "mines": 48, "seed": 372210, "proof": {"min_opening_percent": 5, "max_opening_percent": 25, "min_proof_rounds": 13, "min_subset_rounds": 10, "min_frontier": 24}}
+      ]
+    },
+    {
+      "id": "master",
+      "title": "Master",
+      "difficulty": "minimal openings and the longest coupled proofs",
+      "unlock_after": 5,
+      "opening_distribution": {"min_weighted_mean_percent": 10, "max_weighted_mean_percent": 12, "min_upper_median_percent": 10, "max_upper_median_percent": 12},
+      "levels": [
+        {"id": "master-01", "title": "Black Ice", "width": 14, "height": 14, "mines": 40, "seed": 372301, "proof": {"min_opening_percent": 3, "max_opening_percent": 15, "min_proof_rounds": 16, "min_subset_rounds": 13, "min_frontier": 30}},
+        {"id": "master-02", "title": "Fault Line", "width": 14, "height": 14, "mines": 42, "seed": 372302, "proof": {"min_opening_percent": 3, "max_opening_percent": 15, "min_proof_rounds": 16, "min_subset_rounds": 13, "min_frontier": 30}},
+        {"id": "master-03", "title": "Silent Array", "width": 15, "height": 14, "mines": 44, "seed": 372303, "proof": {"min_opening_percent": 3, "max_opening_percent": 15, "min_proof_rounds": 16, "min_subset_rounds": 13, "min_frontier": 30}},
+        {"id": "master-04", "title": "Locked Horizon", "width": 15, "height": 15, "mines": 47, "seed": 372304, "proof": {"min_opening_percent": 3, "max_opening_percent": 15, "min_proof_rounds": 16, "min_subset_rounds": 13, "min_frontier": 30}},
+        {"id": "master-05", "title": "Needle Grid", "width": 16, "height": 14, "mines": 47, "seed": 372305, "proof": {"min_opening_percent": 3, "max_opening_percent": 15, "min_proof_rounds": 16, "min_subset_rounds": 13, "min_frontier": 30}},
+        {"id": "master-06", "title": "Cold Circuit", "width": 16, "height": 15, "mines": 51, "seed": 372306, "proof": {"min_opening_percent": 3, "max_opening_percent": 15, "min_proof_rounds": 16, "min_subset_rounds": 13, "min_frontier": 30}},
+        {"id": "master-07", "title": "Event Boundary", "width": 16, "height": 16, "mines": 54, "seed": 372307, "proof": {"min_opening_percent": 3, "max_opening_percent": 15, "min_proof_rounds": 16, "min_subset_rounds": 13, "min_frontier": 30}},
+        {"id": "master-08", "title": "Dead Reckoning", "width": 16, "height": 16, "mines": 55, "seed": 372308, "proof": {"min_opening_percent": 3, "max_opening_percent": 15, "min_proof_rounds": 16, "min_subset_rounds": 13, "min_frontier": 30}},
+        {"id": "master-09", "title": "Last Frontier", "width": 16, "height": 16, "mines": 56, "seed": 372309, "proof": {"min_opening_percent": 3, "max_opening_percent": 15, "min_proof_rounds": 16, "min_subset_rounds": 13, "min_frontier": 30}},
+        {"id": "master-10", "title": "Master Grid", "width": 16, "height": 16, "mines": 57, "seed": 372310, "proof": {"min_opening_percent": 3, "max_opening_percent": 15, "min_proof_rounds": 16, "min_subset_rounds": 13, "min_frontier": 30}}
+      ]
+    }
+  ]
+}
