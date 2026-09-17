@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   asNumber,
@@ -8,96 +8,61 @@ import {
   type GameState,
   type ObserverEvent,
 } from "../../../observer-platform/app/game-observer";
+import { exportScale, registerCanvasExport } from "../../../observer-platform/app/webgl/export-source";
 import type { SausageScene as SausageSceneRuntime } from "./scene";
 import { readSceneState } from "./scene-state";
-
-const TILE_SET_NAMES = ["GREEN", "SAND", "SNOW", "SWAMP", "TEMPLE"];
-const COOK_LABELS = ["RAW", "COOK ⟂", "COOK ∥", "BURNT"];
 
 export function SausageState({ state }: { state: GameState }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const runtimeRef = useRef<SausageSceneRuntime | null>(null);
-  const latestRef = useRef(readSceneState(state));
+  const latestRef = useRef(state);
   const [renderError, setRenderError] = useState("");
-  const scene = useMemo(() => readSceneState(state), [state]);
-  latestRef.current = scene;
-  const level = asRecord(state.level);
-  const overworld = asRecord(state.overworld);
-  const mapMode = scene.mode === "overworld";
-  const sausages = scene.entities.filter((entity) => entity.kind === "sausage");
-
+  latestRef.current = state;
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     let cancelled = false;
-    import("./scene")
-      .then(({ SausageScene }) => {
-        if (cancelled) return;
-        const runtime = new SausageScene(canvas);
-        runtimeRef.current = runtime;
-        runtime.update(latestRef.current);
-        setRenderError("");
-      })
-      .catch((reason) => setRenderError(reason instanceof Error ? reason.message : String(reason)));
-    return () => {
-      cancelled = true;
-      runtimeRef.current?.destroy();
-      runtimeRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    try {
-      runtimeRef.current?.update(scene);
+    let unregister = () => {};
+    let runtime: SausageSceneRuntime | null = null;
+    import("./scene").then(async ({ SausageScene }) => {
+      if (cancelled) return;
+      runtime = new SausageScene(canvas);
+      runtime.update(readSceneState(latestRef.current), latestRef.current);
+      await runtime.initializeOverlay();
+      if (cancelled) { runtime.destroy(); return; }
+      runtimeRef.current = runtime;
+      runtime.update(readSceneState(latestRef.current), latestRef.current);
+      unregister = registerCanvasExport(canvas, {
+        async createSession(frames, maxWidth, maxHeight, pixelBudget) {
+          const width = canvas.clientWidth, height = canvas.clientHeight;
+          const output = document.createElement("canvas");
+          const renderer = new SausageScene(output, { width, height, resolution: exportScale(width, height, frames.length, maxWidth, maxHeight, pixelBudget) });
+          try { await renderer.initializeOverlay(); } catch (error) { renderer.destroy(); throw error; }
+          let first = true;
+          return { capture(frame) {
+            renderer.update(readSceneState(frame.state), frame.state);
+            if (first && runtimeRef.current) { renderer.copyViewFrom(runtimeRef.current); first = false; }
+            renderer.prepareExportFrame();
+            return output;
+          }, dispose() { renderer.destroy(); } };
+        },
+      });
       setRenderError("");
-    } catch (reason) {
-      setRenderError(reason instanceof Error ? reason.message : String(reason));
-    }
-  }, [scene]);
-
-  return (
-    <div className="sausage-state">
-      <header className="sausage-scene-header">
-        <div>
-          <span>{mapMode ? "OVERWORLD" : `PUZZLE ${asNumber(level?.ordinal) || "—"}`}</span>
-          <strong>{mapMode ? `${asString(overworld?.title, "Land's End")} · ${scene.entrances.length} entrances` : asString(level?.title, "Campaign complete")}</strong>
-        </div>
-        <dl>
-          <div><dt>MOVE</dt><dd>{asNumber(mapMode ? overworld?.actions : level?.actions)}</dd></div>
-          <div><dt>HEIGHT</dt><dd>{scene.tiles.length ? Math.max(...scene.tiles.map((tile) => tile.pos.z)) - Math.min(...scene.tiles.map((tile) => tile.pos.z)) + 1 : 0}</dd></div>
-          <div><dt>FORK</dt><dd>{scene.entities.some((entity) => entity.kind === "fork") ? "LOOSE" : "HELD"}</dd></div>
-          {mapMode
-            ? <div className="ready"><dt>OPEN</dt><dd>{scene.entrances.filter((entrance) => entrance.status === "available").length}</dd></div>
-            : <div className={state.exit_ready ? "ready" : "locked"}><dt>EXIT</dt><dd>{state.exit_ready ? "READY" : "LOCKED"}</dd></div>}
-        </dl>
-      </header>
-      <div className="sausage-stage" data-tile-set={scene.tileSet}>
-        <canvas ref={canvasRef} aria-label={`${asString(level?.title, "Sausage Roll")} 的三维关卡状态`} />
-        {renderError ? <div className="sausage-render-error" role="alert">3D renderer unavailable: {renderError}</div> : null}
-        <span className="sausage-environment">{mapMode ? "LAND'S END / ALL ENTRANCES · ARROWS SHOW FACING" : `${TILE_SET_NAMES[scene.tileSet] ?? "GREEN"} / CLEAN GEOMETRY`}</span>
-        <div className="sausage-view-controls" aria-label="三维视角控制">
-          <button type="button" onClick={() => runtimeRef.current?.focusPlayer()}>FOLLOW PLAYER</button>
-          <button type="button" onClick={() => runtimeRef.current?.showOverview()}>FULL MAP</button>
-        </div>
-        <span className="sausage-view-hint">DRAG ORBIT · SHIFT+DRAG PAN · WHEEL ZOOM</span>
-      </div>
-      <footer className="sausage-legend">
-        <div className="cook-key" aria-label="烤制状态图例">
-          {COOK_LABELS.map((label, index) => <span key={label}><i data-cook={index} />{label}</span>)}
-        </div>
-        <div className="sausage-face-list" aria-label="每根香肠的四面状态">
-          {sausages.map((sausage) => (
-            <span key={sausage.id}>
-              <b>S{sausage.id}</b>
-              {(sausage.cookedFaces ?? [0, 0, 0, 0]).map((face, index) => (
-                <i data-cook={Math.max(0, Math.min(3, face))} key={index}>F{index + 1}</i>
-              ))}
-            </span>
-          ))}
-        </div>
-      </footer>
+    }).catch(reason => { runtime?.destroy(); if (!cancelled) setRenderError(reason instanceof Error ? reason.message : String(reason)); });
+    return () => { cancelled = true; unregister(); runtimeRef.current?.destroy(); runtimeRef.current = null; };
+  }, []);
+  useEffect(() => {
+    try { runtimeRef.current?.update(readSceneState(state), state); }
+    catch (reason) { setRenderError(reason instanceof Error ? reason.message : String(reason)); }
+  }, [state]);
+  return <div className="sausage-state"><div className="sausage-stage">
+    <canvas ref={canvasRef} data-replay-capture role="img" aria-label="香肠三维关卡与烤制状态" />
+    {renderError && <div className="sausage-render-error" role="alert">WebGL 渲染失败：{renderError}</div>}
+    <div className="sausage-view-controls" aria-label="三维视角控制">
+      <button type="button" onClick={() => runtimeRef.current?.focusPlayer()}>跟随玩家</button>
+      <button type="button" onClick={() => runtimeRef.current?.showOverview()}>完整地图</button>
     </div>
-  );
+  </div></div>;
 }
 
 function describeEvent(event: ObserverEvent) {
@@ -141,6 +106,14 @@ function stateContext(state: GameState) {
   return null;
 }
 
+// Historical frames recorded inside a puzzle omit the large shared overworld
+// map; borrow it from the latest authoritative state so overworld replay
+// frames still render the full map.
+function resolveFrameState(frameState: GameState, latestState: GameState) {
+  if (frameState.overworld_map || !latestState.overworld_map) return frameState;
+  return { ...frameState, overworld_map: latestState.overworld_map };
+}
+
 export default {
   id: "sausage",
   meta: {
@@ -151,4 +124,5 @@ export default {
   State: SausageState,
   stateContext,
   describeEvent,
+  resolveFrameState,
 } satisfies GameObserverModule;

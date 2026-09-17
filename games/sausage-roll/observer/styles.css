@@ -213,3 +213,6 @@
   .sausage-stage { min-height: 300px; }
   .sausage-view-hint { display: none; }
 }
+
+.sausage-stage canvas { height: clamp(380px, 68vh, 720px); }
+.sausage-view-controls { top: 76px; }

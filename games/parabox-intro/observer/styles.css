@@ -244,6 +244,8 @@
 @media (max-width: 620px) {
   .parabox-state { min-height: 0; }
   .parabox-stage { min-height: 280px; padding: 18px; }
+  .parabox-stage.recursive { min-height: 0; padding: 14px 8px; }
+  .parabox-stage.recursive .parabox-camera { width: min(94vw, 64vh); }
   .parabox-grid { width: 100%; }
   .parabox-box-face,
   .parabox-player-face { box-shadow: inset 2px 2px 0 rgba(255,255,255,0.2), inset -2px -2px 0 rgba(0,0,0,0.22); }

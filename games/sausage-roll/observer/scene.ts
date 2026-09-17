@@ -1,3 +1,6 @@
+import type { GameState } from "../../../observer-platform/app/game-observer";
+import { WebGLSurface } from "../../../observer-platform/app/webgl/runtime";
+import { sausageHud } from "./webgl";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
@@ -359,14 +362,22 @@ export class SausageScene {
   private dynamicRoot = new THREE.Group();
   private staticKey = "";
   private state: SausageSceneState | null = null;
+  private overlay: WebGLSurface | null = null;
+  private rawState: GameState = {};
+  private width = 1;
+  private height = 1;
+  private readonly contextLost = (event: Event) => { event.preventDefault(); this.canvas.dataset.ready = "false"; };
+  private readonly contextRestored = () => { window.requestAnimationFrame(() => this.render()); };
   private view: "player" | "overview" = "player";
 
-  constructor(private readonly canvas: HTMLCanvasElement) {
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  constructor(private readonly canvas: HTMLCanvasElement, private readonly fixed?: { width: number; height: number; resolution: number }) {
+    this.renderer = new THREE.WebGLRenderer({ canvas, stencil: true, preserveDrawingBuffer: true, antialias: true, powerPreference: "high-performance" });
+    this.renderer.setPixelRatio(fixed?.resolution ?? Math.min(window.devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
+    canvas.addEventListener("webglcontextlost", this.contextLost);
+    canvas.addEventListener("webglcontextrestored", this.contextRestored);
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.enableDamping = false;
     this.controls.enablePan = true;
@@ -380,11 +391,36 @@ export class SausageScene {
     this.controls.addEventListener("change", () => this.render());
     this.scene.add(this.staticRoot, this.dynamicRoot);
     this.resizeObserver = new ResizeObserver(() => this.resize());
-    this.resizeObserver.observe(canvas);
+    if (!fixed) this.resizeObserver.observe(canvas);
+    this.controls.enabled = !fixed;
     this.resize();
   }
 
-  update(state: SausageSceneState) {
+  async initializeOverlay() {
+    this.overlay = await WebGLSurface.create(this.canvas, this.width, this.height, this.renderer.getPixelRatio(), this.renderer.getContext() as WebGL2RenderingContext);
+    this.render();
+  }
+
+  copyViewFrom(source: SausageScene) {
+    // Replay export starts at its first frame, while the visible canvas may
+    // already show another level or the overworld after a completed puzzle.
+    if (!this.state || this.state.levelKey !== source.state?.levelKey) return;
+    this.view = source.view;
+    this.camera.position.copy(source.camera.position);
+    this.camera.quaternion.copy(source.camera.quaternion);
+    this.camera.near = source.camera.near;
+    this.camera.far = source.camera.far;
+    this.camera.updateProjectionMatrix();
+    this.controls.target.copy(source.controls.target);
+    const from = source.state && playerPoint(source.state), to = this.state && playerPoint(this.state);
+    if (this.view === "player" && from && to) {
+      const delta = to.sub(from); this.camera.position.add(delta); this.controls.target.add(delta);
+    }
+    this.render();
+  }
+
+  update(state: SausageSceneState, rawState: GameState = {}) {
+    this.rawState = rawState;
     const previous = this.state;
     this.state = state;
     const palette = PALETTES[state.tileSet] ?? PALETTES[0];
@@ -443,6 +479,10 @@ export class SausageScene {
     if (!this.state) return;
     this.view = "overview";
     this.frame(scenePoints(this.state));
+    this.render();
+  }
+
+  prepareExportFrame() {
     this.render();
   }
 
@@ -530,8 +570,9 @@ export class SausageScene {
   }
 
   private resize() {
-    const width = Math.max(1, this.canvas.clientWidth);
-    const height = Math.max(1, this.canvas.clientHeight);
+    const width = this.fixed?.width ?? Math.max(1, this.canvas.clientWidth);
+    const height = this.fixed?.height ?? Math.max(1, this.canvas.clientHeight);
+    this.width = width; this.height = height;
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
@@ -539,15 +580,27 @@ export class SausageScene {
   }
 
   private render() {
+    const hud = this.state ? sausageHud(this.rawState, this.state, this.width, this.height) : null;
+    const bottom = hud?.footer ?? 28, fieldHeight = Math.max(1, this.height - 66 - bottom);
+    this.camera.aspect = this.width / fieldHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.resetState();
+    this.renderer.setViewport(0, bottom, this.width, fieldHeight);
     this.renderer.render(this.scene, this.camera);
+    if (hud && this.overlay) this.overlay.render(hud.scene, { clear: false });
   }
 
   destroy() {
+    this.canvas.removeEventListener("webglcontextlost", this.contextLost);
+    this.canvas.removeEventListener("webglcontextrestored", this.contextRestored);
     this.resizeObserver.disconnect();
     this.controls.dispose();
     dispose(this.staticRoot);
     dispose(this.dynamicRoot);
+    this.overlay?.destroy();
+    this.overlay = null;
     this.renderer.dispose();
+    this.renderer.forceContextLoss();
     this.state = null;
   }
 }
