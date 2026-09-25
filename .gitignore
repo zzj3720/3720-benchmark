@@ -5,7 +5,7 @@ __pycache__/
 *.pyc
 .venv/
 node_modules/
-target/
+target
 .harbor/
 jobs/
 
