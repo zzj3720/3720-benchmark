@@ -72,7 +72,8 @@ function hub(env: LiveEnv, path: string, init?: RequestInit) {
 async function body(env: LiveEnv, ctx: Background, request: Request, key: string, missing: string) {
   const cache = edgeCache();
   const cacheKey = new Request(new URL(`/__live/${key}`, request.url).toString());
-  const cached = await cache.match(cacheKey);
+  const acceptsGzip = /\bgzip\b/.test(request.headers.get("accept-encoding") ?? "");
+  const cached = acceptsGzip ? await cache.match(cacheKey) : undefined;
   if (cached) return cached;
   const object = await env.LIVE_BUCKET.get(key);
   if (!object) return error(404, missing);
@@ -83,7 +84,13 @@ async function body(env: LiveEnv, ctx: Background, request: Request, key: string
     "access-control-allow-origin": "*",
     etag: object.httpEtag,
   });
-  if (object.httpMetadata?.contentEncoding) headers.set("content-encoding", object.httpMetadata.contentEncoding);
+  const encoding = object.httpMetadata?.contentEncoding;
+  if (encoding === "gzip" && !acceptsGzip) {
+    // Clients that cannot take gzip get the decoded body; passing the stored
+    // bytes through would leave gzip data without its Content-Encoding.
+    return new Response(object.body.pipeThrough(new DecompressionStream("gzip")), { headers });
+  }
+  if (encoding) headers.set("content-encoding", encoding);
   if (!cacheControl.includes("immutable")) {
     return new Response(object.body, { headers, encodeBody: "manual" });
   }

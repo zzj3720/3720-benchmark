@@ -62,12 +62,16 @@ test("ingest stores framed bodies and the read API serves them with their encodi
   assert.equal(response.status, 200, await response.clone().text());
   assert.equal(objects.size, 2);
 
-  const read = await handleLive(new Request("https://live/api/live/v1/runs/run-1"), env, context);
+  const plain = await handleLive(new Request("https://live/api/live/v1/runs/run-1"), env, context);
+  assert.equal(plain.headers.get("content-encoding"), null);
+  assert.equal((await plain.json()).run.id, "run-1");
+
+  const read = await handleLive(new Request("https://live/api/live/v1/runs/run-1", { headers: { "accept-encoding": "gzip, br" } }), env, context);
   assert.equal(read.headers.get("content-encoding"), "gzip");
   assert.equal(read.headers.get("cache-control"), "no-store");
   assert.equal(JSON.parse(gunzipSync(Buffer.from(await read.arrayBuffer()))).run.id, "run-1");
 
-  const page = await handleLive(new Request("https://live/api/live/v1/runs/run-1?replay_attempt=4&after_sequence=17"), env, context);
+  const page = await handleLive(new Request("https://live/api/live/v1/runs/run-1?replay_attempt=4&after_sequence=17", { headers: { "accept-encoding": "gzip" } }), env, context);
   assert.equal(page.status, 200);
   assert.match(page.headers.get("cache-control"), /immutable/);
   const missing = await handleLive(new Request("https://live/api/live/v1/runs/run-1?replay_attempt=4"), env, context);
