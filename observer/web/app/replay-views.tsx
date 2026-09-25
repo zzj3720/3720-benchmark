@@ -3,7 +3,7 @@
 // a watch page per level that compares every model's attempts, and the player.
 
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Pause, Play, Rewind } from "lucide-react";
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { GAME_META, GameState, clearedGameState, describeGameEvent, resolveGameFrameState, type GameId } from "./game-registry";
 import { EmptyState, REPLAY_CAPTURE_ATTRIBUTE, type ObserverEvent } from "./game-observer";
@@ -22,7 +22,7 @@ import {
   gatewayUrl,
   type ExportChoice,
 } from "./live-shared";
-import { modelName } from "./run-labels";
+import { groupByFamily, modelFamily, modelName } from "./run-labels";
 import type { ReplayExportFormat } from "./replay-export";
 import { COVER_HEIGHT, COVER_WIDTH, canvasExportSource, type CanvasExportSession } from "./webgl/export-source";
 
@@ -319,7 +319,7 @@ export function ReplayLibrary({
               <button key={value} aria-pressed={outcome === value} onClick={() => setOutcome(value)}>{text}</button>
             ))}
           </div>
-          <LiveSelect label="按模型筛选" value={run} onChange={setRun} options={[{ value: "all", label: "全部模型" }, ...runs.map(item => ({ value: item.id, label: labels.get(item.id) ?? modelName(item.model) }))]} />
+          <LiveSelect label="按模型筛选" value={run} onChange={setRun} options={[{ value: "all", label: "全部模型" }, ...groupByFamily(runs).flatMap(({ runs: members }) => members).map(item => ({ value: item.id, label: `${modelFamily(item.model)} · ${labels.get(item.id) ?? modelName(item.model)}` }))]} />
         </div>
         {error && <EmptyState title="回放目录暂不可用" body={error} />}
         <div className="level-grid">
@@ -419,9 +419,11 @@ export function LevelWatch({
     return () => controller.abort();
   }, [game, levelKey]);
 
-  // Order models like the dashboard does, and default to the best run's
-  // first passing attempt (or its latest one).
-  const rank = new Map(runs.map((run, index) => [run.id, index]));
+  // Group models by family like the dashboard does, and default to the best
+  // run's first passing attempt (or its latest one).
+  const families = groupByFamily(runs.filter(run => level?.runs.some(item => item.run === run.id)));
+  const rank = new Map(families.flatMap(family => family.runs).map((run, index) => [run.id, index]));
+  const familyOf = new Map(families.flatMap(({ family, runs: members }) => members.map(run => [run.id, family] as const)));
   const levelRuns = (level?.runs ?? []).filter(item => rank.has(item.run)).sort((a, b) => rank.get(a.run)! - rank.get(b.run)!);
   const fallback = levelRuns.find(item => item.attempts.some(attempt => attempt.successful)) ?? levelRuns[0];
   const selected = play ?? (fallback ? { run: fallback.run, attempt: (fallback.attempts.find(attempt => attempt.successful) ?? fallback.attempts[fallback.attempts.length - 1]).id } : null);
@@ -474,10 +476,13 @@ export function LevelWatch({
           </div>
           <aside className="attempt-board" aria-label="各模型在这一关的尝试">
             <h2>各模型的尝试</h2>
-            {levelRuns.map(item => {
+            {levelRuns.map((item, index) => {
               const passed = item.attempts.some(value => value.successful);
+              const family = familyOf.get(item.run);
               return (
-                <section className="attempt-run" key={item.run} style={{ "--series": colors.get(item.run) } as React.CSSProperties}>
+                <Fragment key={item.run}>
+                {family !== (index > 0 ? familyOf.get(levelRuns[index - 1].run) : undefined) && <div className="family-heading">{family}</div>}
+                <section className="attempt-run" style={{ "--series": colors.get(item.run) } as React.CSSProperties}>
                   <header>
                     <i />
                     <strong>{labels.get(item.run) ?? item.run}</strong>
@@ -502,6 +507,7 @@ export function LevelWatch({
                     })}
                   </div>
                 </section>
+                </Fragment>
               );
             })}
           </aside>

@@ -1909,3 +1909,12 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
   .overview-matrix tbody th { padding: var(--space-md); }
   .overview-matrix td { min-width: 132px; }
 }
+
+/* Family headings wherever runs are listed: sidebar, game dashboard, a level's attempts. */
+.model-list .family-heading { margin: var(--space-md) var(--space-sm) 2px; color: var(--muted); font: 600 var(--text-xs)/1 var(--font-body); }
+.model-list .family-heading:first-child { margin-top: 0; }
+.family-section { margin-top: var(--space-xl); }
+.family-section > .family-heading { display: flex; align-items: baseline; gap: var(--space-sm); margin: 0 0 var(--space-md); font: 600 var(--text-base, 15px)/1.2 var(--font-body); }
+.family-section > .family-heading small { color: var(--muted); font: 400 var(--text-xs)/1 var(--font-body); }
+.family-section > .run-grid { margin-top: 0; }
+.attempt-board .family-heading { margin: var(--space-md) 0 var(--space-xs); color: var(--muted); font: 600 var(--text-xs)/1 var(--font-body); }

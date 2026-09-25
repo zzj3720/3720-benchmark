@@ -2,7 +2,7 @@
 import { GAME_IDS, GAME_META, type GameId } from "./game-registry";
 import type { RunSummary } from "./live-contract";
 import { clockTime } from "./live-shared";
-import { harnessName, modelFamily, modelName } from "./run-labels";
+import { compareModels, firstSeen, harnessName, modelFamily, modelName } from "./run-labels";
 
 /** How far a run got, as a share of the game's total. */
 function completion(run: RunSummary) {
@@ -27,8 +27,7 @@ type ModelRow = { model: string; family: string; best: Map<GameId, RunSummary>; 
 /**
  * One row per model, one column per game; a cell is the model's best run in
  * that game. Games score differently and most models played only some of
- * them, so there is no combined score: rows are ordered by how many games a
- * model played, then by its mean completion in those games.
+ * them, so there is no combined score.
  */
 function modelRows(runs: RunSummary[]) {
   const rows = new Map<string, ModelRow>();
@@ -41,15 +40,21 @@ function modelRows(runs: RunSummary[]) {
     if (!current || run.score > current.score || (run.score === current.score && run.live && !current.live)) row.best.set(run.game, run);
     rows.set(model, row);
   }
-  const mean = (row: ModelRow) => [...row.best.values()].reduce((sum, run) => sum + completion(run), 0) / Math.max(1, row.best.size);
-  return [...rows.values()].sort((a, b) => b.best.size - a.best.size || mean(b) - mean(a) || a.model.localeCompare(b.model));
+  return [...rows.values()];
 }
 
-/** Rows grouped by family, families in the order of their first row. */
-function familyGroups(rows: ModelRow[]) {
+/**
+ * Rows grouped by family, newest model first within a family. Families go by
+ * how many games their models cover, then mean completion ("其他" last).
+ */
+function familyGroups(rows: ModelRow[], seen: Map<string, number>) {
   const groups = new Map<string, ModelRow[]>();
   for (const row of rows) groups.set(row.family, [...(groups.get(row.family) ?? []), row]);
-  return [...groups.entries()].sort(([a], [b]) => Number(a === "其他") - Number(b === "其他"));
+  const games = (members: ModelRow[]) => new Set(members.flatMap(row => [...row.best.keys()])).size;
+  const mean = (members: ModelRow[]) => { const all = members.flatMap(row => [...row.best.values()]); return all.reduce((sum, run) => sum + completion(run), 0) / Math.max(1, all.length); };
+  return [...groups.entries()]
+    .map(([family, members]) => [family, members.sort((a, b) => compareModels(a.model, b.model, seen))] as const)
+    .sort(([a, x], [b, y]) => Number(a === "其他") - Number(b === "其他") || games(y) - games(x) || mean(y) - mean(x));
 }
 
 export function Overview({
@@ -117,7 +122,7 @@ export function Overview({
                   ))}
                 </tr>
               </thead>
-              {familyGroups(rows).map(([family, familyRows]) => (
+              {familyGroups(rows, firstSeen(runs)).map(([family, familyRows]) => (
               <tbody key={family}>
                 <tr className="overview-family"><th scope="rowgroup" colSpan={games.length + 1}>{family}<small>{familyRows.length} 个模型</small></th></tr>
                 {familyRows.map(row => (

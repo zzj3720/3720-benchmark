@@ -59,6 +59,56 @@ export function modelFamily(model: string) {
   return FAMILIES.find(([pattern]) => pattern.test(bare))?.[1] ?? "其他";
 }
 
+/**
+ * Release dates (YYYY-MM-DD) by model name as `modelName` prints it. Within a
+ * family, newer models are listed first; a model missing here is placed by
+ * its version number, then by when it was first benchmarked.
+ */
+export const MODEL_RELEASES: Record<string, string> = {};
+
+function version(name: string) {
+  return name.match(/\d+(?:\.\d+)*/)?.[0].split(".").map(Number) ?? [];
+}
+
+/** Negative when model `a` is newer than `b`. `firstSeen` is when each was first benchmarked. */
+export function compareModels(a: string, b: string, firstSeen: Map<string, number> = new Map()) {
+  const [da, db] = [MODEL_RELEASES[a], MODEL_RELEASES[b]];
+  if (da && db && da !== db) return db.localeCompare(da);
+  const [va, vb] = [version(a), version(b)];
+  for (let i = 0; i < Math.max(va.length, vb.length); i++) {
+    if ((va[i] ?? 0) !== (vb[i] ?? 0)) return (vb[i] ?? 0) - (va[i] ?? 0);
+  }
+  return (firstSeen.get(b) ?? 0) - (firstSeen.get(a) ?? 0) || a.localeCompare(b);
+}
+
+/** When each model was first benchmarked, from its runs' start times. */
+export function firstSeen(runs: { model: string; started_at?: number | null }[]) {
+  const seen = new Map<string, number>();
+  for (const run of runs) {
+    const name = modelName(run.model);
+    seen.set(name, Math.min(seen.get(name) ?? Infinity, run.started_at ?? Infinity));
+  }
+  return seen;
+}
+
+/**
+ * Runs grouped by model family. Families lead with the best score among
+ * their runs ("其他" last); inside a family the newest model comes first,
+ * and runs of one model keep their order in `runs`.
+ */
+export function groupByFamily<T extends LabelledRun>(runs: T[]) {
+  const seen = firstSeen(runs);
+  const position = new Map(runs.map((run, index) => [run.id, index]));
+  const families = new Map<string, T[]>();
+  for (const run of runs) families.set(modelFamily(run.model), [...(families.get(modelFamily(run.model)) ?? []), run]);
+  return [...families]
+    .map(([family, members]) => ({
+      family,
+      runs: members.sort((a, b) => compareModels(modelName(a.model), modelName(b.model), seen) || position.get(a.id)! - position.get(b.id)!),
+    }))
+    .sort((a, b) => Number(a.family === "其他") - Number(b.family === "其他") || Math.max(...b.runs.map(run => run.score)) - Math.max(...a.runs.map(run => run.score)));
+}
+
 /** The harness driving the model, from the agent import path. */
 export function harnessName(agent = "") {
   const module = agent.split(":")[0].split(".").pop() ?? "";

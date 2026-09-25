@@ -17,7 +17,7 @@ import { LiveDisclosure, LiveSelect } from "./live-controls";
 
 import type { RunSummary, RunDetail, ElapsedScorePoint } from "./live-contract";
 import { LiveResource, applySubscription, effectiveDuration } from "./live-client";
-import { harnessName, modelFamily, modelName, rankRuns, runLabels, seriesColors, viewerStatus } from "./run-labels";
+import { groupByFamily, harnessName, modelFamily, modelName, rankRuns, runLabels, seriesColors, viewerStatus } from "./run-labels";
 import { clockTime, durationLabel, gatewayUrl, hydrateRunAssets } from "./live-shared";
 import { CoverBakery, GameTabs, LevelWatch, ReplayLibrary, RunReplayShelf, type LevelSample } from "./replay-views";
 import { Overview } from "./overview";
@@ -322,7 +322,9 @@ function Console() {
               style={{ "--accent": meta.accent } as React.CSSProperties}
             >
               <div className="model-list">
-                {gameRuns.map((run) => (
+                {groupByFamily(gameRuns).flatMap(({ family, runs: familyRuns }) => [
+                  <div className="family-heading" key={`family:${family}`}>{family}</div>,
+                  ...familyRuns.map((run) => (
                   <button
                     key={run.id}
                     className={`model-run ${selectedId === run.id ? "selected" : ""}`}
@@ -338,7 +340,8 @@ function Console() {
                     </span>
                     <b>{run.score}</b>
                   </button>
-                ))}
+                  )),
+                ])}
                 {!gameRuns.length && <div className="no-runs">暂无运行记录</div>}
               </div>
             </section>
@@ -416,7 +419,9 @@ function GameDashboard({
   const chartScale = scale ?? preferredScale(curves, now);
   const best = runs.slice().sort((a, b) => b.score - a.score)[0];
   const liveRuns = runs.filter((run) => run.live).length;
-  let rank = 0;
+  // Cards are grouped by family, newest model first; the badge keeps the overall place by score.
+  const places = new Map(runs.filter(run => !run.live).map((run, index) => [run.id, index + 1]));
+  const families = groupByFamily(runs);
   return (
     <div className="dashboard-page" style={{ "--accent": meta.accent } as React.CSSProperties}>
       <header className="page-heading">
@@ -451,15 +456,18 @@ function GameDashboard({
           <ScoreChart runs={curves} now={now} colors={colors} labels={labels} scale={chartScale} onSelect={onSelect} />
           <div className="compare-picker" role="group" aria-label="选择对比曲线">
             <span>对比曲线（最多 8 条）</span>
-            {runs.map(run => <Toggle.Root className="series-toggle" key={run.id} style={{ "--series": colors.get(run.id) } as React.CSSProperties} pressed={selected.has(run.id)} disabled={!selected.has(run.id) && curves.length >= 8} onPressedChange={pressed => setCompared(() => { const next = new Set(selected); if (pressed) next.add(run.id); else next.delete(run.id); return next; })}><span className="series-toggle-check"><Check size={12} aria-hidden="true" /></span><span>{labels.get(run.id)}</span></Toggle.Root>)}
+            {families.flatMap(family => family.runs).map(run => <Toggle.Root className="series-toggle" key={run.id} style={{ "--series": colors.get(run.id) } as React.CSSProperties} pressed={selected.has(run.id)} disabled={!selected.has(run.id) && curves.length >= 8} onPressedChange={pressed => setCompared(() => { const next = new Set(selected); if (pressed) next.add(run.id); else next.delete(run.id); return next; })}><span className="series-toggle-check"><Check size={12} aria-hidden="true" /></span><span>{labels.get(run.id)}</span></Toggle.Root>)}
           </div>
         </section>
       )}
 
-      <section className="run-grid">
-        {runs.map((run) => {
+      {families.map(({ family, runs: familyRuns }) => (
+      <section className="family-section" key={family}>
+        <h2 className="family-heading">{family}<small>{familyRuns.length} 次运行</small></h2>
+        <div className="run-grid">
+        {familyRuns.map((run) => {
           const status = runStatus(run);
-          const place = run.live ? null : ++rank;
+          const place = places.get(run.id) ?? null;
           return (
             <button
               className="run-card"
@@ -485,8 +493,10 @@ function GameDashboard({
             </button>
           );
         })}
-        {!runs.length && <EmptyState title="还没有运行" body="新的运行开始后会出现在这里。" />}
+        </div>
       </section>
+      ))}
+      {!runs.length && <EmptyState title="还没有运行" body="新的运行开始后会出现在这里。" />}
     </div>
   );
 }
