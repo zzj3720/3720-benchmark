@@ -15,4 +15,6 @@ cd "$(dirname "$0")/.."
 if [ "${1:-}" != "--no-build" ]; then
   npm run build
 fi
-exec npx --yes wrangler@4 deploy -c dist/server/wrangler.json
+# Use the project's pinned Wrangler: dist/server/wrangler.json is generated in
+# its config format, which newer majors may reject.
+exec npx wrangler deploy -c dist/server/wrangler.json
