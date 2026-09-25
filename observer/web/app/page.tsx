@@ -461,41 +461,50 @@ function GameDashboard({
         </section>
       )}
 
-      {families.map(({ family, runs: familyRuns }) => (
-      <section className="family-section" key={family}>
-        <h2 className="family-heading">{family}<small>{familyRuns.length} 次运行</small></h2>
-        <div className="run-grid">
-        {familyRuns.map((run) => {
-          const status = runStatus(run);
-          const place = places.get(run.id) ?? null;
-          return (
-            <button
-              className="run-card"
-              key={run.id}
-              onClick={() => onSelect(run)}
-              style={{ "--series": colors.get(run.id) } as React.CSSProperties}
-            >
-              <div className="run-card-top">
-                {place !== null && <span className="run-rank" aria-label={`第 ${place} 名`}>{place}</span>}
-                <span className={`status-badge ${status.className}`} title={status.detail}>{status.label}</span>
-                {status.tone === "ended" && <small>{status.detail}</small>}
-              </div>
-              <h2 className="model-title">{labels.get(run.id)}</h2>
-              <div className="score-block">
-                <strong>{run.score}</strong>
-                <span>/ {run.total || "—"}</span>
-              </div>
-              <p>{run.live ? "正在玩" : "停在"} {run.objective}</p>
-              <div className="run-card-meta">
-                <span>运行 {durationLabel(taskDuration(run, now))}</span>
-                <span>{sinceLastScore(run, now)}</span>
-              </div>
-            </button>
-          );
-        })}
-        </div>
-      </section>
-      ))}
+      {runs.length > 0 && (
+        <section className="run-table-card">
+          <table className="run-table">
+            <thead>
+              <tr>
+                <th scope="col" className="rank">名次</th>
+                <th scope="col">模型</th>
+                <th scope="col">得分</th>
+                <th scope="col" className="optional">进度</th>
+                <th scope="col" className="optional">运行</th>
+              </tr>
+            </thead>
+            {families.map(({ family, runs: familyRuns }) => (
+              <tbody key={family}>
+                <tr className="run-table-family"><th scope="rowgroup" colSpan={5}>{family}<small>{familyRuns.length} 次运行</small></th></tr>
+                {familyRuns.map((run) => {
+                  const status = runStatus(run);
+                  const place = places.get(run.id) ?? null;
+                  const share = run.total > 0 ? Math.max(0, Math.min(1, run.score / run.total)) : 0;
+                  return (
+                    // The row is the click target; the model name is its button for the keyboard.
+                    <tr key={run.id} className="run-row" onClick={() => onSelect(run)} style={{ "--series": colors.get(run.id) } as React.CSSProperties}>
+                      <td className="rank">{place !== null ? <span className="run-rank" aria-label={`第 ${place} 名`}>{place}</span> : <i className="live-pulse" aria-label="直播中" />}</td>
+                      <td className="run-model">
+                        <button type="button" onClick={event => { event.stopPropagation(); onSelect(run); }}>{labels.get(run.id)}</button>
+                        <small>
+                          <span className={`status-badge ${status.className}`} title={status.detail}>{status.label}</span>
+                          {[harnessName(run.agent), status.tone === "ended" ? status.detail : ""].filter(Boolean).join(" · ")}
+                        </small>
+                      </td>
+                      <td className="run-score">
+                        <span><b>{run.score}</b><small> / {run.total || "—"}</small><small className="share">{Math.round(share * 100)}%</small></span>
+                        <span className="overview-bar" aria-hidden="true"><i style={{ width: `${Math.max(2, share * 100)}%` }} /></span>
+                      </td>
+                      <td className="optional run-objective" title={run.objective}>{run.live ? "正在玩" : "停在"} {run.objective}</td>
+                      <td className="optional run-time">{durationLabel(taskDuration(run, now))}<small>{sinceLastScore(run, now)}</small></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            ))}
+          </table>
+        </section>
+      )}
       {!runs.length && <EmptyState title="还没有运行" body="新的运行开始后会出现在这里。" />}
     </div>
   );
