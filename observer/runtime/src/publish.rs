@@ -6,7 +6,7 @@
 //! Everything it sends is idempotent: a restart re-derives what is missing from
 //! its local upload ledger and continues.
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -238,6 +238,12 @@ impl<S: Sink> Publisher<S> {
             before = value.get("before").and_then(Value::as_u64);
             self.stage(key, page, IMMUTABLE, true)?;
         }
+        // The walk stops at a stored catalog page, so attempts behind it come
+        // from the ledger; any of them without a stored body (after the replay
+        // keys change, say) is published too.
+        let listed = attempts.iter().map(|(attempt, _)| *attempt).collect::<HashSet<_>>();
+        let recorded = self.recorded_attempts(id)?;
+        attempts.extend(recorded.into_iter().filter(|(attempt, _)| !listed.contains(attempt)));
         let mut running = false;
         for (attempt, closed) in attempts {
             let marker = format!("pub/runs/{id}/attempts/{attempt}");
@@ -434,6 +440,21 @@ impl<S: Sink> Publisher<S> {
             .query_row("SELECT 1 FROM attempts WHERE run = ?1 LIMIT 1", params![run], |_| Ok(()))
             .optional()
             .map(|row| row.is_some())
+            .map_err(display)
+    }
+
+    /// Every attempt of `run` recorded so far, and whether it is closed.
+    fn recorded_attempts(&self, run: &str) -> Result<Vec<(u64, bool)>, String> {
+        let mut statement = self
+            .ledger
+            .prepare("SELECT id, status FROM attempts WHERE run = ?1 ORDER BY id")
+            .map_err(display)?;
+        statement
+            .query_map(params![run], |row| {
+                Ok((row.get::<_, i64>(0)? as u64, row.get::<_, String>(1)? != "running"))
+            })
+            .map_err(display)?
+            .collect::<Result<Vec<_>, _>>()
             .map_err(display)
     }
 
