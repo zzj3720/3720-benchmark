@@ -21,7 +21,7 @@ import { groupByFamily, groupByModel, harnessName, modelFamily, modelName, rankR
 import { clockTime, durationLabel, gatewayUrl, hydrateRunAssets } from "./live-shared";
 import { CoverBakery, GameTabs, LevelWatch, ReplayLibrary, RunReplayShelf, type LevelSample } from "./replay-views";
 import { Overview } from "./overview";
-import { FamilyIcon } from "./family-icons";
+import { FamilyIcon, HarnessLine, HarnessTag } from "./family-icons";
 
 
 function taskDuration(run: RunSummary, now: number) {
@@ -339,7 +339,7 @@ function Console() {
                     <span className="model-copy">
                       <strong>{modelRuns.length > 1 ? subLabel(run, labels.get(run.id)) : labels.get(run.id)}</strong>
                       <small>
-                        {[modelRuns.length > 1 && subLabel(run, labels.get(run.id)).includes(harnessName(run.agent)) ? "" : harnessName(run.agent), durationLabel(taskDuration(run, snapshotNow)), runStatus(run).tone === "ended" ? "" : runStatus(run).label].filter(Boolean).join(" · ")}
+                        <HarnessLine harness={modelRuns.length > 1 && subLabel(run, labels.get(run.id)).includes(harnessName(run.agent)) ? "" : harnessName(run.agent)} parts={[durationLabel(taskDuration(run, snapshotNow)), runStatus(run).tone === "ended" ? "" : runStatus(run).label]} />
                       </small>
                     </span>
                     <b>{run.score}</b>
@@ -500,7 +500,7 @@ function GameDashboard({
                               <b>{run.score}<small> / {run.total || "—"}</small></b>
                             </span>
                             <span className="overview-bar" aria-hidden="true"><i style={{ width: `${Math.max(2, share * 100)}%` }} /></span>
-                            <small className="depth-meta">{[depth.includes(harnessName(run.agent)) ? "" : harnessName(run.agent), durationLabel(taskDuration(run, now)), place ? `第 ${place} 名` : ""].filter(Boolean).join(" · ")}</small>
+                            <small className="depth-meta"><HarnessLine harness={depth.includes(harnessName(run.agent)) ? "" : harnessName(run.agent)} parts={[durationLabel(taskDuration(run, now)), place ? `第 ${place} 名` : ""]} /></small>
                           </button>
                         );
                       })}
@@ -599,7 +599,7 @@ function LiveRun({
           {status.tone === "ended" && <span>{status.detail}</span>}
           {run.termination?.kind !== "no_agent" && <span>运行 {durationLabel(elapsed)}</span>}
           {run.termination?.kind !== "no_agent" && <span>{sinceLastScore(run, now)}</span>}
-          {harnessName(run.agent) && <span>{harnessName(run.agent)}</span>}
+          {harnessName(run.agent) && <span><HarnessTag harness={harnessName(run.agent)} size={14} /></span>}
           {run.started_at && <span>{new Intl.DateTimeFormat("zh-CN", { month: "numeric", day: "numeric" }).format(run.started_at)} 开始</span>}
         </div>
       </header>

@@ -2057,3 +2057,7 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
 .agent-feed article { border-bottom-color: transparent; padding-block: 10px; }
 .score-log li { border-bottom-color: transparent; }
 .live-disclosure.runtime-details { border-top-color: transparent; }
+
+/* A harness name with its mark, inline in meta lines. */
+.harness-tag { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; vertical-align: bottom; }
+.harness-tag .family-icon { vertical-align: 0; }

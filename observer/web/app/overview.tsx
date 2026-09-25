@@ -2,7 +2,7 @@
 import { GAME_IDS, GAME_META, type GameId } from "./game-registry";
 import type { RunSummary } from "./live-contract";
 import { clockTime } from "./live-shared";
-import { FamilyIcon } from "./family-icons";
+import { FamilyIcon, HarnessTag } from "./family-icons";
 import { compareModels, firstSeen, harnessName, modelFamily, modelName } from "./run-labels";
 
 /** How far a run got, as a share of the game's total. */
@@ -145,7 +145,7 @@ export function Overview({
                               <b>{run.score}</b><small> / {run.total || "—"}</small>
                             </span>
                             <span className="overview-bar" aria-hidden="true"><i style={{ width: `${Math.max(2, share * 100)}%` }} /></span>
-                            <small>{Math.round(share * 100)}%{detail ? ` · ${detail}` : ""}</small>
+                            <small>{Math.round(share * 100)}%{run.effort !== "default" ? ` · ${run.effort}` : ""}{harnessName(run.agent) && <> · <HarnessTag harness={harnessName(run.agent)} /></>}</small>
                           </button>
                         </td>
                       );
