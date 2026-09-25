@@ -1,0 +1,20 @@
+# Codex (GPT-5.6 Luna, xhigh) with a native Goal. Credentials come from the
+# account's CODEX_AUTH_JSON_PATH (see tools/bench/README.md).
+agent = "tools.agents.isolated_codex:GoalIsolatedCodex"
+model = "openai/gpt-5.6-luna"
+session = "Codex"
+session_dir = "sessions"
+env = ["CODEX_AUTH_JSON_PATH"]
+agent_hosts = ["chatgpt.com", "api.openai.com", "auth.openai.com"]
+environment_hosts = ["deb.debian.org", "raw.githubusercontent.com", "nodejs.org", "registry.npmjs.org"]
+include_logs = ["sessions/**", "workspace/**", "codex.txt"]
+
+[kwargs]
+reasoning_effort = "xhigh"
+web_search = "disabled"
+version = "0.153.4"
+
+[resume]
+default = "tools.agents.isolated_codex:ContinueGoalResumeIsolatedCodex"
+parabox-intro = "tools.agents.isolated_codex:ContinueParaboxGoalResumeIsolatedCodex"
+swarm-farming = "tools.agents.isolated_codex:ContinueSwarmGoalResumeIsolatedCodex"

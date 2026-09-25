@@ -1,0 +1,18 @@
+# How `bench run` launches this game. See tools/bench/README.md.
+task = "tasks/parabox-intro"
+
+# Scored objective; {session} names the agent's native session (codex, Pi, ...).
+objective = """
+Manually solve all 364 puzzles in this Patrick's Parabox campaign using only the displayed game state, deliberate logical reasoning, and reusable mechanics you discover yourself. Do not write or run a solver, search script, automated planner, or any program that generates, tests, or chooses moves; do not retrieve external answers. Make your greatest possible effort: a partial score, a difficult puzzle, or a submit checkpoint is not completion. Keep reasoning, use deliberate undo/restart, update concise notes after every material discovery, and work through other unlocked branches when useful. Continue the same {session} session and private game state until /usr/local/bin/parabox submit verifies score 364/364 or the task runtime ends.
+"""
+
+# Passed to agents whose profile sets game_kwargs = true (campaign Pi agents).
+[kwargs]
+api_version = "parabox-api-v3"
+game_command = "parabox"
+max_score = 364
+
+# Checkpoint roles -> container paths declared as task artifacts.
+[artifacts]
+game_state = "/var/lib/parabox/parabox-state.txt"
+game_audit = "/var/lib/parabox/parabox-audit.tsv"

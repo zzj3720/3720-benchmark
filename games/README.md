@@ -13,6 +13,7 @@ games/<game>/
 ├── observer/   # Game-specific live-state metadata and rendering
 ├── scripts/    # Import, extraction, packaging, and game-specific checks
 ├── src/        # Game engine, API, scoring, and verifier implementation
+├── run.toml    # How `bench run` launches and resumes the game
 └── ...         # Build manifests, tests, licenses, and game documentation
 ```
 

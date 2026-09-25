@@ -1,0 +1,17 @@
+# How `bench run` launches this game. See tools/bench/README.md.
+task = "tasks/emergency-operator"
+
+# Scored objective; {session} names the agent's native session (codex, Pi, ...).
+objective = """
+Play the entire 30-minute Emergency Operator career until a successful operator response proves both complete:true and shift.status:complete, while maximizing score throughout. Every game action must be your own immediate decision. Continue the same {session} session and private game state. Do not mark the Goal complete, give a final answer, or voluntarily stop before that authoritative terminal response; doing so early is a benchmark failure even if the native Goal runtime continues the session.
+"""
+
+# Passed to agents whose profile sets game_kwargs = true (campaign Pi agents).
+[kwargs]
+api_version = "emergency-operator-api-v1"
+game_command = "operator"
+
+# Checkpoint roles -> container paths declared as task artifacts.
+[artifacts]
+game_audit = "/var/lib/operator/audit.jsonl"
+game_events = "/var/lib/operator/events.jsonl"

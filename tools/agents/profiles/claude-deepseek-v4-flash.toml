@@ -1,0 +1,16 @@
+# Claude Code driving DeepSeek V4 Flash (xhigh) with a native Goal.
+agent = "tools.agents.deepseek_claude_code:GoalDeepSeekClaudeCode"
+model = "deepseek-v4-flash"
+session = "Claude Code"
+session_dir = "sessions"
+env = ["DEEPSEEK_API_KEY"]
+agent_hosts = ["api.deepseek.com"]
+environment_hosts = ["deb.debian.org", "raw.githubusercontent.com", "nodejs.org", "registry.npmjs.org", "downloads.claude.ai"]
+include_logs = ["sessions/**", "claude-code.txt"]
+
+[kwargs]
+reasoning_effort = "xhigh"
+disallowed_tools = "WebSearch,WebFetch"
+
+[resume]
+parabox-intro = "tools.agents.deepseek_claude_code:ResumeParaboxGoalDeepSeekClaudeCode"

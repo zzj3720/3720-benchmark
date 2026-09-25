@@ -1,0 +1,7 @@
+# Harbor's no-op agent: exercises launch, recording, checkpoint and resume
+# without a model. Every task must score zero with it.
+agent = "nop"
+objective_kwarg = ""
+
+[resume]
+default = "nop"

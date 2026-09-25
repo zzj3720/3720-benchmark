@@ -157,25 +157,26 @@ truncated, or rewritten in place, previously ingested lines are not appended to
 the journal again. Game actions remain authoritative through the sidecar event
 stream instead of being duplicated from Agent tool calls.
 
-All scored benchmark launches use `tools/observer/harbor-run`. A first segment
-defaults its chain id to the Harbor job name. A continuation sets
+All scored benchmark launches use `tools/bench/bench run`, which wraps
+`tools/observer/harbor-run`. A first segment defaults its chain id to the
+Harbor job name (the run id). A continuation sets
 `BENCHMARK_CHAIN_ID` to the existing id while keeping its own new job and trial
 identity. Parallel writers for the same chain are invalid; continuation is a
 sequential append to the sealed prior segment. The recorder holds an exclusive
 process lock for the chain and rejects a second active writer.
-The process-scoped lock protects writers on the recorder host. The native gateway
-can inspect it directly; the Docker gateway uses the recorder's versioned,
-freshness-checked `writer-lease.json` heartbeat instead:
-an unsealed segment is `live` only while its recorder still holds the lock.
-If the recorder disappears without appending `segment_finished`, the gateway
-projects the segment as `orphaned` instead of `running`. A small lease monitor
-invalidates the SSE summary when the lock owner changes; it does not poll game
-state or infer identity from Docker or Harbor names.
+The process-scoped lock protects writers on the recorder host, where the
+projection (gateway or publisher) inspects it directly: an unsealed segment is
+`live` only while its recorder still holds the lock. If the recorder disappears
+without appending `segment_finished`, the segment projects as `orphaned`
+instead of `running`. A lock change republishes the run summary; nothing polls
+game state or infers identity from Docker or Harbor names.
 
 ### 3. Live projection plane
 
-The gateway consumes only the authoritative run journal. It maintains one
-in-memory projection per `chain_id` and exposes:
+The projection consumes only the authoritative run journal. The local
+`live-gateway` serves it directly; `live-publisher` pushes the same bodies to
+the Cloudflare console, which serves them from R2 and `LiveHub` (see
+[Live platform](../live-platform.md)). Both expose:
 
 ```text
 GET /v1/runs
@@ -189,7 +190,8 @@ remains only as the thin Harbor plugin interface that starts the recorder and
 for Harbor's Agent implementations; there is no Python replay, projection,
 scoring, or gateway path.
 
-The browser subscribes only to this projection. One scoreboard projection is shared by SSE subscribers. Each v2 connection
+The browser subscribes only to this projection. One scoreboard projection is shared by SSE subscribers.
+Every message also says whether the benchmark host is still publishing. Each v2 connection
 receives changes and appended score points after its initial snapshot. Selected
 detail is invalidated by sequence and lifecycle/lease state rather than unrelated
 filesystem updates.

@@ -1,0 +1,16 @@
+# How `bench run` launches this game. See tools/bench/README.md.
+task = "tasks/swarm-farming"
+
+# Scored objective; {session} names the agent's native session (codex, Pi, ...).
+objective = """
+Finish the frozen Swarm Farming scenario with the highest score possible by reasoning from observed state and deliberately controlling virtual time. Develop and run a valid concurrent Swarm program, continue diagnosing and revising it while useful progress remains, and do not stop at a partial attempt. Continue the same {session} session until swarm submit verifies that the scenario is won or the task runtime ends.
+"""
+
+# Passed to agents whose profile sets game_kwargs = true (campaign Pi agents).
+[kwargs]
+api_version = "swarm-api-v1"
+game_command = "swarm"
+
+# Checkpoint roles -> container paths declared as task artifacts.
+[artifacts]
+game_audit = "/var/lib/swarm/audit.jsonl"

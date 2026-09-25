@@ -1,0 +1,21 @@
+# Pi with DeepSeek V4 Flash (xhigh thinking), kept running until the game's
+# authoritative terminal state.
+agent = "tools.agents.pi_goal:CampaignGoalPi"
+model = "deepseek/deepseek-v4-flash"
+session = "Pi"
+session_dir = "pi/sessions"
+game_kwargs = true
+env = ["DEEPSEEK_API_KEY"]
+agent_hosts = ["api.deepseek.com"]
+environment_hosts = ["deb.debian.org", "raw.githubusercontent.com", "nodejs.org", "registry.npmjs.org"]
+include_logs = ["pi/sessions/**", "pi.txt", "goal-pi-events.jsonl", "goal-pi-transcript.jsonl"]
+
+[kwargs]
+thinking = "xhigh"
+
+[agents]
+emergency-operator = "tools.agents.pi_goal:EmergencyOperatorGoalPi"
+sokoban = "tools.agents.pi_goal:SokobanGoalPi"
+
+[resume]
+parabox-intro = "tools.agents.pi_goal:ResumeParaboxCampaignGoalPi"

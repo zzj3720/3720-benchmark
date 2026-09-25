@@ -20,7 +20,9 @@ The repository starts from Harbor's official
 ├── tasks/                       # Harbor task bank
 │   └── hello-world/             # Toolchain smoke task; not a scored case
 ├── observer/                    # Live console: recorder, gateway, relay, web
+├── runs/                        # Local run manifests and checkpoints (untracked)
 ├── tools/
+│   ├── bench/                   # Launch, pause, resume, package, check
 │   ├── observer/                # harbor-run and the Harbor recorder hook
 │   ├── agents/                  # Harbor agent adapters (game_support/ for game hooks)
 │   └── results/                 # Result matrix runners
@@ -45,9 +47,10 @@ snapshot into the corresponding Harbor task. Raw model trajectories and
 recovery workspaces remain local rather than entering the repository.
 
 Each game sidecar also exposes a common read-only state subscription. The
-private [live operations console](docs/live-platform.md) can watch Agent
+public [live console](docs/live-platform.md), hosted on Cloudflare, shows Agent
 actions, authoritative environment state, virtual time, progress, and results
-across concurrent benchmark runs.
+across concurrent benchmark runs; if the benchmark host goes offline it keeps
+the last published state.
 
 Scored game tasks use a 240-hour Agent timeout as a safety ceiling, not as a
 required run length. Calibration runs may be stopped earlier by the operator
@@ -56,41 +59,23 @@ progress has become persistently unproductive, or available resources require
 it. The saved native session, workspace, authoritative environment state, and
 append-only action trace remain the evidence boundary for any early stop.
 
-## Create a task
+## Create a task or run a benchmark
 
-Install Harbor:
-
-```bash
-uv tool install harbor
-```
-
-Scaffold a task:
+Game tasks are built from `games/<game>/` and launched with `bench`:
 
 ```bash
-harbor task init "3720/<task-name>" \
-  --include-canary-strings \
-  --metadata-template task-template.toml \
-  --tasks-dir tasks/
+tools/bench/bench package sokoban
+tools/bench/bench check sokoban
+tools/bench/bench run new sokoban --profile pi-deepseek-v4-flash --account main
+tools/bench/bench run pause <run>
+tools/bench/bench run resume <run>
 ```
 
-Fill in the task's `category`, `tags`, and track-specific evidence, then validate
-it:
-
-```bash
-for check in ci_checks/check-*.sh; do
-  bash "$check" "tasks/<task-name>"
-done
-
-HARBOR_TELEMETRY=off tools/observer/harbor-run \
-  --path "tasks/<task-name>" \
-  --agent oracle
-
-HARBOR_TELEMETRY=off tools/observer/harbor-run \
-  --path "tasks/<task-name>" \
-  --agent nop
-```
-
-Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a scored case.
+Every run executes a recorded commit, writes its journal to
+`.harbor/run-journals/<run>`, and appears on the live console through the
+publisher. See [tools/bench/README.md](tools/bench/README.md) for profiles,
+accounts, checkpoints and resume, and [CONTRIBUTING.md](CONTRIBUTING.md)
+before proposing a scored case.
 
 ## CI configuration
 

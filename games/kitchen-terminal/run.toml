@@ -1,0 +1,17 @@
+# How `bench run` launches this game. See tools/bench/README.md.
+task = "tasks/kitchen-terminal"
+
+# Scored objective; {session} names the agent's native session (codex, Pi, ...).
+objective = """
+Play the real-time Kitchen Terminal shift through its authoritative 20-minute end and earn the highest score you can by personally choosing every immediate kitchen command. Continue the same {session} session and live private game state until a successful kitchen submit response reports complete true; the terminal score may be below 260 / 260. Use only the supplied one-command kitchen client and reminder-only alarms. Do not use scripts, loops, command chains, macros, background jobs, direct HTTP calls, online solutions, hidden task data, or any automation that executes game actions. Do not voluntarily stop before the authoritative shift terminal state.
+"""
+
+# Passed to agents whose profile sets game_kwargs = true (campaign Pi agents).
+[kwargs]
+api_version = "overcooked-api-v4"
+game_command = "kitchen"
+max_score = 260
+
+# Checkpoint roles -> container paths declared as task artifacts.
+[artifacts]
+game_audit = "/var/lib/kitchen/audit.jsonl"

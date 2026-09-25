@@ -1,0 +1,18 @@
+# How `bench run` launches this game. See tools/bench/README.md.
+task = "tasks/minesweeper"
+
+# Scored objective; {session} names the agent's native session (codex, Pi, ...).
+objective = """
+Play the one-shot No-Guess Minesweeper campaign to its authoritative end by choosing every reveal, flag, chord, and level selection yourself from displayed game state. Each difficulty has ten levels; every level can be attempted once, five wins pass the difficulty for one point, and six losses end the campaign because five wins have become impossible. An attempted level cannot be selected again, and a started level cannot be abandoned. Continue the same {session} session and private game state until a successful minesweeper response reports campaign.complete true; the terminal score may be below 5 / 5. Do not use solvers, scripts, loops, macros, direct HTTP calls, online solutions, hidden task data, or other automation. Do not mark the Goal complete, blocked, or voluntarily stop before the authoritative campaign terminal state; if an action loses a board, continue with another available one until the campaign itself ends.
+"""
+
+# Passed to agents whose profile sets game_kwargs = true (campaign Pi agents).
+[kwargs]
+api_version = "minesweeper-api-v2"
+game_command = "minesweeper"
+max_score = 5
+
+# Checkpoint roles -> container paths declared as task artifacts.
+[artifacts]
+game_audit = "/var/lib/minesweeper/audit.jsonl"
+game_events = "/var/lib/minesweeper/events.jsonl"

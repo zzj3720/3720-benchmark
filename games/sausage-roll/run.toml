@@ -1,0 +1,19 @@
+# How `bench run` launches this game. See tools/bench/README.md.
+task = "tasks/sausage-roll"
+
+# Scored objective; {session} names the agent's native session (codex, Pi, ...).
+objective = """
+Make the greatest possible effort to solve all 86 puzzles of this Stephen's Sausage Roll campaign, using only manual reasoning from observed states and literal sausage commands. No solvers, automated move planners, source inspection, walkthroughs, or external hints. Continue the same {session} session and private game state; a partial score is not completion.
+"""
+
+# Passed to agents whose profile sets game_kwargs = true (campaign Pi agents).
+[kwargs]
+api_version = "sausage-api-v1"
+game_command = "sausage"
+max_score = 86
+
+# Checkpoint roles -> container paths declared as task artifacts.
+[artifacts]
+game_state = "/var/lib/sausage/session.json"
+game_audit = "/var/lib/sausage/audit.jsonl"
+game_events = "/var/lib/sausage/events.jsonl"

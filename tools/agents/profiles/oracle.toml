@@ -1,0 +1,3 @@
+# Harbor's oracle agent: runs each task's solution/solve.sh.
+agent = "oracle"
+objective_kwarg = ""

@@ -1,0 +1,18 @@
+# How `bench run` launches this game. See tools/bench/README.md.
+task = "tasks/sokoban"
+
+# Scored objective; {session} names the agent's native session (codex, Pi, ...).
+objective = """
+Solve all 305 Sokoban Classics levels by choosing every move yourself. Continue the same {session} session and private game state until a successful sokoban response proves campaign.complete true and score 305 / 305. Do not use solvers, scripts, loops, macros, online solutions, or hidden task data. Do not voluntarily stop before the authoritative full-campaign terminal state.
+"""
+
+# Passed to agents whose profile sets game_kwargs = true (campaign Pi agents).
+[kwargs]
+api_version = "sokoban-api-v1"
+game_command = "sokoban"
+max_score = 305
+
+# Checkpoint roles -> container paths declared as task artifacts.
+[artifacts]
+game_audit = "/var/lib/sokoban/audit.jsonl"
+game_events = "/var/lib/sokoban/events.jsonl"
