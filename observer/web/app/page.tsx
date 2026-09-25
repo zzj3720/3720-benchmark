@@ -21,6 +21,7 @@ import { groupByFamily, groupByModel, harnessName, modelFamily, modelName, rankR
 import { clockTime, durationLabel, gatewayUrl, hydrateRunAssets } from "./live-shared";
 import { CoverBakery, GameTabs, LevelWatch, ReplayLibrary, RunReplayShelf, type LevelSample } from "./replay-views";
 import { Overview } from "./overview";
+import { FamilyIcon } from "./family-icons";
 
 
 function taskDuration(run: RunSummary, now: number) {
@@ -323,7 +324,7 @@ function Console() {
             >
               <div className="model-list">
                 {groupByFamily(gameRuns).flatMap(({ family, runs: familyRuns }) => [
-                  <div className="family-heading" key={`family:${family}`}>{family}</div>,
+                  <div className="family-heading" key={`family:${family}`}><FamilyIcon family={family} size={12} />{family}</div>,
                   // Several thinking depths of one model sit under the model's name.
                   ...groupByModel(familyRuns).flatMap(({ model, runs: modelRuns }) => [
                     ...(modelRuns.length > 1 ? [<div className="model-heading" key={`model:${model}`}>{model}</div>] : []),
@@ -472,7 +473,7 @@ function GameDashboard({
             const models = groupByModel(familyRuns);
             return (
               <section className="model-family" key={family}>
-                <h2>{family}<small>{models.length} 个模型 · {familyRuns.length} 次运行</small></h2>
+                <h2><FamilyIcon family={family} />{family}<small>{models.length} 个模型 · {familyRuns.length} 次运行</small></h2>
                 {models.map(({ model, runs: modelRuns }) => (
                   <div className="model-line" key={model}>
                     <strong className="model-line-name">{model}</strong>
@@ -576,7 +577,7 @@ function LiveRun({
         <div className="detail-title-row">
           <div>
             <h1 className="model-title">
-              <small className="model-family">{modelFamily(run.model)}</small>
+              <small className="model-family"><FamilyIcon family={modelFamily(run.model)} />{modelFamily(run.model)}</small>
               {modelName(run.model)}
               {run.effort !== "default" && <span>{run.effort}</span>}
             </h1>

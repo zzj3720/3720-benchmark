@@ -23,6 +23,7 @@ import {
   type ExportChoice,
 } from "./live-shared";
 import { groupByFamily, modelFamily, modelName } from "./run-labels";
+import { FamilyIcon } from "./family-icons";
 import type { ReplayExportFormat } from "./replay-export";
 import { COVER_HEIGHT, COVER_WIDTH, canvasExportSource, type CanvasExportSession } from "./webgl/export-source";
 
@@ -481,7 +482,7 @@ export function LevelWatch({
               const family = familyOf.get(item.run);
               return (
                 <Fragment key={item.run}>
-                {family !== (index > 0 ? familyOf.get(levelRuns[index - 1].run) : undefined) && <div className="family-heading">{family}</div>}
+                {family !== (index > 0 ? familyOf.get(levelRuns[index - 1].run) : undefined) && <div className="family-heading">{family && <FamilyIcon family={family} size={12} />}{family}</div>}
                 <section className="attempt-run" style={{ "--series": colors.get(item.run) } as React.CSSProperties}>
                   <header>
                     <i />

@@ -2,6 +2,7 @@
 import { GAME_IDS, GAME_META, type GameId } from "./game-registry";
 import type { RunSummary } from "./live-contract";
 import { clockTime } from "./live-shared";
+import { FamilyIcon } from "./family-icons";
 import { compareModels, firstSeen, harnessName, modelFamily, modelName } from "./run-labels";
 
 /** How far a run got, as a share of the game's total. */
@@ -93,7 +94,7 @@ export function Overview({
               {live.map(run => (
                 <button key={run.id} type="button" className="overview-live-run" style={{ "--accent": GAME_META[run.game].accent } as React.CSSProperties} onClick={() => onRun(run)}>
                   <span>{GAME_META[run.game].short}</span>
-                  <strong>{modelFamily(run.model)} · {modelName(run.model)}</strong>
+                  <strong><FamilyIcon family={modelFamily(run.model)} />{modelName(run.model)}</strong>
                   <b>{run.score}<small> / {run.total || "—"}</small></b>
                 </button>
               ))}
@@ -124,7 +125,7 @@ export function Overview({
               </thead>
               {familyGroups(rows, firstSeen(runs)).map(([family, familyRows]) => (
               <tbody key={family}>
-                <tr className="overview-family"><th scope="rowgroup" colSpan={games.length + 1}>{family}<small>{familyRows.length} 个模型</small></th></tr>
+                <tr className="overview-family"><th scope="rowgroup" colSpan={games.length + 1}><FamilyIcon family={family} />{family}<small>{familyRows.length} 个模型</small></th></tr>
                 {familyRows.map(row => (
                   <tr key={row.model}>
                     <th scope="row">
