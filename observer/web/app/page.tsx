@@ -426,50 +426,6 @@ function GameDashboard({
   // Cards are grouped by family, newest model first; the badge keeps the overall place by score.
   const places = new Map(runs.filter(run => !run.live).map((run, index) => [run.id, index + 1]));
   const families = groupByFamily(runs);
-  // A model run at several thinking depths gets a summary row with one child row per run.
-  const modelRow = (model: string, modelRuns: RunSummary[]) => {
-    const best = modelRuns.reduce((top, run) => run.score > top.score ? run : top);
-    const share = best.total > 0 ? Math.max(0, Math.min(1, best.score / best.total)) : 0;
-    return (
-      <tr key={`model:${model}`} className="run-row run-model-row" onClick={() => onSelect(best)} style={{ "--series": colors.get(best.id) } as React.CSSProperties}>
-        <td className="rank" />
-        <td className="run-model">
-          <button type="button" onClick={event => { event.stopPropagation(); onSelect(best); }}>{model}</button>
-          <small>{modelRuns.length} 个思考深度 · 最好是 {subLabel(best, labels.get(best.id))}</small>
-        </td>
-        <td className="run-score">
-          <span><b>{best.score}</b><small> / {best.total || "—"}</small><small className="share">{Math.round(share * 100)}%</small></span>
-          <span className="overview-bar" aria-hidden="true"><i style={{ width: `${Math.max(2, share * 100)}%` }} /></span>
-        </td>
-        <td className="optional" />
-        <td className="optional" />
-      </tr>
-    );
-  };
-  const runRow = (run: RunSummary, name: string, child: boolean) => {
-    const status = runStatus(run);
-    const place = places.get(run.id) ?? null;
-    const share = run.total > 0 ? Math.max(0, Math.min(1, run.score / run.total)) : 0;
-    return (
-      // The row is the click target; the name is its button for the keyboard.
-      <tr key={run.id} className={`run-row ${child ? "run-child" : ""}`} onClick={() => onSelect(run)} style={{ "--series": colors.get(run.id) } as React.CSSProperties}>
-        <td className="rank">{place !== null ? <span className="run-rank" aria-label={`第 ${place} 名`}>{place}</span> : <i className="live-pulse" aria-label="直播中" />}</td>
-        <td className="run-model">
-          <button type="button" onClick={event => { event.stopPropagation(); onSelect(run); }}>{name}</button>
-          <small>
-            <span className={`status-badge ${status.className}`} title={status.detail}>{status.label}</span>
-            {[child && name.includes(harnessName(run.agent)) ? "" : harnessName(run.agent), status.tone === "ended" ? status.detail : ""].filter(Boolean).join(" · ")}
-          </small>
-        </td>
-        <td className="run-score">
-          <span><b>{run.score}</b><small> / {run.total || "—"}</small><small className="share">{Math.round(share * 100)}%</small></span>
-          <span className="overview-bar" aria-hidden="true"><i style={{ width: `${Math.max(2, share * 100)}%` }} /></span>
-        </td>
-        <td className="optional run-objective" title={run.objective}>{run.live ? "正在玩" : "停在"} {run.objective}</td>
-        <td className="optional run-time">{durationLabel(taskDuration(run, now))}<small>{sinceLastScore(run, now)}</small></td>
-      </tr>
-    );
-  };
   return (
     <div className="dashboard-page" style={{ "--accent": meta.accent } as React.CSSProperties}>
       <header className="page-heading">
@@ -510,26 +466,49 @@ function GameDashboard({
       )}
 
       {runs.length > 0 && (
-        <section className="run-table-card">
-          <table className="run-table">
-            <thead>
-              <tr>
-                <th scope="col" className="rank">名次</th>
-                <th scope="col">模型</th>
-                <th scope="col">得分</th>
-                <th scope="col" className="optional">进度</th>
-                <th scope="col" className="optional">运行</th>
-              </tr>
-            </thead>
-            {families.map(({ family, runs: familyRuns }) => (
-              <tbody key={family}>
-                <tr className="run-table-family"><th scope="rowgroup" colSpan={5}>{family}<small>{familyRuns.length} 次运行</small></th></tr>
-                {groupByModel(familyRuns).flatMap(({ model, runs: modelRuns }) => modelRuns.length === 1
-                  ? [runRow(modelRuns[0], labels.get(modelRuns[0].id) ?? model, false)]
-                  : [modelRow(model, modelRuns), ...modelRuns.map(run => runRow(run, subLabel(run, labels.get(run.id)), true))])}
-              </tbody>
-            ))}
-          </table>
+        // One line per model, grouped by family; its thinking depths sit side by side.
+        <section className="model-board">
+          {families.map(({ family, runs: familyRuns }) => {
+            const models = groupByModel(familyRuns);
+            return (
+              <section className="model-family" key={family}>
+                <h2>{family}<small>{models.length} 个模型 · {familyRuns.length} 次运行</small></h2>
+                {models.map(({ model, runs: modelRuns }) => (
+                  <div className="model-line" key={model}>
+                    <strong className="model-line-name">{model}</strong>
+                    <div className="model-line-runs">
+                      {modelRuns.map(run => {
+                        const status = runStatus(run);
+                        const place = places.get(run.id);
+                        const share = run.total > 0 ? Math.max(0, Math.min(1, run.score / run.total)) : 0;
+                        const depth = subLabel(run, labels.get(run.id));
+                        const details = [
+                          labels.get(run.id),
+                          place ? `第 ${place} 名` : "直播中",
+                          `${run.live ? "正在玩" : "停在"} ${run.objective}`,
+                          `运行 ${durationLabel(taskDuration(run, now))}`,
+                          sinceLastScore(run, now),
+                          harnessName(run.agent),
+                          status.tone === "ended" ? `${status.label}（${status.detail}）` : status.label,
+                        ].filter(Boolean).join("\n");
+                        return (
+                          <button type="button" key={run.id} className={`depth-chip ${run.live ? "live" : ""}`} style={{ "--series": colors.get(run.id) } as React.CSSProperties} onClick={() => onSelect(run)} title={details}>
+                            <span className="depth-head">
+                              {run.live && <i className="live-pulse" aria-label="直播中" />}
+                              <span className="depth-name">{depth}</span>
+                              <b>{run.score}<small> / {run.total || "—"}</small></b>
+                            </span>
+                            <span className="overview-bar" aria-hidden="true"><i style={{ width: `${Math.max(2, share * 100)}%` }} /></span>
+                            <small className="depth-meta">{[depth.includes(harnessName(run.agent)) ? "" : harnessName(run.agent), durationLabel(taskDuration(run, now)), place ? `第 ${place} 名` : ""].filter(Boolean).join(" · ")}</small>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </section>
+            );
+          })}
         </section>
       )}
       {!runs.length && <EmptyState title="还没有运行" body="新的运行开始后会出现在这里。" />}
