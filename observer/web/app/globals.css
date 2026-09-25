@@ -1649,6 +1649,7 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
 
 /* Replay export: a visible entry point and a small panel of explicit choices. */
 .replay-export-button,
+.replay-undone-toggle,
 .export-actions button {
   display: inline-flex;
   align-items: center;
@@ -1664,7 +1665,13 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
 }
 .replay-export-button[aria-expanded="true"] { border-color: var(--accent); }
 .replay-export-button:disabled { color: var(--muted); cursor: not-allowed; }
+/* Showing what the agent undid is a mode, so it reads as pressed while on. */
+.replay-undone-toggle { color: var(--muted); white-space: nowrap; }
+.replay-undone-toggle[aria-pressed="true"] { border-color: var(--accent); color: var(--foreground); background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+.replay-undone-toggle:disabled { cursor: not-allowed; }
+.event-row.undone strong { color: var(--muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
 .replay-export-button:focus-visible,
+.replay-undone-toggle:focus-visible,
 .export-actions button:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .export-panel {
   display: grid;

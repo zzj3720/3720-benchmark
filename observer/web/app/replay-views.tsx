@@ -8,7 +8,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { GAME_META, GameState, describeGameEvent, resolveGameFrameState, type GameId } from "./game-registry";
 import { EmptyState, REPLAY_CAPTURE_ATTRIBUTE, type ObserverEvent } from "./game-observer";
 import { LiveActionMenu, LiveSelect, LiveSlider } from "./live-controls";
-import type { LoadedAttemptReplay, RunDetail, RunSummary } from "./live-contract";
+import type { LoadedAttemptReplay, ReplayFrame, ReplayOperation, RunDetail, RunSummary } from "./live-contract";
 import { RequestGate } from "./live-client";
 import {
   EXPORT_HOLD_MS,
@@ -100,7 +100,7 @@ export function ThumbnailProvider({ game, baseRun, children }: { game: GameId; b
     if (!pending) {
       // Data loads in parallel; drawing takes turns on the one renderer.
       const data = Promise.all([
-        fetchJson<LoadedAttemptReplay>(`/v1/runs/${encodeURIComponent(sample.run)}?replay_attempt=${sample.attempt}`),
+        fetchJson<LoadedAttemptReplay>(`/v1/runs/${encodeURIComponent(sample.run)}?replay_attempt=${sample.attempt}&preview=1&v=${REPLAY_VERSION}`),
         fetchRunDetail(sample.run),
       ]);
       pending = queue.current.then(async () => {
@@ -379,7 +379,8 @@ type Caption = { level: string; kind: string; index: number; successful: boolean
 
 export function ReplayPlayer({ run, attemptId, label, caption }: { run: RunDetail; attemptId: number; label: string; caption: Caption }) {
   const [replay, setReplay] = useState<LoadedAttemptReplay | null>(null);
-  const [pages, setPages] = useState<(number | null)[]>([null]);
+  const [showUndone, setShowUndone] = useState(false);
+  useEffect(() => { if (readShowUndone()) setShowUndone(true); }, []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [cursor, setCursor] = useState(0);
@@ -393,21 +394,19 @@ export function ReplayPlayer({ run, attemptId, label, caption }: { run: RunDetai
   const exportAbort = useRef<AbortController | null>(null);
   const gate = useRef(new RequestGate());
 
-  const load = useCallback(async (nextPages: (number | null)[]) => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError("");
     const request = gate.current.begin();
     try {
-      const after = nextPages[nextPages.length - 1];
       const payload = await fetchJson<LoadedAttemptReplay>(
-        `/v1/runs/${encodeURIComponent(run.id)}?replay_attempt=${attemptId}${after !== null ? `&after_sequence=${after}` : ""}`,
-        AbortSignal.any([request.signal, AbortSignal.timeout(20_000)]),
+        `/v1/runs/${encodeURIComponent(run.id)}?replay_attempt=${attemptId}&v=${REPLAY_VERSION}`,
+        AbortSignal.any([request.signal, AbortSignal.timeout(60_000)]),
       );
       if (!request.current()) return;
       setReplay(payload);
-      setPages(nextPages);
       setCursor(0);
-      setPlaying(payload.frames.length > 1 || payload.next_after_sequence != null);
+      setPlaying(payload.frames.length > 1);
     } catch {
       if (request.current()) setError("回放加载失败，请重新选择这次尝试");
     } finally {
@@ -417,26 +416,36 @@ export function ReplayPlayer({ run, attemptId, label, caption }: { run: RunDetai
 
   useEffect(() => {
     const requests = gate.current;
-    void load([null]);
+    void load();
     return () => { requests.cancel(); exportAbort.current?.abort(); };
   }, [load]);
 
-  const frames = useMemo(() => replay?.frames ?? [], [replay]);
+  // The default view is the path the agent kept; the toggle adds what it undid.
+  const allFrames = useMemo(() => replay?.frames ?? [], [replay]);
+  const undoneCount = useMemo(() => allFrames.filter(frame => frame.undone).length, [allFrames]);
+  const frames = useMemo(() => showUndone ? allFrames : allFrames.filter(frame => !frame.undone), [allFrames, showUndone]);
+  const operations = useMemo(() => replayOperations(frames), [frames]);
   const last = frames.length - 1;
   const active = frames[Math.min(cursor, Math.max(0, last))];
+  const toggleUndone = () => {
+    const next = !showUndone;
+    // Stay on the same moment: the same frame, or the last kept one before it.
+    const position = active ? allFrames.indexOf(active) : -1;
+    const shown = next ? allFrames : allFrames.filter(frame => !frame.undone);
+    setCursor(Math.max(0, shown.findLastIndex(frame => allFrames.indexOf(frame) <= position)));
+    setShowUndone(next);
+    try { window.localStorage.setItem(SHOW_UNDONE_KEY, next ? "1" : "0"); } catch {}
+  };
 
   useEffect(() => {
     if (!playing || exporting) return;
     if (cursor >= last) {
-      queueMicrotask(() => {
-        if (replay?.next_after_sequence != null) void load([...pages, replay.next_after_sequence]);
-        else setPlaying(false);
-      });
+      queueMicrotask(() => setPlaying(false));
       return;
     }
     const timer = window.setTimeout(() => setCursor(value => value + 1), FRAME_MS / speed);
     return () => window.clearTimeout(timer);
-  }, [playing, cursor, last, speed, replay, pages, load, exporting]);
+  }, [playing, cursor, last, speed, exporting]);
 
   const move = useCallback((index: number) => {
     if (exporting) return;
@@ -548,6 +557,11 @@ export function ReplayPlayer({ run, attemptId, label, caption }: { run: RunDetai
                 { label: "上一组操作", icon: ChevronsLeft, onSelect: () => move(operationStart(-1)), disabled: operationStart(-1) < 0 },
                 { label: "下一组操作", icon: ChevronsRight, onSelect: () => move(operationStart(1)), disabled: operationStart(1) < 0 },
               ]} />
+              {undoneCount > 0 && (
+                <button type="button" className="replay-undone-toggle" aria-pressed={showUndone} onClick={toggleUndone} disabled={exporting !== null} title="模型撤销掉的操作默认不显示；打开后按真实顺序播放，包括撤销">
+                  撤销过程 {undoneCount}
+                </button>
+              )}
               <button type="button" className="replay-export-button" aria-expanded={exportOpen} onClick={() => setExportOpen(open => !open)} disabled={!frames.length} title="把这次尝试导出为视频或 GIF">
                 <Download size={15} aria-hidden="true" />导出
               </button>
@@ -560,7 +574,7 @@ export function ReplayPlayer({ run, attemptId, label, caption }: { run: RunDetai
               <i className="replay" />
               {exporting
                 ? <>正在导出{exporting.format === "gif" ? " GIF" : "视频"} · {Math.round(exporting.completed / Math.max(1, exporting.total) * 100)}%<button type="button" className="replay-export-cancel" onClick={() => exportAbort.current?.abort()}>取消</button></>
-                : exportNotice || (loading ? "正在载入回放…" : error || (pages.length > 1 || replay?.next_after_sequence != null ? `片段 ${pages.length}` : `${label} · ${attemptText}`))}
+                : exportNotice || (loading ? "正在载入回放…" : error || `${label} · ${attemptText}${showUndone ? " · 含撤销过程" : ""}`)}
             </div>
           </div>
           {exportOpen && frames.length > 0 && (
@@ -585,19 +599,13 @@ export function ReplayPlayer({ run, attemptId, label, caption }: { run: RunDetai
                 <input type="checkbox" checked={exportChoice.caption} onChange={event => setExportChoice(choice => ({ ...choice, caption: event.target.checked }))} />
                 <span>加标题栏（游戏、模型、关卡、第几次尝试）</span>
               </label>
-              <p className="export-summary">{attemptText} · {frames.length} 帧 · 约 {exportSeconds} 秒{pages.length > 1 || replay?.next_after_sequence != null ? " · 只导出当前片段" : ""}{exportChoice.format === "gif" ? " · GIF 体积较大，适合短片段" : ""}</p>
+              <p className="export-summary">{attemptText} · {frames.length} 帧 · 约 {exportSeconds} 秒{showUndone ? " · 含撤销过程" : ""}{exportChoice.format === "gif" ? " · GIF 体积较大，适合短片段" : ""}</p>
               <div className="export-actions">
                 <button type="button" className="export-go" disabled={exporting !== null} onClick={() => { void exportSegment(exportChoice); setExportOpen(false); }}>
                   <Download size={15} aria-hidden="true" />导出{exportChoice.format === "video" ? "视频" : " GIF"}
                 </button>
                 <button type="button" onClick={() => setExportOpen(false)}>收起</button>
               </div>
-            </div>
-          )}
-          {(pages.length > 1 || replay?.next_after_sequence != null) && (
-            <div className="history-pages" role="group" aria-label="回放片段">
-              {pages.length > 1 && <button disabled={loading || exporting !== null} onClick={() => void load(pages.slice(0, -1))}>上一片段</button>}
-              {replay?.next_after_sequence != null && <button disabled={loading || exporting !== null} onClick={() => void load([...pages, replay.next_after_sequence!])}>下一片段</button>}
             </div>
           )}
         </section>
@@ -612,12 +620,12 @@ export function ReplayPlayer({ run, attemptId, label, caption }: { run: RunDetai
           </div>
         </div>
         <div className="event-card">
-          <div className="section-title"><strong>操作</strong><small>{replay ? `${replay.operations.length} 组，点一下跳过去` : ""}</small></div>
+          <div className="section-title"><strong>操作</strong><small>{replay ? `${operations.length} 组，点一下跳过去` : ""}</small></div>
           <div className="event-list">
-            {replay?.operations.map((operation, index) => {
+            {operations.map((operation, index) => {
               const start = frameIndex.get(operation.first_frame_key) ?? -1;
               const end = frameIndex.get(operation.last_frame_key);
-              const previous = index > 0 ? replay.operations[index - 1] : null;
+              const previous = index > 0 ? operations[index - 1] : null;
               const previousEnd = previous ? frameIndex.get(previous.last_frame_key) : undefined;
               const event: ObserverEvent = {
                 ...(end === undefined ? { sequence: operation.sequence } : frames[end].event),
@@ -629,10 +637,10 @@ export function ReplayPlayer({ run, attemptId, label, caption }: { run: RunDetai
               const description = describeGameEvent(run.game, event, previousEnd === undefined ? null : frames[previousEnd].event);
               const current = operation.sequence === active?.operation_sequence;
               return (
-                <button className={`event-row ${current ? "active" : ""}`} key={operation.sequence} onClick={() => start >= 0 && move(start)} disabled={start < 0} aria-current={current ? "step" : undefined}>
+                <button className={`event-row ${current ? "active" : ""} ${operation.undone ? "undone" : ""}`} key={operation.sequence} onClick={() => start >= 0 && move(start)} disabled={start < 0} aria-current={current ? "step" : undefined}>
                   <time>{clockTime(operation.timestamp_ms)}</time>
                   <strong>{description.title}</strong>
-                  <span>{operation.score_delta ? `${operation.score_delta > 0 ? "+" : ""}${operation.score_delta} 分` : `${operation.frame_count} 帧`}</span>
+                  <span>{operation.undone ? "已撤销 · " : ""}{operation.score_delta ? `${operation.score_delta > 0 ? "+" : ""}${operation.score_delta} 分` : `${operation.frame_count} 帧`}</span>
                 </button>
               );
             })}
@@ -641,6 +649,43 @@ export function ReplayPlayer({ run, attemptId, label, caption }: { run: RunDetai
       </section>
     </>
   );
+}
+
+/** Bumped when replay bodies change shape, so browsers do not reuse an immutable copy. */
+const REPLAY_VERSION = 2;
+const SHOW_UNDONE_KEY = "replay-show-undone";
+
+function readShowUndone() {
+  try { return window.localStorage.getItem(SHOW_UNDONE_KEY) === "1"; } catch { return false; }
+}
+
+type ShownOperation = ReplayOperation & { undone: boolean };
+
+/** Consecutive frames of one operation, from the frames being shown. */
+function replayOperations(frames: ReplayFrame[]): ShownOperation[] {
+  const operations: ShownOperation[] = [];
+  for (const frame of frames) {
+    if (frame.operation_action?.command === "initial") continue;
+    const current = operations.at(-1);
+    if (current && current.sequence === frame.operation_sequence) {
+      current.last_frame_key = frame.key;
+      current.frame_count += 1;
+      current.score_delta += frame.event.score_delta ?? 0;
+      current.undone &&= Boolean(frame.undone);
+      continue;
+    }
+    operations.push({
+      sequence: frame.operation_sequence,
+      timestamp_ms: frame.operation_timestamp_ms,
+      action: frame.operation_action,
+      first_frame_key: frame.key,
+      last_frame_key: frame.key,
+      frame_count: 1,
+      score_delta: frame.event.score_delta ?? 0,
+      undone: Boolean(frame.undone),
+    });
+  }
+  return operations;
 }
 
 export function GameTabs({ view, onDashboard, onReplays }: { view: "dashboard" | "replays"; onDashboard: () => void; onReplays: () => void }) {

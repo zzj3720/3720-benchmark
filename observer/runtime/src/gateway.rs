@@ -121,13 +121,12 @@ impl Projector {
         )
     }
 
-    pub fn replay(&self, run_id: &str, attempt: u64, after: Option<u64>) -> Payload {
+    pub fn replay(&self, run_id: &str, attempt: u64) -> Payload {
         run_payload(
             &self.app,
             run_id,
             RunQuery {
                 replay_attempt: Some(attempt),
-                after_sequence: after,
                 ..RunQuery::default()
             },
         )
@@ -183,7 +182,6 @@ struct NativeRun {
 #[derive(Default, Deserialize)]
 struct RunQuery {
     replay_attempt: Option<u64>,
-    after_sequence: Option<u64>,
     catalog_before: Option<u64>,
 }
 
@@ -398,7 +396,7 @@ fn run_payload(app: &App, run_id: &str, query: RunQuery) -> Payload {
     }
     if let Some(attempt_id) = query.replay_attempt {
         return match native_run(app, run_id) {
-            Ok(Some(run)) => match native_replay(&run, attempt_id, query.after_sequence) {
+            Ok(Some(run)) => match native_replay(&run, attempt_id) {
                 Ok(Some(value)) => json_payload(&value),
                 Ok(None) => Err((NOT_FOUND, "unknown replay attempt".into())),
                 Err(error) => Err((INTERNAL, error)),
@@ -1366,6 +1364,10 @@ fn latest_live_replay(events: &[Value], objects: &Path) -> Result<Value, String>
         return Ok(Value::Null);
     }
     let mut projection = replay_projection(&events[start..], 0, events.len() - start)?;
+    // The live strip shows the kept path only.
+    if let Some(frames) = projection["frames"].as_array_mut() {
+        frames.retain(|frame| frame["undone"] != Value::Bool(true));
+    }
     projection["sequence"] = events
         .last()
         .and_then(|event| event.get("sequence"))
@@ -1400,18 +1402,14 @@ fn asset_references(events: &[Value]) -> Value {
     Value::Object(references)
 }
 
-fn native_replay(
-    run: &NativeRun,
-    attempt_id: u64,
-    after: Option<u64>,
-) -> Result<Option<Value>, String> {
+fn native_replay(run: &NativeRun, attempt_id: u64) -> Result<Option<Value>, String> {
     let index = crate::index::RunIndex::open(&run.chain, &run.cache)?;
     let Some(attempt) = index.attempt(attempt_id)? else {
         return Ok(None);
     };
-    let (rows, next) = index.game_window(attempt.start, attempt.end, after)?;
+    let rows = index.game_window(attempt.start, attempt.end)?;
     if rows.is_empty() {
-        return Err("replay cursor is outside this attempt".into());
+        return Err("replay attempt has no game events".into());
     }
     let mut input = Vec::new();
     if let Some(anchor) = index.anchor(rows[0]["sequence"].as_u64().unwrap())? {
@@ -1433,7 +1431,7 @@ fn native_replay(
     )?;
     let metadata = json!({"schema":"benchmark-live-attempt-replay-v2","run_id":run.id,"attempt_id":attempt_id,
         "kind":attempt.context.kind,"reference":attempt.context.reference,"title":attempt.context.title,"score":attempt.score,"successful":attempt.successful,
-        "asset_refs":run.detail["asset_refs"],"activity":activity,"next_after_sequence":next,"page_after_sequence":after});
+        "asset_refs":run.detail["asset_refs"],"activity":activity});
     projection
         .as_object_mut()
         .unwrap()

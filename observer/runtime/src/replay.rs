@@ -177,10 +177,15 @@ pub fn replay_projection(normalized: &[Value], start: usize, end: usize) -> Resu
     }
 
     // Undo/redo manipulates indices, not copies of every retained game state.
+    // Every frame is kept; `undone` marks the ones the default view leaves out:
+    // a branch the agent undid, the undo/redo that moved over it, and resets.
+    // An undo whose target is not on this page stays visible, so the board
+    // steps back instead of jumping.
     let fingerprints = candidates
         .iter()
         .map(|frame| frame.pointer("/event/state").map(fingerprint).transpose())
         .collect::<Result<Vec<_>, _>>()?;
+    let mut undone = vec![false; candidates.len()];
     let mut output = Vec::<usize>::new();
     let mut redo = Vec::<Vec<usize>>::new();
     let mut index = 0;
@@ -206,9 +211,15 @@ pub fn replay_projection(normalized: &[Value], start: usize, end: usize) -> Resu
                         .rposition(|index| fingerprints[*index].as_ref() == Some(target))
                 }) {
                     let removed = output.split_off(matching + 1);
+                    for removed in &removed {
+                        undone[*removed] = true;
+                    }
+                    undone[index..boundary].fill(true);
                     if !removed.is_empty() {
                         redo.push(removed);
                     }
+                } else {
+                    output.extend(index..boundary);
                 }
             }
             "redo" => {
@@ -220,8 +231,18 @@ pub fn replay_projection(normalized: &[Value], start: usize, end: usize) -> Resu
                                 .position(|index| fingerprints[*index].as_ref() == Some(target))
                         })
                         .unwrap_or(restored.len().saturating_sub(1));
+                    for restored in restored.iter().take(matching + 1) {
+                        undone[*restored] = false;
+                    }
                     output.extend(restored.into_iter().take(matching + 1));
+                    undone[index..boundary].fill(true);
+                } else {
+                    output.extend(index..boundary);
                 }
+            }
+            "restart" | "reset" => {
+                redo.clear();
+                undone[index..boundary].fill(true);
             }
             _ => {
                 redo.clear();
@@ -230,25 +251,18 @@ pub fn replay_projection(normalized: &[Value], start: usize, end: usize) -> Resu
         }
         index = boundary;
     }
-    let candidate_count = candidates.len();
-    let mut frames = Vec::new();
-    for index in output {
-        let command = candidates[index]
-            .pointer("/operation_action/command")
-            .and_then(Value::as_str)
-            .unwrap_or_default()
-            .to_ascii_lowercase();
-        if !matches!(command.as_str(), "restart" | "reset" | "undo" | "redo") {
-            frames.push(std::mem::take(&mut candidates[index]));
-        }
+    let mut frames = candidates;
+    for (frame, undone) in frames.iter_mut().zip(&undone) {
+        frame["undone"] = Value::Bool(*undone);
     }
-    drop(candidates);
+    let eliminated = undone.iter().filter(|undone| **undone).count();
     let mut operations: Vec<Value> = Vec::new();
     for frame in &frames {
-        if frame
-            .pointer("/operation_action/command")
-            .and_then(Value::as_str)
-            == Some("initial")
+        if frame["undone"] == Value::Bool(true)
+            || frame
+                .pointer("/operation_action/command")
+                .and_then(Value::as_str)
+                == Some("initial")
         {
             continue;
         }
@@ -285,7 +299,7 @@ pub fn replay_projection(normalized: &[Value], start: usize, end: usize) -> Resu
         }));
     }
 
-    let mut result = json!({"skipped_unchanged":skipped,"eliminated_history_frames":candidate_count.saturating_sub(frames.len())});
+    let mut result = json!({"skipped_unchanged":skipped,"eliminated_history_frames":eliminated});
     result["frames"] = Value::Array(frames);
     result["operations"] = Value::Array(operations);
     Ok(result)
@@ -456,15 +470,37 @@ mod tests {
             json!({"sequence": 8, "action": {"command": "move"}, "state": state("E"), "score_delta": 1}),
         ];
         let projection = replay_projection(&events, 1, 8).unwrap();
-        assert_eq!(
+        let keys = |undone: Option<bool>| {
             projection["frames"]
                 .as_array()
                 .unwrap()
                 .iter()
+                .filter(|frame| undone.is_none_or(|undone| frame["undone"] == undone))
                 .map(|frame| frame["key"].as_str().unwrap())
-                .collect::<Vec<_>>(),
-            ["initial", "2", "5", "8"]
-        );
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(keys(Some(false)), ["initial", "2", "5", "8"]);
+        assert_eq!(keys(None), ["initial", "2", "3", "4", "5", "6", "7", "8"]);
         assert_eq!(projection["eliminated_history_frames"], 4);
+        assert_eq!(projection["operations"].as_array().unwrap().len(), 3);
+    }
+
+    #[test]
+    fn undo_past_the_page_start_stays_visible() {
+        // The page starts at B; the undo returns to A, which is not on it.
+        let events = vec![
+            json!({"sequence": 1, "action": {"command": "move"}, "state": state("B")}),
+            json!({"sequence": 2, "action": {"command": "undo"}, "state": state("A")}),
+            json!({"sequence": 3, "action": {"command": "move"}, "state": state("C")}),
+        ];
+        let projection = replay_projection(&events, 1, 3).unwrap();
+        let visible = projection["frames"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|frame| frame["undone"] == false)
+            .map(|frame| frame["key"].as_str().unwrap())
+            .collect::<Vec<_>>();
+        assert_eq!(visible, ["initial", "2", "3"]);
     }
 }

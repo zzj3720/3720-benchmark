@@ -183,8 +183,8 @@ that changed it stores, under `pub/` in R2:
 |---|---|---|
 | `pub/runs/<run>/detail.json` | `GET /v1/runs/<run>` | `no-store` |
 | `pub/runs/<run>/catalog/<before>.json` | `?catalog_before=<before>` | immutable |
-| `pub/runs/<run>/replay/<attempt>/first.json` | `?replay_attempt=<attempt>` | immutable once the attempt closes |
-| `pub/runs/<run>/replay/<attempt>/<after>.json` | `…&after_sequence=<after>` | as above |
+| `pub/runs/<run>/attempts/<attempt>.json` | `?replay_attempt=<attempt>` | immutable once the attempt closes |
+| `pub/runs/<run>/attempts/<attempt>.preview.json` | `…&preview=1` (first frame only, for thumbnails) | as above |
 | `pub/assets/<sha256>` | `GET /v1/assets/<sha256>` | immutable |
 
 Bodies are byte-identical to the local gateway's responses (both call the same
@@ -194,6 +194,15 @@ refreshed at most every 15 seconds. The authority itself is backed up under
 `raw/<chain>/`: sealed history and objects in content-named tar bundles
 (`bundles/<digest>.tar`, about 8 MiB each), the index and the open tail (every
 10 minutes) as individual files.
+
+A replay body is one whole attempt: one level (or one stretch of the
+overworld) between resets or level changes. It is not split by event count,
+so undo history and the starting board never cross a page boundary. The
+largest attempts are a few MiB gzip-encoded. Every recorded frame is kept;
+frames the agent undid (and the undo/redo that moved over them, and resets)
+carry `undone: true`. The console hides them by default and a toggle plays
+the attempt as it really happened. An undo whose target is not in the attempt
+stays visible, so the board steps back rather than jumping.
 
 After the bodies, it pushes changed run summaries (with score history) to
 `LiveHub`, then heartbeats every 10 seconds. The ledger is written only after
@@ -215,7 +224,7 @@ GET /api/live/health
 GET /api/live/v1/runs
 GET /api/live/v1/runs/<id>
 GET /api/live/v1/runs/<id>?catalog_before=<attempt-id>
-GET /api/live/v1/runs/<id>?replay_attempt=<attempt-id>[&after_sequence=<sequence>]
+GET /api/live/v1/runs/<id>?replay_attempt=<attempt-id>[&preview=1]
 GET /api/live/v1/assets/<sha256>
 GET /api/live/v1/subscribe?protocol=2[&run_id=<id>]
 ```

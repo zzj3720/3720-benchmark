@@ -11,7 +11,6 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 pub const CATALOG_PAGE: usize = 200;
-pub const REPLAY_BYTES: u64 = 1024 * 1024;
 const INDEX_VERSION: &str = "6";
 
 pub struct RunIndex {
@@ -369,20 +368,14 @@ impl RunIndex {
             .transpose()
     }
 
-    pub fn game_window(
-        &self,
-        start: u64,
-        end: u64,
-        after: Option<u64>,
-    ) -> Result<(Vec<Value>, Option<u64>), String> {
-        let after = after.unwrap_or(start.saturating_sub(1));
-        let mut statement=self.connection.prepare("SELECT row FROM events WHERE source='game' AND sequence>=?1 AND sequence<=?2 AND sequence>?3 ORDER BY sequence LIMIT 129").map_err(error)?;
+    /// Every game event of one attempt, in order. An attempt (one level, or
+    /// one run of it between resets) is what a replay shows, so it is never
+    /// split into pages; a single operation still has to fit the memory budget.
+    pub fn game_window(&self, start: u64, end: u64) -> Result<Vec<Value>, String> {
+        let mut statement=self.connection.prepare("SELECT row FROM events WHERE source='game' AND sequence>=?1 AND sequence<=?2 ORDER BY sequence").map_err(error)?;
         let mut output = Vec::new();
-        let mut bytes = 0;
-        let mut instructions = 0;
-        let mut next = None;
         for text in statement
-            .query_map(params![start, end, after], |row| row.get::<_, String>(0))
+            .query_map(params![start, end], |row| row.get::<_, String>(0))
             .map_err(error)?
         {
             let text = text.map_err(error)?;
@@ -395,32 +388,20 @@ impl RunIndex {
                     .pointer("/payload/instruction_trace/uncompressed_bytes")
                     .and_then(Value::as_u64)
                     .unwrap_or(0);
-            let count = row
-                .pointer("/payload/instruction_trace/count")
-                .and_then(Value::as_u64)
-                .unwrap_or(1);
-            if !output.is_empty()
-                && (bytes + cost > REPLAY_BYTES
-                    || output.len() >= 128
-                    || instructions + count > 1024)
-            {
-                next = output
-                    .last()
-                    .and_then(|row: &Value| row["sequence"].as_u64());
-                break;
-            }
             if cost > 4 * 1024 * 1024 {
                 return Err("individual replay operation exceeds the 4 MiB memory budget".into());
             }
-            bytes += cost;
-            instructions += count;
             output.push(row);
         }
-        Ok((output, next))
+        Ok(output)
     }
 
+    /// The last game event before `before` that carries a state, which is the
+    /// board a replay page starts from. A traced operation carries its state
+    /// as the last frame of `instruction_trace`, so it counts too; skipping it
+    /// started pages from a board several operations old.
     pub fn anchor(&self, before: u64) -> Result<Option<Value>, String> {
-        self.connection.query_row("SELECT row FROM events WHERE source='game' AND sequence<?1 AND (json_type(row,'$.payload.state')='object' OR json_type(row,'$.payload.state_snapshot')='object') ORDER BY sequence DESC LIMIT 1",[before],|row|row.get::<_,String>(0)).optional().map_err(error)?.map(|text|serde_json::from_str(&text).map_err(error)).transpose()
+        self.connection.query_row("SELECT row FROM events WHERE source='game' AND sequence<?1 AND (json_type(row,'$.payload.state')='object' OR json_type(row,'$.payload.state_snapshot')='object' OR json_type(row,'$.payload.instruction_trace')='object') ORDER BY sequence DESC LIMIT 1",[before],|row|row.get::<_,String>(0)).optional().map_err(error)?.map(|text|serde_json::from_str(&text).map_err(error)).transpose()
     }
 
     pub fn activity(&self, start: Option<u64>, end: Option<u64>) -> Result<Vec<Value>, String> {
@@ -579,7 +560,7 @@ mod tests {
         }
         {
             let index = RunIndex::open(&chain, &root.join("cache")).unwrap();
-            assert_eq!(index.game_window(1, 10, None).unwrap().0.len(), 1);
+            assert_eq!(index.game_window(1, 10).unwrap().len(), 1);
         }
         fs::remove_dir_all(root).unwrap();
     }
@@ -631,23 +612,30 @@ mod tests {
         fs::remove_dir_all(root).unwrap();
     }
     #[test]
-    fn replay_pages_obey_the_decoded_byte_budget() {
-        let (root, chain) = setup("window");
-        let mut rows = (2..6)
-            .map(|sequence| row(sequence, "move", "one", 0))
-            .collect::<Vec<_>>();
-        for row in &mut rows {
-            crate::contract::stamp(&mut row["payload"]);
-            row["payload"]["state_snapshot"] = json!({"uncompressed_bytes":3*1024*1024});
-        }
+    fn anchor_counts_traced_operations() {
+        let (root, chain) = setup("anchor");
+        let mut rows = vec![row(2, "move", "one", 0), row(3, "move", "one", 0)];
+        rows[1]["payload"].as_object_mut().unwrap().remove("state");
+        rows[1]["payload"]["instruction_trace"] = json!({"object":"trace","count":2});
         append(&chain, &rows);
         let index = RunIndex::open(&chain, &root.join("cache")).unwrap();
-        let (first, next) = index.game_window(2, 5, None).unwrap();
-        assert_eq!(first.len(), 1);
-        assert_eq!(next, Some(2));
-        let (second, _) = index.game_window(2, 5, next).unwrap();
-        assert_eq!(second[0]["sequence"], 3);
+        assert_eq!(index.anchor(4).unwrap().unwrap()["sequence"], 3);
         drop(index);
         fs::remove_dir_all(root).unwrap();
     }
+    #[test]
+    fn an_attempt_is_one_window() {
+        let (root, chain) = setup("window");
+        let rows = (2..200)
+            .map(|sequence| row(sequence, "move", "one", 0))
+            .collect::<Vec<_>>();
+        append(&chain, &rows);
+        let index = RunIndex::open(&chain, &root.join("cache")).unwrap();
+        let window = index.game_window(2, 199).unwrap();
+        assert_eq!(window.len(), 198);
+        assert_eq!(window[197]["sequence"], 199);
+        drop(index);
+        fs::remove_dir_all(root).unwrap();
+    }
+
 }

@@ -54,9 +54,10 @@ export async function handleLive(request: Request, env: LiveEnv, ctx: Background
   const attempt = url.searchParams.get("replay_attempt");
   const before = url.searchParams.get("catalog_before");
   if (attempt !== null) {
-    const after = url.searchParams.get("after_sequence");
-    if (!DIGITS.test(attempt) || (after !== null && !DIGITS.test(after))) return error(400, "invalid replay cursor");
-    return body(env, request, `pub/runs/${id}/replay/${attempt}/${after ?? "first"}.json`, "unknown replay attempt");
+    // One body per attempt; `preview` is its first frame alone, for level thumbnails.
+    if (!DIGITS.test(attempt)) return error(400, "invalid replay attempt");
+    const part = url.searchParams.get("preview") === "1" ? ".preview" : "";
+    return body(env, request, `pub/runs/${id}/attempts/${attempt}${part}.json`, "unknown replay attempt");
   }
   if (before !== null) {
     if (!DIGITS.test(before)) return error(400, "invalid catalog cursor");

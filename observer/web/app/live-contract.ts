@@ -82,6 +82,8 @@ export type ReplayFrame = {
   instruction_count: number;
   operation_size: number;
   has_instruction_trace: boolean;
+  /** Left out of the default view: a branch the agent undid, the undo/redo over it, or a reset. */
+  undone?: boolean;
 };
 
 export type ReplayOperation = {
@@ -111,8 +113,6 @@ export type ReplayGroupSummary = {
 
 export type LoadedAttemptReplay = {
   attempt_id: number;
-  next_after_sequence?: number | null;
-  page_after_sequence?: number | null;
   kind: "level" | "overworld" | "shift" | "world";
   reference?: string | null;
   title?: string | null;

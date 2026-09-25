@@ -6,7 +6,7 @@
 //! Everything it sends is idempotent: a restart re-derives what is missing from
 //! its local upload ledger and continues.
 
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap};
 use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -240,7 +240,7 @@ impl<S: Sink> Publisher<S> {
         }
         let mut running = false;
         for (attempt, closed) in attempts {
-            let marker = format!("pub/runs/{id}/replay/{attempt}");
+            let marker = format!("pub/runs/{id}/attempts/{attempt}");
             if closed && self.is_finished(&marker)? {
                 continue;
             }
@@ -259,21 +259,21 @@ impl<S: Sink> Publisher<S> {
         Ok(())
     }
 
+    /// One body per attempt, plus its first frame alone for level thumbnails.
     fn publish_replay(&mut self, id: &str, attempt: u64, cache: &'static str) -> Result<(), String> {
-        let mut after = None;
-        let mut seen = HashSet::new();
-        loop {
-            let Some(page) = optional(self.projector.replay(id, attempt, after))? else {
-                return Ok(());
-            };
-            let value: Value = serde_json::from_slice(&page).map_err(display)?;
-            let name = after.map_or_else(|| "first".to_owned(), |after| after.to_string());
-            self.stage(format!("pub/runs/{id}/replay/{attempt}/{name}.json"), page, cache, false)?;
-            match value.get("next_after_sequence").and_then(Value::as_u64) {
-                Some(next) if seen.insert(next) => after = Some(next),
-                _ => return Ok(()),
-            }
+        let Some(body) = optional(self.projector.replay(id, attempt))? else {
+            return Ok(());
+        };
+        let mut preview: Value = serde_json::from_slice(&body).map_err(display)?;
+        if let Some(frames) = preview.get_mut("frames").and_then(Value::as_array_mut) {
+            frames.truncate(1);
         }
+        for key in ["operations", "activity"] {
+            preview[key] = json!([]);
+        }
+        self.stage(format!("pub/runs/{id}/attempts/{attempt}.json"), body, cache, false)?;
+        self.stage(format!("pub/runs/{id}/attempts/{attempt}.preview.json"), serde_json::to_vec(&preview).map_err(display)?, cache, false)?;
+        Ok(())
     }
 
     fn publish_archived_replays(&mut self, id: &str) -> Result<(), String> {
@@ -290,11 +290,11 @@ impl<S: Sink> Publisher<S> {
             else {
                 continue;
             };
-            let key = format!("pub/runs/{id}/replay/{attempt}/first.json");
+            let key = format!("pub/runs/{id}/attempts/{attempt}.json");
             if self.is_finished(&key)? {
                 continue;
             }
-            if let Some(page) = optional(self.projector.replay(id, attempt, None))? {
+            if let Some(page) = optional(self.projector.replay(id, attempt))? {
                 self.stage(key, page, IMMUTABLE, true)?;
             }
         }
