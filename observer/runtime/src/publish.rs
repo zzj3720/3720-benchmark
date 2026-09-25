@@ -23,10 +23,9 @@ use crate::storage;
 /// One body to store under `key`. `body` is already encoded as `encoding`.
 pub struct Upload {
     pub key: String,
-    /// Digest of the decoded body, recorded once the sink accepts it.
-    pub digest: String,
-    /// Immutable bodies are never rechecked after they are stored.
-    pub finished: bool,
+    /// Ledger entries (key, decoded digest, immutable) recorded once the sink
+    /// accepts the body. A bundle records every file it contains.
+    pub records: Vec<(String, String, bool)>,
     pub body: Vec<u8>,
     pub content_type: &'static str,
     pub encoding: Option<&'static str>,
@@ -47,6 +46,9 @@ const BATCH_COUNT: usize = 200;
 const LIVE_REPLAY_INTERVAL: Duration = Duration::from_secs(15);
 const RAW_TAIL_INTERVAL: Duration = Duration::from_secs(600);
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(10);
+/// Immutable journal files are backed up in tar bundles of about this size,
+/// so small objects do not each cost a storage write.
+const RAW_BUNDLE_BYTES: usize = 8 * 1024 * 1024;
 
 pub struct Publisher<S: Sink> {
     projector: Projector,
@@ -311,6 +313,8 @@ impl<S: Sink> Publisher<S> {
     }
 
     /// Back up the authority itself, byte for byte, outside the public prefix.
+    /// Sealed history and objects never change and go into tar bundles; the
+    /// index and the open tail are stored individually and overwritten.
     fn publish_raw(&mut self, chain_id: &str) -> Result<(), String> {
         let chain = self.projector.journals().join(chain_id);
         if !chain.is_dir() {
@@ -320,7 +324,10 @@ impl<S: Sink> Publisher<S> {
             .raw_tails
             .get(chain_id)
             .is_none_or(|at| at.elapsed() >= RAW_TAIL_INTERVAL);
+        let mut bundle: Vec<(String, Vec<u8>)> = Vec::new();
+        let mut bundle_bytes = 0;
         for entry in walkdir::WalkDir::new(&chain)
+            .sort_by_file_name()
             .into_iter()
             .filter_map(Result::ok)
             .filter(|entry| entry.file_type().is_file())
@@ -337,7 +344,17 @@ impl<S: Sink> Publisher<S> {
             }
             let immutable = relative.starts_with("history/") || relative.starts_with("objects/");
             let key = format!("raw/{chain_id}/{relative}");
-            if immutable && self.is_finished(&key)? {
+            if immutable {
+                if self.is_finished(&key)? {
+                    continue;
+                }
+                let bytes = fs::read(path).map_err(display)?;
+                bundle_bytes += bytes.len();
+                bundle.push((relative, bytes));
+                if bundle_bytes >= RAW_BUNDLE_BYTES {
+                    self.enqueue_bundle(chain_id, std::mem::take(&mut bundle))?;
+                    bundle_bytes = 0;
+                }
                 continue;
             }
             if name == "journal.jsonl" && !tail_due {
@@ -348,25 +365,48 @@ impl<S: Sink> Publisher<S> {
             if self.uploaded_digest(&key)?.as_deref() == Some(digest.as_str()) {
                 continue;
             }
-            let (body, encoding) = if name.ends_with(".zst") || name.ends_with(".gz") {
-                (bytes, None)
-            } else {
-                (gzip(&bytes)?, Some("gzip"))
-            };
             self.enqueue(Upload {
+                records: vec![(key.clone(), digest, false)],
                 key,
-                digest,
-                finished: immutable,
-                body,
+                body: gzip(&bytes)?,
                 content_type: "application/octet-stream",
-                encoding,
+                encoding: Some("gzip"),
                 cache_control: NO_STORE,
             })?;
+        }
+        if !bundle.is_empty() {
+            self.enqueue_bundle(chain_id, bundle)?;
         }
         if tail_due {
             self.raw_tails.insert(chain_id.to_owned(), Instant::now());
         }
         Ok(())
+    }
+
+    /// Store files as one tar archive named by its content digest.
+    fn enqueue_bundle(&mut self, chain_id: &str, files: Vec<(String, Vec<u8>)>) -> Result<(), String> {
+        let mut archive = tar::Builder::new(Vec::new());
+        let mut records = Vec::with_capacity(files.len());
+        for (relative, bytes) in &files {
+            let mut header = tar::Header::new_ustar();
+            header.set_size(bytes.len() as u64);
+            header.set_mode(0o644);
+            header.set_mtime(0);
+            archive
+                .append_data(&mut header, relative, bytes.as_slice())
+                .map_err(display)?;
+            records.push((format!("raw/{chain_id}/{relative}"), storage::digest(bytes), true));
+        }
+        let body = archive.into_inner().map_err(display)?;
+        let key = format!("raw/{chain_id}/bundles/{}.tar", &storage::digest(&body)[..32]);
+        self.enqueue(Upload {
+            key,
+            records,
+            body,
+            content_type: "application/x-tar",
+            encoding: None,
+            cache_control: NO_STORE,
+        })
     }
 
     fn push_runs(&mut self, runs: &[Value]) -> Result<(), String> {
@@ -435,9 +475,8 @@ impl<S: Sink> Publisher<S> {
             return Ok(());
         }
         self.enqueue(Upload {
+            records: vec![(key.clone(), digest, finished)],
             key,
-            digest,
-            finished,
             body: gzip(&body)?,
             content_type: JSON,
             encoding: Some("gzip"),
@@ -476,17 +515,17 @@ impl<S: Sink> Publisher<S> {
             return Err(error);
         }
         let transaction = self.ledger.unchecked_transaction().map_err(display)?;
-        for upload in &batch {
+        for (key, digest, finished) in batch.iter().flat_map(|upload| &upload.records) {
             transaction
                 .execute(
                     "INSERT INTO uploaded (key, digest) VALUES (?1, ?2)
                      ON CONFLICT(key) DO UPDATE SET digest = excluded.digest",
-                    params![upload.key, upload.digest],
+                    params![key, digest],
                 )
                 .map_err(display)?;
-            if upload.finished {
+            if *finished {
                 transaction
-                    .execute("INSERT OR IGNORE INTO finished (key) VALUES (?1)", params![upload.key])
+                    .execute("INSERT OR IGNORE INTO finished (key) VALUES (?1)", params![key])
                     .map_err(display)?;
             }
         }
@@ -758,7 +797,8 @@ mod tests {
             let recorded = sink.0.borrow();
             assert!(recorded.keys.contains(&"pub/runs/run-a/detail.json".to_owned()));
             assert!(recorded.keys.contains(&"raw/run-a/journal.jsonl".to_owned()));
-            assert!(recorded.keys.iter().any(|key| key.starts_with("raw/run-a/objects/")));
+            assert!(recorded.keys.iter().any(|key| key.starts_with("raw/run-a/bundles/")));
+            assert!(!recorded.keys.iter().any(|key| key.starts_with("raw/run-a/objects/")));
             assert_eq!(recorded.runs.len(), 1);
             assert_eq!(recorded.runs[0]["order"], json!(["run-a"]));
             assert_eq!(recorded.runs[0]["runs"][0]["score"], 1);

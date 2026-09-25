@@ -190,8 +190,10 @@ that changed it stores, under `pub/` in R2:
 Bodies are byte-identical to the local gateway's responses (both call the same
 projection functions) and stored gzip-encoded. Older catalog pages and closed
 attempts never change, so each is uploaded once; the open attempt's replay is
-refreshed at most every 15 seconds. The authority itself (sealed history,
-objects, index, and the tail every 10 minutes) is copied under `raw/<chain>/`.
+refreshed at most every 15 seconds. The authority itself is backed up under
+`raw/<chain>/`: sealed history and objects in content-named tar bundles
+(`bundles/<digest>.tar`, about 8 MiB each), the index and the open tail (every
+10 minutes) as individual files.
 
 After the bodies, it pushes changed run summaries (with score history) to
 `LiveHub`, then heartbeats every 10 seconds. The ledger is written only after
