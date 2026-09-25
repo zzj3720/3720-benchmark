@@ -1963,3 +1963,22 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
   .run-model small { white-space: normal; flex-wrap: wrap; row-gap: 2px; }
   .run-score { width: 42%; }
 }
+
+/* Family rows: the label sits in the middle of its band. */
+.run-table tr.run-table-family th,
+.overview-matrix tr.overview-family th { padding: 9px var(--space-md); vertical-align: middle; line-height: 1.2; }
+.overview-matrix tr.overview-family th { padding-inline: var(--space-lg); }
+
+/* One model at several thinking depths: a summary row, then indented runs. */
+.run-model-row .run-model small { color: var(--muted); }
+.run-model-row .run-score b { color: var(--muted); }
+.run-row.run-child .run-model { position: relative; padding-left: calc(var(--space-md) + 20px); }
+.run-row.run-child .run-model::before { content: ""; position: absolute; left: calc(var(--space-md) + 4px); top: 0; bottom: 50%; width: 10px; border-left: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.run-row.run-child .run-model button { font-weight: 500; }
+.run-table tr.run-model-row + tr.run-child td,
+.run-table tr.run-child + tr.run-child td { border-top-color: color-mix(in srgb, var(--line) 45%, transparent); }
+
+.model-list .model-heading { margin: var(--space-sm) var(--space-sm) 0; color: var(--foreground); font: 600 var(--text-sm)/1.2 var(--font-body); }
+.model-list .model-run.child { margin-left: var(--space-md); padding-left: var(--space-sm); border-left: 1px solid var(--line); border-radius: 0 var(--radius-control) var(--radius-control) 0; }
+
+.model-list .model-run.child { width: calc(100% - var(--space-md)); min-width: 0; box-sizing: border-box; }

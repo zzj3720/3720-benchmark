@@ -109,6 +109,24 @@ export function groupByFamily<T extends LabelledRun>(runs: T[]) {
     .sort((a, b) => Number(a.family === "其他") - Number(b.family === "其他") || Math.max(...b.runs.map(run => run.score)) - Math.max(...a.runs.map(run => run.score)));
 }
 
+/** Consecutive runs of one model (as `groupByFamily` orders them), e.g. its thinking depths. */
+export function groupByModel<T extends LabelledRun>(runs: T[]) {
+  const groups: { model: string; runs: T[] }[] = [];
+  for (const run of runs) {
+    const model = modelName(run.model), last = groups.at(-1);
+    if (last?.model === model) last.runs.push(run);
+    else groups.push({ model, runs: [run] });
+  }
+  return groups;
+}
+
+/** What tells a run apart inside its model's group: `max`, `xhigh · Codex`, or `默认`. */
+export function subLabel(run: LabelledRun, label: string | undefined) {
+  const model = modelName(run.model);
+  const rest = label?.startsWith(`${model} · `) ? label.slice(model.length + 3) : "";
+  return rest || "默认";
+}
+
 /** The harness driving the model, from the agent import path. */
 export function harnessName(agent = "") {
   const module = agent.split(":")[0].split(".").pop() ?? "";
