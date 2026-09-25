@@ -1,7 +1,8 @@
 import type { GameState } from "../game-observer";
 
 export type Rect = { x: number; y: number; width: number; height: number };
-export type Viewport = { width: number; height: number; compact: boolean };
+/** `cover` asks for the board alone at exactly width x height, for a level cover. */
+export type Viewport = { width: number; height: number; compact: boolean; cover?: boolean };
 type Common = { clip?: Rect; alpha?: number; sprite?: number };
 export type DrawCommand = Common & (
   | { kind: "rect"; x: number; y: number; width: number; height: number; color?: string; radius?: number; stroke?: string; strokeWidth?: number }

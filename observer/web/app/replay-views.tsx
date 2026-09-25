@@ -24,7 +24,7 @@ import {
 } from "./live-shared";
 import { modelName } from "./run-labels";
 import type { ReplayExportFormat } from "./replay-export";
-import { canvasExportSource, type CanvasExportSession } from "./webgl/export-source";
+import { COVER_HEIGHT, COVER_WIDTH, canvasExportSource, type CanvasExportSession } from "./webgl/export-source";
 
 export type LevelAttempt = { id: number; successful: boolean; score: number; status: string };
 export type LevelSample = { run: string; attempt: number };
@@ -70,49 +70,102 @@ type ThumbnailRequest = (sample: LevelSample) => Promise<string | null>;
 const ThumbnailContext = createContext<ThumbnailRequest | null>(null);
 const thumbnailCache = new Map<string, Promise<string | null>>();
 
+/** Covers baked ahead of time (`scripts/bake-covers.mjs`); cards render one only when this is missing. */
+function coverUrl(sample: LevelSample) {
+  return String(gatewayUrl(`/v1/covers/${encodeURIComponent(sample.run)}/${sample.attempt}`));
+}
+
 /**
- * Renders level previews with the game's own renderer. A hidden game view
- * provides the renderer; previews are drawn one at a time and cached.
+ * Trim the even margin around a rendered board and centre what is left in a
+ * 16:10 cover. The margin colour is the commonest colour along the edges.
+ */
+function cropCover(source: HTMLCanvasElement) {
+  const { width, height } = source;
+  const probe = document.createElement("canvas");
+  probe.width = width; probe.height = height;
+  const context = probe.getContext("2d", { willReadFrequently: true })!;
+  context.drawImage(source, 0, 0);
+  const { data } = context.getImageData(0, 0, width, height);
+  const counts = new Map<number, [number, number]>();
+  const edge = (x: number, y: number) => {
+    const i = (y * width + x) * 4, key = (data[i] >> 3) << 10 | (data[i + 1] >> 3) << 5 | (data[i + 2] >> 3);
+    const seen = counts.get(key);
+    counts.set(key, [(seen?.[0] ?? 0) + 1, seen?.[1] ?? i]);
+  };
+  for (let x = 0; x < width; x += 2) { edge(x, 0); edge(x, height - 1); }
+  for (let y = 0; y < height; y += 2) { edge(0, y); edge(width - 1, y); }
+  const [, [, sample]] = [...counts].sort((a, b) => b[1][0] - a[1][0])[0];
+  const background = [data[sample], data[sample + 1], data[sample + 2]];
+  let left = width, top = height, right = -1, bottom = -1;
+  for (let y = 0; y < height; y += 2) for (let x = 0; x < width; x += 2) {
+    const i = (y * width + x) * 4;
+    if (Math.abs(data[i] - background[0]) + Math.abs(data[i + 1] - background[1]) + Math.abs(data[i + 2] - background[2]) <= 24) continue;
+    left = Math.min(left, x); right = Math.max(right, x); top = Math.min(top, y); bottom = Math.max(bottom, y);
+  }
+  if (right < 0) { left = 0; top = 0; right = width - 1; bottom = height - 1; }
+  const pad = 0.05 * Math.max(right - left, bottom - top);
+  const boxWidth = right - left + 2 * pad, boxHeight = bottom - top + 2 * pad;
+  const cropWidth = Math.max(boxWidth, boxHeight * COVER_WIDTH / COVER_HEIGHT), cropHeight = cropWidth * COVER_HEIGHT / COVER_WIDTH;
+  const centreX = (left + right) / 2, centreY = (top + bottom) / 2;
+  const output = document.createElement("canvas");
+  output.width = COVER_WIDTH; output.height = COVER_HEIGHT;
+  const target = output.getContext("2d")!;
+  target.fillStyle = `rgb(${background.join(",")})`;
+  target.fillRect(0, 0, COVER_WIDTH, COVER_HEIGHT);
+  target.imageSmoothingQuality = "high";
+  target.drawImage(source, centreX - cropWidth / 2, centreY - cropHeight / 2, cropWidth, cropHeight, 0, 0, COVER_WIDTH, COVER_HEIGHT);
+  return output.toDataURL("image/webp", 0.85);
+}
+
+/**
+ * Renders level covers with the game's own renderer, for covers not baked
+ * yet. The hidden game view that provides the renderer is only mounted once a
+ * cover is actually needed; covers are drawn one at a time and cached.
  */
 export function ThumbnailProvider({ game, baseRun, children }: { game: GameId; baseRun: string | undefined; children: React.ReactNode }) {
   const stage = useRef<HTMLDivElement>(null);
   const queue = useRef<Promise<unknown>>(Promise.resolve());
+  const [needed, setNeeded] = useState(false);
   const [base, setBase] = useState<RunDetail | null>(null);
-  const [ready, setReady] = useState(false);
+  const ready = useRef<{ promise: Promise<boolean>; resolve: (ok: boolean) => void } | null>(null);
+  if (!ready.current) {
+    let resolve: (ok: boolean) => void = () => {};
+    ready.current = { promise: new Promise<boolean>(done => { resolve = done; }), resolve };
+  }
   useEffect(() => {
-    if (!baseRun) return;
+    if (!needed || !baseRun) return;
     let current = true;
-    fetchRunDetail(baseRun).then(detail => { if (current) setBase(detail); }).catch(() => {});
+    fetchRunDetail(baseRun).then(detail => { if (current) setBase(detail); }).catch(() => ready.current?.resolve(false));
     return () => { current = false; };
-  }, [baseRun]);
-  // Previews are requested only once the hidden game view has a renderer.
+  }, [needed, baseRun]);
   useEffect(() => {
     if (!base) return;
-    let current = true;
     void waitFor(() => stage.current ? canvasExportSource(stage.current) : undefined, 20_000)
-      .then(renderer => { if (current && renderer) setReady(true); });
-    return () => { current = false; };
+      .then(renderer => ready.current?.resolve(Boolean(renderer)));
   }, [base]);
 
   const request = useCallback<ThumbnailRequest>((sample) => {
     const key = `${game}:${sample.run}:${sample.attempt}`;
     let pending = thumbnailCache.get(key);
     if (!pending) {
+      setNeeded(true);
       // Data loads in parallel; drawing takes turns on the one renderer.
       const data = Promise.all([
         fetchJson<LoadedAttemptReplay>(`/v1/runs/${encodeURIComponent(sample.run)}?replay_attempt=${sample.attempt}&preview=1&v=${REPLAY_VERSION}`),
         fetchRunDetail(sample.run),
       ]);
-      pending = queue.current.then(async () => {
+      // Wait for the renderer, then for the cover queued before this one.
+      const previous = queue.current;
+      pending = ready.current!.promise.then(ok => ok ? previous : Promise.reject(new Error("no renderer"))).then(async () => {
         const renderer = stage.current ? canvasExportSource(stage.current) : undefined;
         if (!renderer) return null;
         const [replay, detail] = await data;
         const first = replay.frames[0];
         if (!first) return null;
         const frame = { state: resolveGameFrameState(game, first.event.state ?? {}, detail.state ?? {}), previous: null };
-        const session = await renderer.createSession([frame], 640, 400, 640 * 400);
+        const session = await renderer.createSession([frame], COVER_WIDTH, COVER_HEIGHT, COVER_WIDTH * COVER_HEIGHT, { cover: true });
         try {
-          return session.capture(frame).toDataURL("image/webp", 0.82);
+          return cropCover(session.capture(frame));
         } finally {
           session.dispose();
         }
@@ -126,7 +179,7 @@ export function ThumbnailProvider({ game, baseRun, children }: { game: GameId; b
   }, [game]);
 
   return (
-    <ThumbnailContext.Provider value={ready ? request : null}>
+    <ThumbnailContext.Provider value={request}>
       {children}
       {base && (
         <div className="thumb-stage" ref={stage} aria-hidden="true">
@@ -135,6 +188,35 @@ export function ThumbnailProvider({ game, baseRun, children }: { game: GameId; b
       )}
     </ThumbnailContext.Provider>
   );
+}
+
+/**
+ * `?bake=covers`: the page `scripts/bake-covers.mjs` drives. It exposes
+ * `window.bakeCover(game, run, attempt)`, which renders one cover and
+ * returns it as a WebP data URL (or null).
+ */
+export function CoverBakery() {
+  const [target, setTarget] = useState<{ game: GameId; run: string } | null>(null);
+  const bridge = useRef<{ game: GameId; request: ThumbnailRequest } | null>(null);
+  useEffect(() => {
+    (window as unknown as { bakeCover?: unknown }).bakeCover = async (game: GameId, run: string, attempt: number) => {
+      if (bridge.current?.game !== game) {
+        bridge.current = null;
+        setTarget({ game, run });
+        await waitFor(() => bridge.current?.game === game ? true : undefined, 30_000);
+      }
+      return bridge.current ? bridge.current.request({ run, attempt }) : null;
+    };
+  }, []);
+  return target
+    ? <ThumbnailProvider key={target.game} game={target.game} baseRun={target.run}><BakeBridge game={target.game} bridge={bridge} /></ThumbnailProvider>
+    : <p>cover bakery</p>;
+}
+
+function BakeBridge({ game, bridge }: { game: GameId; bridge: React.RefObject<{ game: GameId; request: ThumbnailRequest } | null> }) {
+  const request = useContext(ThumbnailContext);
+  useEffect(() => { if (request) bridge.current = { game, request }; }, [game, request, bridge]);
+  return null;
 }
 
 async function waitFor<T>(probe: () => T | undefined, timeoutMs = 8000): Promise<T | undefined> {
@@ -149,22 +231,31 @@ async function waitFor<T>(probe: () => T | undefined, timeoutMs = 8000): Promise
 function LevelThumbnail({ sample, label }: { sample: LevelSample | null; label: string }) {
   const request = useContext(ThumbnailContext);
   const holder = useRef<HTMLDivElement>(null);
-  const [url, setUrl] = useState<string | null>(null);
+  // A baked cover first; a rendered one only when there is none.
+  const [source, setSource] = useState<"waiting" | "baked" | "render">("waiting");
+  const [rendered, setRendered] = useState<string | null>(null);
   useEffect(() => {
     const element = holder.current;
-    if (!element || !sample || !request) return;
-    let current = true;
+    if (!element || !sample) return;
     const observer = new IntersectionObserver(entries => {
       if (!entries.some(entry => entry.isIntersecting)) return;
       observer.disconnect();
-      void request(sample).then(value => { if (current) setUrl(value); });
+      setSource("baked");
     }, { rootMargin: "200px" });
     observer.observe(element);
-    return () => { current = false; observer.disconnect(); };
-  }, [request, sample]);
+    return () => observer.disconnect();
+  }, [sample]);
+  useEffect(() => {
+    if (source !== "render" || !sample || !request) return;
+    let current = true;
+    void request(sample).then(value => { if (current) setRendered(value); });
+    return () => { current = false; };
+  }, [source, sample, request]);
   return (
     <div className="level-thumb" ref={holder}>
-      {url ? <img src={url} alt="" /> : <span>{label}</span>}
+      <span>{label}</span>
+      {sample && source === "baked" && <img src={coverUrl(sample)} alt="" loading="lazy" decoding="async" onError={() => setSource("render")} />}
+      {source === "render" && rendered && <img src={rendered} alt="" />}
     </div>
   );
 }

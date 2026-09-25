@@ -41,6 +41,12 @@ export async function handleLive(request: Request, env: LiveEnv, ctx: Background
     if (!ASSET_ID.test(asset[1])) return error(400, "invalid asset id");
     return body(env, request, `pub/assets/${asset[1]}`, "unknown asset");
   }
+  // Covers are baked by scripts/bake-covers.mjs; a missing one is a 404 and the page renders it.
+  const cover = /^v1\/covers\/([^/]+)\/(\d+)$/.exec(path);
+  if (cover) {
+    if (!SAFE_ID.test(cover[1])) return error(400, "invalid run id");
+    return body(env, request, `pub/covers/${cover[1]}/${cover[2]}.webp`, "no cover yet");
+  }
   const levels = /^v1\/games\/([^/]+)\/levels(?:\/([^/]+))?$/.exec(path);
   if (levels) {
     const [, game, key] = levels;

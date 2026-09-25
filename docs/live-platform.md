@@ -186,6 +186,7 @@ that changed it stores, under `pub/` in R2:
 | `pub/runs/<run>/attempts/<attempt>.json` | `?replay_attempt=<attempt>` | immutable once the attempt closes |
 | `pub/runs/<run>/attempts/<attempt>.preview.json` | `…&preview=1` (first frame only, for thumbnails) | as above |
 | `pub/assets/<sha256>` | `GET /v1/assets/<sha256>` | immutable |
+| `pub/covers/<run>/<attempt>.webp` | `GET /v1/covers/<run>/<attempt>` (baked, see below) | immutable |
 
 Bodies are byte-identical to the local gateway's responses (both call the same
 projection functions) and stored gzip-encoded. Older catalog pages and closed
@@ -226,6 +227,7 @@ GET /api/live/v1/runs/<id>
 GET /api/live/v1/runs/<id>?catalog_before=<attempt-id>
 GET /api/live/v1/runs/<id>?replay_attempt=<attempt-id>[&preview=1]
 GET /api/live/v1/assets/<sha256>
+GET /api/live/v1/covers/<run>/<attempt>
 GET /api/live/v1/subscribe?protocol=2[&run_id=<id>]
 ```
 
@@ -270,6 +272,24 @@ observer/runtime/scripts/install_publisher.sh https://live.benchmark.3720.org ~/
 
 Roll the Worker back with `npx wrangler rollback`. The R2 bodies and `LiveHub`
 state are unaffected by Worker versions.
+
+## Level covers
+
+Level cards (the replay library and the shelf under a run's live view) show
+the first frame of an attempt as a 640x400 WebP cover. Rendering these in the
+viewer's browser took seconds per page, most of all for Sausage's 3D scenes, so
+they are baked once: `observer/web/scripts/bake-covers.mjs` collects every
+card's attempt from the public API, renders the covers missing from R2 in
+headless Chrome through the console's own `?bake=covers` page, and uploads them
+through the ingest endpoint as `pub/covers/<run>/<attempt>.webp`. An attempt's
+first frame never changes, so a cover is baked once and kept.
+`observer/web/scripts/install_cover_baker.sh <site> <token-file>` runs it every
+15 minutes as a LaunchAgent. A card whose cover is not baked yet renders it in
+the browser, the same way.
+
+Covers use the renderers' cover mode (`createSession(..., { cover: true })`,
+`Viewport.cover`): the board alone at cover size, without headers, side panels
+or the Sausage HUD. The result is trimmed to its content and centred in 16:10.
 
 ## WebGL scenes and direct replay export
 

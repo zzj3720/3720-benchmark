@@ -19,7 +19,7 @@ import type { RunSummary, RunDetail, ElapsedScorePoint } from "./live-contract";
 import { LiveResource, applySubscription, effectiveDuration } from "./live-client";
 import { harnessName, modelFamily, modelName, rankRuns, runLabels, seriesColors, viewerStatus } from "./run-labels";
 import { clockTime, durationLabel, gatewayUrl, hydrateRunAssets } from "./live-shared";
-import { GameTabs, LevelWatch, ReplayLibrary, RunReplayShelf, type LevelSample } from "./replay-views";
+import { CoverBakery, GameTabs, LevelWatch, ReplayLibrary, RunReplayShelf, type LevelSample } from "./replay-views";
 import { Overview } from "./overview";
 
 
@@ -99,6 +99,13 @@ function reuseUnchangedState(previous: RunDetail | null, next: RunDetail): RunDe
 }
 
 export default function Home() {
+  // `?bake=covers` is the page the cover baker drives, not the console.
+  const [bake, setBake] = useState(false);
+  useEffect(() => { setBake(new URL(window.location.href).searchParams.get("bake") === "covers"); }, []);
+  return bake ? <CoverBakery /> : <Console />;
+}
+
+function Console() {
   const [runs, setRuns] = useState<RunSummary[]>([]);
   const [selectedGame, setSelectedGame] = useState<GameId>(GAME_IDS[0]);
   const [selectedId, setSelectedId] = useState<string | null>(null);

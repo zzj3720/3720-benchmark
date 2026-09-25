@@ -2,7 +2,10 @@ import type { GameState } from "../game-observer";
 
 export type ExportFrame = { state: GameState; previous?: GameState | null };
 export type CanvasExportSession = { capture(frame: ExportFrame): HTMLCanvasElement; dispose(): void };
-export type CanvasExportSource = { createSession(frames: ExportFrame[], maxWidth: number, maxHeight: number, pixelBudget: number): Promise<CanvasExportSession> };
+/** `cover` asks for a 640x400 still of the board alone: no headers, side panels or overlays. */
+export type ExportOptions = { cover?: boolean };
+export const COVER_WIDTH = 640, COVER_HEIGHT = 400;
+export type CanvasExportSource = { createSession(frames: ExportFrame[], maxWidth: number, maxHeight: number, pixelBudget: number, options?: ExportOptions): Promise<CanvasExportSession> };
 const sources = new WeakMap<HTMLCanvasElement, CanvasExportSource>();
 export function registerCanvasExport(canvas: HTMLCanvasElement, source: CanvasExportSource) {
   sources.set(canvas, source);

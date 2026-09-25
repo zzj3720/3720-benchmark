@@ -6,17 +6,19 @@ export function tileBoardScene(kind: "sokoban" | "minesweeper", state: GameState
   const mines = kind === "minesweeper", accent = mines ? "#56d6c4" : "#f0b44d";
   const board = rec(state.board), level = rec(state.level), campaign = rec(state.campaign);
   const map = strings(board?.map), cols = Math.max(1, num(board?.width, map[0]?.length ?? 1)), rows = Math.max(1, map.length);
-  const tiers = records(state.tiers), wide = view.width >= 680, aside = wide && tiers.length ? 220 : 0;
+  // A cover is the board alone, as large as the view allows.
+  const cover = view.cover === true;
+  const tiers = cover ? [] : records(state.tiers), wide = view.width >= 680, aside = wide && tiers.length ? 220 : 0;
   // The board takes the tile size that fits the width and a share of the
   // window height, and the area shrinks to it so no band is left empty.
-  const areaWidth = view.width - aside - 32, maxHeight = Math.max(240, Math.min(600, view.height * (wide ? .55 : .42)));
-  const tile = Math.min(mines ? 44 : 40, (areaWidth - 20) / cols, (maxHeight - 20) / rows);
-  const boardArea = { x: 16, y: 60, width: areaWidth, height: map.length ? rows * tile + 20 : 240 };
+  const areaWidth = view.width - aside - 32, maxHeight = cover ? view.height - 12 : Math.max(240, Math.min(600, view.height * (wide ? .55 : .42)));
+  const tile = Math.min(cover ? Infinity : mines ? 44 : 40, (areaWidth - 20) / cols, (maxHeight - 20) / rows);
+  const boardArea = cover ? { x: 16, y: 6, width: areaWidth, height: view.height - 12 } : { x: 16, y: 60, width: areaWidth, height: map.length ? rows * tile + 20 : 240 };
   const left = boardArea.x + (boardArea.width - cols * tile) / 2, top = boardArea.y + (boardArea.height - rows * tile) / 2;
   const p = new Painter(view.width, mines ? "#09100f" : "#0b0d0d");
-  p.rect(0, 0, view.width, 46, "#111d1b");
-  p.text(16, 10, `${str(level?.id, "等待关卡")}  ${num(campaign?.score)}/${num(campaign?.max_score)}`, 13, accent, true);
-  p.text(view.width - 16, 29, mines ? `${str(board?.status, "READY").toUpperCase()} · SAFE ${num(board?.remaining_safe)}` : `MOVE ${num(board?.moves)} · PUSH ${num(board?.pushes)}`, 11, "#9aafa5", false, "right");
+  if (!cover) p.rect(0, 0, view.width, 46, "#111d1b");
+  if (!cover) p.text(16, 10, `${str(level?.id, "等待关卡")}  ${num(campaign?.score)}/${num(campaign?.max_score)}`, 13, accent, true);
+  if (!cover) p.text(view.width - 16, 29, mines ? `${str(board?.status, "READY").toUpperCase()} · SAFE ${num(board?.remaining_safe)}` : `MOVE ${num(board?.moves)} · PUSH ${num(board?.pushes)}`, 11, "#9aafa5", false, "right");
   if (!map.length) p.text(boardArea.x + boardArea.width / 2, top + 80, "等待棋盘状态", 14, "#91a69c", false, "center");
   if (map.length) p.rect(left - 1, top - 1, cols * tile + 2, rows * tile + 2, "#394943");
   for (let row = 0; row < map.length; row++) for (let col = 0; col < cols; col++) {
@@ -49,6 +51,7 @@ export function tileBoardScene(kind: "sokoban" | "minesweeper", state: GameState
     p.bar(tierX, tierY + 38, tierWidth, num(tier.solved) / Math.max(1, num(mines ? tier.wins_required : tier.total)), accent, 3);
     tierY += 54;
   }
+  if (cover) return p.finish(view.height, `${mines ? "Minesweeper" : "Sokoban"} ${str(level?.title)}`, `${kind}:${str(level?.id)}:cover`);
   const bottom = Math.max(boardArea.y + boardArea.height, tierY) + 14;
   if (mines) p.text(16, bottom, `NO-GUESS VERIFIED · ${num(rec(state.guarantee)?.safe_radius, 1) === 1 ? "3×3 FIRST-CLICK SAFE" : "FIRST CLICK SAFE"}`, 10, accent);
   return p.finish(bottom + (mines ? 30 : 4), `${mines ? "Minesweeper" : "Sokoban"} ${str(level?.title)}，${cols} 列 ${rows} 行，得分 ${num(campaign?.score)}`, `${kind}:${str(level?.id)}:${cols}x${rows}`);

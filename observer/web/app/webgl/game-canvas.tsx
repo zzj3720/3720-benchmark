@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { GameState } from "../game-observer";
 import type { GameScene, Rect, SceneBuilder, Viewport } from "./scene";
 import type { WebGLSurface } from "./runtime";
-import { exportScale, registerCanvasExport } from "./export-source";
+import { COVER_HEIGHT, COVER_WIDTH, exportScale, registerCanvasExport } from "./export-source";
 import { easeInOut, lerpRect, pairSprites, placeSprites, sameRect } from "./motion";
 
 /** Longest tween; faster replays shorten it to fit between frames. */
@@ -75,8 +75,8 @@ export function GameCanvas({ state, previousState, build, label }: { state: Game
       if (disposed) { surface.destroy(); return; }
       rendererRef.current = surface;
       unregister = registerCanvasExport(canvas, {
-        async createSession(frames, maxWidth, maxHeight, pixelBudget) {
-          const view = viewport(), builder = latest.current.build;
+        async createSession(frames, maxWidth, maxHeight, pixelBudget, options) {
+          const view = options?.cover ? { width: COVER_WIDTH, height: COVER_HEIGHT, compact: false, cover: true } : viewport(), builder = latest.current.build;
           let height = 1;
           for (const frame of frames) height = Math.max(height, builder(frame.state, view, frame.previous).height);
           const scale = exportScale(view.width, height, frames.length, maxWidth, maxHeight, pixelBudget);

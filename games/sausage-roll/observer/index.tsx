@@ -8,7 +8,7 @@ import {
   type GameState,
   type ObserverEvent,
 } from "../../../observer/web/app/game-observer";
-import { exportScale, registerCanvasExport } from "../../../observer/web/app/webgl/export-source";
+import { COVER_HEIGHT, COVER_WIDTH, exportScale, registerCanvasExport } from "../../../observer/web/app/webgl/export-source";
 import type { SausageScene as SausageSceneRuntime } from "./scene";
 import { readSceneState } from "./scene-state";
 
@@ -33,15 +33,17 @@ export function SausageState({ state }: { state: GameState }) {
       runtimeRef.current = runtime;
       runtime.update(readSceneState(latestRef.current), latestRef.current);
       unregister = registerCanvasExport(canvas, {
-        async createSession(frames, maxWidth, maxHeight, pixelBudget) {
-          const width = canvas.clientWidth, height = canvas.clientHeight;
+        async createSession(frames, maxWidth, maxHeight, pixelBudget, options) {
+          // A cover is the scene alone at cover size, framed on the player, without the HUD.
+          const cover = options?.cover === true;
+          const width = cover ? COVER_WIDTH : canvas.clientWidth, height = cover ? COVER_HEIGHT : canvas.clientHeight;
           const output = document.createElement("canvas");
-          const renderer = new SausageScene(output, { width, height, resolution: exportScale(width, height, frames.length, maxWidth, maxHeight, pixelBudget) });
-          try { await renderer.initializeOverlay(); } catch (error) { renderer.destroy(); throw error; }
+          const renderer = new SausageScene(output, { width, height, hud: !cover, resolution: cover ? 1 : exportScale(width, height, frames.length, maxWidth, maxHeight, pixelBudget) });
+          if (!cover) try { await renderer.initializeOverlay(); } catch (error) { renderer.destroy(); throw error; }
           let first = true;
           return { capture(frame) {
             renderer.update(readSceneState(frame.state), frame.state);
-            if (first && runtimeRef.current) { renderer.copyViewFrom(runtimeRef.current); first = false; }
+            if (first && runtimeRef.current && !cover) { renderer.copyViewFrom(runtimeRef.current); first = false; }
             renderer.prepareExportFrame();
             return output;
           }, dispose() { renderer.destroy(); } };

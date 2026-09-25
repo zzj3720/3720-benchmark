@@ -19,8 +19,11 @@ export const buildOperatorScene: SceneBuilder = (state, view) => {
   const statCols = view.width < 520 ? 3 : 5, statWidth = view.width / statCols, header = Math.ceil(stats.length / statCols) * 48;
   p.rect(0, 0, view.width, header, "#11201f");
   stats.forEach(([label, value], i) => { const x = (i % statCols) * statWidth + 12, y = Math.floor(i / statCols) * 48 + 8; p.text(x, y, label, 10, "#829d92"); p.text(x, y + 17, short(value, statWidth - 24, 12), 12, "#d7e8df", true); p.hit({ x, y, width: statWidth - 20, height: 36 }, `${label}: ${value}`); });
-  const wide = view.width >= 680, mapWidth = wide ? Math.floor(view.width * .58) - 24 : view.width - 32;
-  const map = { x: 16, y: header + 16, width: mapWidth, height: Math.max(260, Math.min(390, mapWidth * .7)) };
+  // A cover is the stats and the dispatch map alone, filling the view.
+  const wide = view.width >= 680 && !view.cover, mapWidth = wide ? Math.floor(view.width * .58) - 24 : view.width - 32;
+  const map = view.cover
+    ? { x: 16, y: header + 12, width: mapWidth, height: view.height - header - 24 }
+    : { x: 16, y: header + 16, width: mapWidth, height: Math.max(260, Math.min(390, mapWidth * .7)) };
   p.panel(map.x, map.y, map.width, map.height, str(duty?.city, "Dispatch"));
   const grid = { x: map.x + 28, y: map.y + 38, width: map.width - 48, height: map.height - 66 };
   for (let i = 0; i <= 16; i++) { const x = grid.x + grid.width * i / 16, y = grid.y + grid.height * i / 16; p.line([x, grid.y, x, grid.y + grid.height], i % 4 ? "#1b302d" : "#30473f"); p.line([grid.x, y, grid.x + grid.width, y], i % 4 ? "#1b302d" : "#30473f"); }
@@ -42,6 +45,7 @@ export const buildOperatorScene: SceneBuilder = (state, view) => {
       p.hit({ x: at.x - 9, y: at.y - 9, width: 18, height: 18 }, `${str(unit.label)} · ${str(unit.status)}${unit.eta_ms != null ? ` · ETA ${clock(num(unit.eta_ms))}` : ""}`);
     });
   });
+  if (view.cover) return p.finish(view.height, `Operator ${str(duty?.city)}`, "operator:cover");
   let y = map.y + map.height + 16;
   const sideX = wide ? map.x + map.width + 16 : 16, sideWidth = view.width - sideX - 16;
   const drawUnits = (x: number, top: number, width: number) => {

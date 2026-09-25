@@ -390,7 +390,7 @@ export class SausageScene {
   /** Whether the last "player" framing found the player to centre on. */
   private anchored = false;
 
-  constructor(private readonly canvas: HTMLCanvasElement, private readonly fixed?: { width: number; height: number; resolution: number }) {
+  constructor(private readonly canvas: HTMLCanvasElement, private readonly fixed?: { width: number; height: number; resolution: number; hud?: boolean }) {
     this.renderer = new THREE.WebGLRenderer({ canvas, stencil: true, preserveDrawingBuffer: true, antialias: true, powerPreference: "high-performance" });
     this.renderer.setPixelRatio(fixed?.resolution ?? Math.min(window.devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -681,8 +681,10 @@ export class SausageScene {
   }
 
   private render() {
-    const hud = this.state ? sausageHud(this.rawState, this.state, this.width, this.height) : null;
-    const bottom = hud?.footer ?? 28, fieldHeight = Math.max(1, this.height - 66 - bottom);
+    // Without the HUD (a cover) the scene takes the whole canvas.
+    const withHud = this.fixed?.hud !== false;
+    const hud = this.state && withHud ? sausageHud(this.rawState, this.state, this.width, this.height) : null;
+    const bottom = withHud ? hud?.footer ?? 28 : 0, fieldHeight = Math.max(1, this.height - (withHud ? 66 : 0) - bottom);
     this.camera.aspect = this.width / fieldHeight;
     this.camera.updateProjectionMatrix();
     this.renderer.resetState();

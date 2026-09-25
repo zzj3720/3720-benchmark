@@ -7,7 +7,7 @@ const mapRows = (value: Json | undefined) => Array.isArray(value) ? value.map(ro
 const wall = (value: Json | undefined) => ["#", "!"].includes(str(value, " "));
 
 export const buildParaboxScene: SceneBuilder = (state, view) => {
-  const focusSize = Math.max(80, Math.min(view.width - 32, view.height * (view.compact ? .32 : .36), view.compact ? 340 : 400));
+  const focusSize = view.cover ? Math.min(view.width, view.height) - 32 : Math.max(80, Math.min(view.width - 32, view.height * (view.compact ? .32 : .36), view.compact ? 340 : 400));
   const height = focusSize + 32, p = new Painter(view.width, "#081827");
   const focusRect = { x: (view.width - focusSize) / 2, y: 16, width: focusSize, height: focusSize };
   const raw = rec(state.observer_scene), spaces = new Map<number, GameState>();
