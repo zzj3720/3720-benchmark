@@ -78,8 +78,10 @@ export const buildParaboxScene: SceneBuilder = (state, view) => {
           else p.rect(x + tile * inset, y + tile * inset, tile * (1 - inset * 2), tile * (1 - inset * 2), undefined, 0, "#88c7ed", stroke, .82);
         }
         if (subspace === skipSubspace && skipSubspace >= 0) continue;
-        if (kind === "player" || (old && ["@", "P"].includes(symbol))) player(x, y, tile, rgb(block?.color, "#e74678"), depth > 0);
-        else if (kind === "box" || (old && (/^\d$/.test(symbol) || symbol === "X"))) {
+        // Pieces of the drawn level move; the contents of boxes move with their box.
+        const piece = (key: string, draw: () => void) => depth ? draw() : p.sprite(`${id}:${key}`, cell, draw);
+        if (kind === "player" || (old && ["@", "P"].includes(symbol))) piece("player", () => player(x, y, tile, rgb(block?.color, "#e74678"), depth > 0));
+        else if (kind === "box" || (old && (/^\d$/.test(symbol) || symbol === "X"))) piece(`box:${num(block?.definition_id, Number(symbol) || 0)}:${subspace}`, () => {
           const definition = num(block?.definition_id, Number(symbol) || 0), color = rgb(block?.color, BOX_COLORS[((definition % BOX_COLORS.length) + BOX_COLORS.length) % BOX_COLORS.length]);
           const child = spaces.get(subspace), childSpan = Math.max(num(child?.width, 1), num(child?.height, 1));
           if (!old && child && depth < 12 && tile / childSpan >= focusSize / 512) drawSpace(subspace, cell, depth + 1, flip !== (block?.flip_h === true), visible);
@@ -87,7 +89,8 @@ export const buildParaboxScene: SceneBuilder = (state, view) => {
             p.rect(x, y, tile, tile, old ? mix(color, "#526170", .72) : color);
             if (old && tile > 24) { p.rect(x + tile * .23, y + tile * .23, tile * .54, tile * .54, mix(color, "#173653", .67)); p.text(x + tile / 2, y + tile * .4, "未记录", Math.min(9, tile * .16), "#10253a", true, "center"); }
           }
-        } else if ([".", "+"].includes(symbol)) { p.circle(x + tile / 2, y + tile / 2, tile * .14, "#6ec6ff", undefined, 0, .12); p.circle(x + tile / 2, y + tile / 2, tile * .065, "#9bd8ff"); }
+        });
+        else if ([".", "+"].includes(symbol)) { p.circle(x + tile / 2, y + tile / 2, tile * .14, "#6ec6ff", undefined, 0, .12); p.circle(x + tile / 2, y + tile / 2, tile * .065, "#9bd8ff"); }
       }
     });
   };
@@ -104,5 +107,5 @@ export const buildParaboxScene: SceneBuilder = (state, view) => {
     p.rect(8, 4, Math.min(view.width - 16, 320), 20, "#2d2007", 2, "#9f7920");
     p.text(14, 7, "旧记录：盒内与外层场景未记录", 10, "#ffe6a3");
   }
-  return p.finish(height, `Parabox ${str(rec(state.level)?.reference, "")}，${recursive ? "递归空间" : "历史当前空间"}`);
+  return p.finish(height, `Parabox ${str(rec(state.level)?.reference, "")}，${recursive ? "递归空间" : "历史当前空间"}`, `${str(rec(state.level)?.reference, "")}:${recursive ? focusId : "legacy"}:${raw?.camera_flip_h === true}`);
 };

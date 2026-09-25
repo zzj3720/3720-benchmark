@@ -2,7 +2,7 @@ import type { GameState } from "../game-observer";
 
 export type Rect = { x: number; y: number; width: number; height: number };
 export type Viewport = { width: number; height: number; compact: boolean };
-type Common = { clip?: Rect; alpha?: number };
+type Common = { clip?: Rect; alpha?: number; sprite?: number };
 export type DrawCommand = Common & (
   | { kind: "rect"; x: number; y: number; width: number; height: number; color?: string; radius?: number; stroke?: string; strokeWidth?: number }
   | { kind: "circle"; x: number; y: number; radius: number; color?: string; stroke?: string; strokeWidth?: number }
@@ -10,7 +10,10 @@ export type DrawCommand = Common & (
   | { kind: "polygon"; points: number[]; color: string; stroke?: string; strokeWidth?: number }
   | { kind: "text"; x: number; y: number; text: string; color: string; size: number; bold?: boolean; align?: "left" | "center" | "right" }
 );
-export type GameScene = { width: number; height: number; background: string; description: string; commands: DrawCommand[]; hits: { bounds: Rect; text: string }[] };
+/** Something that moves between frames: its commands follow `bounds` when the view tweens. `key` names it across frames; several sprites may share a key (every box), and are then paired by distance. */
+export type Sprite = { key: string; bounds: Rect };
+/** `continuity` names the space the sprites live in; frames tween only while it stays the same. */
+export type GameScene = { width: number; height: number; background: string; description: string; commands: DrawCommand[]; hits: { bounds: Rect; text: string }[]; sprites: Sprite[]; continuity: string };
 export type SceneBuilder = (state: GameState, viewport: Viewport, previous?: GameState | null) => GameScene;
 
 export function intersect(a: Rect, b: Rect): Rect {
@@ -21,14 +24,22 @@ export function intersect(a: Rect, b: Rect): Rect {
 export class Painter {
   readonly commands: DrawCommand[] = [];
   readonly hits: { bounds: Rect; text: string }[] = [];
+  readonly sprites: Sprite[] = [];
   private clip?: Rect;
+  private current = -1;
   constructor(readonly width: number, readonly background = "#0d1515") {}
   private add(command: DrawCommand) {
     if (this.commands.length >= 50_000) throw new Error("场景超出绘制预算");
     if (this.clip && (!this.clip.width || !this.clip.height)) return;
-    this.commands.push({ ...command, clip: this.clip });
+    this.commands.push({ ...command, clip: this.clip, sprite: this.current >= 0 ? this.current : undefined });
   }
   hit(bounds: Rect, text: string) { this.hits.push({ bounds: this.clip ? intersect(this.clip, bounds) : bounds, text }); }
+  /** Draw something that moves; a sprite drawn inside another stays part of the outer one. */
+  sprite(key: string, bounds: Rect, draw: () => void) {
+    if (this.current >= 0) { draw(); return; }
+    this.current = this.sprites.push({ key, bounds }) - 1;
+    try { draw(); } finally { this.current = -1; }
+  }
   clipped(rect: Rect, draw: () => void) {
     const before = this.clip;
     this.clip = before ? intersect(before, rect) : rect;
@@ -60,7 +71,7 @@ export class Painter {
     this.rect(x, y, width, height, "#293731", 2);
     this.rect(x, y, width * Math.max(0, Math.min(1, fraction)), height, color, 2);
   }
-  finish(height: number, description: string): GameScene { return { width: this.width, height: Math.max(1, Math.ceil(height)), background: this.background, description, commands: this.commands, hits: this.hits }; }
+  finish(height: number, description: string, continuity = ""): GameScene { return { width: this.width, height: Math.max(1, Math.ceil(height)), background: this.background, description, commands: this.commands, hits: this.hits, sprites: this.sprites, continuity }; }
 }
 
 /** Greedy wrap that keeps Latin words whole; wide characters count double and break anywhere. */

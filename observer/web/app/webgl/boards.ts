@@ -32,8 +32,9 @@ export function tileBoardScene(kind: "sokoban" | "minesweeper", state: GameState
       p.rect(x + .5, y + .5, tile - 1, tile - 1, symbol === "#" ? "#55534d" : "#191b1a");
       if (symbol === "#") p.line([x + 1, y + tile - 1, x + tile - 1, y + 1], "#68655e", Math.max(1, tile * .04));
       if ([".", "*", "+"].includes(symbol)) p.circle(x + tile / 2, y + tile / 2, tile * .18, undefined, accent, 2);
-      if (["$", "*"].includes(symbol)) { const color = symbol === "*" ? "#d6f05c" : accent; p.rect(x + tile * .13, y + tile * .13, tile * .74, tile * .74, color, 1, "#a97c31", 2); p.line([x + tile * .23, y + tile * .23, x + tile * .77, y + tile * .77], "#8d672d", 1.5); }
-      if (["@", "+"].includes(symbol)) p.circle(x + tile / 2, y + tile / 2, tile * .3, "#58a7d8", "#bce3ff", Math.max(1, tile * .05));
+      const cell = { x, y, width: tile, height: tile };
+      if (["$", "*"].includes(symbol)) p.sprite("box", cell, () => { const color = symbol === "*" ? "#d6f05c" : accent; p.rect(x + tile * .13, y + tile * .13, tile * .74, tile * .74, color, 1, "#a97c31", 2); p.line([x + tile * .23, y + tile * .23, x + tile * .77, y + tile * .77], "#8d672d", 1.5); });
+      if (["@", "+"].includes(symbol)) p.sprite("player", cell, () => p.circle(x + tile / 2, y + tile / 2, tile * .3, "#58a7d8", "#bce3ff", Math.max(1, tile * .05)));
     }
   }
   let tierY = wide ? 62 : boardArea.y + boardArea.height + 18;
@@ -50,5 +51,5 @@ export function tileBoardScene(kind: "sokoban" | "minesweeper", state: GameState
   }
   const bottom = Math.max(boardArea.y + boardArea.height, tierY) + 14;
   if (mines) p.text(16, bottom, `NO-GUESS VERIFIED · ${num(rec(state.guarantee)?.safe_radius, 1) === 1 ? "3×3 FIRST-CLICK SAFE" : "FIRST CLICK SAFE"}`, 10, accent);
-  return p.finish(bottom + (mines ? 30 : 4), `${mines ? "Minesweeper" : "Sokoban"} ${str(level?.title)}，${cols} 列 ${rows} 行，得分 ${num(campaign?.score)}`);
+  return p.finish(bottom + (mines ? 30 : 4), `${mines ? "Minesweeper" : "Sokoban"} ${str(level?.title)}，${cols} 列 ${rows} 行，得分 ${num(campaign?.score)}`, `${kind}:${str(level?.id)}:${cols}x${rows}`);
 }

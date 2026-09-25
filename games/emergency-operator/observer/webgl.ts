@@ -35,8 +35,10 @@ export const buildOperatorScene: SceneBuilder = (state, view) => {
     }
     units.forEach((unit, i) => {
       const at = position(rec(unit.location), i % 2 ? .22 : -.22), color = roleColor(str(unit.role));
-      p.rect(at.x - 7, at.y - 7, 14, 14, color, 2, "#e1eae4", 1);
-      p.text(at.x, at.y - 5, str(unit.id).replace(/[^0-9]/g, "") || "·", 8, "#091311", true, "center");
+      p.sprite(`unit:${str(unit.id, String(i))}`, { x: at.x - 7, y: at.y - 7, width: 14, height: 14 }, () => {
+        p.rect(at.x - 7, at.y - 7, 14, 14, color, 2, "#e1eae4", 1);
+        p.text(at.x, at.y - 5, str(unit.id).replace(/[^0-9]/g, "") || "·", 8, "#091311", true, "center");
+      });
       p.hit({ x: at.x - 9, y: at.y - 9, width: 18, height: 18 }, `${str(unit.label)} · ${str(unit.status)}${unit.eta_ms != null ? ` · ETA ${clock(num(unit.eta_ms))}` : ""}`);
     });
   });
@@ -94,5 +96,5 @@ export const buildOperatorScene: SceneBuilder = (state, view) => {
     for (const [key, value] of facts) memoryY = p.paragraph(memoryX, memoryY, `${key.toUpperCase()} · ${str(value)}`, columnWidth, 11, "#93b5a0", 4) + 10;
     for (const alarm of pending) memoryY = p.paragraph(memoryX, memoryY, `ALARM ${clock(num(alarm.due_ms))} · ${str(alarm.note, "Agent reminder")}`, columnWidth, 11, "#dfb66f", 4) + 10;
   }
-  return p.finish(Math.max(incidentY, unitBottom, memoryY) + 16, `Operator，${activeCalls.length} 通来电，${open.length} 个事件，${units.length} 个单位，得分 ${num(campaign?.score)}`);
+  return p.finish(Math.max(incidentY, unitBottom, memoryY) + 16, `Operator，${activeCalls.length} 通来电，${open.length} 个事件，${units.length} 个单位，得分 ${num(campaign?.score)}`, `operator:${str(duty?.city)}`);
 };

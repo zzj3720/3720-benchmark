@@ -32,6 +32,17 @@ function scenePoints(state: SausageSceneState) {
   ];
 }
 
+/** Longest tween; faster replays shorten it to fit between frames. */
+const MOTION_MS = 260;
+
+type Placement = { position: THREE.Vector3; quaternion: THREE.Quaternion; rotation?: number };
+type MotionItem = { object: THREE.Object3D; from: Placement; to: Placement; hop: boolean; spin?: { mesh?: THREE.Object3D; from: number } };
+type Motion = { start: number; duration: number; items: MotionItem[]; camera?: { from: { position: THREE.Vector3; target: THREE.Vector3 }; to: { position: THREE.Vector3; target: THREE.Vector3 } } };
+
+function placementOf(object: THREE.Object3D): Placement {
+  return { position: object.position.clone(), quaternion: object.quaternion.clone(), rotation: object.userData.rotation as number | undefined };
+}
+
 function playerPoint(state: SausageSceneState) {
   const player = state.entities.find((entity) => entity.kind === "player");
   return player ? worldPosition(player.pos).add(new THREE.Vector3(0, 0.72, 0)) : null;
@@ -227,6 +238,7 @@ function sausageGeometry(faces: number[], rotation: number) {
 function addSausage(root: THREE.Group, entity: SceneEntity, spectral = false) {
   const group = new THREE.Group();
   group.name = `sausage-${entity.id}`;
+  group.userData.rotation = entity.rotation;
   const forward = directionVector(entity.direction);
   group.position.copy(worldPosition(entity.pos));
   group.position.addScaledVector(forward, 0.5);
@@ -252,6 +264,7 @@ function addSausage(root: THREE.Group, entity: SceneEntity, spectral = false) {
 
 function addDetachedFork(root: THREE.Group, entity: SceneEntity) {
   const group = new THREE.Group();
+  group.name = `fork-${entity.id}`;
   group.position.copy(worldPosition(entity.pos));
   group.position.y += 0.12;
   orientForward(group, entity.direction);
@@ -369,6 +382,11 @@ export class SausageScene {
   private readonly contextLost = (event: Event) => { event.preventDefault(); this.canvas.dataset.ready = "false"; };
   private readonly contextRestored = () => { window.requestAnimationFrame(() => this.render()); };
   private view: "player" | "overview" = "player";
+  /** The tween in flight, and where the camera is heading so a new move adds to its goal, not to a mid-tween position. */
+  private motion: Motion | null = null;
+  private motionFrame = 0;
+  private lastUpdate = 0;
+  private cameraGoal: { position: THREE.Vector3; target: THREE.Vector3 } | null = null;
   /** Whether the last "player" framing found the player to centre on. */
   private anchored = false;
 
@@ -425,6 +443,13 @@ export class SausageScene {
     this.rawState = rawState;
     const previous = this.state;
     this.state = state;
+    const now = performance.now(), interval = now - this.lastUpdate;
+    this.lastUpdate = now;
+    window.cancelAnimationFrame(this.motionFrame);
+    // Exports capture one frame per state and reduced motion asks for none.
+    const animate = !this.fixed && previous?.levelKey === state.levelKey && !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const shown = new Map<string, Placement>();
+    if (animate) for (const child of this.dynamicRoot.children) if (child.name) shown.set(child.name, placementOf(child));
     const palette = PALETTES[state.tileSet] ?? PALETTES[0];
     const nextStaticKey = staticSignature(state);
     if (nextStaticKey !== this.staticKey) {
@@ -456,6 +481,29 @@ export class SausageScene {
     }
     if (state.exit) addExit(this.dynamicRoot, state.exit);
     this.scene.add(this.dynamicRoot);
+    const items: MotionItem[] = [];
+    for (const child of this.dynamicRoot.children) {
+      const from = shown.get(child.name);
+      if (!from) continue;
+      const to = placementOf(child);
+      const rolled = from.rotation !== undefined && from.rotation !== to.rotation;
+      if (from.position.distanceTo(to.position) < 1e-3 && from.quaternion.angleTo(to.quaternion) < 1e-3 && !rolled) continue;
+      const item: MotionItem = { object: child, from, to, hop: child.name.startsWith("player-") };
+      if (rolled) {
+        // The new colours already show the rolled sausage; spin into them about its long axis.
+        const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(to.quaternion), delta = to.position.clone().sub(from.position);
+        item.spin = { mesh: child.children[0]?.children[0], from: Math.PI * (Math.sign(forward.z * delta.x - forward.x * delta.z) || 1) };
+      }
+      items.push(item);
+    }
+    if (!items.length && this.cameraGoal) {
+      // An interrupted follow that this update does not continue lands where it was heading.
+      this.camera.position.copy(this.cameraGoal.position);
+      this.controls.target.copy(this.cameraGoal.target);
+      this.controls.update();
+      this.cameraGoal = null;
+    }
+    let camera: Motion["camera"];
     if (!previous || previous.levelKey !== state.levelKey) {
       // Follow the player everywhere, including the overworld: the whole map
       // is too large to read at once. "完整地图" still shows everything.
@@ -464,14 +512,54 @@ export class SausageScene {
     } else if (this.view === "player") {
       // A first frame without a player (or before the map loaded) cannot be
       // centred; centre as soon as the player appears instead of panning.
-      if (this.anchored) this.followPlayer(previous, state);
-      else this.focusPlayer();
+      if (!this.anchored) this.focusPlayer();
+      else if (animate && items.length) camera = this.cameraMove(previous, state);
+      else this.followPlayer(previous, state);
+    }
+    if (items.length || camera) {
+      this.motion = { start: now, duration: Math.max(90, Math.min(MOTION_MS, interval * 0.75)), items, camera };
+      this.step();
+    } else {
+      this.motion = null;
+      this.render();
+    }
+  }
+
+  private readonly step = () => {
+    const motion = this.motion;
+    if (!motion) return;
+    const t = Math.min(1, (performance.now() - motion.start) / motion.duration);
+    const e = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+    for (const item of motion.items) {
+      item.object.position.lerpVectors(item.from.position, item.to.position, e);
+      if (item.hop) item.object.position.y += Math.sin(Math.PI * e) * 0.18;
+      item.object.quaternion.slerpQuaternions(item.from.quaternion, item.to.quaternion, e);
+      if (item.spin?.mesh) item.spin.mesh.rotation.y = item.spin.from * (1 - e);
+    }
+    if (motion.camera) {
+      this.camera.position.lerpVectors(motion.camera.from.position, motion.camera.to.position, e);
+      this.controls.target.lerpVectors(motion.camera.from.target, motion.camera.to.target, e);
+      this.controls.update();
     }
     this.render();
+    if (t < 1) this.motionFrame = window.requestAnimationFrame(this.step);
+    else { this.motion = null; this.cameraGoal = null; }
+  };
+
+  /** The camera tween for a follow: from where it is to where the last goal plus this move puts it. */
+  private cameraMove(previous: SausageSceneState, state: SausageSceneState): Motion["camera"] {
+    const before = playerPoint(previous), after = playerPoint(state);
+    if (!before || !after) { this.focusPlayer(); return undefined; }
+    const delta = after.sub(before);
+    const from = { position: this.camera.position.clone(), target: this.controls.target.clone() };
+    const base = this.cameraGoal ?? from;
+    this.cameraGoal = { position: base.position.clone().add(delta), target: base.target.clone().add(delta) };
+    return { from, to: this.cameraGoal };
   }
 
   focusPlayer() {
     if (!this.state) return;
+    this.cameraGoal = null;
     this.view = "player";
     const player = playerPoint(this.state);
     this.anchored = Boolean(player);
@@ -481,6 +569,7 @@ export class SausageScene {
 
   showOverview() {
     if (!this.state) return;
+    this.cameraGoal = null;
     this.view = "overview";
     this.frame(scenePoints(this.state));
     this.render();
@@ -601,6 +690,8 @@ export class SausageScene {
   }
 
   destroy() {
+    window.cancelAnimationFrame(this.motionFrame);
+    this.motion = null;
     this.canvas.removeEventListener("webglcontextlost", this.contextLost);
     this.canvas.removeEventListener("webglcontextrestored", this.contextRestored);
     this.resizeObserver.disconnect();
