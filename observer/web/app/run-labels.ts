@@ -62,9 +62,27 @@ export function modelFamily(model: string) {
 /**
  * Release dates (YYYY-MM-DD) by model name as `modelName` prints it. Within a
  * family, newer models are listed first; a model missing here is placed by
- * its version number, then by when it was first benchmarked.
+ * its version number, then by when it was first benchmarked. First public
+ * availability, previews included.
  */
-export const MODEL_RELEASES: Record<string, string> = {};
+export const MODEL_RELEASES: Record<string, string> = {
+  "GPT-6 Astra": "2026-09-03",
+  "GPT-5.6 Sol": "2026-06-26",
+  "GPT-5.6 Terra": "2026-06-26",
+  "GPT-5.6 Luna": "2026-06-26",
+  "DeepSeek V4.1 Flash": "2026-09-10",
+  "DeepSeek V4 Flash": "2026-04-24",
+};
+
+/**
+ * Relative size of models released together, larger first: OpenAI lists
+ * GPT-5.6 as Luna < Terra < Sol, which their prices follow too.
+ */
+export const MODEL_SIZES: Record<string, number> = {
+  "GPT-5.6 Sol": 3,
+  "GPT-5.6 Terra": 2,
+  "GPT-5.6 Luna": 1,
+};
 
 function version(name: string) {
   return name.match(/\d+(?:\.\d+)*/)?.[0].split(".").map(Number) ?? [];
@@ -74,6 +92,7 @@ function version(name: string) {
 export function compareModels(a: string, b: string, firstSeen: Map<string, number> = new Map()) {
   const [da, db] = [MODEL_RELEASES[a], MODEL_RELEASES[b]];
   if (da && db && da !== db) return db.localeCompare(da);
+  if (da && db && (MODEL_SIZES[a] ?? 0) !== (MODEL_SIZES[b] ?? 0)) return (MODEL_SIZES[b] ?? 0) - (MODEL_SIZES[a] ?? 0);
   const [va, vb] = [version(a), version(b)];
   for (let i = 0; i < Math.max(va.length, vb.length); i++) {
     if ((va[i] ?? 0) !== (vb[i] ?? 0)) return (vb[i] ?? 0) - (va[i] ?? 0);
