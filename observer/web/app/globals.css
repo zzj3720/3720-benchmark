@@ -1979,9 +1979,9 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
 .run-table tr.run-child + tr.run-child td { border-top-color: color-mix(in srgb, var(--line) 45%, transparent); }
 
 .model-list .model-heading { margin: var(--space-sm) var(--space-sm) 0; color: var(--foreground); font: 600 var(--text-sm)/1.2 var(--font-body); }
-.model-list .model-run.child { margin-left: var(--space-md); padding-left: var(--space-sm); border-left: 1px solid var(--line); border-radius: 0 var(--radius-control) var(--radius-control) 0; }
 
-.model-list .model-run.child { width: calc(100% - var(--space-md)); min-width: 0; box-sizing: border-box; }
+
+
 
 /* A game's runs by model: family bands, one line per model, its thinking
    depths as side-by-side chips. A chip's bar is its curve's colour. */
@@ -2008,3 +2008,9 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
   .model-family > h2 { padding-inline: var(--space-md); }
   .depth-chip { width: 100%; }
 }
+
+/* Every row keeps its dot in one column; a thinking depth indents only its
+   text, behind a guide line, under its model's name (which lines up with
+   the names of single-run rows: padding + border + dot + gap). */
+.model-list .model-heading { margin-left: calc(var(--space-sm) + 1px + 7px + 9px); }
+.model-list .model-run.child .model-copy { padding-left: var(--space-md); border-left: 1px solid var(--line); }
