@@ -1817,3 +1817,19 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
   .agent-feed:not(.expanded) .agent-feed-list article:nth-child(n + 5) { display: none; }
   .agent-feed-more { display: block; margin: 0 var(--space-lg) var(--space-lg); height: 34px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--background); color: var(--foreground); font-size: var(--text-sm); cursor: pointer; }
 }
+
+/* The last frame of a cleared attempt says so over the board. */
+.replay-export-stage { position: relative; }
+.replay-cleared {
+  position: absolute;
+  top: 58px;
+  right: var(--space-md);
+  z-index: 4;
+  padding: var(--space-xs) var(--space-md);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--accent) 22%, var(--surface));
+  color: var(--foreground);
+  font: 600 var(--text-sm)/1.4 var(--font-body);
+  pointer-events: none;
+}

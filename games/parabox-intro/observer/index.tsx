@@ -1,5 +1,6 @@
 import { GameCanvas } from "../../../observer/web/app/webgl/game-canvas";
 import { buildParaboxScene } from "./webgl";
+import { clearedParaboxState } from "./cleared";
 import {
   asNumber,
   asRecord,
@@ -158,4 +159,5 @@ export default {
       .join(" › ");
   },
   describeEvent: describeParaboxEvent,
+  clearedState: clearedParaboxState,
 } satisfies GameObserverModule;

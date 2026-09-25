@@ -44,6 +44,13 @@ export type GameObserverModule<Game extends string = string> = {
    * to the frame state unchanged.
    */
   resolveFrameState?: (frameState: GameState, latestState: GameState) => GameState;
+  /**
+   * The board at the moment a level was cleared, for games that move on (to
+   * the next level, or the overworld) in the same step. Given the last state
+   * of the level and the clearing event; null when the event's own state
+   * already shows the cleared board.
+   */
+  clearedState?: (before: GameState, event: ObserverEvent) => GameState | null;
 };
 
 /** Attribute a game observer puts on the DOM node captured by replay export. */

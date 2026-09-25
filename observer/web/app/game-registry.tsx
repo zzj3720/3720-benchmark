@@ -55,6 +55,12 @@ export function resolveGameFrameState(game: GameId, frameState: State, latestSta
   return observer.resolveFrameState?.(frameState, latestState) ?? frameState;
 }
 
+/** See `GameObserverModule.clearedState`. */
+export function clearedGameState(game: GameId, before: State, event: ObserverEvent) {
+  const observer = GAME_OBSERVERS[game] as GameObserverModule;
+  return observer.clearedState?.(before, event) ?? null;
+}
+
 export function describeGameEvent(
   game: GameId,
   event: ObserverEvent,

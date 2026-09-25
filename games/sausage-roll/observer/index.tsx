@@ -114,6 +114,14 @@ function resolveFrameState(frameState: GameState, latestState: GameState) {
   return { ...frameState, overworld_map: latestState.overworld_map };
 }
 
+// A cleared puzzle returns to the overworld in the same step, so the recorded
+// state of that step shows the overworld. The last puzzle state already has
+// every sausage cooked and the player on the exit; the step only walks out.
+function clearedState(before: GameState, event: ObserverEvent) {
+  const level = (state?: GameState | null) => asString(asRecord(state?.level)?.id, "");
+  return level(event.state) === level(before) ? null : before;
+}
+
 export default {
   id: "sausage",
   meta: {
@@ -125,4 +133,5 @@ export default {
   stateContext,
   describeEvent,
   resolveFrameState,
+  clearedState,
 } satisfies GameObserverModule;

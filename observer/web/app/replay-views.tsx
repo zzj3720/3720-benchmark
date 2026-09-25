@@ -5,7 +5,7 @@
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Pause, Play, Rewind } from "lucide-react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
-import { GAME_META, GameState, describeGameEvent, resolveGameFrameState, type GameId } from "./game-registry";
+import { GAME_META, GameState, clearedGameState, describeGameEvent, resolveGameFrameState, type GameId } from "./game-registry";
 import { EmptyState, REPLAY_CAPTURE_ATTRIBUTE, type ObserverEvent } from "./game-observer";
 import { LiveActionMenu, LiveSelect, LiveSlider } from "./live-controls";
 import type { LoadedAttemptReplay, ReplayFrame, ReplayOperation, RunDetail, RunSummary } from "./live-contract";
@@ -423,14 +423,22 @@ export function ReplayPlayer({ run, attemptId, label, caption }: { run: RunDetai
   // The default view is the path the agent kept; the toggle adds what it undid.
   const allFrames = useMemo(() => replay?.frames ?? [], [replay]);
   const undoneCount = useMemo(() => allFrames.filter(frame => frame.undone).length, [allFrames]);
-  const frames = useMemo(() => showUndone ? allFrames : allFrames.filter(frame => !frame.undone), [allFrames, showUndone]);
+  const shownFrames = useMemo(() => showUndone ? allFrames : allFrames.filter(frame => !frame.undone), [allFrames, showUndone]);
+  // Games that move on in the step that clears a level recorded the next
+  // level there; show the cleared board instead.
+  const frames = useMemo(() => {
+    const final = shownFrames.at(-1);
+    if (!replay?.successful || !final || shownFrames.length < 2 || !(final.event.score_delta ?? 0)) return shownFrames;
+    const cleared = clearedGameState(run.game, shownFrames[shownFrames.length - 2].event.state ?? {}, final.event);
+    return cleared ? [...shownFrames.slice(0, -1), { ...final, event: { ...final.event, state: cleared } }] : shownFrames;
+  }, [shownFrames, replay, run.game]);
   const operations = useMemo(() => replayOperations(frames), [frames]);
   const last = frames.length - 1;
   const active = frames[Math.min(cursor, Math.max(0, last))];
   const toggleUndone = () => {
     const next = !showUndone;
     // Stay on the same moment: the same frame, or the last kept one before it.
-    const position = active ? allFrames.indexOf(active) : -1;
+    const position = active ? allFrames.findIndex(frame => frame.key === active.key) : -1;
     const shown = next ? allFrames : allFrames.filter(frame => !frame.undone);
     setCursor(Math.max(0, shown.findLastIndex(frame => allFrames.indexOf(frame) <= position)));
     setShowUndone(next);
@@ -544,6 +552,9 @@ export function ReplayPlayer({ run, attemptId, label, caption }: { run: RunDetai
             <small>{attemptText}</small>
           </div>
           {active ? <GameState game={run.game} state={state} previousState={previousState} /> : <EmptyState title={error || "正在载入回放…"} body="" />}
+          {replay?.successful && active && cursor === last && (active.event.score_delta ?? 0) > 0 && (
+            <div className="replay-cleared" role="status">通关 +{active.event.score_delta}</div>
+          )}
         </div>
         <section className="replay-panel" aria-label="回放控制">
           <div className="replay-toolbar">
