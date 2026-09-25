@@ -220,8 +220,8 @@ GET /api/live/v1/assets/<sha256>
 GET /api/live/v1/subscribe?protocol=2[&run_id=<id>]
 ```
 
-Run bodies and assets come from R2; immutable ones are also kept in the edge
-cache. `raw/` is never routed. `LiveHub` holds run summaries in its SQLite
+Run bodies and assets come from R2 as stored (gzip), with their cache
+headers; browsers cache immutable ones. `raw/` is never routed. `LiveHub` holds run summaries in its SQLite
 storage and serves the subscription as Server-Sent Events: a `reset` snapshot,
 then only changed runs (with `score_history_delta` when history grew by an
 unchanged prefix), removals, and the selected run's `detail_revision`. Every

@@ -4,7 +4,6 @@ import test from "node:test";
 import { handleLive } from "../worker/live-api.ts";
 
 // Workers-only globals the handler relies on.
-globalThis.caches ??= { default: { match: async () => undefined, put: async () => {} } };
 crypto.subtle.timingSafeEqual ??= (left, right) =>
   left.byteLength === right.byteLength && left.every((byte, index) => byte === right[index]);
 

@@ -16,7 +16,6 @@ const UPLOAD_CONCURRENCY = 6;
 // The project type-checks against both DOM and Workers declarations; these
 // are the Workers-only members the DOM types do not know about.
 type Background = { waitUntil(promise: Promise<unknown>): void };
-const edgeCache = () => (caches as unknown as { default: Cache }).default;
 const timingSafeEqual = (left: Uint8Array, right: Uint8Array) =>
   (crypto.subtle as unknown as { timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean }).timingSafeEqual(left, right);
 
@@ -40,7 +39,7 @@ export async function handleLive(request: Request, env: LiveEnv, ctx: Background
   const asset = /^v1\/assets\/([^/]+)$/.exec(path);
   if (asset) {
     if (!ASSET_ID.test(asset[1])) return error(400, "invalid asset id");
-    return body(env, ctx, request, `pub/assets/${asset[1]}`, "unknown asset");
+    return body(env, request, `pub/assets/${asset[1]}`, "unknown asset");
   }
   const run = /^v1\/runs\/([^/]+)$/.exec(path);
   if (!run) return error(404, "live endpoint is read-only");
@@ -51,13 +50,13 @@ export async function handleLive(request: Request, env: LiveEnv, ctx: Background
   if (attempt !== null) {
     const after = url.searchParams.get("after_sequence");
     if (!DIGITS.test(attempt) || (after !== null && !DIGITS.test(after))) return error(400, "invalid replay cursor");
-    return body(env, ctx, request, `pub/runs/${id}/replay/${attempt}/${after ?? "first"}.json`, "unknown replay attempt");
+    return body(env, request, `pub/runs/${id}/replay/${attempt}/${after ?? "first"}.json`, "unknown replay attempt");
   }
   if (before !== null) {
     if (!DIGITS.test(before)) return error(400, "invalid catalog cursor");
-    return body(env, ctx, request, `pub/runs/${id}/catalog/${before}.json`, "unknown run");
+    return body(env, request, `pub/runs/${id}/catalog/${before}.json`, "unknown run");
   }
-  return body(env, ctx, request, `pub/runs/${id}/detail.json`, "unknown run");
+  return body(env, request, `pub/runs/${id}/detail.json`, "unknown run");
 }
 
 function stub(env: LiveEnv) {
@@ -68,36 +67,28 @@ function hub(env: LiveEnv, path: string, init?: RequestInit) {
   return stub(env).fetch(`https://hub${path}`, init);
 }
 
-/** Serve a stored body. Immutable bodies are also kept in the edge cache. */
-async function body(env: LiveEnv, ctx: Background, request: Request, key: string, missing: string) {
-  const cache = edgeCache();
-  const cacheKey = new Request(new URL(`/__live/${key}`, request.url).toString());
-  const acceptsGzip = /\bgzip\b/.test(request.headers.get("accept-encoding") ?? "");
-  const cached = acceptsGzip ? await cache.match(cacheKey) : undefined;
-  if (cached) return cached;
+/**
+ * Serve a stored body. Bodies are stored gzip-encoded and passed through
+ * as-is. They are not put in the Cache API: it stores manual-encoded bytes as
+ * the decoded body and re-compresses them on a hit.
+ */
+async function body(env: LiveEnv, request: Request, key: string, missing: string) {
   const object = await env.LIVE_BUCKET.get(key);
   if (!object) return error(404, missing);
-  const cacheControl = object.httpMetadata?.cacheControl ?? "no-store";
   const headers = new Headers({
     "content-type": object.httpMetadata?.contentType ?? "application/json; charset=utf-8",
-    "cache-control": cacheControl,
+    "cache-control": object.httpMetadata?.cacheControl ?? "no-store",
     "access-control-allow-origin": "*",
     etag: object.httpEtag,
   });
   const encoding = object.httpMetadata?.contentEncoding;
-  if (encoding === "gzip" && !acceptsGzip) {
-    // Clients that cannot take gzip get the decoded body; passing the stored
-    // bytes through would leave gzip data without its Content-Encoding.
+  if (encoding === "gzip" && !/\bgzip\b/.test(request.headers.get("accept-encoding") ?? "")) {
+    // Cloudflare would drop Content-Encoding for this client but pass the
+    // manual-encoded bytes through, so decode them here instead.
     return new Response(object.body.pipeThrough(new DecompressionStream("gzip")), { headers });
   }
   if (encoding) headers.set("content-encoding", encoding);
-  if (!cacheControl.includes("immutable")) {
-    return new Response(object.body, { headers, encodeBody: "manual" });
-  }
-  const bytes = await object.arrayBuffer();
-  const response = new Response(bytes, { headers, encodeBody: "manual" });
-  ctx.waitUntil(cache.put(cacheKey, response.clone()));
-  return response;
+  return new Response(object.body, { headers, encodeBody: "manual" });
 }
 
 async function ingest(request: Request, env: LiveEnv, route: string) {
