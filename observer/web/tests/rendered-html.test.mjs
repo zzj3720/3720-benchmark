@@ -39,10 +39,10 @@ test("server-renders the benchmark operations console", async () => {
   assert.match(html, /Benchmark Live/);
   // The home page is the overview of every game; empty, it says what will appear.
   assert.match(html, /3720 Benchmark/);
-  assert.match(html, /aria-pressed="true">大盘/);
+  assert.match(html, /aria-current="page">大盘/);
   assert.match(html, /新的运行开始后会出现在这里/);
-  // Games without runs stay out of the switcher.
-  assert.match(html, />PARABOX</);
+  // Games without runs stay out of the top navigation.
+  assert.doesNotMatch(html, />PARABOX</);
   assert.doesNotMatch(html, />SWARM</);
   assert.match(html, /https:\/\/observer\.example\/og\.png/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
@@ -50,8 +50,8 @@ test("server-renders the benchmark operations console", async () => {
 
 test("renders navigation controls without search or demo data", async () => {
   const html = await (await render()).text();
-  assert.match(html, /aria-label="切换游戏"/);
-  assert.match(html, /role="combobox"/);
+  assert.match(html, /<nav class="top-nav" aria-label="大盘与游戏">/);
+  assert.doesNotMatch(html, /run-sidebar/);
   assert.doesNotMatch(html, /最近 8 次/);
   assert.doesNotMatch(html, /<input[^>]*type="search"/);
   assert.doesNotMatch(html, /DEMO_STATES|DEMO FIXTURE/);

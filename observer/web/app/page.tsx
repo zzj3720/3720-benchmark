@@ -288,6 +288,15 @@ function Console() {
           <span>3720</span>
           <strong>Benchmark Live</strong>
         </button>
+        {/* The overview and every game with runs; a game stays current on its runs and replays. */}
+        <nav className="top-nav" aria-label="大盘与游戏">
+          <button type="button" aria-current={overview ? "page" : undefined} onClick={showOverview}>大盘</button>
+          {GAME_IDS.filter(game => grouped[game].length).map(game => (
+            <button type="button" key={game} aria-current={!overview && selectedGame === game ? "page" : undefined} onClick={() => showDashboard(game)} style={{ "--accent": GAME_META[game].accent } as React.CSSProperties}>
+              {GAME_META[game].short}<small>{grouped[game].length}</small>
+            </button>
+          ))}
+        </nav>
         <div className={`ingest-status ${sourceOffline ? "offline" : connection}`} title={lastReceivedAt ? `最近数据更新 ${clockTime(lastReceivedAt)}` : "正在连接"}>
           <i />
           {paused
@@ -303,56 +312,6 @@ function Console() {
         </div>
       </header>
 
-      <aside className="run-sidebar">
-        <button type="button" className="overview-link" aria-pressed={overview} onClick={showOverview}>大盘<small>全部游戏</small></button>
-        <div className="sidebar-label">游戏</div>
-        <nav className="game-switcher" aria-label="选择游戏">
-          {GAME_IDS.filter(game => grouped[game].length || selectedGame === game).map(game => <button key={game} aria-pressed={!overview && selectedGame === game} onClick={() => showDashboard(game)}><span>{GAME_META[game].short}</span><small>{grouped[game].length}</small></button>)}
-        </nav>
-        <div className="mobile-switcher">
-          <LiveSelect label="切换游戏" value={overview ? "__overview" : selectedGame} onChange={value => value === "__overview" ? showOverview() : showDashboard(value as GameId)} options={[{ value: "__overview", label: "大盘" }, ...GAME_IDS.filter(game => grouped[game].length || selectedGame === game).map(game => ({ value: game, label: GAME_META[game].short }))]} />
-          {!overview && <LiveSelect label="切换运行" value={selectedId ?? (route.view === "replays" ? "__replays" : "__overview")} onChange={value => { const run = runs.find(run => run.id === value); if (run) selectRun(run); else if (value === "__replays") showReplays(); else showDashboard(); }} options={[{ value: "__overview", label: "得分总览" }, { value: "__replays", label: "关卡回放" }, ...visibleRuns.map(run => ({ value: run.id, label: `${labels.get(run.id)} · ${run.score} 分` }))]} />}
-        </div>
-        {(overview ? [] : [selectedGame]).map((game) => {
-          const meta = GAME_META[game];
-          const gameRuns = grouped[game];
-          return (
-            <section
-              className={`game-group ${selectedGame === game ? "current" : ""}`}
-              key={game}
-              style={{ "--accent": meta.accent } as React.CSSProperties}
-            >
-              <div className="model-list">
-                {groupByFamily(gameRuns).flatMap(({ family, runs: familyRuns }) => [
-                  <div className="family-heading" key={`family:${family}`}><FamilyIcon family={family} size={16} />{family}</div>,
-                  // Several thinking depths of one model sit under the model's name.
-                  ...groupByModel(familyRuns).flatMap(({ model, runs: modelRuns }) => [
-                    ...(modelRuns.length > 1 ? [<div className="model-heading" key={`model:${model}`}>{model}</div>] : []),
-                    ...modelRuns.map((run) => (
-                  <button
-                    key={run.id}
-                    className={`model-run ${modelRuns.length > 1 ? "child" : ""} ${selectedId === run.id ? "selected" : ""}`}
-                    onClick={() => selectRun(run)}
-                    aria-pressed={selectedId === run.id}
-                  >
-                    <span className={`run-dot ${runStatus(run).className}`} />
-                    <span className="model-copy">
-                      <strong>{modelRuns.length > 1 ? subLabel(run, labels.get(run.id)) : labels.get(run.id)}</strong>
-                      <small>
-                        <HarnessLine harness={modelRuns.length > 1 && subLabel(run, labels.get(run.id)).includes(harnessName(run.agent)) ? "" : harnessName(run.agent)} parts={[durationLabel(taskDuration(run, snapshotNow)), runStatus(run).tone === "ended" ? "" : runStatus(run).label]} />
-                      </small>
-                    </span>
-                    <b>{run.score}</b>
-                  </button>
-                    )),
-                  ]),
-                ])}
-                {!gameRuns.length && <div className="no-runs">暂无运行记录</div>}
-              </div>
-            </section>
-          );
-        })}
-      </aside>
 
       <section className="content" ref={contentRef}>
         {sourceOffline && <div className="data-notice" role="status">评测机已与直播断开，画面停在 {clockTime(feed?.last_seen_ms)} 的最后状态，恢复后会自动续上</div>}
@@ -371,6 +330,9 @@ function Console() {
             onBack={() => showDashboard(selectedGame)}
             onReplays={() => showReplays(selectedGame, selectedId)}
             onPlay={(key, sample) => openLevel(key, sample)}
+            siblings={visibleRuns}
+            labels={labels}
+            onSelectRun={selectRun}
           />
         ) : route.level ? (
           <LevelWatch
@@ -543,6 +505,9 @@ function LiveRun({
   onBack,
   onReplays,
   onPlay,
+  siblings,
+  labels,
+  onSelectRun,
 }: {
   run: RunDetail | RunSummary | null;
   now: number;
@@ -550,6 +515,9 @@ function LiveRun({
   onBack: () => void;
   onReplays: () => void;
   onPlay: (key: string, sample: LevelSample) => void;
+  siblings: RunSummary[];
+  labels: Map<string, string>;
+  onSelectRun: (run: RunSummary) => void;
 }) {
   const [allMessages, setAllMessages] = useState(false);
   const runDetail = run && "state" in run ? run as RunDetail : null;
@@ -571,9 +539,21 @@ function LiveRun({
   return (
     <div className={`detail-page live-page ${run.live ? "is-live" : ""}`} style={{ "--accent": meta.accent } as React.CSSProperties}>
       <header className="detail-heading">
-        <button className="back-button" onClick={onBack}>
-          ← 返回 {meta.short} 成绩
-        </button>
+        <div className="detail-nav">
+          <button className="back-button" onClick={onBack}>
+            ← 返回 {meta.short} 成绩
+          </button>
+          {siblings.length > 1 && (
+            // Switch to another run of this game without going back; grouped like the dashboard.
+            <LiveSelect
+              className="run-switcher"
+              label="切换到这个游戏的其他运行"
+              value={run.id}
+              onChange={id => { const next = siblings.find(item => item.id === id); if (next) onSelectRun(next); }}
+              options={groupByFamily(siblings).flatMap(({ family, runs: members }) => members.map(item => ({ value: item.id, label: `${family} · ${labels.get(item.id) ?? modelName(item.model)} · ${item.score} 分` })))}
+            />
+          )}
+        </div>
         <div className="detail-title-row">
           <div>
             <h1 className="model-title">
