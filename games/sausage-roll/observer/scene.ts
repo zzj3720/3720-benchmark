@@ -369,6 +369,8 @@ export class SausageScene {
   private readonly contextLost = (event: Event) => { event.preventDefault(); this.canvas.dataset.ready = "false"; };
   private readonly contextRestored = () => { window.requestAnimationFrame(() => this.render()); };
   private view: "player" | "overview" = "player";
+  /** Whether the last "player" framing found the player to centre on. */
+  private anchored = false;
 
   constructor(private readonly canvas: HTMLCanvasElement, private readonly fixed?: { width: number; height: number; resolution: number }) {
     this.renderer = new THREE.WebGLRenderer({ canvas, stencil: true, preserveDrawingBuffer: true, antialias: true, powerPreference: "high-performance" });
@@ -455,15 +457,15 @@ export class SausageScene {
     if (state.exit) addExit(this.dynamicRoot, state.exit);
     this.scene.add(this.dynamicRoot);
     if (!previous || previous.levelKey !== state.levelKey) {
-      if (state.mode === "overworld") {
-        this.view = "overview";
-        this.showOverview();
-      } else {
-        this.view = "player";
-        this.focusPlayer();
-      }
+      // Follow the player everywhere, including the overworld: the whole map
+      // is too large to read at once. "完整地图" still shows everything.
+      this.view = "player";
+      this.focusPlayer();
     } else if (this.view === "player") {
-      this.followPlayer(previous, state);
+      // A first frame without a player (or before the map loaded) cannot be
+      // centred; centre as soon as the player appears instead of panning.
+      if (this.anchored) this.followPlayer(previous, state);
+      else this.focusPlayer();
     }
     this.render();
   }
@@ -471,7 +473,9 @@ export class SausageScene {
   focusPlayer() {
     if (!this.state) return;
     this.view = "player";
-    this.frame(activityPoints(this.state), playerPoint(this.state));
+    const player = playerPoint(this.state);
+    this.anchored = Boolean(player);
+    this.frame(activityPoints(this.state), player);
     this.render();
   }
 
@@ -572,10 +576,16 @@ export class SausageScene {
   private resize() {
     const width = this.fixed?.width ?? Math.max(1, this.canvas.clientWidth);
     const height = this.fixed?.height ?? Math.max(1, this.canvas.clientHeight);
+    const changed = width !== this.width || height !== this.height;
     this.width = width; this.height = height;
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
+    // Framing depends on the aspect ratio; redo it once the canvas has its size.
+    if (changed && this.state) {
+      if (this.view === "player") this.focusPlayer();
+      else this.showOverview();
+    }
     this.render();
   }
 
