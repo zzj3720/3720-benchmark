@@ -22,7 +22,14 @@ export function pairSprites(from: Sprite[], to: Sprite[]): (Rect | null)[] {
       starts[index] = olds.splice(old, 1)[0]; open.delete(index);
     }
   }
-  return starts;
+  // A piece that moved further than a cell or so was carried (Parabox exits
+  // through a box edge, several moves in one frame): sliding it straight
+  // across would show a path it never took, so it appears in place instead.
+  return starts.map((start, index) => start && distance(start, to[index].bounds) <= 1.5 * Math.max(start.width, start.height, to[index].bounds.width, to[index].bounds.height) ? start : null);
+}
+
+function distance(a: Rect, b: Rect) {
+  return Math.hypot(centre(a).x - centre(b).x, centre(a).y - centre(b).y);
 }
 
 export function sameRect(a: Rect, b: Rect) {

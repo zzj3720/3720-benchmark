@@ -488,6 +488,8 @@ export class SausageScene {
       const to = placementOf(child);
       const rolled = from.rotation !== undefined && from.rotation !== to.rotation;
       if (from.position.distanceTo(to.position) < 1e-3 && from.quaternion.angleTo(to.quaternion) < 1e-3 && !rolled) continue;
+      // More than about a cell sideways in one frame was not one step; sliding would show a path never taken. Falls are vertical and still tween.
+      if (Math.hypot(to.position.x - from.position.x, to.position.z - from.position.z) > 1.6) continue;
       const item: MotionItem = { object: child, from, to, hop: child.name.startsWith("player-") };
       if (rolled) {
         // The new colours already show the rolled sausage; spin into them about its long axis.
