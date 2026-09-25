@@ -10,8 +10,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   CircleSlash2,
-  FileImage,
-  Film,
+  Download,
   Map as MapIcon,
   Pause,
   Play,
@@ -128,15 +127,45 @@ function actionLabel(action?: Record<string, Json> | null) {
   return direction ? `${command} ${direction.toUpperCase()}` : command;
 }
 
-function instructionLabel(frame: ReplayFrame) {
-  if (frame.has_instruction_trace && frame.operation_size > 1) {
-    return `${frame.instruction_index} / ${frame.instruction_count}`;
-  }
-  if (!frame.has_instruction_trace && frame.operation_size > 1) return "整组";
-  return "单个";
-}
-
 type Feed = { connected: boolean; last_seen_ms: number | null };
+
+type ExportChoice = { format: ReplayExportFormat; speed: number; caption: boolean };
+
+const FRAME_MS = 450;
+const EXPORT_HOLD_MS = 1500;
+
+/** Draw a title band above an exported frame: what, who, which attempt, where from. */
+function captionFrame(
+  frame: HTMLCanvasElement,
+  target: HTMLCanvasElement,
+  lines: { title: string; segment: string; step: string },
+) {
+  const band = Math.max(48, Math.round(frame.width * 0.075));
+  if (target.width !== frame.width || target.height !== frame.height + band) {
+    target.width = frame.width;
+    target.height = frame.height + band;
+  }
+  const context = target.getContext("2d")!;
+  context.fillStyle = "#0f1413";
+  context.fillRect(0, 0, target.width, band);
+  context.drawImage(frame, 0, band);
+  const pad = Math.round(band * 0.3);
+  const font = "system-ui, -apple-system, 'PingFang SC', sans-serif";
+  context.textBaseline = "alphabetic";
+  context.fillStyle = "#edf3eb";
+  context.font = `600 ${Math.round(band * 0.3)}px ${font}`;
+  context.fillText(lines.title, pad, band * 0.44);
+  context.fillStyle = "#8c9892";
+  context.font = `${Math.round(band * 0.25)}px ${font}`;
+  context.fillText(lines.segment, pad, band * 0.8);
+  context.textAlign = "right";
+  context.fillText(lines.step, target.width - pad, band * 0.44);
+  context.fillStyle = "rgba(237, 243, 235, 0.55)";
+  context.font = `${Math.round(band * 0.22)}px ${font}`;
+  context.fillText("live.benchmark.3720.org", target.width - pad, target.height - pad * 0.6);
+  context.textAlign = "left";
+  return target;
+}
 
 /** Once the local publisher is gone, time stops where its last heartbeat was. */
 function feedNow(now: number, feed: Feed | null) {
@@ -670,9 +699,25 @@ function RunDetails({
     }
     const timer = window.setTimeout(() => {
       setCursorKey(frames[activeIndex + 1]?.key ?? null);
-    }, 450 / speed);
+    }, FRAME_MS / speed);
     return () => window.clearTimeout(timer);
   }, [activeIndex, frames, isLatest, playing, speed, attemptReplay?.next_after_sequence, attemptReplay?.attempt_id, replayPages, loadAttemptReplay]);
+
+  // Space plays or pauses, arrows step, Home goes to the first state.
+  const keyActions = useRef({ toggle: () => {}, move: (_index: number) => {}, index: 0 });
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (event.metaKey || event.ctrlKey || event.altKey || target?.closest("input, textarea, select, [role=combobox], [role=menu], [contenteditable=true]")) return;
+      const actions = keyActions.current;
+      if (event.key === " ") { event.preventDefault(); actions.toggle(); }
+      else if (event.key === "ArrowLeft") { event.preventDefault(); actions.move(actions.index - 1); }
+      else if (event.key === "ArrowRight") { event.preventDefault(); actions.move(actions.index + 1); }
+      else if (event.key === "Home") { event.preventDefault(); actions.move(0); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const frameGame = run?.game;
   const frameState = (followingLive ? runDetail?.state : activeEvent?.state) ?? runDetail?.state;
@@ -718,6 +763,8 @@ function RunDetails({
     setPlaying(true);
   }
 
+  keyActions.current = { toggle: togglePlayback, move: moveCursor, index: activeIndex };
+
   function followLive() {
     if (exporting) return;
     replayGate.current.cancel();
@@ -750,7 +797,7 @@ function RunDetails({
     } finally { if (request.current()) setCatalogLoading(false); }
   }
 
-  async function exportSegment(format: ReplayExportFormat) {
+  async function exportSegment({ format, speed: exportSpeed, caption }: ExportChoice) {
     const element = exportStageRef.current?.querySelector<HTMLElement>(
       `[${REPLAY_CAPTURE_ATTRIBUTE}]`,
     );
@@ -760,6 +807,16 @@ function RunDetails({
     const segment = selectedAttempt
       ? `${selectedAttempt.group.reference}-${selectedAttempt.group.kind === "overworld" ? "route" : "attempt"}-${selectedAttempt.index + 1}`
       : `attempt-${attemptReplay.attempt_id}`;
+    const modelLabel = [modelName(run.model), run.effort !== "default" ? run.effort : ""].filter(Boolean).join(" · ");
+    const captionLines = {
+      title: `${meta.label} · ${modelLabel}`,
+      segment: selectedAttempt
+        ? selectedAttempt.group.kind === "overworld"
+          ? `大地图 · 第 ${selectedAttempt.index + 1} 段`
+          : `${[selectedAttempt.group.reference, selectedAttempt.group.title].filter((value, index, all) => value && all.indexOf(value) === index).join(" / ")} · 第 ${selectedAttempt.index + 1} 次尝试 · ${selectedAttempt.attempt.successful ? `通过 +${selectedAttempt.attempt.score}` : "未通过"}`
+        : `尝试 ${attemptReplay.attempt_id}`,
+    };
+    const captionCanvas = document.createElement("canvas");
     const abort = new AbortController();
     exportAbortRef.current = abort;
     setPlaying(false);
@@ -777,17 +834,23 @@ function RunDetails({
       session = await renderer.createSession(exportFrames, 900, 900, 80_000_000);
       const activeSession = session;
       await exportReplaySegment({
-        fileName: fileSlug(`${run.game}-${run.model}-${segment}`),
+        fileName: fileSlug(`${run.game}-${modelLabel}-${segment}`),
         format,
         frameCount: source.length,
-        frameDelayMs: 450 / speed,
+        frameDelayMs: FRAME_MS / exportSpeed,
+        lastFrameHoldMs: EXPORT_HOLD_MS,
         signal: abort.signal,
-        captureFrame: (index) => activeSession.capture(exportFrames[index]),
+        captureFrame: async (index) => {
+          const frame = await activeSession.capture(exportFrames[index]);
+          return caption
+            ? captionFrame(frame, captionCanvas, { ...captionLines, step: `${index + 1} / ${source.length}` })
+            : frame;
+        },
         onProgress: (completed) => {
           setExporting({ format, completed, total: source.length });
         },
       });
-      if (mounted.current) setExportNotice(format === "gif" ? "GIF 已下载" : "视频已下载");
+      if (mounted.current) setExportNotice(format === "gif" ? "GIF 已导出，已开始下载" : "视频已导出，已开始下载");
     } catch (reason) {
       if (mounted.current) setExportNotice(
         reason instanceof DOMException && reason.name === "AbortError"
@@ -1030,9 +1093,11 @@ function ReplayTimeline({
   onFollowLive: () => void;
   onSkipFailedAttempts: (enabled: boolean) => void;
   onAttemptReplay: (attemptId: number) => void;
-  onExport: (format: ReplayExportFormat) => void;
+  onExport: (choice: ExportChoice) => void;
   onCancelExport: () => void;
 }) {
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportChoice, setExportChoice] = useState<ExportChoice>({ format: "video", speed: 2, caption: true });
   const active = frames[activeIndex];
   const previousOperation = frames.findLastIndex(
     (frame, index) => index < activeIndex && frame.operation_sequence !== active?.operation_sequence,
@@ -1049,6 +1114,15 @@ function ReplayTimeline({
   );
   const newestAttempt = replayAttempts.reduce((latest, item) => item.attempt.id > (latest?.attempt.id ?? -1) ? item : latest, replayAttempts[0]);
   const activeGroup = replayGroups.find(group => group.reference === groupReference) ?? selectedReplay?.group ?? newestAttempt?.group;
+  const groupIndex = activeGroup ? replayGroups.indexOf(activeGroup) : -1;
+  // Choosing a level plays its latest attempt right away.
+  const openGroup = (reference: string) => {
+    setGroupReference(reference);
+    const group = replayGroups.find(item => item.reference === reference);
+    const latest = group?.attempts[group.attempts.length - 1];
+    if (latest) onAttemptReplay(latest.id);
+  };
+  const exportSeconds = Math.round((frames.length * FRAME_MS / exportChoice.speed + EXPORT_HOLD_MS) / 1000);
   return (
     <section className="replay-panel" aria-label="状态回放时间轴">
       <div className="replay-toolbar">
@@ -1057,24 +1131,32 @@ function ReplayTimeline({
           <ReplayIconButton className="play-button" label={playing ? "暂停回放" : "播放回放"} icon={playing ? Pause : Play} onClick={onTogglePlayback} disabled={frames.length < 2} />
           <ReplayIconButton label="下一条有效指令" icon={ChevronRight} onClick={() => onMove(activeIndex + 1)} disabled={!frames.length || isLatest} />
 
-          <LiveSelect className="replay-speed" label="回放速度" value={String(speed)} onChange={value => onSpeed(Number(value))} disabled={attemptReplayLoading} options={[0.5, 1, 2, 4].map(value => ({ value: String(value), label: `${value}×` }))} />
+          <LiveSelect className="replay-speed" label="回放速度" value={String(speed)} onChange={value => onSpeed(Number(value))} disabled={attemptReplayLoading} options={[0.5, 1, 2, 4, 8, 16].map(value => ({ value: String(value), label: `${value}×` }))} />
           <LiveActionMenu items={[
             { label: "跳到最早状态", icon: Rewind, onSelect: () => onMove(0), disabled: activeIndex <= 0 },
             { label: "上一组操作", icon: ChevronsLeft, onSelect: () => onMove(previousOperation), disabled: previousOperation < 0 },
             { label: "下一组操作", icon: ChevronsRight, onSelect: () => onMove(nextOperation), disabled: nextOperation < 0 },
-            { label: "导出 GIF", icon: FileImage, onSelect: () => onExport("gif"), disabled: !canExport || exporting !== null, separator: true },
-            { label: "导出视频", icon: Film, onSelect: () => onExport("video"), disabled: !canExport || exporting !== null },
           ]} />
-          <div className="replay-inline-scrubber">
+          <button
+            type="button"
+            className="replay-export-button"
+            aria-expanded={exportOpen}
+            onClick={() => setExportOpen(open => !open)}
+            disabled={!canExport && !exportOpen}
+            title={canExport ? "把这次尝试导出为视频或 GIF" : "先在下方选一次尝试，再导出它的回放"}
+          >
+            <Download size={15} aria-hidden="true" />导出
+          </button>
+          <div className="replay-inline-scrubber" title="快捷键：空格 播放/暂停，← → 单步，Home 回到开头">
             <LiveSlider max={Math.max(0, frames.length - 1)} value={Math.max(0, activeIndex)} onChange={onMove} disabled={!frames.length} />
-            <b>{active ? `${instructionLabel(active)} · ${actionLabel(active.event.action)}` : "—"}</b>
+            <b>{active ? `${activeIndex + 1} / ${frames.length} · ${actionLabel(active.event.action)}` : "—"}</b>
           </div>
         </div>}
         <div className="replay-status" aria-live="polite">
           <i className={followingLive && selectedAttemptReplay === null ? "live" : "replay"} />
           {exporting
             ? <>
-                正在导出 {exporting.format === "gif" ? "GIF" : "视频"} · {exporting.completed} / {exporting.total}
+                正在导出{exporting.format === "gif" ? " GIF" : "视频"} · {Math.round(exporting.completed / Math.max(1, exporting.total) * 100)}%
                 <button type="button" className="replay-export-cancel" onClick={onCancelExport}>
                   取消
                 </button>
@@ -1086,7 +1168,7 @@ function ReplayTimeline({
             : selectedReplay
               ? selectedReplay.group.kind === "overworld"
                 ? `正在回放大地图 · 路段 ${selectedReplay.index + 1}`
-                : `正在回放 ${selectedReplay.group.reference} · 尝试 ${selectedReplay.index + 1}`
+                : `正在回放 ${selectedReplay.group.reference} · 第 ${selectedReplay.index + 1} 次尝试 · ${selectedReplay.attempt.successful ? "通过" : selectedReplay.attempt.status === "running" ? "进行中" : "未通过"}`
               : followingLive
                 ? "最新状态"
                 : isLatest
@@ -1095,9 +1177,45 @@ function ReplayTimeline({
           {!followingLive && <button type="button" className="follow-live-button" onClick={onFollowLive} disabled={exporting !== null}><Radio aria-hidden="true" size={16} />返回最新</button>}
         </div>
       </div>
+      {exportOpen && canExport && (
+        <div className="export-panel" role="group" aria-label="导出这次尝试">
+          <div className="export-field">
+            <span>格式</span>
+            <div className="scale-switch" role="group" aria-label="导出格式">
+              {(["video", "gif"] as const).map(format => (
+                <button key={format} aria-pressed={exportChoice.format === format} onClick={() => setExportChoice(choice => ({ ...choice, format }))}>
+                  {format === "video" ? "视频（MP4）" : "GIF 动图"}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="export-field">
+            <span>速度</span>
+            <div className="scale-switch" role="group" aria-label="导出速度">
+              {[1, 2, 4, 8].map(value => (
+                <button key={value} aria-pressed={exportChoice.speed === value} onClick={() => setExportChoice(choice => ({ ...choice, speed: value }))}>{value}×</button>
+              ))}
+            </div>
+          </div>
+          <label className="export-field export-caption">
+            <input type="checkbox" checked={exportChoice.caption} onChange={event => setExportChoice(choice => ({ ...choice, caption: event.target.checked }))} />
+            <span>加标题栏（游戏、模型、关卡、第几次尝试）</span>
+          </label>
+          <p className="export-summary">{selectedReplay ? `${selectedReplay.group.reference} 第 ${selectedReplay.index + 1} 次尝试 · ` : ""}{frames.length} 帧 · 约 {exportSeconds} 秒{exportChoice.format === "gif" ? " · GIF 体积较大，适合短片段" : ""}</p>
+          <div className="export-actions">
+            <button type="button" className="export-go" disabled={exporting !== null} onClick={() => { onExport(exportChoice); setExportOpen(false); }}>
+              <Download size={15} aria-hidden="true" />导出{exportChoice.format === "video" ? "视频" : " GIF"}
+            </button>
+            <button type="button" onClick={() => setExportOpen(false)}>收起</button>
+          </div>
+        </div>
+      )}
       {replayGroups.length > 0 && <div className="score-replay-picker">
         <div className="history-selector">
-          <span className="control-label">历史尝试</span><LiveSelect className="history-select" label="选择历史关卡" value={activeGroup?.reference ?? ""} onChange={setGroupReference} disabled={!replayGroups.length || exporting !== null} options={replayGroups.map(group => ({ value: group.reference, label: `${group.title && group.title !== group.reference ? `${group.reference} · ${group.title}` : group.reference} · ${group.attempts.length} 次尝试` }))} />
+          <span className="control-label">历史尝试</span>
+          <ReplayIconButton label="上一关" icon={ChevronLeft} onClick={() => openGroup(replayGroups[groupIndex - 1].reference)} disabled={groupIndex <= 0 || exporting !== null} />
+          <LiveSelect className="history-select" label="选择历史关卡" value={activeGroup?.reference ?? ""} onChange={openGroup} disabled={!replayGroups.length || exporting !== null} options={replayGroups.map(group => ({ value: group.reference, label: `${group.title && group.title !== group.reference ? `${group.reference} · ${group.title}` : group.reference} · ${group.attempts.length} 次尝试` }))} />
+          <ReplayIconButton label="下一关" icon={ChevronRight} onClick={() => openGroup(replayGroups[groupIndex + 1].reference)} disabled={groupIndex < 0 || groupIndex >= replayGroups.length - 1 || exporting !== null} />
           <Toggle.Root
             className="replay-icon replay-toggle"
             aria-label="跳过失败尝试（以重置为分界）"
@@ -1139,7 +1257,7 @@ function ReplayTimeline({
                           disabled={exporting !== null || (attemptReplayLoading && !loading)}
                         >
                           <strong>{loading ? "…" : index + 1}</strong>
-                          {attempt.successful && <small>+{attempt.score}</small>}
+                          {group.kind !== "overworld" && (attempt.successful ? <small>+{attempt.score}</small> : attempt.status === "running" ? <small>进行中</small> : <small aria-hidden="true">✕</small>)}
                         </button>
                       );
                       })}

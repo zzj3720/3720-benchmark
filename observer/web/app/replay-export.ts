@@ -5,6 +5,8 @@ export type ReplayExportFormat = "gif" | "video";
 type ReplayExportOptions = {
   frameCount: number;
   frameDelayMs: number;
+  /** Extra time the last frame stays on screen, so a looping GIF shows the result. */
+  lastFrameHoldMs?: number;
   fileName: string;
   format: ReplayExportFormat;
   captureFrame: (index: number) => HTMLCanvasElement | Promise<HTMLCanvasElement>;
@@ -48,8 +50,9 @@ export async function exportReplaySegment(options: ReplayExportOptions) {
       if (!context) throw new Error("Could not read the replay frame.");
       const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
       const palette = quantize(pixels, 128, { format: "rgb444" });
+      const last = index === options.frameCount - 1;
       gif.writeFrame(applyPalette(pixels, palette, "rgb444"), canvas.width, canvas.height, {
-        delay: options.frameDelayMs,
+        delay: options.frameDelayMs + (last ? options.lastFrameHoldMs ?? 0 : 0),
         palette,
         repeat: 0,
       });
@@ -84,12 +87,13 @@ export async function exportReplaySegment(options: ReplayExportOptions) {
       try {
         await output.start();
         const duration = options.frameDelayMs / 1000;
+        const hold = (options.lastFrameHoldMs ?? 0) / 1000;
         for (let index = 0; index < options.frameCount; index++) {
           throwIfAborted(options.signal);
           const frame = index === 0 ? firstFrame : await capture(index);
           context.fillStyle = "#08100e"; context.fillRect(0, 0, canvas.width, canvas.height);
           context.drawImage(frame, 0, 0);
-          await source.add(index * duration, duration);
+          await source.add(index * duration, index === options.frameCount - 1 ? duration + hold : duration);
           options.onProgress(index + 1);
         }
         source.close();
@@ -119,6 +123,7 @@ export async function exportReplaySegment(options: ReplayExportOptions) {
   let source: InstanceType<MediaRuntime["EncodedVideoPacketSource"]> | undefined;
   let decoderKey: string | undefined;
   const duration = options.frameDelayMs / 1000;
+  const hold = (options.lastFrameHoldMs ?? 0) / 1000;
   try {
     for (let index = 0; index < options.frameCount; index++) {
       throwIfAborted(options.signal);
@@ -138,7 +143,8 @@ export async function exportReplaySegment(options: ReplayExportOptions) {
       } else if (key !== decoderKey) {
         throw new Error("视频编码格式发生变化，请重试导出。");
       }
-      await source.add(encoded.packet.clone({ timestamp: index * duration, duration, sequenceNumber: index }), { decoderConfig: encoded.decoderConfig });
+      const frameDuration = index === options.frameCount - 1 ? duration + hold : duration;
+      await source.add(encoded.packet.clone({ timestamp: index * duration, duration: frameDuration, sequenceNumber: index }), { decoderConfig: encoded.decoderConfig });
       options.onProgress(index + 1);
     }
     source?.close();
