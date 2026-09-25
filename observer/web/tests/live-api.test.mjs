@@ -110,3 +110,13 @@ test("gzipped run batches reach the hub decoded; the read side is GET-only", asy
   const invalid = await handleLive(new Request("https://live/api/live/v1/subscribe?run_id=../x"), env, context);
   assert.equal(invalid.status, 400);
 });
+
+test("level indexes are served per game and keys are validated", async () => {
+  const { env } = environment();
+  await env.LIVE_BUCKET.put("pub/games/parabox/levels.json", new TextEncoder().encode('{"levels":[]}'), { httpMetadata: { contentType: "application/json", cacheControl: "no-store" } });
+  await env.LIVE_BUCKET.put("pub/games/parabox/levels/0123456789abcdef.json", new TextEncoder().encode('{"runs":[]}'), { httpMetadata: { contentType: "application/json", cacheControl: "no-store" } });
+  assert.deepEqual(await (await handleLive(new Request("https://live/api/live/v1/games/parabox/levels"), env, context)).json(), { levels: [] });
+  assert.deepEqual(await (await handleLive(new Request("https://live/api/live/v1/games/parabox/levels/0123456789abcdef"), env, context)).json(), { runs: [] });
+  assert.equal((await handleLive(new Request("https://live/api/live/v1/games/parabox/levels/../x"), env, context)).status, 404);
+  assert.equal((await handleLive(new Request("https://live/api/live/v1/games/parabox/levels/nothex"), env, context)).status, 400);
+});

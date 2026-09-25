@@ -61,6 +61,7 @@ pub struct Publisher<S: Sink> {
     pushed: HashMap<String, String>,
     order: Vec<String>,
     live_replays: HashMap<String, Instant>,
+    levels_dirty: bool,
     raw_tails: HashMap<String, Instant>,
     last_heartbeat: Option<Instant>,
     started_at: u64,
@@ -77,7 +78,12 @@ impl<S: Sink> Publisher<S> {
                 "PRAGMA journal_mode=WAL;
                  CREATE TABLE IF NOT EXISTS uploaded (key TEXT PRIMARY KEY, digest TEXT NOT NULL);
                  PRAGMA synchronous=NORMAL;
-                 CREATE TABLE IF NOT EXISTS finished (key TEXT PRIMARY KEY);",
+                 CREATE TABLE IF NOT EXISTS finished (key TEXT PRIMARY KEY);
+                 CREATE TABLE IF NOT EXISTS attempts (
+                     run TEXT NOT NULL, id INTEGER NOT NULL, reference TEXT NOT NULL,
+                     title TEXT, kind TEXT NOT NULL, successful INTEGER NOT NULL,
+                     score INTEGER NOT NULL, status TEXT NOT NULL,
+                     PRIMARY KEY (run, id));",
             )
             .map_err(display)?;
         Ok(Self {
@@ -91,6 +97,7 @@ impl<S: Sink> Publisher<S> {
             pushed: HashMap::new(),
             order: Vec::new(),
             live_replays: HashMap::new(),
+            levels_dirty: true,
             raw_tails: HashMap::new(),
             last_heartbeat: None,
             started_at: now_ms(),
@@ -142,6 +149,14 @@ impl<S: Sink> Publisher<S> {
         }
         if archive_changed {
             self.publish_archive_assets()?;
+        }
+        let listed = runs.iter().filter_map(|run| run.get("id").and_then(Value::as_str)).collect::<Vec<_>>();
+        if listed != self.order.iter().map(String::as_str).collect::<Vec<_>>() {
+            self.levels_dirty = true;
+        }
+        if self.levels_dirty {
+            self.publish_levels(&runs)?;
+            self.levels_dirty = false;
         }
         // Bodies first: a summary must never point at a revision whose detail
         // has not been stored yet.
@@ -197,6 +212,10 @@ impl<S: Sink> Publisher<S> {
             return self.publish_archived_replays(id);
         }
         let mut attempts = attempts(run.get("replay_groups"));
+        // A run without recorded attempts (new, or from before the level
+        // index existed) walks its whole catalog once.
+        let full_walk = !self.has_attempts(id)?;
+        self.record_attempts(id, run.get("replay_groups"))?;
         let mut more = run
             .get("replay_catalog_more")
             .and_then(Value::as_bool)
@@ -207,13 +226,14 @@ impl<S: Sink> Publisher<S> {
             let key = format!("pub/runs/{id}/catalog/{cursor}.json");
             // Older pages only hold closed attempts, so a stored page and
             // everything behind it are already complete.
-            if self.is_finished(&key)? {
+            if self.is_finished(&key)? && !full_walk {
                 break;
             }
             let page = optional(self.projector.catalog(id, cursor))?
                 .ok_or_else(|| format!("{id}: catalog page {cursor} disappeared"))?;
             let value: Value = serde_json::from_slice(&page).map_err(display)?;
             attempts.extend(self::attempts(value.get("groups")));
+            self.record_attempts(id, value.get("groups"))?;
             more = value.get("more").and_then(Value::as_bool).unwrap_or(false);
             before = value.get("before").and_then(Value::as_u64);
             self.stage(key, page, IMMUTABLE, true)?;
@@ -409,6 +429,135 @@ impl<S: Sink> Publisher<S> {
         })
     }
 
+    fn has_attempts(&self, run: &str) -> Result<bool, String> {
+        self.ledger
+            .query_row("SELECT 1 FROM attempts WHERE run = ?1 LIMIT 1", params![run], |_| Ok(()))
+            .optional()
+            .map(|row| row.is_some())
+            .map_err(display)
+    }
+
+    /// Remember every attempt of a catalog page for the cross-run level index.
+    fn record_attempts(&mut self, run: &str, groups: Option<&Value>) -> Result<(), String> {
+        let transaction = self.ledger.unchecked_transaction().map_err(display)?;
+        for group in groups.and_then(Value::as_array).into_iter().flatten() {
+            let reference = group.get("reference").and_then(Value::as_str).unwrap_or_default();
+            let title = group.get("title").and_then(Value::as_str);
+            let kind = group.get("kind").and_then(Value::as_str).unwrap_or("level");
+            for attempt in group.get("attempts").and_then(Value::as_array).into_iter().flatten() {
+                let Some(id) = attempt.get("id").and_then(Value::as_u64) else { continue };
+                let changed = transaction
+                    .execute(
+                        "INSERT INTO attempts (run, id, reference, title, kind, successful, score, status)
+                         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+                         ON CONFLICT(run, id) DO UPDATE SET successful = excluded.successful,
+                             score = excluded.score, status = excluded.status, title = excluded.title
+                         WHERE successful != excluded.successful OR score != excluded.score
+                             OR status != excluded.status OR title IS NOT excluded.title",
+                        params![
+                            run,
+                            id as i64,
+                            reference,
+                            title,
+                            kind,
+                            attempt.get("successful").and_then(Value::as_bool).unwrap_or(false),
+                            attempt.get("score").and_then(Value::as_i64).unwrap_or(0),
+                            attempt.get("status").and_then(Value::as_str).unwrap_or("completed"),
+                        ],
+                    )
+                    .map_err(display)?;
+                self.levels_dirty |= changed > 0;
+            }
+        }
+        transaction.commit().map_err(display)
+    }
+
+    /// Per game: an index of every level across runs, and one file per level
+    /// listing each run's attempts, so viewers can compare models on a level.
+    fn publish_levels(&mut self, runs: &[Value]) -> Result<(), String> {
+        let mut games: BTreeMap<String, Vec<String>> = BTreeMap::new();
+        for run in runs {
+            if let (Some(id), Some(game)) = (run.get("id").and_then(Value::as_str), run.get("game").and_then(Value::as_str)) {
+                games.entry(game.to_owned()).or_default().push(id.to_owned());
+            }
+        }
+        for (game, run_ids) in games {
+            // reference -> (title, kind, [(run, [attempt])]) with runs in ranking order.
+            let mut levels: BTreeMap<String, (Option<String>, String, Vec<(String, Vec<Value>)>)> = BTreeMap::new();
+            for run in &run_ids {
+                let mut statement = self
+                    .ledger
+                    .prepare("SELECT reference, title, kind, id, successful, score, status FROM attempts WHERE run = ?1 ORDER BY id")
+                    .map_err(display)?;
+                let rows = statement
+                    .query_map(params![run], |row| {
+                        Ok((
+                            row.get::<_, String>(0)?,
+                            row.get::<_, Option<String>>(1)?,
+                            row.get::<_, String>(2)?,
+                            json!({"id": row.get::<_, i64>(3)?, "successful": row.get::<_, bool>(4)?, "score": row.get::<_, i64>(5)?, "status": row.get::<_, String>(6)?}),
+                        ))
+                    })
+                    .map_err(display)?;
+                for row in rows {
+                    let (reference, title, kind, attempt) = row.map_err(display)?;
+                    let level = levels.entry(reference).or_insert_with(|| (None, kind, Vec::new()));
+                    if level.0.is_none() {
+                        level.0 = title;
+                    }
+                    match level.2.last_mut() {
+                        Some((last, attempts)) if last == run => attempts.push(attempt),
+                        _ => level.2.push((run.clone(), vec![attempt])),
+                    }
+                }
+            }
+            let mut ordered = levels.into_iter().collect::<Vec<_>>();
+            ordered.sort_by(|(left, (_, left_kind, _)), (right, (_, right_kind, _))| {
+                (left_kind != "overworld", natural_key(left)).cmp(&(right_kind != "overworld", natural_key(right)))
+            });
+            let mut index = Vec::with_capacity(ordered.len());
+            for (reference, (title, kind, runs)) in ordered {
+                let key = storage::digest(reference.as_bytes())[..16].to_owned();
+                let passed = |attempts: &[Value]| attempts.iter().any(|attempt| attempt["successful"] == json!(true));
+                let summary = runs
+                    .iter()
+                    .map(|(run, attempts)| json!({
+                        "run": run,
+                        "attempts": attempts.len(),
+                        "passed": passed(attempts),
+                        "best": attempts.iter().filter_map(|attempt| attempt["score"].as_i64()).max().unwrap_or(0),
+                    }))
+                    .collect::<Vec<_>>();
+                let sample = runs
+                    .first()
+                    .and_then(|(run, attempts)| attempts.first().map(|attempt| json!({"run": run, "attempt": attempt["id"]})));
+                index.push(json!({
+                    "key": key,
+                    "reference": reference,
+                    "title": title,
+                    "kind": kind,
+                    "attempts": runs.iter().map(|(_, attempts)| attempts.len()).sum::<usize>(),
+                    "passed_runs": runs.iter().filter(|(_, attempts)| passed(attempts)).count(),
+                    "runs": summary,
+                    "sample": sample,
+                }));
+                let detail = json!({
+                    "schema": "benchmark-live-level-v1",
+                    "game": game,
+                    "key": key,
+                    "reference": reference,
+                    "title": title,
+                    "kind": kind,
+                    "runs": runs.iter().map(|(run, attempts)| json!({"run": run, "attempts": attempts})).collect::<Vec<_>>(),
+                });
+                self.stage(format!("pub/games/{game}/levels/{key}.json"), serde_json::to_vec(&detail).map_err(display)?, NO_STORE, false)?;
+            }
+            let body = json!({"schema": "benchmark-live-levels-v1", "game": game, "levels": index});
+            self.stage(format!("pub/games/{game}/levels.json"), serde_json::to_vec(&body).map_err(display)?, NO_STORE, false)?;
+        }
+        Ok(())
+    }
+
     fn push_runs(&mut self, runs: &[Value]) -> Result<(), String> {
         let order = runs
             .iter()
@@ -558,6 +707,34 @@ impl<S: Sink> Publisher<S> {
             .map_err(display)
     }
 
+}
+
+/// Orders level references the way people number them: a2 before a10.
+fn natural_key(reference: &str) -> Vec<(u8, u64, String)> {
+    let mut parts = Vec::new();
+    let mut digits = String::new();
+    let mut text = String::new();
+    for character in reference.chars() {
+        if character.is_ascii_digit() {
+            if !text.is_empty() {
+                parts.push((1, 0, std::mem::take(&mut text)));
+            }
+            digits.push(character);
+        } else {
+            if !digits.is_empty() {
+                parts.push((0, digits.parse().unwrap_or(u64::MAX), String::new()));
+                digits.clear();
+            }
+            text.push(character.to_ascii_lowercase());
+        }
+    }
+    if !text.is_empty() {
+        parts.push((1, 0, text));
+    }
+    if !digits.is_empty() {
+        parts.push((0, digits.parse().unwrap_or(u64::MAX), String::new()));
+    }
+    parts
 }
 
 /// `(attempt id, closed)` for every attempt in a catalog's groups.
@@ -799,6 +976,7 @@ mod tests {
             assert!(recorded.keys.contains(&"raw/run-a/journal.jsonl".to_owned()));
             assert!(recorded.keys.iter().any(|key| key.starts_with("raw/run-a/bundles/")));
             assert!(!recorded.keys.iter().any(|key| key.starts_with("raw/run-a/objects/")));
+            assert!(recorded.keys.contains(&"pub/games/sokoban/levels.json".to_owned()));
             assert_eq!(recorded.runs.len(), 1);
             assert_eq!(recorded.runs[0]["order"], json!(["run-a"]));
             assert_eq!(recorded.runs[0]["runs"][0]["score"], 1);
@@ -833,5 +1011,12 @@ mod tests {
         assert!(sink.0.borrow().keys.contains(&"pub/runs/run-a/detail.json".to_owned()));
         assert_eq!(sink.0.borrow().runs.len(), 1);
         fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn level_references_sort_naturally() {
+        let mut references = vec!["a10", "a2", "b1", "microban-010", "microban-009", "a1"];
+        references.sort_by_key(|reference| natural_key(reference));
+        assert_eq!(references, vec!["a1", "a2", "a10", "b1", "microban-009", "microban-010"]);
     }
 }

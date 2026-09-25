@@ -7,6 +7,8 @@ import { HubState, type IngestRuns, type Run } from "./live-hub-state";
 // loadable under Node for server-rendering tests.
 
 const KEEPALIVE_MS = 15_000;
+/** Messages a viewer may lag behind before its stream is closed. */
+const MAX_BACKLOG = 64;
 
 type Subscriber = { writer: WritableStreamDefaultWriter<Uint8Array>; selected: string | null };
 
@@ -59,9 +61,9 @@ export class LiveHub {
     const now = Date.now();
     if (this.state.expire(now)) {
       this.saveMeta();
-      await this.broadcast({ runs: [], removed: [] }, now);
+      this.broadcast({ runs: [], removed: [] }, now);
     }
-    await this.write(": keepalive\n\n");
+    this.write(": keepalive\n\n");
     // Stay idle (and unbilled) when nobody watches and nothing can go stale.
     if (this.subscribers.size || this.state.feed.connected) await this.schedule();
   }
@@ -72,14 +74,14 @@ export class LiveHub {
     for (const run of message.runs) sql.exec("INSERT OR REPLACE INTO runs (id, body) VALUES (?, ?)", run.id, JSON.stringify(run));
     for (const id of update?.removed ?? []) sql.exec("DELETE FROM runs WHERE id = ?", id);
     this.saveMeta();
-    if (update) await this.broadcast(update, now);
+    if (update) this.broadcast(update, now);
     return Response.json({ ok: true, revision: this.state.revision });
   }
 
   private async heartbeat(message: { publisher?: string }, now: number) {
     const reconnected = this.state.heartbeat(message.publisher ?? "unknown", now);
     this.saveMeta();
-    if (reconnected) await this.broadcast({ runs: [], removed: [] }, now);
+    if (reconnected) this.broadcast({ runs: [], removed: [] }, now);
     await this.schedule();
     return Response.json({ ok: true, revision: this.state.revision });
   }
@@ -88,7 +90,7 @@ export class LiveHub {
     const stream = new TransformStream<Uint8Array, Uint8Array>();
     const subscriber = { writer: stream.writable.getWriter(), selected };
     this.subscribers.add(subscriber);
-    void this.send(subscriber, this.state.snapshot(selected, now));
+    this.send(subscriber, this.state.snapshot(selected, now));
     void this.schedule();
     return new Response(stream.readable, {
       headers: {
@@ -99,26 +101,33 @@ export class LiveHub {
     });
   }
 
-  private async broadcast(update: { runs: Run[]; removed: string[] }, now: number) {
-    await Promise.all([...this.subscribers].map(subscriber =>
-      this.send(subscriber, this.state.message(update, subscriber.selected, now))));
+  private broadcast(update: { runs: Run[]; removed: string[] }, now: number) {
+    for (const subscriber of this.subscribers) this.send(subscriber, this.state.message(update, subscriber.selected, now));
   }
 
-  private async send(subscriber: Subscriber, message: unknown) {
-    await this.writeTo(subscriber, `data: ${JSON.stringify(message)}\n\n`);
+  private send(subscriber: Subscriber, message: unknown) {
+    this.writeTo(subscriber, `data: ${JSON.stringify(message)}\n\n`);
   }
 
-  private async write(text: string) {
-    await Promise.all([...this.subscribers].map(subscriber => this.writeTo(subscriber, text)));
+  private write(text: string) {
+    for (const subscriber of this.subscribers) this.writeTo(subscriber, text);
   }
 
-  private async writeTo(subscriber: Subscriber, text: string) {
-    try {
-      await subscriber.writer.write(this.encoder.encode(text));
-    } catch {
+  /**
+   * Never wait on a viewer: a stalled stream must not hold up ingest. A viewer
+   * that falls far behind is dropped; its browser reconnects and resyncs.
+   */
+  private writeTo(subscriber: Subscriber, text: string) {
+    const writer = subscriber.writer;
+    if ((writer.desiredSize ?? 0) < -MAX_BACKLOG) {
+      this.subscribers.delete(subscriber);
+      void writer.abort("viewer fell behind").catch(() => {});
+      return;
+    }
+    writer.write(this.encoder.encode(text)).catch(() => {
       // The viewer went away; its stream is closed.
       this.subscribers.delete(subscriber);
-    }
+    });
   }
 
   private async schedule() {

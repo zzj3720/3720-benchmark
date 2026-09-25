@@ -21,6 +21,12 @@ sed -e "s#@PUBLISHER@#$publisher#g" -e "s#@ROOT@#$root#g" -e "s#@ENDPOINT@#$endp
     -e "s#@TOKEN_FILE@#$token_file#g" -e "s#@LOG@#$log#g" \
     "$root/observer/runtime/deploy/$label.plist.in" > "$plist"
 
-launchctl bootout "gui/$(id -u)/$label" 2>/dev/null || true
-launchctl bootstrap "gui/$(id -u)" "$plist"
+domain="gui/$(id -u)"
+launchctl bootout "$domain/$label" 2>/dev/null || true
+# bootout returns before the old job is gone; bootstrapping too early fails with EIO.
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+  launchctl print "$domain/$label" >/dev/null 2>&1 || break
+  sleep 1
+done
+launchctl bootstrap "$domain" "$plist" || { sleep 2; launchctl bootstrap "$domain" "$plist"; }
 echo "Installed $label; logs in $log"

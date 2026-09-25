@@ -41,6 +41,12 @@ export async function handleLive(request: Request, env: LiveEnv, ctx: Background
     if (!ASSET_ID.test(asset[1])) return error(400, "invalid asset id");
     return body(env, request, `pub/assets/${asset[1]}`, "unknown asset");
   }
+  const levels = /^v1\/games\/([^/]+)\/levels(?:\/([^/]+))?$/.exec(path);
+  if (levels) {
+    const [, game, key] = levels;
+    if (!SAFE_ID.test(game) || (key !== undefined && !/^[0-9a-f]{16}$/.test(key))) return error(400, "invalid level");
+    return body(env, request, key ? `pub/games/${game}/levels/${key}.json` : `pub/games/${game}/levels.json`, "unknown level");
+  }
   const run = /^v1\/runs\/([^/]+)$/.exec(path);
   if (!run) return error(404, "live endpoint is read-only");
   const id = run[1];
