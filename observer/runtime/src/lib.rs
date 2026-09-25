@@ -20,6 +20,7 @@ pub mod archive;
 pub mod contract;
 pub mod gateway;
 pub mod index;
+pub mod publish;
 mod replay;
 pub mod storage;
 pub use replay::replay_projection;

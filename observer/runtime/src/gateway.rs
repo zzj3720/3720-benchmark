@@ -46,8 +46,100 @@ struct App {
     ready: Arc<AtomicBool>,
     shutdown: watch::Sender<bool>,
     changes: broadcast::Sender<u64>,
-    _watcher: Arc<Mutex<notify::RecommendedWatcher>>,
+    _watcher: Option<Arc<Mutex<notify::RecommendedWatcher>>>,
 }
+
+impl App {
+    /// A projection over the authority without HTTP serving or file watching.
+    fn offline(root: PathBuf, cache: PathBuf) -> Self {
+        Self {
+            archive: root.join(".harbor/live-archive"),
+            journals: root.join(".harbor/run-journals"),
+            root,
+            cache,
+            run_locks: Arc::new(Mutex::new(HashMap::new())),
+            summaries: Arc::new(Mutex::new(HashMap::new())),
+            details: Arc::new(Mutex::new(HashMap::new())),
+            subscription: Arc::new(Mutex::new(CachedSubscription::default())),
+            revision: Arc::new(AtomicU64::new(1)),
+            ready: Arc::new(AtomicBool::new(true)),
+            shutdown: watch::channel(false).0,
+            changes: broadcast::channel(1).0,
+            _watcher: None,
+        }
+    }
+}
+
+/// Response bodies exactly as the gateway serves them, for publishers that
+/// replicate the read API elsewhere.
+pub struct Projector {
+    app: App,
+}
+
+impl Projector {
+    pub fn open(root: &Path, cache: &Path) -> Result<Self, String> {
+        let root = root.canonicalize().map_err(display_error)?;
+        fs::create_dir_all(cache).map_err(display_error)?;
+        Ok(Self {
+            app: App::offline(root, cache.to_path_buf()),
+        })
+    }
+
+    pub fn journals(&self) -> &Path {
+        &self.app.journals
+    }
+
+    pub fn archive(&self) -> &Path {
+        &self.app.archive
+    }
+
+    /// Changes whenever any chain's authority, lease, or the archive changes.
+    pub fn source_revisions(&self) -> BTreeMap<String, String> {
+        source_revisions(&self.app.journals, &self.app.archive)
+    }
+
+    pub fn is_native(&self, run_id: &str) -> bool {
+        source_signature(&self.app.journals.join(run_id)).is_some()
+    }
+
+    pub fn runs(&self) -> Result<Vec<Value>, String> {
+        list_runs(&self.app)
+    }
+
+    pub fn detail(&self, run_id: &str) -> Payload {
+        run_payload(&self.app, run_id, RunQuery::default())
+    }
+
+    pub fn catalog(&self, run_id: &str, before: u64) -> Payload {
+        run_payload(
+            &self.app,
+            run_id,
+            RunQuery {
+                catalog_before: Some(before),
+                ..RunQuery::default()
+            },
+        )
+    }
+
+    pub fn replay(&self, run_id: &str, attempt: u64, after: Option<u64>) -> Payload {
+        run_payload(
+            &self.app,
+            run_id,
+            RunQuery {
+                replay_attempt: Some(attempt),
+                after_sequence: after,
+                ..RunQuery::default()
+            },
+        )
+    }
+
+    pub fn asset(&self, asset_id: &str) -> Payload {
+        asset_payload(&self.app, asset_id)
+    }
+}
+
+/// A read API body, or the HTTP status and message the gateway would return.
+pub type Payload = Result<Vec<u8>, (u16, String)>;
 
 struct CachedRun {
     signature: String,
@@ -88,7 +180,7 @@ struct NativeRun {
     cache: PathBuf,
 }
 
-#[derive(Deserialize)]
+#[derive(Default, Deserialize)]
 struct RunQuery {
     replay_attempt: Option<u64>,
     after_sequence: Option<u64>,
@@ -168,7 +260,7 @@ pub async fn serve(root: PathBuf, host: &str, port: u16) -> Result<(), String> {
         ready: Arc::new(AtomicBool::new(false)),
         shutdown: watch::channel(false).0,
         changes,
-        _watcher: Arc::new(Mutex::new(watcher)),
+        _watcher: Some(Arc::new(Mutex::new(watcher))),
     };
     let warm_app = app.clone();
     tokio::spawn(async move {
@@ -294,24 +386,31 @@ async fn run(
 }
 
 fn run_response(app: &App, run_id: &str, query: RunQuery) -> Response {
+    payload_response(run_payload(app, run_id, query), "no-store")
+}
+
+fn run_payload(app: &App, run_id: &str, query: RunQuery) -> Payload {
+    const BAD_REQUEST: u16 = 400;
+    const NOT_FOUND: u16 = 404;
+    const INTERNAL: u16 = 500;
     if !safe_id(run_id) {
-        return error_response(StatusCode::BAD_REQUEST, "invalid run id");
+        return Err((BAD_REQUEST, "invalid run id".into()));
     }
     if let Some(attempt_id) = query.replay_attempt {
         return match native_run(app, run_id) {
             Ok(Some(run)) => match native_replay(&run, attempt_id, query.after_sequence) {
-                Ok(Some(value)) => json_response(StatusCode::OK, value),
-                Ok(None) => error_response(StatusCode::NOT_FOUND, "unknown replay attempt"),
-                Err(error) => error_response(StatusCode::INTERNAL_SERVER_ERROR, error),
+                Ok(Some(value)) => json_payload(&value),
+                Ok(None) => Err((NOT_FOUND, "unknown replay attempt".into())),
+                Err(error) => Err((INTERNAL, error)),
             },
-            Ok(None) => archive_response(
+            Ok(None) => archive_payload(
                 &app.archive
                     .join("replays")
                     .join(run_id)
                     .join(format!("{attempt_id}.json.gz")),
                 "unknown replay attempt",
             ),
-            Err(error) => error_response(StatusCode::INTERNAL_SERVER_ERROR, error),
+            Err(error) => Err((INTERNAL, error)),
         };
     }
     if let Some(before) = query.catalog_before {
@@ -320,30 +419,33 @@ fn run_response(app: &App, run_id: &str, query: RunQuery) -> Response {
             .and_then(|run| crate::index::RunIndex::open(&run.chain, &run.cache))
             .and_then(|index| index.catalog(Some(before)))
         {
-            Ok((attempts, more)) => json_response(StatusCode::OK, catalog_value(&attempts, more)),
-            Err(error) => error_response(StatusCode::BAD_REQUEST, error),
+            Ok((attempts, more)) => json_payload(&catalog_value(&attempts, more)),
+            Err(error) => Err((BAD_REQUEST, error)),
         };
     }
     match native_run(app, run_id) {
-        Ok(Some(run)) => json_response(
-            StatusCode::OK,
-            json!({"schema": "benchmark-live-run-v1", "run": run.detail}),
-        ),
-        Ok(None) => archive_response(
+        Ok(Some(run)) => json_payload(&json!({"schema": "benchmark-live-run-v1", "run": run.detail})),
+        Ok(None) => archive_payload(
             &app.archive.join("runs").join(format!("{run_id}.json.gz")),
             "unknown run",
         ),
-        Err(error) => error_response(StatusCode::INTERNAL_SERVER_ERROR, error),
+        Err(error) => Err((INTERNAL, error)),
     }
 }
 
 async fn asset(State(app): State<App>, AxumPath(asset_id): AxumPath<String>) -> Response {
-    blocking_response(move || asset_response(&app, &asset_id)).await
+    blocking_response(move || {
+        payload_response(
+            asset_payload(&app, &asset_id),
+            "public, max-age=31536000, immutable",
+        )
+    })
+    .await
 }
 
-fn asset_response(app: &App, asset_id: &str) -> Response {
+fn asset_payload(app: &App, asset_id: &str) -> Payload {
     if asset_id.len() != 64 || !asset_id.bytes().all(|byte| byte.is_ascii_hexdigit()) {
-        return error_response(StatusCode::BAD_REQUEST, "invalid asset id");
+        return Err((400, "invalid asset id".into()));
     }
     let archived = storage::resolve(
         &app.archive
@@ -351,10 +453,10 @@ fn asset_response(app: &App, asset_id: &str) -> Response {
             .join(format!("{asset_id}.json.gz")),
     );
     if archived.is_file() {
-        return decoded_file_response(&archived, "public, max-age=31536000, immutable");
+        return read_gzip(&archived).map_err(|error| (500, error));
     }
     let Ok(chains) = fs::read_dir(&app.journals) else {
-        return error_response(StatusCode::NOT_FOUND, "unknown asset");
+        return Err((404, "unknown asset".into()));
     };
     for chain in chains.flatten() {
         let object = storage::resolve(
@@ -364,10 +466,32 @@ fn asset_response(app: &App, asset_id: &str) -> Response {
                 .join(format!("{asset_id}.json.gz")),
         );
         if object.is_file() {
-            return decoded_file_response(&object, "public, max-age=31536000, immutable");
+            return read_gzip(&object).map_err(|error| (500, error));
         }
     }
-    error_response(StatusCode::NOT_FOUND, "unknown asset")
+    Err((404, "unknown asset".into()))
+}
+
+fn payload_response(payload: Payload, cache_control: &'static str) -> Response {
+    match payload {
+        Ok(body) => response(StatusCode::OK, body, cache_control),
+        Err((status, error)) => error_response(
+            StatusCode::from_u16(status).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR),
+            error,
+        ),
+    }
+}
+
+fn json_payload(value: &Value) -> Payload {
+    serde_json::to_vec(value).map_err(|error| (500, error.to_string()))
+}
+
+fn archive_payload(path: &Path, not_found: &str) -> Payload {
+    let path = storage::resolve(path);
+    if !path.is_file() {
+        return Err((404, not_found.to_owned()));
+    }
+    read_gzip(&path).map_err(|error| (500, error))
 }
 
 #[derive(Default, Deserialize)]
@@ -1665,21 +1789,6 @@ fn experience(markdown: &str, updated_at: Option<Value>) -> Value {
     })
 }
 
-fn archive_response(path: &Path, not_found: &str) -> Response {
-    let path = storage::resolve(path);
-    if !path.is_file() {
-        return error_response(StatusCode::NOT_FOUND, not_found);
-    }
-    decoded_file_response(&path, "no-store")
-}
-
-fn decoded_file_response(path: &Path, cache_control: &'static str) -> Response {
-    match read_gzip(path) {
-        Ok(body) => response(StatusCode::OK, body, cache_control),
-        Err(error) => error_response(StatusCode::INTERNAL_SERVER_ERROR, error),
-    }
-}
-
 fn json_response(status: StatusCode, value: Value) -> Response {
     match serde_json::to_vec(&value) {
         Ok(body) => response(status, body, "no-store"),
@@ -1789,7 +1898,7 @@ mod tests {
             ready: Arc::new(AtomicBool::new(true)),
             shutdown: watch::channel(false).0,
             changes: broadcast::channel(8).0,
-            _watcher: Arc::new(Mutex::new(watcher)),
+            _watcher: Some(Arc::new(Mutex::new(watcher))),
         };
         assert_eq!(native_summary(&app, "legacy").unwrap().unwrap()["score"], 1);
         let run = native_run(&app, "legacy").unwrap().unwrap();

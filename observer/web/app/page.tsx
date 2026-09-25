@@ -157,6 +157,13 @@ function instructionLabel(frame: ReplayFrame) {
   return "单个";
 }
 
+type Feed = { connected: boolean; last_seen_ms: number | null };
+
+/** Once the local publisher is gone, time stops where its last heartbeat was. */
+function feedNow(now: number, feed: Feed | null) {
+  return feed && !feed.connected && feed.last_seen_ms !== null ? Math.min(now, feed.last_seen_ms) : now;
+}
+
 function gatewayUrl(path: string) {
   const origin = import.meta.env.VITE_LIVE_GATEWAY_ORIGIN;
   return new URL(origin ? `${origin}${path}` : `/api/live${path}`, window.location.origin);
@@ -228,15 +235,16 @@ export default function Home() {
   const [feedRetry, setFeedRetry] = useState(0);
   const [lastReceivedAt, setLastReceivedAt] = useState<number | null>(null);
   const [clockOffset, setClockOffset] = useState(0);
+  const [feed, setFeed] = useState<Feed | null>(null);
   const runsRef = useRef<RunSummary[]>([]);
   const detailResource = useRef<LiveResource<RunDetail> | null>(null);
   const contentRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (paused || connection !== "live") return;
-    const timer = window.setInterval(() => setSnapshotNow(Date.now() + clockOffset), 1000);
+    const timer = window.setInterval(() => setSnapshotNow(feedNow(Date.now() + clockOffset, feed)), 1000);
     return () => window.clearInterval(timer);
-  }, [paused, connection, clockOffset]);
+  }, [paused, connection, clockOffset, feed]);
 
   useEffect(() => {
     const syncFromLocation = () => {
@@ -291,9 +299,11 @@ export default function Home() {
         const update = applySubscription<RunSummary>(runsRef.current, payload);
         appliedRevision = typeof payload.revision === "number" ? payload.revision : appliedRevision;
         const observedAt = update.generatedAt;
+        const nextFeed = payload.feed && typeof payload.feed.connected === "boolean" ? payload.feed as Feed : null;
         runsRef.current = update.runs;
         setRuns(update.runs);
-        setSnapshotNow(observedAt);
+        setFeed(nextFeed);
+        setSnapshotNow(feedNow(observedAt, nextFeed));
         setClockOffset(observedAt - Date.now());
         setLastReceivedAt(Date.now());
         setConnection("live");
@@ -332,6 +342,7 @@ export default function Home() {
   );
   const visibleRuns = grouped[selectedGame];
   const liveCount = runs.filter((run) => run.live).length;
+  const sourceOffline = feed !== null && !feed.connected && feed.last_seen_ms !== null;
   function selectRun(run: RunSummary) {
     // Selecting the current run must preserve its detail and replay state.
     // Its unchanged ID would not restart the detail resource after clearing it.
@@ -371,13 +382,15 @@ export default function Home() {
           <span>3720</span>
           <strong>Benchmark Live</strong>
         </button>
-        <div className={`ingest-status ${connection}`} title={lastReceivedAt ? `最近数据更新 ${clockTime(lastReceivedAt)}` : "正在连接"}>
+        <div className={`ingest-status ${sourceOffline ? "offline" : connection}`} title={lastReceivedAt ? `最近数据更新 ${clockTime(lastReceivedAt)}` : "正在连接"}>
           <i />
           {paused
             ? "画面已暂停"
-            : connection === "live"
-              ? liveCount ? `${liveCount} 个运行进行中` : "已连接 · 暂无运行"
-              : connection === "connecting" ? "正在连接" : "连接中断"}
+            : sourceOffline
+              ? `直播源离线 · 停在 ${clockTime(feed?.last_seen_ms)}`
+              : connection === "live"
+                ? liveCount ? `${liveCount} 个运行进行中` : "已连接 · 暂无运行"
+                : connection === "connecting" ? "正在连接" : "连接中断"}
         </div>
         <div className="top-actions">
           <button onClick={() => setPaused((value) => !value)}>{paused ? "恢复更新" : "暂停更新"}</button>
@@ -430,6 +443,7 @@ export default function Home() {
       </aside>
 
       <section className="content" ref={contentRef}>
+        {sourceOffline && <div className="data-notice" role="status">评测机已与直播断开，画面停在 {clockTime(feed?.last_seen_ms)} 的最后状态，恢复后会自动续上</div>}
         {feedError && <div className="data-notice" role="alert">{feedError} · 保留上次画面 <button onClick={() => setFeedRetry(value => value + 1)}>重新连接</button></div>}
         {selectedId && detailStatus === "error" && <div className="data-notice" role="alert">{detailError} · 画面可能已过期 <button onClick={() => detailResource.current?.retry()}>重试详情</button></div>}
         {selectedId ? (

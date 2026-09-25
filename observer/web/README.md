@@ -1,13 +1,15 @@
 # 3720 Live Operations
 
-The supported deployment is now `compose.yaml`: immutable web/gateway images,
-read-only history mounts, and a separate disposable query-cache volume. See
-[`docs/live-platform.md`](../../docs/live-platform.md) for the storage/API
-contract, memory budgets, migration, and rollback.
+`observer/web/` is the public console at
+[live.benchmark.3720.org](https://live.benchmark.3720.org), deployed as one
+Cloudflare Worker. It holds the vinext web app, the read-only `/api/live` API
+and authenticated ingest (`worker/live-api.ts`), and the `LiveHub` Durable
+Object that keeps run summaries and streams updates (`worker/live-hub.ts`,
+protocol logic in `worker/live-hub-state.ts`). Run bodies live in the
+`benchmark-live` R2 bucket. See [`docs/live-platform.md`](../../docs/live-platform.md)
+for the publishing contract, storage layout, and deployment.
 
-
-`observer/web/` is the public, read-only live console for 3720 game
-benchmarks. It shows real Harbor runs rather than browser fixtures:
+It is read-only and shows real Harbor runs rather than browser fixtures:
 
 - a separate scoreboard for each game registered in `app/game-registry.tsx`
   (currently Parabox, Swarm, Sausage, Emergency Operator, Kitchen Terminal,
@@ -20,87 +22,33 @@ benchmarks. It shows real Harbor runs rather than browser fixtures:
   messages, and recent append-only events;
 - both active trials and the most recent saved result for each game/model.
 
-The browser holds one versioned Server-Sent Events subscription:
-
-```text
-GET /api/live/v1/subscribe?protocol=2
-GET /api/live/v1/subscribe?protocol=2&run_id=<run-id>
-```
-
-The first message is a snapshot. Later messages contain changed runs, removed
-IDs, and appended score points. The browser preserves the last valid snapshot
-on errors, retries detail independently of new game events, and serializes
-revision updates. The v1 full-snapshot feed remains available for older pages.
-
-Run detail includes the current state, recent visible Agent activity, and up to
-200 attempts. Older catalog pages and bounded replay windows are fetched on
-demand. Assets are immutable and use a bounded browser cache. The gateway uses
-a disposable SQLite index with a 4 MiB page cache per connection, a 32 MiB
-weighted detail cache, and at most two simultaneous projection/replay jobs.
-The authority remains the journal, not SQLite.
-
-Finalized history is stored in independent zstd segments with a 16 MiB decoded
-limit (32 MiB is supported), indexed by sequence range and SHA-256. Active runs
-rotate at the same limit and retain only the open tail as JSONL. Segment
-boundaries never split an event. Source data is read-only inside Docker; the
-recorder and archive CLI run on the host and own all authoritative writes.
+The browser holds one Server-Sent Events subscription
+(`GET /api/live/v1/subscribe?protocol=2[&run_id=<run-id>]`). The first message
+is a snapshot; later messages contain changed runs, removed IDs, appended score
+points, and the feed status. When the benchmark host stops publishing, the page
+says so, keeps the last state, and stops advancing live durations at the last
+heartbeat. Run detail, older catalog pages and bounded replay windows are
+fetched on demand; assets are immutable and use a bounded browser cache.
 
 Emergency Operator publishes read-only clock snapshots once per second after a
 shift starts, so calls, ETAs, incident health, alarms, and score remain live
 while the Agent is waiting. These observer ticks never deliver an alarm or
 enter the scoring audit.
 
-The Vinext route forwards them to the loopback live gateway on port 3740. New
-Harbor runs are launched through `tools/observer/harbor-run`; its recorder
-manifest is the discovery boundary and its journal is the only live source.
-Archived results are served from `.harbor/live-archive`. The gateway never
-calls a game mutation endpoint.
-
-A separately launched Sausage sidecar on port 3733 is also shown, but is marked
-`No agent attached` until a real Harbor Agent run exists. Missing sources are
-shown as unavailable—there is no demo-data fallback.
-
-The runtime ledger and migration boundary are specified in
-[`docs/tracks/live-observability.md`](../../docs/tracks/live-observability.md).
-
-The production URL is [live.benchmark.3720.org](https://live.benchmark.3720.org).
-A Cloudflare Worker accepts only `GET` and `HEAD`, rewrites `/api/live/v1/*` to
-the gateway's `/v1/*`, and forwards to the named Tunnel origin. The Vinext
-application route applies the same read-only allowlist (`/v1/runs`,
-`/v1/assets/<id>`, `/v1/subscribe`) and streams responses through, so a
-self-hosted `vinext start` serves the same endpoints without the Worker in
-front.
-
-## Docker operation
-
-Docker Compose, Node.js 24+ (for host checks), and Rust (for the host recorder)
-are required. From the repository root:
+## Development and deployment
 
 ```bash
 npm --prefix observer/web ci
-npm --prefix observer/web test
-cargo test --manifest-path observer/runtime/Cargo.toml
-python3 observer/web/scripts/publish_docker.py --preview
-python3 observer/web/scripts/publish_docker.py
+npm --prefix observer/web test        # typecheck, build, node tests
+observer/web/scripts/deploy.sh        # build and `wrangler deploy`
 ```
 
-Publication builds versioned images and the host recorder, verifies the
-candidate on ports 14000/14740, compares run identities/scores with the current
-service, and only then switches ports 3000/3740. Failure restores the previous
-Docker release or the existing macOS LaunchAgents. The native services are
-disabled only during the first successful switch. Public content-hashed chunks
-are retained across releases so cached HTML remains usable.
-
-The web and gateway each have a 256 MiB container limit, with swap disabled.
-Only loopback ports are published. The gateway's `/health` becomes ready after
-its query index has been rebuilt; startup can take longer with a cold cache.
-A writer heartbeat lets the Docker gateway observe the host recorder without
-assuming that macOS and the Linux VM share file-lock ownership.
-
-For development, use `npm run dev` inside this directory and start the Rust
-gateway separately. The browser normally uses the same-origin API route.
-Set `LIVE_GATEWAY_ORIGIN` on the Node process for an alternate gateway;
-`VITE_LIVE_GATEWAY_ORIGIN` is an explicit browser override for isolated fixtures.
+`npm run dev` serves the app with a local `LiveHub` and R2 (Miniflare). Point
+a local `live-publisher --endpoint http://127.0.0.1:<port>` at it with the
+`LIVE_INGEST_TOKEN` you give `wrangler dev --var`. `VITE_LIVE_GATEWAY_ORIGIN`
+makes the browser read another origin's API, for example the production site.
+The browser tests (`npm run test:browser`) serve the standalone build against
+fixtures.
 
 ## Render QA
 

@@ -12,8 +12,16 @@ const { d1, r2 } = hostingConfig;
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 
 const localBindingConfig = {
+  name: "benchmark-live",
   main: "./worker/index.ts",
   compatibility_flags: ["nodejs_compat"],
+  // The live console: run summaries and subscriptions in one Durable Object,
+  // published bodies and the raw journal backup in R2.
+  durable_objects: { bindings: [{ name: "LIVE_HUB", class_name: "LiveHub" }] },
+  migrations: [{ tag: "live-hub-v1", new_sqlite_classes: ["LiveHub"] }],
+  ...(process.env.LIVE_CUSTOM_DOMAIN
+    ? { routes: [{ pattern: process.env.LIVE_CUSTOM_DOMAIN, custom_domain: true }] }
+    : {}),
   d1_databases: d1
     ? [
         {
@@ -23,14 +31,10 @@ const localBindingConfig = {
         },
       ]
     : [],
-  r2_buckets: r2
-    ? [
-        {
-          binding: r2,
-          bucket_name: "site-creator-r2",
-        },
-      ]
-    : [],
+  r2_buckets: [
+    { binding: "LIVE_BUCKET", bucket_name: "benchmark-live" },
+    ...(r2 ? [{ binding: r2, bucket_name: "site-creator-r2" }] : []),
+  ],
 };
 
 export default defineConfig(async () => {

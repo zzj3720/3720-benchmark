@@ -3,24 +3,25 @@
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>org.3720.benchmark-live-gateway</string>
+  <string>org.3720.benchmark-live-publisher</string>
   <key>ProgramArguments</key>
   <array>
-    <string>@GATEWAY@</string>
+    <string>@PUBLISHER@</string>
     <string>--root</string>
     <string>@ROOT@</string>
+    <string>--endpoint</string>
+    <string>@ENDPOINT@</string>
+    <string>--token-file</string>
+    <string>@TOKEN_FILE@</string>
   </array>
   <key>WorkingDirectory</key>
   <string>@ROOT@</string>
-  <key>EnvironmentVariables</key>
-  <dict>
-    <key>PATH</key>
-    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
-  </dict>
   <key>RunAtLoad</key>
   <true/>
   <key>KeepAlive</key>
   <true/>
+  <key>ProcessType</key>
+  <string>Background</string>
   <key>StandardOutPath</key>
   <string>@LOG@</string>
   <key>StandardErrorPath</key>

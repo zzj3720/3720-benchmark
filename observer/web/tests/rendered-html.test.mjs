@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { access, readFile } from "node:fs/promises";
+import { access } from "node:fs/promises";
 import test from "node:test";
 
 const root = new URL("../", import.meta.url);
@@ -59,22 +59,8 @@ test("renders range and comparison controls without search", async () => {
   await access(new URL("../public/og.png", import.meta.url));
 });
 
-test("keeps the public observer gateway read-only", async () => {
-  // The legacy per-game sidecar proxy is gone: all live data flows through
-  // the single gateway allowlist below.
+test("has no per-game sidecar proxy", async () => {
+  // All live data flows through the Worker's read API (worker/live-api.ts).
   await assert.rejects(access(new URL("../app/observe", import.meta.url)));
-
-  const liveRoute = await readFile(
-    new URL("../app/api/live/[...path]/route.ts", import.meta.url),
-    "utf8",
-  );
-  assert.match(liveRoute, /\^v1\\\/\(\?:runs/);
-  assert.match(liveRoute, /assets\\\/\[\^\/\]\+/);
-  assert.match(liveRoute, /\|subscribe\)\$/);
-  assert.match(liveRoute, /LIVE_GATEWAY_ORIGIN/);
-  assert.match(liveRoute, /live endpoint is read-only/);
-  // SSE subscriptions must stream through, never buffer to completion.
-  assert.match(liveRoute, /new Response\(response\.body/);
-  assert.doesNotMatch(liveRoute, /arrayBuffer/);
-  assert.doesNotMatch(liveRoute, /POST|PUT|PATCH|DELETE/);
+  await assert.rejects(access(new URL("../app/api/live", import.meta.url)));
 });

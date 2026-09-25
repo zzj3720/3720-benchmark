@@ -1,9 +1,16 @@
 # Live platform: protocol, storage and operations
 
-This is the current deployment and storage contract. The logical-run identity,
-effective-time rules and checkpoint ownership in `tracks/live-observability.md`
-remain in force. The v2 storage layout replaces whole-file gzip history and the
-old in-memory/full-history gateway projection.
+Benchmarks run locally; the public console runs on Cloudflare. The run
+recorder writes each run's authoritative journal on the benchmark host. The
+`live-publisher` beside it projects every run with the same Rust code the local
+gateway serves and pushes the results to Cloudflare, where a Worker, one
+Durable Object and an R2 bucket serve [live.benchmark.3720.org](https://live.benchmark.3720.org).
+If the benchmark host goes away, the site keeps serving the last published
+state and tells viewers the feed is offline; when the host returns, the
+publisher resumes from what Cloudflare already holds.
+
+The logical-run identity, effective-time rules and checkpoint ownership in
+`tracks/live-observability.md` remain in force.
 
 ## Components
 
@@ -11,13 +18,18 @@ old in-memory/full-history gateway projection.
 |---|---|
 | `games/<game>/observer/` | Game-specific live-state metadata and WebGL scene |
 | `observer/relay/` | Sidecar relay that projects native Parabox/Swarm logs into the common observer API |
-| `observer/runtime/` | Rust `run-recorder`, `live-gateway`, `run-archive`, and replay tools |
-| `observer/web/` | Public read-only console, Docker Compose deployment, and edge proxy |
+| `observer/runtime/` | Rust `run-recorder`, `live-publisher`, `live-gateway` (local inspection), `run-archive`, `run-audit` |
+| `observer/web/` | The console: vinext app, Worker read API and ingest (`worker/live-api.ts`), `LiveHub` Durable Object |
 | `tools/observer/` | Harbor-side hook: `harbor-run` and `RunJournalPlugin`, which start the recorder |
 
-The live platform has two read-only layers: a common per-game observer schema
-inside sidecars, and a host gateway that projects all current Harbor trials into
-one multi-run feed.
+```text
+benchmark host                                   Cloudflare
+  Harbor ─► run-recorder ─► .harbor/run-journals   R2 bucket benchmark-live
+                              │                      pub/…  published bodies
+                              ▼                      raw/…  journal backup (never routed)
+                        live-publisher ── HTTPS ──►  LiveHub (run summaries, SSE fan-out)
+                                                     Worker (web app + /api/live read API)
+```
 
 ## Per-game observer protocol
 
@@ -43,53 +55,26 @@ Parabox native records additionally contain a private recursive scene graph for
 the host dashboard. The common sidecar relay strips that field so richer human
 rendering does not expand the state available to the benchmark Agent.
 
-## Recorder and gateway
+## Recorder
 
-The Rust `live-gateway` binary in `observer/runtime` is the read-only
-projection used by the public dashboard. New runs are read from the single
-chain journal. Runtime lifecycle, sidecar game records, visible Agent messages,
-tool actions, and workspace notes therefore arrive with one identity, one
+Runtime lifecycle, sidecar game records, visible Agent messages, tool actions
+and workspace notes arrive in one chain journal with one identity, one
 sequence, and an already-stamped effective Agent time. Runs created before the
-recorder are frozen in the local `.harbor/live-archive`; request handling never
-scans Docker or joins live Harbor artifacts.
-An unsealed segment is reported as live only while its recorder owns the
-chain's process-scoped writer lease. Losing that lease without a durable
-`segment_finished` record produces `orphaned`, not a false `running` state.
+recorder are frozen in `.harbor/live-archive`.
 
-Recorder-aware sidecars append to a durable trial inbox. The Rust recorder
-tails it incrementally and drains it idempotently by source sequence; the file
-itself is also the recovery buffer. Agent session and note additions enter that
-same recorder before publication. Live ingestion therefore does not poll
-sidecar state.
+Recorder-aware sidecars append to a durable trial inbox. The recorder tails it
+incrementally and drains it idempotently by source sequence; the file itself is
+also the recovery buffer. Live ingestion never polls sidecar state.
 
-The v2 SSE feed starts with a snapshot, then contains only changed run summaries, appended score points, removals, and a selected-run revision. The
-browser fetches detail after that revision changes; it does not receive the
-complete current state on every SSE notification. A detail read adds the
-authoritative dynamic game state, compact replay catalog, and explicit Agent
-notes. A selected replay is loaded separately. Content-addressed assets are
-immutable and cached by the browser and edge. Hidden reasoning is neither
-required nor exposed.
+An unsealed segment is live only while its recorder holds the chain's writer
+lock. Losing it without a durable `segment_finished` record projects as
+`orphaned`, not a false `running`.
 
 Score charts normalize every run to cumulative Agent execution time starting
 at `0h`; the horizontal axis never uses calendar time. Continuation gaps and
-infrastructure-only failed segments are excluded, while live runs extend the
-current active segment until the next gateway refresh.
+infrastructure-only failed segments are excluded.
 
-## Ownership and layout
-
-Harbor and the recorder remain on the host. The recorder owns game/runtime
-ingestion, writer.lock, and the authoritative event sequence. Docker runs two
-read-only public services: `web` and `gateway`. Neither mounts a Docker socket,
-Agent sessions, or the entire repository. Only the two observer data directories
-are mounted; the query index lives in a separate writable cache volume.
-
-The public Cloudflare Tunnel runs separately in `benchmark-live-cloudflared`,
-on the `benchmark-live_default` network. It resolves edge endpoints using its
-explicit container DNS servers, independent of the host's virtual DNS settings.
-Its existing credentials and ingress config are mounted read-only; ingress
-targets the `web` and `gateway` service names. The previous native live-tunnel
-LaunchAgent is disabled. `.harbor/live-deploy/start-tunnel.sh` starts or recreates
-the connector with the saved configuration.
+## Local layout
 
 ```text
 .harbor/
@@ -100,19 +85,15 @@ the connector with the saved configuration.
     journal-index.json                 # atomic, versioned segment inventory
     history/<first>-<last>-<hash>.jsonl.zst
     objects/<decoded-content-sha256>.json.zst
-  live-archive/                        # legacy public projections, now zstd
-  archive-migration.json               # most recent migration summary
-  archive-receipts/<migration>/*.jsonl.zst # per-file checksums, also segmented
-  live-deploy/current.json             # deployed image tag + rollback tag
-
-Docker volumes:
-  benchmark-live-cache-v2/<chain_id>/projection-v6.sqlite
-  benchmark-live-assets/               # immutable chunks from web releases
+  live-archive/                        # legacy public projections
+  live-publish/
+    index/<chain_id>/projection-v6.sqlite  # disposable query index
+    ledger.sqlite                          # what Cloudflare has accepted
 ```
 
-The query index is disposable. Deleting it loses no scores or replay evidence;
-the gateway rebuilds it by streaming the authority, one source segment at a time.
-The health endpoint stays unready until the initial index scan completes.
+The query index and the ledger are disposable. Deleting the index loses no
+scores or replay evidence; deleting the ledger makes the publisher resend
+everything.
 
 ## Event and object formats
 
@@ -193,137 +174,91 @@ deduplicate that prefix by authoritative sequence. Continuation appends a new
 tail and streams prior segments for recovery, without expanding all history to
 disk or RAM.
 
-The gateway uses these budgets:
+## Publishing
 
-| Resource | Budget |
-|---|---:|
-| Web container | 256 MiB, no swap; V8 heap 160 MiB |
-| Gateway container | 256 MiB, no swap |
-| Concurrent blocking query work | 2 |
-| Concurrent replay assembly | 1 |
-| SQLite page cache per connection | 4 MiB; temporary data on disk |
-| Retained detail cache | 32 MiB weighted estimate; oversized entries bypass it |
-| Replay input per page | about 1 MiB decoded state/trace data, at most 128 events / 1,024 traced instructions |
-| Single replay operation | at most 4 MiB decoded state + trace |
-| Attempt catalog page | 200 attempts |
-| Score chart | at most about 2,050 sampled points per run |
-| Recent Agent activity | 20 messages live; 100 per replay window |
-| Browser immutable-asset cache | 16 MiB weighted estimate |
+`live-publisher` watches every chain's authority and writer lock. For each run
+that changed it stores, under `pub/` in R2:
 
-Weighted estimates account for object overhead; they are not measurements of
-exact allocator usage. Container limits are the hard boundary. Large histories
-are sampled only for drawing charts; the index and authoritative segments retain
-every score event. `score_history_sampled` and `score_history_points` describe
-this distinction. Replay/catalog pagination does not retain every prior page in
-browser memory. Playback automatically fetches the next fragment. Export operates
-on the current replay fragment and caps raster size/total pixel work. Video keeps
-every selected replay frame and uses the playback speed to set its timestamps;
-rendering or capture delays do not remove frames or change the output duration.
+| Key | Body | Cache |
+|---|---|---|
+| `pub/runs/<run>/detail.json` | `GET /v1/runs/<run>` | `no-store` |
+| `pub/runs/<run>/catalog/<before>.json` | `?catalog_before=<before>` | immutable |
+| `pub/runs/<run>/replay/<attempt>/first.json` | `?replay_attempt=<attempt>` | immutable once the attempt closes |
+| `pub/runs/<run>/replay/<attempt>/<after>.json` | `…&after_sequence=<after>` | as above |
+| `pub/assets/<sha256>` | `GET /v1/assets/<sha256>` | immutable |
 
-## Read API and state transitions
+Bodies are byte-identical to the local gateway's responses (both call the same
+projection functions) and stored gzip-encoded. Older catalog pages and closed
+attempts never change, so each is uploaded once; the open attempt's replay is
+refreshed at most every 15 seconds. The authority itself (sealed history,
+objects, index, and the tail every 10 minutes) is copied under `raw/<chain>/`.
+
+After the bodies, it pushes changed run summaries (with score history) to
+`LiveHub`, then heartbeats every 10 seconds. The ledger is written only after
+Cloudflare accepts a batch, so a crash or network failure resends rather than
+skips. Verify a publisher export against the gateway with
+`observer/runtime/scripts/compare_publish.py`.
+
+Ingest is `POST /api/ingest/{objects,runs,heartbeat}` with
+`Authorization: Bearer $LIVE_INGEST_TOKEN`. Objects arrive batched in one frame
+(u32 big-endian manifest length, manifest JSON, then each body); keys must be
+under `pub/` or `raw/`.
+
+## Serving
+
+The Worker answers `/api/live/*` before the web app:
 
 ```text
-GET /health
-GET /v1/runs
-GET /v1/runs/<id>
-GET /v1/runs/<id>?catalog_before=<attempt-id>
-GET /v1/runs/<id>?replay_attempt=<attempt-id>&after_sequence=<sequence>
-GET /v1/assets/<sha256>
-GET /v1/subscribe?protocol=2&run_id=<id>
+GET /api/live/health
+GET /api/live/v1/runs
+GET /api/live/v1/runs/<id>
+GET /api/live/v1/runs/<id>?catalog_before=<attempt-id>
+GET /api/live/v1/runs/<id>?replay_attempt=<attempt-id>[&after_sequence=<sequence>]
+GET /api/live/v1/assets/<sha256>
+GET /api/live/v1/subscribe?protocol=2[&run_id=<id>]
 ```
 
-The web proxy exposes these under `/api/live` and forwards cancellation. Assets
-keep immutable cache headers. `catalog_before` returns `groups`, `more` and
-`before`. Detail includes the first catalog page; replay returns
-`next_after_sequence` when another fragment is available.
+Run bodies and assets come from R2; immutable ones are also kept in the edge
+cache. `raw/` is never routed. `LiveHub` holds run summaries in its SQLite
+storage and serves the subscription as Server-Sent Events: a `reset` snapshot,
+then only changed runs (with `score_history_delta` when history grew by an
+unchanged prefix), removals, and the selected run's `detail_revision`. Every
+message carries `feed: {connected, last_seen_ms, publisher}`.
 
-SSE v2 starts with `reset: true`, `runs` containing the initial snapshot and an
-empty `removed` array. Later messages contain only changed runs, deleted IDs,
-and `score_history_delta` when the history grows by an unchanged prefix. A
-corrected/downsampled history is sent as a replacement `score_history` array.
-Each subscriber retains fingerprints rather than copies of all historical
-states. A reconnect starts a new snapshot. `protocol=1`/no protocol keeps the
-legacy full-snapshot feed for old pages.
+Without a heartbeat for 45 seconds `LiveHub` marks the feed disconnected and
+broadcasts it. Runs keep their last published state; the console shows the
+time of the last heartbeat and stops extrapolating live durations there. The
+next heartbeat reconnects the feed.
 
-`detail_revision` includes lifecycle/lease state as well as sequence, so losing
-the recorder invalidates detail even when no new event was written. The
-`execution` object supplies an active-window timestamp/elapsed anchor; the
-browser extrapolates only while that window and the connection are active.
-Published historical points always use their recorded effective timestamps.
+`LiveHub` is a single Durable Object that stays idle when nobody watches and
+the feed is offline. SSE streams keep it resident while viewers are connected;
+at this site's scale that stays within the Workers free allowance.
 
-Details use one in-flight request with coalesced revisions, cancellation and
-bounded retries independent of new game events. Errors preserve the last good
-snapshot and show a retry action. Returning to live invalidates pending replay
-requests. Holding an old frame freezes its replay batch instead of allowing
-incoming details to pull the cursor forward. Export cancels on unmount and
-blocks controls that could change its source frame.
+## Deploying
 
-The host writes `benchmark-writer-lease-v1` once per second. Docker uses its
-freshness (five seconds), health, and explicit runtime identity rather than host
-file-lock ownership. Filesystem notifications provide normal updates; a small
-two-second metadata/lease scan also handles notifications lost across the VM
-mount. Neither path polls game state. SSE closes on shutdown; restart policies
-are managed by Docker.
-
-## Migration and deployment
-
-Back up the two data directories first. The archive CLI runs on the same host
-as the recorder so its exclusive writer-lock checks are meaningful:
+One-time setup, from a machine logged in with `wrangler login`:
 
 ```sh
-cargo build --release --locked --manifest-path observer/runtime/Cargo.toml --bins
-observer/runtime/target/release/run-archive --root . --chunk-mib 16
-observer/runtime/target/release/run-archive --root . --chunk-mib 16 --apply
+npx wrangler r2 bucket create benchmark-live
+openssl rand -hex 32 > ~/.config/3720-benchmark/live-ingest-token
+npx wrangler secret put LIVE_INGEST_TOKEN -c observer/web/dist/server/wrangler.json < ~/.config/3720-benchmark/live-ingest-token
 ```
 
-The dry run reports planned segments and size totals. `--apply` writes verified
-zstd copies and receipts while keeping old sources. After the Docker service
-passes identity/score/replay checks, add `--retire` to remove verified legacy
-sources. Active writers and unsealed segments are skipped. Migration is
-repeatable; original event bytes and legacy IDs are preserved. To inspect a
-chain without materializing it:
+Deploy the console (set `LIVE_CUSTOM_DOMAIN=live.benchmark.3720.org` to attach
+the public hostname):
 
 ```sh
-observer/runtime/target/release/run-archive --cat .harbor/run-journals/<id>
+LIVE_CUSTOM_DOMAIN=live.benchmark.3720.org observer/web/scripts/deploy.sh
 ```
 
-Deploy from the repository root:
+On the benchmark host, install the publisher as a LaunchAgent:
 
 ```sh
-npm --prefix observer/web ci
-npm --prefix observer/web test
-cargo test --manifest-path observer/runtime/Cargo.toml
-python3 observer/web/scripts/publish_docker.py --preview
-python3 observer/web/scripts/publish_docker.py
+observer/runtime/scripts/install_publisher.sh https://live.benchmark.3720.org ~/.config/3720-benchmark/live-ingest-token
 ```
 
-The publisher builds immutable image tags and the host recorder, starts a
-candidate at 14000/14740, checks HTML/assets/API/SSE and compares scores before
-stopping anything. It then switches the existing 3000/3740 origins. Failure
-restores the prior Docker tag or the existing native services. Shared immutable
-web assets cover cached HTML during a switch. The Cloudflare hostname/Tunnel
-routing remains unchanged.
-
-For a Docker rollback, read the previous image tag from
-`.harbor/live-deploy/current.json` and run Compose with `LIVE_RELEASE=<tag>`.
-Do not remove the data directories or shared volumes. Returning to a pre-zstd
-native gateway after retiring legacy sources requires restoring the data backup
-first. Docker/OrbStack must be running for restart policies to take effect.
-
-Relevant upstream references: [Compose health dependencies](https://docs.docker.com/compose/how-tos/startup-order/),
-[zstd streaming encoder](https://docs.rs/zstd/latest/zstd/stream/write/struct.Encoder.html),
-[rusqlite connections](https://docs.rs/rusqlite/latest/rusqlite/struct.Connection.html).
-
-## Public path
-
-The console at [live.benchmark.3720.org](https://live.benchmark.3720.org) holds
-one `/api/live/v1/subscribe` connection. JSON detail and replay responses use HTTP
-gzip; immutable assets use year-long content-hash caching. Vinext forwards the
-strict read-only allowlist to the loopback gateway on port 3740. A named
-Cloudflare Tunnel connects the local site to
-`benchmark-live-origin.3720.org`, and a Worker custom domain exposes the final
-hostname. Game commands, session files, Docker, and Harbor artifacts are never
-directly reachable from the internet.
+Roll the Worker back with `npx wrangler rollback`. The R2 bodies and `LiveHub`
+state are unaffected by Worker versions.
 
 ## WebGL scenes and direct replay export
 
