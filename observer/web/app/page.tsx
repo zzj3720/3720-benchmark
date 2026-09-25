@@ -1,24 +1,7 @@
 "use client";
-import { canvasExportSource, type CanvasExportSession } from "./webgl/export-source";
-
-import * as ScrollArea from "@radix-ui/react-scroll-area";
 import * as Toggle from "@radix-ui/react-toggle";
-import {
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  CircleSlash2,
-  Download,
-  Map as MapIcon,
-  Pause,
-  Play,
-  Radio,
-  Rewind,
-  type LucideIcon,
-} from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ButtonHTMLAttributes } from "react";
+import { Check } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
 import {
   GAME_IDS,
@@ -29,40 +12,14 @@ import {
   resolveGameFrameState,
   type GameId,
 } from "./game-registry";
-import {
-  EmptyState,
-  Metric,
-  REPLAY_CAPTURE_ATTRIBUTE,
-  asString,
-  type Json,
-  type ObserverEvent,
-} from "./game-observer";
-import { LiveActionMenu, LiveDisclosure, LiveSelect, LiveSlider } from "./live-controls";
-import type { ReplayExportFormat } from "./replay-export";
+import { EmptyState, Metric, type ObserverEvent } from "./game-observer";
+import { LiveDisclosure, LiveSelect } from "./live-controls";
 
-import type { RunSummary, RunDetail, ElapsedScorePoint, ReplayFrame, ReplayGroupSummary, LoadedAttemptReplay } from "./live-contract";
-import { LiveResource, RequestGate, applySubscription, effectiveDuration } from "./live-client";
+import type { RunSummary, RunDetail, ElapsedScorePoint } from "./live-contract";
+import { LiveResource, applySubscription, effectiveDuration } from "./live-client";
 import { harnessName, modelName, rankRuns, runLabels, seriesColors, viewerStatus } from "./run-labels";
-
-function clockTime(timestamp?: number | null) {
-  if (!timestamp) return "—";
-  return new Intl.DateTimeFormat("zh-CN", {
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  }).format(timestamp);
-}
-
-function fileSlug(value: string) {
-  return value
-    .normalize("NFKD")
-    .replace(/[^\w.-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .toLowerCase();
-}
+import { clockTime, durationLabel, gatewayUrl, hydrateRunAssets } from "./live-shared";
+import { GameTabs, LevelWatch, ReplayLibrary, type LevelSample } from "./replay-views";
 
 
 function taskDuration(run: RunSummary, now: number) {
@@ -78,11 +35,6 @@ function taskDuration(run: RunSummary, now: number) {
   const lastHistoryAt = timestamps[timestamps.length - 1] ?? startedAt;
   const endedAt = run.live ? now : (run.finished_at ?? lastHistoryAt);
   return Math.max(0, lastHistoryAt - startedAt, endedAt - startedAt);
-}
-
-function durationLabel(durationMs: number, axisMaxMs = durationMs) {
-  if (axisMaxMs < 60 * 60 * 1000) return `${Math.round(durationMs / 60_000)}m`;
-  return `${(durationMs / (60 * 60 * 1000)).toFixed(1)}h`;
 }
 
 function noScoreDuration(run: RunSummary, now: number) {
@@ -121,94 +73,10 @@ function sinceLastScore(run: RunSummary, now: number) {
   return silence < 60_000 ? "刚刚得分" : `${durationLabel(silence)}前得分`;
 }
 
-function actionLabel(action?: Record<string, Json> | null) {
-  const command = asString(action?.command, "STATE").toUpperCase();
-  const direction = asString(action?.direction, "");
-  return direction ? `${command} ${direction.toUpperCase()}` : command;
-}
-
 type Feed = { connected: boolean; last_seen_ms: number | null };
 
-type ExportChoice = { format: ReplayExportFormat; speed: number; caption: boolean };
-
-const FRAME_MS = 450;
-const EXPORT_HOLD_MS = 1500;
-
-/** Draw a title band above an exported frame: what, who, which attempt, where from. */
-function captionFrame(
-  frame: HTMLCanvasElement,
-  target: HTMLCanvasElement,
-  lines: { title: string; segment: string; step: string },
-) {
-  const band = Math.max(48, Math.round(frame.width * 0.075));
-  if (target.width !== frame.width || target.height !== frame.height + band) {
-    target.width = frame.width;
-    target.height = frame.height + band;
-  }
-  const context = target.getContext("2d")!;
-  context.fillStyle = "#0f1413";
-  context.fillRect(0, 0, target.width, band);
-  context.drawImage(frame, 0, band);
-  const pad = Math.round(band * 0.3);
-  const font = "system-ui, -apple-system, 'PingFang SC', sans-serif";
-  context.textBaseline = "alphabetic";
-  context.fillStyle = "#edf3eb";
-  context.font = `600 ${Math.round(band * 0.3)}px ${font}`;
-  context.fillText(lines.title, pad, band * 0.44);
-  context.fillStyle = "#8c9892";
-  context.font = `${Math.round(band * 0.25)}px ${font}`;
-  context.fillText(lines.segment, pad, band * 0.8);
-  context.textAlign = "right";
-  context.fillText(lines.step, target.width - pad, band * 0.44);
-  context.fillStyle = "rgba(237, 243, 235, 0.55)";
-  context.font = `${Math.round(band * 0.22)}px ${font}`;
-  context.fillText("live.benchmark.3720.org", target.width - pad, target.height - pad * 0.6);
-  context.textAlign = "left";
-  return target;
-}
-
-/** Once the local publisher is gone, time stops where its last heartbeat was. */
 function feedNow(now: number, feed: Feed | null) {
   return feed && !feed.connected && feed.last_seen_ms !== null ? Math.min(now, feed.last_seen_ms) : now;
-}
-
-function gatewayUrl(path: string) {
-  const origin = import.meta.env.VITE_LIVE_GATEWAY_ORIGIN;
-  return new URL(origin ? `${origin}${path}` : `/api/live${path}`, window.location.origin);
-}
-
-// Assets are content-addressed and immutable: parse each id once per session
-// instead of re-fetching and re-parsing megabytes of JSON on every live tick.
-const assetCache = new Map<string, { promise: Promise<Json>; bytes: number }>();
-const ASSET_CACHE_BYTES = 16 * 1024 * 1024;
-
-function fetchAsset(id: string, decodedBytes = 0) {
-  const cached = assetCache.get(id);
-  if (cached) { assetCache.delete(id); assetCache.set(id, cached); return cached.promise; }
-  const promise = fetch(gatewayUrl(`/v1/assets/${id}`), {cache: "force-cache", signal: AbortSignal.timeout(15_000)}).then(async response => {
-    if (!response.ok) throw new Error(`asset ${id}: HTTP ${response.status}`);
-    return await response.json() as Json;
-  });
-  const bytes = Math.max(decodedBytes, 64 * 1024) * 4;
-  if (bytes <= ASSET_CACHE_BYTES) {
-    while ([...assetCache.values()].reduce((total, entry) => total + entry.bytes, 0) + bytes > ASSET_CACHE_BYTES) {
-      const oldest = assetCache.keys().next().value;
-      if (oldest === undefined) break;
-      assetCache.delete(oldest);
-    }
-    assetCache.set(id, {promise, bytes});
-    promise.catch(() => { if (assetCache.get(id)?.promise === promise) assetCache.delete(id); });
-  }
-  return promise;
-}
-
-async function hydrateRunAssets(detail: RunDetail) {
-  const entries = Object.entries(detail.asset_refs ?? {});
-  if (!entries.length) return detail;
-  const assets = await Promise.all(
-    entries.map(async ([name, reference]) => [name, await fetchAsset(reference.id, reference.bytes)] as const),
-  );
-  return { ...detail, state: { ...detail.state, ...Object.fromEntries(assets) } };
 }
 
 // Keep the previous state object when every value is reference-identical, so
@@ -233,6 +101,8 @@ export default function Home() {
   const [runs, setRuns] = useState<RunSummary[]>([]);
   const [selectedGame, setSelectedGame] = useState<GameId>(GAME_IDS[0]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Replays live on their own pages: a per-game library and a per-level watch page.
+  const [route, setRoute] = useState<{ view: "dashboard" | "replays"; level: string | null; play: LevelSample | null; model: string | null }>({ view: "dashboard", level: null, play: null, model: null });
   const [detail, setDetail] = useState<RunDetail | null>(null);
   const [connection, setConnection] = useState<"connecting" | "live" | "offline">("connecting");
   const [paused, setPaused] = useState(false);
@@ -245,6 +115,7 @@ export default function Home() {
   const [clockOffset, setClockOffset] = useState(0);
   const [feed, setFeed] = useState<Feed | null>(null);
   const runsRef = useRef<RunSummary[]>([]);
+  const navigateRef = useRef(() => {});
   const detailResource = useRef<LiveResource<RunDetail> | null>(null);
   const contentRef = useRef<HTMLElement>(null);
 
@@ -259,15 +130,23 @@ export default function Home() {
       const params = new URL(window.location.href).searchParams;
       const runId = params.get("run");
       const game = params.get("game");
+      const play = params.get("play")?.split(":");
       contentRef.current?.scrollTo({ top: 0 });
       window.scrollTo({ top: 0 });
       setDetail(current => current?.id === runId ? current : null);
       setSelectedId(runId);
+      setRoute({
+        view: params.get("view") === "replays" || params.get("level") ? "replays" : "dashboard",
+        level: params.get("level"),
+        play: play?.length === 2 && /^\d+$/.test(play[1]) ? { run: play[0], attempt: Number(play[1]) } : null,
+        model: params.get("model"),
+      });
       setSelectedGame(
         runsRef.current.find(run => run.id === runId)?.game ??
         ((GAME_IDS as string[]).includes(game ?? "") ? (game as GameId) : GAME_IDS[0]),
       );
     };
+    navigateRef.current = syncFromLocation;
     queueMicrotask(syncFromLocation);
     window.addEventListener("popstate", syncFromLocation);
     return () => window.removeEventListener("popstate", syncFromLocation);
@@ -356,32 +235,31 @@ export default function Home() {
   const visibleRuns = grouped[selectedGame];
   const liveCount = runs.filter((run) => run.live).length;
   const sourceOffline = feed !== null && !feed.connected && feed.last_seen_ms !== null;
-  function selectRun(run: RunSummary) {
-    // Selecting the current run must preserve its detail and replay state.
-    // Its unchanged ID would not restart the detail resource after clearing it.
-    if (run.id === selectedId) return;
-    contentRef.current?.scrollTo({ top: 0 });
-    window.scrollTo({ top: 0 });
-    setDetail(null);
-    setSelectedId(run.id);
-    setSelectedGame(run.game);
+  /** Every page is addressable: push the URL, then derive state from it. */
+  function go(params: Record<string, string | null | undefined>) {
     const url = new URL(window.location.href);
-    url.searchParams.set("run", run.id);
-    url.searchParams.delete("game");
+    url.search = "";
+    for (const [key, value] of Object.entries(params)) if (value) url.searchParams.set(key, value);
     window.history.pushState({}, "", url);
+    navigateRef.current();
+  }
+
+  function selectRun(run: RunSummary) {
+    // Selecting the current run must preserve its detail state.
+    if (run.id === selectedId) return;
+    go({ run: run.id });
   }
 
   function showDashboard(game = selectedGame) {
-    contentRef.current?.scrollTo({ top: 0 });
-    window.scrollTo({ top: 0 });
-    setSelectedGame(game);
-    setSelectedId(null);
-    setDetail(null);
-    const url = new URL(window.location.href);
-    url.searchParams.delete("run");
-    if (game === GAME_IDS[0]) url.searchParams.delete("game");
-    else url.searchParams.set("game", game);
-    window.history.pushState({}, "", url);
+    go({ game: game === GAME_IDS[0] ? null : game });
+  }
+
+  function showReplays(game = selectedGame, model?: string) {
+    go({ game, view: "replays", model });
+  }
+
+  function openLevel(key: string, play?: LevelSample) {
+    go({ game: selectedGame, level: key, play: play ? `${play.run}:${play.attempt}` : null });
   }
 
   return (
@@ -417,7 +295,7 @@ export default function Home() {
         </nav>
         <div className="mobile-switcher">
           <LiveSelect label="切换游戏" value={selectedGame} onChange={value => showDashboard(value as GameId)} options={GAME_IDS.filter(game => grouped[game].length || selectedGame === game).map(game => ({ value: game, label: GAME_META[game].short }))} />
-          <LiveSelect label="切换运行" value={selectedId ?? "__overview"} onChange={value => { const run = runs.find(run => run.id === value); if (run) selectRun(run); else showDashboard(); }} options={[{ value: "__overview", label: "得分总览" }, ...visibleRuns.map(run => ({ value: run.id, label: `${labels.get(run.id)} · ${run.score} 分` }))]} />
+          <LiveSelect label="切换运行" value={selectedId ?? (route.view === "replays" ? "__replays" : "__overview")} onChange={value => { const run = runs.find(run => run.id === value); if (run) selectRun(run); else if (value === "__replays") showReplays(); else showDashboard(); }} options={[{ value: "__overview", label: "得分总览" }, { value: "__replays", label: "关卡回放" }, ...visibleRuns.map(run => ({ value: run.id, label: `${labels.get(run.id)} · ${run.score} 分` }))]} />
         </div>
         {[selectedGame].map((game) => {
           const meta = GAME_META[game];
@@ -458,14 +336,33 @@ export default function Home() {
         {feedError && <div className="data-notice" role="alert">{feedError} · 保留上次画面 <button onClick={() => setFeedRetry(value => value + 1)}>重新连接</button></div>}
         {selectedId && detailStatus === "error" && <div className="data-notice" role="alert">{detailError} · 画面可能已过期 <button onClick={() => detailResource.current?.retry()}>重试详情</button></div>}
         {selectedId ? (
-          <RunDetails
+          <LiveRun
             key={selectedId}
             run={detail ?? runs.find((run) => run.id === selectedId) ?? null}
             now={snapshotNow}
             onBack={() => showDashboard(selectedGame)}
+            onReplays={() => showReplays(selectedGame, selectedId)}
           />
+        ) : route.level ? (
+          <LevelWatch
+            key={`${selectedGame}:${route.level}`}
+            game={selectedGame}
+            levelKey={route.level}
+            play={route.play}
+            runs={visibleRuns}
+            labels={labels}
+            colors={seriesColors(visibleRuns)}
+            onOpenLevel={key => openLevel(key)}
+            onPlay={sample => openLevel(route.level!, sample)}
+          />
+        ) : route.view === "replays" ? (
+          <div className="dashboard-page" style={{ "--accent": GAME_META[selectedGame].accent } as React.CSSProperties}>
+            <header className="page-heading"><div><h1>{GAME_META[selectedGame].label}</h1></div></header>
+            <GameTabs view="replays" onDashboard={() => showDashboard()} onReplays={() => showReplays()} />
+            <ReplayLibrary key={`${selectedGame}:${route.model ?? ""}`} game={selectedGame} runs={visibleRuns} labels={labels} initialRun={route.model} onOpenLevel={key => openLevel(key)} />
+          </div>
         ) : (
-          <GameDashboard key={selectedGame} game={selectedGame} runs={visibleRuns} labels={labels} now={snapshotNow} onSelect={selectRun} />
+          <GameDashboard key={selectedGame} game={selectedGame} runs={visibleRuns} labels={labels} now={snapshotNow} onSelect={selectRun} onReplays={() => showReplays()} />
         )}
       </section>
     </main>
@@ -478,12 +375,14 @@ function GameDashboard({
   labels,
   now,
   onSelect,
+  onReplays,
 }: {
   game: GameId;
   runs: RunSummary[];
   labels: Map<string, string>;
   now: number;
   onSelect: (run: RunSummary) => void;
+  onReplays: () => void;
 }) {
   const [compared, setCompared] = useState<Set<string> | null>(null);
   const meta = GAME_META[game];
@@ -512,6 +411,7 @@ function GameDashboard({
           <Metric label="最高分" value={best ? `${best.score}` : "—"} />
         </div>
       </header>
+      <GameTabs view="dashboard" onDashboard={() => {}} onReplays={onReplays} />
 
       {runs.length > 0 && (
         <section className="chart-card">
@@ -568,309 +468,37 @@ function GameDashboard({
   );
 }
 
-function RunDetails({
+function LiveRun({
   run,
   now,
   onBack,
+  onReplays,
 }: {
   run: RunDetail | RunSummary | null;
   now: number;
   onBack: () => void;
+  onReplays: () => void;
 }) {
-  const runDetail = run as RunDetail | null;
-  const [attemptReplay, setAttemptReplay] = useState<LoadedAttemptReplay | null>(null);
-  const [attemptReplayLoading, setAttemptReplayLoading] = useState(false);
-  const [pendingAttemptReplay, setPendingAttemptReplay] = useState<number | null>(null);
-  const [attemptReplayError, setAttemptReplayError] = useState("");
-  const [skipFailedAttempts, setSkipFailedAttempts] = useState(false);
-  const [catalogPage, setCatalogPage] = useState<{ groups: ReplayGroupSummary[]; more: boolean; before: number | null } | null>(null);
-  const [catalogLoading, setCatalogLoading] = useState(false);
-  const [catalogError, setCatalogError] = useState("");
-  const catalogGate = useRef(new RequestGate());
-  const [replayPages, setReplayPages] = useState<(number | null)[]>([null]);
-  const replayGroups = catalogPage?.groups ?? runDetail?.replay_groups ?? [];
-  const [exporting, setExporting] = useState<{
-    format: ReplayExportFormat;
-    completed: number;
-    total: number;
-  } | null>(null);
-  const [exportNotice, setExportNotice] = useState("");
-  const exportStageRef = useRef<HTMLDivElement>(null);
-  const exportAbortRef = useRef<AbortController | null>(null);
-  const [heldLiveReplay, setHeldLiveReplay] = useState<RunDetail["live_replay"]>(null);
-  const replayGate = useRef(new RequestGate());
-  const mounted = useRef(true);
-  useEffect(() => {
-    mounted.current = true;
-    const replay = replayGate.current;
-    const catalog = catalogGate.current;
-    return () => { mounted.current = false; replay.cancel(); catalog.cancel(); exportAbortRef.current?.abort(); };
-  }, []);
-  const liveReplay = heldLiveReplay ?? runDetail?.live_replay ?? null;
-  const frames = useMemo(
-    () => attemptReplay?.frames ?? liveReplay?.frames ?? [],
-    [attemptReplay, liveReplay],
+  const runDetail = run && "state" in run ? run as RunDetail : null;
+  const game = run?.game;
+  const state = useMemo(
+    () => game && runDetail ? resolveGameFrameState(game, runDetail.state ?? {}, runDetail.state ?? {}) : {},
+    [game, runDetail],
   );
-  const [cursorKey, setCursorKey] = useState<string | null>(null);
-  const [playing, setPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
-  const frameIndexByKey = useMemo(
-    () => new Map(frames.map((frame, index) => [frame.key, index])),
-    [frames],
-  );
-
-  // Live mode shows the latest frame (cursorKey === null). The gateway sends a
-  // fresh live_replay object on every detail reload, so keying any cursor reset
-  // off its identity would yank viewers back to frame 0 on every live tick.
-  // Attempt replays opt into autoplay explicitly in loadAttemptReplay.
-  useEffect(() => {
-    if (
-      cursorKey !== null &&
-      frames.length > 0 &&
-      !frames.some((frame) => frame.key === cursorKey)
-    ) {
-      queueMicrotask(() => {
-        setCursorKey(null);
-        setPlaying(false);
-      });
-    }
-  }, [cursorKey, frames]);
-
-  const cursorIndex = cursorKey === null
-    ? frames.length - 1
-    : (frameIndexByKey.get(cursorKey) ?? -1);
-  const activeIndex = cursorIndex < 0 ? frames.length - 1 : cursorIndex;
-  const activeFrame = frames[activeIndex] ?? null;
-  const activeEvent = activeFrame?.event ?? null;
-  const previousEvent = activeIndex > 0 ? frames[activeIndex - 1].event : null;
-  const isLatest = activeIndex >= frames.length - 1;
-  const followingLive = attemptReplay === null && heldLiveReplay === null && cursorKey === null && pendingAttemptReplay === null;
-  const failedAttempts = replayGroups.reduce(
-    (total, group) => total + (group.kind === "level" ? group.attempts.filter((attempt) => !attempt.successful && attempt.status !== "running").length : 0),
-    0,
-  );
-
-  const runId = runDetail?.id;
-  const loadedAttemptId = attemptReplay?.attempt_id;
-  const hasNextFragment = attemptReplay?.next_after_sequence != null;
-  const loadAttemptReplay = useCallback(async (attemptId: number, pages: (number | null)[] = [null]) => {
-    if (!runId || exporting) return;
-    if (loadedAttemptId === attemptId && pages.length === 1 && replayPages.length === 1) {
-      setCursorKey(frames[0]?.key ?? null);
-      setPlaying(frames.length > 1 || hasNextFragment);
-      return;
-    }
-    setCursorKey(null);
-    setPlaying(false);
-    setAttemptReplayLoading(true);
-    setPendingAttemptReplay(attemptId);
-    setAttemptReplayError("");
-    const request = replayGate.current.begin();
-    try {
-      const path = `/v1/runs/${encodeURIComponent(runId)}`;
-      const url = gatewayUrl(path);
-      url.searchParams.set("replay_attempt", String(attemptId));
-      const after = pages[pages.length - 1];
-      if (after !== null) url.searchParams.set("after_sequence", String(after));
-      const response = await fetch(url, { cache: "no-store", signal: AbortSignal.any([request.signal, AbortSignal.timeout(15_000)]) });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const payload = await response.json() as LoadedAttemptReplay & { schema: string };
-      if (!request.current()) return;
-      if (payload.attempt_id !== attemptId || !Array.isArray(payload.frames)) throw new Error("回放格式无效");
-      setHeldLiveReplay(null);
-      setCursorKey(payload.frames[0]?.key ?? null);
-      setPlaying(payload.frames.length > 1 || payload.next_after_sequence != null);
-      setAttemptReplay(payload);
-      setReplayPages(pages);
-    } catch {
-      if (request.current()) setAttemptReplayError("尝试回放加载失败，请重新选择尝试");
-    } finally {
-      if (request.current()) { setAttemptReplayLoading(false); setPendingAttemptReplay(null); }
-    }
-  }, [runId, exporting, loadedAttemptId, hasNextFragment, frames, replayPages.length]);
-
-  useEffect(() => {
-    if (!playing || !frames.length || isLatest) {
-      if (playing && isLatest) queueMicrotask(() => {
-        if (attemptReplay?.next_after_sequence != null) void loadAttemptReplay(attemptReplay.attempt_id, [...replayPages, attemptReplay.next_after_sequence]);
-        else setPlaying(false);
-      });
-      return;
-    }
-    const timer = window.setTimeout(() => {
-      setCursorKey(frames[activeIndex + 1]?.key ?? null);
-    }, FRAME_MS / speed);
-    return () => window.clearTimeout(timer);
-  }, [activeIndex, frames, isLatest, playing, speed, attemptReplay?.next_after_sequence, attemptReplay?.attempt_id, replayPages, loadAttemptReplay]);
-
-  // Space plays or pauses, arrows step, Home goes to the first state.
-  const keyActions = useRef({ toggle: () => {}, move: (_index: number) => {}, index: 0 });
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (event.metaKey || event.ctrlKey || event.altKey || target?.closest("input, textarea, select, [role=combobox], [role=menu], [contenteditable=true]")) return;
-      const actions = keyActions.current;
-      if (event.key === " ") { event.preventDefault(); actions.toggle(); }
-      else if (event.key === "ArrowLeft") { event.preventDefault(); actions.move(actions.index - 1); }
-      else if (event.key === "ArrowRight") { event.preventDefault(); actions.move(actions.index + 1); }
-      else if (event.key === "Home") { event.preventDefault(); actions.move(0); }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
-  const frameGame = run?.game;
-  const frameState = (followingLive ? runDetail?.state : activeEvent?.state) ?? runDetail?.state;
-  const state = useMemo(() => frameGame ? resolveGameFrameState(frameGame, frameState ?? {}, runDetail?.state ?? {}) : {}, [frameGame, frameState, runDetail?.state]);
-  const previousFrameState = followingLive ? null : previousEvent?.state;
-  const previousState = useMemo(() => frameGame && previousFrameState ? resolveGameFrameState(frameGame, previousFrameState, runDetail?.state ?? {}) : null, [frameGame, previousFrameState, runDetail?.state]);
-  if (!run || !("state" in run)) {
+  if (!run || !runDetail) {
     return <EmptyState title="正在加载运行" body="" />;
   }
-  const detail = run as RunDetail;
   const meta = GAME_META[run.game];
-  const selectedAttempt = replayGroups
-    .flatMap((group) => group.attempts.map((attempt, index) => ({ group, attempt, index })))
-    .find(({ attempt }) => attempt.id === attemptReplay?.attempt_id);
-  const environmentTitle = attemptReplay
-    ? attemptReplay.kind === "overworld"
-      ? `${attemptReplay.title ?? "Land's End"} / 大地图`
-      : attemptReplay.kind === "level"
-        ? [...new Set([attemptReplay.reference, attemptReplay.title].filter(Boolean))].join(" / ") || "未命名关卡"
-        : attemptReplay.title ?? "历史任务"
-    : run.objective;
-  const environmentContext = gameStateContext(run.game, state);
-  const elapsed = taskDuration(run, now);
   const status = runStatus(run);
-
-  function moveCursor(index: number) {
-    if (exporting) return;
-    if (!attemptReplay && !heldLiveReplay) setHeldLiveReplay(runDetail?.live_replay ?? null);
-    const bounded = Math.max(0, Math.min(frames.length - 1, index));
-    setCursorKey(frames[bounded]?.key ?? null);
-    setPlaying(false);
-  }
-
-  function togglePlayback() {
-    if (exporting) return;
-    if (!attemptReplay && !heldLiveReplay) setHeldLiveReplay(runDetail?.live_replay ?? null);
-    if (playing) {
-      setPlaying(false);
-      return;
-    }
-    if (!frames.length) return;
-    if (isLatest) setCursorKey(frames[0].key);
-    setPlaying(true);
-  }
-
-  keyActions.current = { toggle: togglePlayback, move: moveCursor, index: activeIndex };
-
-  function followLive() {
-    if (exporting) return;
-    replayGate.current.cancel();
-    setAttemptReplayLoading(false);
-    setAttemptReplayError("");
-    setHeldLiveReplay(null);
-    setReplayPages([null]);
-    setAttemptReplay(null);
-    setPendingAttemptReplay(null);
-    setCursorKey(null);
-    setPlaying(false);
-  }
-
-
-  async function loadOlderCatalog() {
-    const before = catalogPage?.before ?? runDetail?.replay_catalog_before;
-    if (!runDetail || before == null || catalogLoading || exporting) return;
-    const request = catalogGate.current.begin();
-    setCatalogLoading(true); setCatalogError("");
-    try {
-      const url = gatewayUrl(`/v1/runs/${encodeURIComponent(runDetail.id)}`);
-      url.searchParams.set("catalog_before", String(before));
-      const response = await fetch(url, {signal: AbortSignal.any([request.signal, AbortSignal.timeout(15_000)])});
-      if (!response.ok) throw new Error("较早记录加载失败");
-      const page = await response.json() as { groups: ReplayGroupSummary[]; more: boolean; before: number | null };
-      if (!Array.isArray(page.groups)) throw new Error("回放目录格式无效");
-      if (request.current()) setCatalogPage(page);
-    } catch (error) {
-      if (request.current()) setCatalogError(error instanceof Error ? error.message : "回放目录加载失败");
-    } finally { if (request.current()) setCatalogLoading(false); }
-  }
-
-  async function exportSegment({ format, speed: exportSpeed, caption }: ExportChoice) {
-    const element = exportStageRef.current?.querySelector<HTMLElement>(
-      `[${REPLAY_CAPTURE_ATTRIBUTE}]`,
-    );
-    const source = attemptReplay?.frames;
-    if (!element || !source?.length || exporting || attemptReplayLoading || !attemptReplay || !run) return;
-    replayGate.current.cancel();
-    const segment = selectedAttempt
-      ? `${selectedAttempt.group.reference}-${selectedAttempt.group.kind === "overworld" ? "route" : "attempt"}-${selectedAttempt.index + 1}`
-      : `attempt-${attemptReplay.attempt_id}`;
-    const modelLabel = [modelName(run.model), run.effort !== "default" ? run.effort : ""].filter(Boolean).join(" · ");
-    const captionLines = {
-      title: `${meta.label} · ${modelLabel}`,
-      segment: selectedAttempt
-        ? selectedAttempt.group.kind === "overworld"
-          ? `大地图 · 第 ${selectedAttempt.index + 1} 段`
-          : `${[selectedAttempt.group.reference, selectedAttempt.group.title].filter((value, index, all) => value && all.indexOf(value) === index).join(" / ")} · 第 ${selectedAttempt.index + 1} 次尝试 · ${selectedAttempt.attempt.successful ? `通过 +${selectedAttempt.attempt.score}` : "未通过"}`
-        : `尝试 ${attemptReplay.attempt_id}`,
-    };
-    const captionCanvas = document.createElement("canvas");
-    const abort = new AbortController();
-    exportAbortRef.current = abort;
-    setPlaying(false);
-    setExportNotice("");
-    setExporting({ format, completed: 0, total: source.length });
-    let session: CanvasExportSession | undefined;
-    try {
-      const { exportReplaySegment } = await import("./replay-export");
-      const renderer = canvasExportSource(element);
-      if (!renderer) throw new Error("画布尚未准备好，请稍后重试");
-      const exportFrames = source.map((frame, index) => ({
-        state: resolveGameFrameState(run.game, frame.event.state ?? {}, runDetail?.state ?? {}),
-        previous: index > 0 ? resolveGameFrameState(run.game, source[index - 1].event.state ?? {}, runDetail?.state ?? {}) : null,
-      }));
-      session = await renderer.createSession(exportFrames, 900, 900, 80_000_000);
-      const activeSession = session;
-      await exportReplaySegment({
-        fileName: fileSlug(`${run.game}-${modelLabel}-${segment}`),
-        format,
-        frameCount: source.length,
-        frameDelayMs: FRAME_MS / exportSpeed,
-        lastFrameHoldMs: EXPORT_HOLD_MS,
-        signal: abort.signal,
-        captureFrame: async (index) => {
-          const frame = await activeSession.capture(exportFrames[index]);
-          return caption
-            ? captionFrame(frame, captionCanvas, { ...captionLines, step: `${index + 1} / ${source.length}` })
-            : frame;
-        },
-        onProgress: (completed) => {
-          setExporting({ format, completed, total: source.length });
-        },
-      });
-      if (mounted.current) setExportNotice(format === "gif" ? "GIF 已导出，已开始下载" : "视频已导出，已开始下载");
-    } catch (reason) {
-      if (mounted.current) setExportNotice(
-        reason instanceof DOMException && reason.name === "AbortError"
-          ? "导出已取消"
-          : reason instanceof Error
-            ? reason.message
-            : "回放导出失败",
-      );
-    } finally {
-      exportAbortRef.current = null;
-      session?.dispose();
-      if (mounted.current) setExporting(null);
-    }
-  }
+  const elapsed = taskDuration(run, now);
+  const environmentContext = gameStateContext(run.game, state);
+  const operations = runDetail.live_replay?.operations ?? [];
 
   return (
     <div className="detail-page" style={{ "--accent": meta.accent } as React.CSSProperties}>
       <header className="detail-heading">
         <button className="back-button" onClick={onBack}>
-          ← 返回 {meta.short} 大盘
+          ← 返回 {meta.short} 成绩
         </button>
         <div className="detail-title-row">
           <div>
@@ -899,400 +527,64 @@ function RunDetails({
 
       <section className="detail-grid">
         <div className="environment-card">
-          <div className="replay-export-stage" ref={exportStageRef}>
-            <div className="section-title environment-title">
-              <strong title={environmentContext ?? undefined}>{environmentTitle}</strong>
-            </div>
-            <GameState game={run.game} state={state} previousState={previousState} />
+          <div className="section-title environment-title">
+            <strong title={environmentContext ?? undefined}>{run.objective}</strong>
+            <small>{run.live ? "实时画面" : "结束时的画面"}</small>
           </div>
-          <ReplayTimeline
-            frames={frames}
-            activeIndex={activeIndex}
-            isLatest={isLatest}
-            followingLive={followingLive}
-            playing={playing}
-            speed={speed}
-            failedAttempts={failedAttempts}
-            skipFailedAttempts={skipFailedAttempts}
-            replayGroups={replayGroups}
-            selectedAttemptReplay={pendingAttemptReplay ?? attemptReplay?.attempt_id ?? null}
-            attemptReplayLoading={attemptReplayLoading}
-            pendingAttemptReplay={pendingAttemptReplay}
-            attemptReplayError={attemptReplayError}
-            canExport={Boolean(attemptReplay?.frames.length) && !attemptReplayLoading}
-            exporting={exporting}
-            exportNotice={exportNotice}
-            onMove={moveCursor}
-            onTogglePlayback={togglePlayback}
-            onSpeed={(value) => { if (!exporting) setSpeed(value); }}
-            onFollowLive={followLive}
-            onSkipFailedAttempts={setSkipFailedAttempts}
-            onAttemptReplay={loadAttemptReplay}
-            onExport={exportSegment}
-            onCancelExport={() => exportAbortRef.current?.abort()}
-          />
-          <div className="history-pages" role="group" aria-label="历史分页">
-            {(catalogPage?.more ?? detail.replay_catalog_more) && <button disabled={catalogLoading || exporting !== null} onClick={() => void loadOlderCatalog()}>{catalogLoading ? "加载中…" : "较早的尝试"}</button>}
-            {catalogPage && <button disabled={exporting !== null} onClick={() => { catalogGate.current.cancel(); setCatalogLoading(false); setCatalogPage(null); }}>最新尝试</button>}
-            {attemptReplay && replayPages.length > 1 && <button disabled={attemptReplayLoading || exporting !== null} onClick={() => void loadAttemptReplay(attemptReplay.attempt_id, replayPages.slice(0, -1))}>上一片段</button>}
-            {attemptReplay?.next_after_sequence != null && <button disabled={attemptReplayLoading || exporting !== null} onClick={() => void loadAttemptReplay(attemptReplay.attempt_id, [...replayPages, attemptReplay.next_after_sequence!])}>下一片段</button>}
-            {attemptReplay && (replayPages.length > 1 || attemptReplay.next_after_sequence != null) && <span>片段 {replayPages.length} · 导出当前片段</span>}
-            {catalogError && <span role="alert">{catalogError}</span>}
+          <GameState game={run.game} state={state} previousState={null} />
+          <div className="live-footer">
+            <span>{run.live ? `最近动作 ${clockTime(run.last_activity_at)}` : `结束于 ${clockTime(run.finished_at ?? run.last_activity_at)}`}</span>
+            <button type="button" className="replay-export-button" onClick={onReplays}>看这次运行的关卡回放</button>
           </div>
         </div>
       </section>
 
       <LiveDisclosure className="analysis-disclosure" title="得分与 Agent 活动" defaultOpen>
         <div className="disclosure-body">
-
-      <section className="detail-chart chart-card">
-        <div className="section-title">
-          <div>
-
-            <strong>分数轨迹</strong>
-          </div>
-          <small>累计有效时间 {durationLabel(taskDuration(run, now))}</small>
-        </div>
-        <ScoreChart runs={[run]} now={now} colors={new Map([[run.id, meta.accent]])} />
-      </section>
-
-      <section className="activity-grid">
-        <div className="activity-card">
-          <div className="section-title">
-            <div>
-              <strong>{attemptReplay ? "此次尝试的 Agent 活动" : "Agent 最近活动"}</strong>
+          <section className="detail-chart chart-card">
+            <div className="section-title">
+              <strong>分数轨迹</strong>
+              <small>累计有效时间 {durationLabel(elapsed)}</small>
             </div>
-            <small>{selectedAttempt ? `${selectedAttempt.group.kind === "overworld" ? "大地图" : selectedAttempt.group.reference} · ${selectedAttempt.group.kind === "overworld" ? "路段" : "尝试"} ${selectedAttempt.index + 1}` : "随回放段按需载入"}</small>
-          </div>
-          <div className="activity-list">
-            {(attemptReplay?.activity ?? detail.recent_activity)?.length ? (
-              (attemptReplay?.activity ?? detail.recent_activity ?? []).map((item, index) => (
-                  <article key={`${item.timestamp_ms}-${index}`}>
-                    <time>{clockTime(item.timestamp_ms)}</time>
-                    <p>{item.text}</p>
-                  </article>
-                ))
-            ) : (
-              <EmptyState
-                title={attemptReplay ? "此次尝试没有可见消息" : "暂无可见活动"}
-                body={attemptReplay ? "这段时间没有保存可展示的消息。" : "这里显示 Agent 的可见消息；历史活动随所选尝试载入。"}
-              />
-            )}
-          </div>
-        </div>
-        <div className="event-card">
-          <div className="section-title">
-            <div>
-              <strong>{attemptReplay ? "此次尝试的操作" : "最近操作"}</strong>
+            <ScoreChart runs={[run]} now={now} colors={new Map([[run.id, meta.accent]])} />
+          </section>
+          <section className="activity-grid">
+            <div className="activity-card">
+              <div className="section-title"><strong>Agent 最近说了什么</strong></div>
+              <div className="activity-list">
+                {runDetail.recent_activity?.length
+                  ? runDetail.recent_activity.map((item, index) => (
+                    <article key={`${item.timestamp_ms}-${index}`}>
+                      <time>{clockTime(item.timestamp_ms)}</time>
+                      <p>{item.text}</p>
+                    </article>
+                  ))
+                  : <EmptyState title="暂无可见消息" body="Agent 的可见消息会出现在这里。" />}
+              </div>
             </div>
-            <small>{attemptReplay ? `${attemptReplay.operations.length} 组` : "随尝试按需载入"}</small>
-          </div>
-          <div className="event-list">
-            {(attemptReplay?.operations ?? liveReplay?.operations)?.length ? (
-              (attemptReplay?.operations ?? liveReplay?.operations ?? []).map((operation, operationIndex) => {
-                const frameIndex = frameIndexByKey.get(operation.first_frame_key) ?? -1;
-                const lastFrameIndex = frameIndexByKey.get(operation.last_frame_key);
-                const frame = lastFrameIndex === undefined ? undefined : frames[lastFrameIndex];
-                const previousOperation = operationIndex > 0
-                  ? (attemptReplay?.operations ?? liveReplay?.operations ?? [])[operationIndex - 1]
-                  : null;
-                const previousFrameIndex = previousOperation
-                  ? frameIndexByKey.get(previousOperation.last_frame_key)
-                  : undefined;
-                const previousFrame = previousFrameIndex === undefined
-                  ? null
-                  : frames[previousFrameIndex];
-                const event: ObserverEvent = {
-                  ...(frame?.event ?? { sequence: operation.sequence }),
-                  sequence: operation.sequence,
-                  timestamp_ms: operation.timestamp_ms,
-                  action: operation.action,
-                  score_delta: operation.score_delta,
-                };
-                const description = describeGameEvent(
-                  run.game,
-                  event,
-                  previousFrame?.event ?? null,
-                );
-                return (
-                <button
-                  className={`event-row ${operation.sequence === activeFrame?.operation_sequence ? "active" : ""}`}
-                  key={operation.sequence}
-                  onClick={() => frameIndex >= 0 && moveCursor(frameIndex)}
-                  disabled={frameIndex < 0}
-                  aria-current={operation.sequence === activeFrame?.operation_sequence ? "step" : undefined}
-                >
-                  <time>{clockTime(operation.timestamp_ms)}</time>
-                  <strong>{description.title}</strong>
-                  <span>{operation.score_delta ? `${operation.score_delta > 0 ? "+" : ""}${operation.score_delta} 分` : `${operation.frame_count} 帧`}</span>
-                  <small>#{operation.sequence}</small>
-                </button>
-              )})
-            ) : (
-              <EmptyState
-                title={attemptReplay ? "此次尝试没有有效操作" : "选择一次尝试"}
-                body="选择历史尝试后，可查看操作并跳转到对应画面。"
-              />
-            )}
-          </div>
-        </div>
-      </section>
-      <ExperiencePanel experience={detail.agent_experience} />
-      <LiveDisclosure className="runtime-details" title="运行信息"><dl><dt>运行 ID</dt><dd>{run.id}</dd><dt>Agent</dt><dd>{run.agent}</dd><dt>停止原因</dt><dd>{run.termination?.reason ?? "—"}</dd><dt>最近动作</dt><dd>{clockTime(run.last_activity_at)}</dd></dl></LiveDisclosure>
+            <div className="event-card">
+              <div className="section-title"><strong>最近的操作</strong></div>
+              <div className="event-list">
+                {operations.length
+                  ? operations.slice().reverse().map(operation => {
+                    const event: ObserverEvent = { sequence: operation.sequence, timestamp_ms: operation.timestamp_ms, action: operation.action, score_delta: operation.score_delta };
+                    return (
+                      <div className="event-row" key={operation.sequence}>
+                        <time>{clockTime(operation.timestamp_ms)}</time>
+                        <strong>{describeGameEvent(run.game, event, null).title}</strong>
+                        <span>{operation.score_delta ? `${operation.score_delta > 0 ? "+" : ""}${operation.score_delta} 分` : `${operation.frame_count} 帧`}</span>
+                      </div>
+                    );
+                  })
+                  : <EmptyState title="暂无操作" body="" />}
+              </div>
+            </div>
+          </section>
+          <ExperiencePanel experience={runDetail.agent_experience} />
+          <LiveDisclosure className="runtime-details" title="运行信息"><dl><dt>运行 ID</dt><dd>{run.id}</dd><dt>Agent</dt><dd>{run.agent}</dd><dt>停止原因</dt><dd>{run.termination?.reason ?? "—"}</dd><dt>最近动作</dt><dd>{clockTime(run.last_activity_at)}</dd></dl></LiveDisclosure>
         </div>
       </LiveDisclosure>
     </div>
-  );
-}
-
-function ReplayTimeline({
-  frames,
-  activeIndex,
-  isLatest,
-  followingLive,
-  playing,
-  speed,
-  failedAttempts,
-  skipFailedAttempts,
-  replayGroups,
-  selectedAttemptReplay,
-  attemptReplayLoading,
-  pendingAttemptReplay,
-  attemptReplayError,
-  canExport,
-  exporting,
-  exportNotice,
-  onMove,
-  onTogglePlayback,
-  onSpeed,
-  onFollowLive,
-  onSkipFailedAttempts,
-  onAttemptReplay,
-  onExport,
-  onCancelExport,
-}: {
-  frames: ReplayFrame[];
-  activeIndex: number;
-  isLatest: boolean;
-  followingLive: boolean;
-  playing: boolean;
-  speed: number;
-  failedAttempts: number;
-  skipFailedAttempts: boolean;
-  replayGroups: ReplayGroupSummary[];
-  selectedAttemptReplay: number | null;
-  attemptReplayLoading: boolean;
-  pendingAttemptReplay: number | null;
-  attemptReplayError: string;
-  canExport: boolean;
-  exporting: { format: ReplayExportFormat; completed: number; total: number } | null;
-  exportNotice: string;
-  onMove: (index: number) => void;
-  onTogglePlayback: () => void;
-  onSpeed: (speed: number) => void;
-  onFollowLive: () => void;
-  onSkipFailedAttempts: (enabled: boolean) => void;
-  onAttemptReplay: (attemptId: number) => void;
-  onExport: (choice: ExportChoice) => void;
-  onCancelExport: () => void;
-}) {
-  const [exportOpen, setExportOpen] = useState(false);
-  const [exportChoice, setExportChoice] = useState<ExportChoice>({ format: "video", speed: 2, caption: true });
-  const active = frames[activeIndex];
-  const previousOperation = frames.findLastIndex(
-    (frame, index) => index < activeIndex && frame.operation_sequence !== active?.operation_sequence,
-  );
-  const nextOperation = frames.findIndex(
-    (frame, index) => index > activeIndex && frame.operation_sequence !== active?.operation_sequence,
-  );
-  const replayAttempts = replayGroups.flatMap((group) =>
-    group.attempts.map((attempt, index) => ({ group, attempt, index })),
-  );
-  const [groupReference, setGroupReference] = useState<string | null>(null);
-  const selectedReplay = replayAttempts.find(
-    ({ attempt }) => attempt.id === selectedAttemptReplay,
-  );
-  const newestAttempt = replayAttempts.reduce((latest, item) => item.attempt.id > (latest?.attempt.id ?? -1) ? item : latest, replayAttempts[0]);
-  const activeGroup = replayGroups.find(group => group.reference === groupReference) ?? selectedReplay?.group ?? newestAttempt?.group;
-  const groupIndex = activeGroup ? replayGroups.indexOf(activeGroup) : -1;
-  // Choosing a level plays its latest attempt right away.
-  const openGroup = (reference: string) => {
-    setGroupReference(reference);
-    const group = replayGroups.find(item => item.reference === reference);
-    const latest = group?.attempts[group.attempts.length - 1];
-    if (latest) onAttemptReplay(latest.id);
-  };
-  const exportSeconds = Math.round((frames.length * FRAME_MS / exportChoice.speed + EXPORT_HOLD_MS) / 1000);
-  return (
-    <section className="replay-panel" aria-label="状态回放时间轴">
-      <div className="replay-toolbar">
-        {frames.length > 0 && <div className="replay-controls" role="group" aria-label="回放操作" inert={exporting !== null}>
-          <ReplayIconButton label="上一条有效指令" icon={ChevronLeft} onClick={() => onMove(activeIndex - 1)} disabled={!frames.length || activeIndex <= 0} />
-          <ReplayIconButton className="play-button" label={playing ? "暂停回放" : "播放回放"} icon={playing ? Pause : Play} onClick={onTogglePlayback} disabled={frames.length < 2} />
-          <ReplayIconButton label="下一条有效指令" icon={ChevronRight} onClick={() => onMove(activeIndex + 1)} disabled={!frames.length || isLatest} />
-
-          <LiveSelect className="replay-speed" label="回放速度" value={String(speed)} onChange={value => onSpeed(Number(value))} disabled={attemptReplayLoading} options={[0.5, 1, 2, 4, 8, 16].map(value => ({ value: String(value), label: `${value}×` }))} />
-          <LiveActionMenu items={[
-            { label: "跳到最早状态", icon: Rewind, onSelect: () => onMove(0), disabled: activeIndex <= 0 },
-            { label: "上一组操作", icon: ChevronsLeft, onSelect: () => onMove(previousOperation), disabled: previousOperation < 0 },
-            { label: "下一组操作", icon: ChevronsRight, onSelect: () => onMove(nextOperation), disabled: nextOperation < 0 },
-          ]} />
-          <button
-            type="button"
-            className="replay-export-button"
-            aria-expanded={exportOpen}
-            onClick={() => setExportOpen(open => !open)}
-            disabled={!canExport && !exportOpen}
-            title={canExport ? "把这次尝试导出为视频或 GIF" : "先在下方选一次尝试，再导出它的回放"}
-          >
-            <Download size={15} aria-hidden="true" />导出
-          </button>
-          <div className="replay-inline-scrubber" title="快捷键：空格 播放/暂停，← → 单步，Home 回到开头">
-            <LiveSlider max={Math.max(0, frames.length - 1)} value={Math.max(0, activeIndex)} onChange={onMove} disabled={!frames.length} />
-            <b>{active ? `${activeIndex + 1} / ${frames.length} · ${actionLabel(active.event.action)}` : "—"}</b>
-          </div>
-        </div>}
-        <div className="replay-status" aria-live="polite">
-          <i className={followingLive && selectedAttemptReplay === null ? "live" : "replay"} />
-          {exporting
-            ? <>
-                正在导出{exporting.format === "gif" ? " GIF" : "视频"} · {Math.round(exporting.completed / Math.max(1, exporting.total) * 100)}%
-                <button type="button" className="replay-export-cancel" onClick={onCancelExport}>
-                  取消
-                </button>
-              </>
-            : exportNotice
-              ? exportNotice
-              : pendingAttemptReplay !== null
-            ? "正在载入尝试回放…"
-            : selectedReplay
-              ? selectedReplay.group.kind === "overworld"
-                ? `正在回放大地图 · 路段 ${selectedReplay.index + 1}`
-                : `正在回放 ${selectedReplay.group.reference} · 第 ${selectedReplay.index + 1} 次尝试 · ${selectedReplay.attempt.successful ? "通过" : selectedReplay.attempt.status === "running" ? "进行中" : "未通过"}`
-              : followingLive
-                ? "最新状态"
-                : isLatest
-                  ? "已到当前片段末尾"
-                  : `回看 ${clockTime(active?.event.timestamp_ms)}`}
-          {!followingLive && <button type="button" className="follow-live-button" onClick={onFollowLive} disabled={exporting !== null}><Radio aria-hidden="true" size={16} />返回最新</button>}
-        </div>
-      </div>
-      {exportOpen && canExport && (
-        <div className="export-panel" role="group" aria-label="导出这次尝试">
-          <div className="export-field">
-            <span>格式</span>
-            <div className="scale-switch" role="group" aria-label="导出格式">
-              {(["video", "gif"] as const).map(format => (
-                <button key={format} aria-pressed={exportChoice.format === format} onClick={() => setExportChoice(choice => ({ ...choice, format }))}>
-                  {format === "video" ? "视频（MP4）" : "GIF 动图"}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="export-field">
-            <span>速度</span>
-            <div className="scale-switch" role="group" aria-label="导出速度">
-              {[1, 2, 4, 8].map(value => (
-                <button key={value} aria-pressed={exportChoice.speed === value} onClick={() => setExportChoice(choice => ({ ...choice, speed: value }))}>{value}×</button>
-              ))}
-            </div>
-          </div>
-          <label className="export-field export-caption">
-            <input type="checkbox" checked={exportChoice.caption} onChange={event => setExportChoice(choice => ({ ...choice, caption: event.target.checked }))} />
-            <span>加标题栏（游戏、模型、关卡、第几次尝试）</span>
-          </label>
-          <p className="export-summary">{selectedReplay ? `${selectedReplay.group.reference} 第 ${selectedReplay.index + 1} 次尝试 · ` : ""}{frames.length} 帧 · 约 {exportSeconds} 秒{exportChoice.format === "gif" ? " · GIF 体积较大，适合短片段" : ""}</p>
-          <div className="export-actions">
-            <button type="button" className="export-go" disabled={exporting !== null} onClick={() => { onExport(exportChoice); setExportOpen(false); }}>
-              <Download size={15} aria-hidden="true" />导出{exportChoice.format === "video" ? "视频" : " GIF"}
-            </button>
-            <button type="button" onClick={() => setExportOpen(false)}>收起</button>
-          </div>
-        </div>
-      )}
-      {replayGroups.length > 0 && <div className="score-replay-picker">
-        <div className="history-selector">
-          <span className="control-label">历史尝试</span>
-          <ReplayIconButton label="上一关" icon={ChevronLeft} onClick={() => openGroup(replayGroups[groupIndex - 1].reference)} disabled={groupIndex <= 0 || exporting !== null} />
-          <LiveSelect className="history-select" label="选择历史关卡" value={activeGroup?.reference ?? ""} onChange={openGroup} disabled={!replayGroups.length || exporting !== null} options={replayGroups.map(group => ({ value: group.reference, label: `${group.title && group.title !== group.reference ? `${group.reference} · ${group.title}` : group.reference} · ${group.attempts.length} 次尝试` }))} />
-          <ReplayIconButton label="下一关" icon={ChevronRight} onClick={() => openGroup(replayGroups[groupIndex + 1].reference)} disabled={groupIndex < 0 || groupIndex >= replayGroups.length - 1 || exporting !== null} />
-          <Toggle.Root
-            className="replay-icon replay-toggle"
-            aria-label="跳过失败尝试（以重置为分界）"
-            title="跳过失败尝试（以重置为分界）"
-            pressed={skipFailedAttempts}
-            onPressedChange={onSkipFailedAttempts}
-            disabled={!failedAttempts}
-          >
-            <CircleSlash2 aria-hidden="true" size={17} strokeWidth={2} /><span>隐藏失败</span>
-          </Toggle.Root>
-        </div>
-        <ScrollArea.Root className="score-replay-scroll" type="auto">
-          <ScrollArea.Viewport className="score-replay-viewport">
-            <div className="score-replay-list" role="group" aria-label="选择回放段">
-              {(activeGroup ? [activeGroup] : []).map((group) => (
-                <section className={`score-replay-level ${group.kind}`} key={group.reference}>
-                  <header>
-                    <strong>{group.kind === "overworld" ? <MapIcon aria-label="大地图" size={14} /> : group.reference}</strong>
-                    <span>{group.title ?? (group.kind === "overworld" ? "Land's End" : "未命名关卡")}</span>
-                    <small>{group.kind === "overworld" ? "大地图" : group.kind === "shift" ? "班次" : group.kind === "world" ? "世界" : `${group.score} 分`}</small>
-                  </header>
-                  <div>
-                    {group.attempts
-                      .map((attempt, index) => ({ attempt, index }))
-                      .filter(({ attempt }) => group.kind === "overworld" || !skipFailedAttempts || attempt.successful || attempt.status === "running")
-                      .reverse()
-                      .map(({ attempt, index }) => {
-                      const selected = attempt.id === selectedAttemptReplay;
-                      const loading = attempt.id === pendingAttemptReplay;
-                      return (
-                        <button
-                          type="button"
-                          aria-pressed={selected}
-                          className={`${selected ? "selected" : ""} ${group.kind === "overworld" ? "map" : attempt.successful ? "scored" : "failed"}`}
-                          key={attempt.id}
-                          aria-label={`尝试 ${index + 1}，${attempt.successful ? `得分 ${attempt.score}` : "未得分"}`}
-                          title={group.kind === "overworld" ? `${group.title ?? "Land's End"} · 大地图路段 ${index + 1}` : `${group.reference} / ${group.title ?? "未命名关卡"} · 尝试 ${index + 1}${attempt.successful ? ` · 得分 ${attempt.score}` : " · 未得分"}`}
-                          onClick={() => onAttemptReplay(attempt.id)}
-                          disabled={exporting !== null || (attemptReplayLoading && !loading)}
-                        >
-                          <strong>{loading ? "…" : index + 1}</strong>
-                          {group.kind !== "overworld" && (attempt.successful ? <small>+{attempt.score}</small> : attempt.status === "running" ? <small>进行中</small> : <small aria-hidden="true">✕</small>)}
-                        </button>
-                      );
-                      })}
-                    {skipFailedAttempts && group.kind !== "overworld" && !group.attempts.some(attempt => attempt.successful || attempt.status === "running") && <p className="history-filter-empty">此关卡没有得分尝试，关闭“隐藏失败”可查看全部。</p>}
-                  </div>
-                </section>
-              ))}
-              {!replayGroups.length && <span className="score-replay-empty">暂无可回放操作</span>}
-            </div>
-          </ScrollArea.Viewport>
-          <ScrollArea.Scrollbar className="score-replay-scrollbar" orientation="horizontal">
-            <ScrollArea.Thumb className="score-replay-thumb" />
-          </ScrollArea.Scrollbar>
-        </ScrollArea.Root>
-      </div>}
-      {attemptReplayError && <p className="replay-error">{attemptReplayError}</p>}
-    </section>
-  );
-}
-
-function ReplayIconButton({
-  label,
-  icon,
-  className = "",
-  ...props
-}: {
-  label: string;
-  icon: LucideIcon;
-  className?: string;
-} & ButtonHTMLAttributes<HTMLButtonElement>) {
-  const Icon = icon;
-  return (
-    <button className={`replay-icon ${className}`} aria-label={label} title={label} {...props}>
-      <Icon aria-hidden="true" size={17} strokeWidth={2} />
-    </button>
   );
 }
 
