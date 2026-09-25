@@ -1,6 +1,6 @@
-import type { GameState } from "../../../observer-platform/app/game-observer";
-import { num, rec, str, records, point, friendly, clock } from "../../../observer-platform/app/webgl/data";
-import { Painter, type SceneBuilder } from "../../../observer-platform/app/webgl/scene";
+import type { GameState } from "../../../observer/web/app/game-observer";
+import { num, rec, str, records, point, friendly, clock } from "../../../observer/web/app/webgl/data";
+import { Painter, type SceneBuilder } from "../../../observer/web/app/webgl/scene";
 
 const labels: Record<string, string> = { ingredient_crate: "ING", workstation: "CHOP", cooker: "HEAT", delivery: "SERVE", sink: "WASH", plate_return: "PLATE", bin: "BIN", switch: "SWITCH", loose_item: "LOOSE", moving_barrier: "DOOR", counter: "", structure: "" };
 const colors: Record<string, string> = { ingredient_crate: "#46705e", workstation: "#826c4f", cooker: "#8b493e", delivery: "#d89b3f", sink: "#427080", plate_return: "#6b7180", bin: "#4d5a48", switch: "#725c8f", loose_item: "#4d5e64", moving_barrier: "#4f5d70", counter: "#4b443b", structure: "#4b443b" };

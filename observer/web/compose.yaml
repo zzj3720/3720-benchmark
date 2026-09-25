@@ -3,8 +3,8 @@ services:
   gateway:
     image: benchmark-live-gateway:${LIVE_RELEASE:-local}
     build:
-      context: ..
-      dockerfile: observer-platform/Dockerfile
+      context: ../..
+      dockerfile: observer/web/Dockerfile
       target: gateway
     init: true
     restart: unless-stopped
@@ -19,8 +19,8 @@ services:
       LIVE_LEASE_MODE: ${LIVE_LEASE_MODE:-heartbeat}
       LIVE_DETAIL_CACHE_MIB: "32"
     volumes:
-      - ${LIVE_DATA_ROOT:-../.harbor}/run-journals:/data/.harbor/run-journals:ro
-      - ${LIVE_DATA_ROOT:-../.harbor}/live-archive:/data/.harbor/live-archive:ro
+      - ${LIVE_DATA_ROOT:-../../.harbor}/run-journals:/data/.harbor/run-journals:ro
+      - ${LIVE_DATA_ROOT:-../../.harbor}/live-archive:/data/.harbor/live-archive:ro
       - live-cache:/cache
     tmpfs:
       - /tmp:size=16m,mode=1777
@@ -37,8 +37,8 @@ services:
   web:
     image: benchmark-live-web:${LIVE_RELEASE:-local}
     build:
-      context: ..
-      dockerfile: observer-platform/Dockerfile
+      context: ../..
+      dockerfile: observer/web/Dockerfile
       target: web
     init: true
     restart: unless-stopped

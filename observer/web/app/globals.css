@@ -1,13 +1,13 @@
 /* Hallmark · macrostructure: Workbench · theme: Terminal · anchor hue: green */
 @import "../tokens.css";
 @import "tailwindcss";
-@import "../../games/emergency-operator/observer/styles.css";
-@import "../../games/kitchen-terminal/observer/styles.css";
-@import "../../games/minesweeper/observer/styles.css";
-@import "../../games/parabox-intro/observer/styles.css";
-@import "../../games/sausage-roll/observer/styles.css";
-@import "../../games/sokoban/observer/styles.css";
-@import "../../games/swarm-farming/observer/styles.css";
+@import "../../../games/emergency-operator/observer/styles.css";
+@import "../../../games/kitchen-terminal/observer/styles.css";
+@import "../../../games/minesweeper/observer/styles.css";
+@import "../../../games/parabox-intro/observer/styles.css";
+@import "../../../games/sausage-roll/observer/styles.css";
+@import "../../../games/sokoban/observer/styles.css";
+@import "../../../games/swarm-farming/observer/styles.css";
 
 :root {
   --background: #090b0b;

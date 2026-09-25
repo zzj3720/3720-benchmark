@@ -1,4 +1,4 @@
-import { GameCanvas } from "../../../observer-platform/app/webgl/game-canvas";
+import { GameCanvas } from "../../../observer/web/app/webgl/game-canvas";
 import { buildParaboxScene } from "./webgl";
 import {
   asNumber,
@@ -9,7 +9,7 @@ import {
   type GameState,
   type Json,
   type ObserverEvent,
-} from "../../../observer-platform/app/game-observer";
+} from "../../../observer/web/app/game-observer";
 
 function spaceMap(state?: GameState | null) {
   const space = asRecord(state?.space);

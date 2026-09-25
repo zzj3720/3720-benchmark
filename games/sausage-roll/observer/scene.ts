@@ -1,5 +1,5 @@
-import type { GameState } from "../../../observer-platform/app/game-observer";
-import { WebGLSurface } from "../../../observer-platform/app/webgl/runtime";
+import type { GameState } from "../../../observer/web/app/game-observer";
+import { WebGLSurface } from "../../../observer/web/app/webgl/runtime";
 import { sausageHud } from "./webgl";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";

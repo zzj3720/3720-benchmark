@@ -1,6 +1,6 @@
-import type { Json } from "../../../observer-platform/app/game-observer";
-import { num, rec, str, records } from "../../../observer-platform/app/webgl/data";
-import { Painter, type SceneBuilder } from "../../../observer-platform/app/webgl/scene";
+import type { Json } from "../../../observer/web/app/game-observer";
+import { num, rec, str, records } from "../../../observer/web/app/webgl/data";
+import { Painter, type SceneBuilder } from "../../../observer/web/app/webgl/scene";
 
 export const buildSwarmScene: SceneBuilder = (state, view) => {
   const p = new Painter(view.width, "#08100f"), tick = num(state.tick), deadline = Math.max(1, num(state.deadline_ticks, 1));

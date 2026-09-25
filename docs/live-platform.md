@@ -1,9 +1,79 @@
-# Live platform: data, storage and operations
+# Live platform: protocol, storage and operations
 
 This is the current deployment and storage contract. The logical-run identity,
 effective-time rules and checkpoint ownership in `tracks/live-observability.md`
 remain in force. The v2 storage layout replaces whole-file gzip history and the
 old in-memory/full-history gateway projection.
+
+## Components
+
+| Path | Role |
+|---|---|
+| `games/<game>/observer/` | Game-specific live-state metadata and WebGL scene |
+| `observer/relay/` | Sidecar relay that projects native Parabox/Swarm logs into the common observer API |
+| `observer/runtime/` | Rust `run-recorder`, `live-gateway`, `run-archive`, and replay tools |
+| `observer/web/` | Public read-only console, Docker Compose deployment, and edge proxy |
+| `tools/observer/` | Harbor-side hook: `harbor-run` and `RunJournalPlugin`, which start the recorder |
+
+The live platform has two read-only layers: a common per-game observer schema
+inside sidecars, and a host gateway that projects all current Harbor trials into
+one multi-run feed.
+
+## Per-game observer protocol
+
+Each scored sidecar supports:
+
+```text
+GET /v1/observe/snapshot
+GET /v1/observe/events?after=<sequence>&limit=<1..1000>&wait_ms=<0..30000>
+```
+
+Normalized events use `benchmark-observer-event-v1` and carry a monotonically
+increasing sequence, source timestamp, task identity, action, post-action
+dynamic state, and compact result. Large immutable scene data is emitted once
+as a gzip-compressed observer asset and referenced by content hash. Reads do
+not advance a virtual clock, trigger cooldowns, alter scoring, or enter the
+Agent command audit.
+
+- Parabox projects its native `parabox-events-v1` log.
+- Swarm projects its `swarm-audit-v1` initial state and command responses.
+- Sausage writes the common event schema directly.
+
+Parabox native records additionally contain a private recursive scene graph for
+the host dashboard. The common sidecar relay strips that field so richer human
+rendering does not expand the state available to the benchmark Agent.
+
+## Recorder and gateway
+
+The Rust `live-gateway` binary in `observer/runtime` is the read-only
+projection used by the public dashboard. New runs are read from the single
+chain journal. Runtime lifecycle, sidecar game records, visible Agent messages,
+tool actions, and workspace notes therefore arrive with one identity, one
+sequence, and an already-stamped effective Agent time. Runs created before the
+recorder are frozen in the local `.harbor/live-archive`; request handling never
+scans Docker or joins live Harbor artifacts.
+An unsealed segment is reported as live only while its recorder owns the
+chain's process-scoped writer lease. Losing that lease without a durable
+`segment_finished` record produces `orphaned`, not a false `running` state.
+
+Recorder-aware sidecars append to a durable trial inbox. The Rust recorder
+tails it incrementally and drains it idempotently by source sequence; the file
+itself is also the recovery buffer. Agent session and note additions enter that
+same recorder before publication. Live ingestion therefore does not poll
+sidecar state.
+
+The v2 SSE feed starts with a snapshot, then contains only changed run summaries, appended score points, removals, and a selected-run revision. The
+browser fetches detail after that revision changes; it does not receive the
+complete current state on every SSE notification. A detail read adds the
+authoritative dynamic game state, compact replay catalog, and explicit Agent
+notes. A selected replay is loaded separately. Content-addressed assets are
+immutable and cached by the browser and edge. Hidden reasoning is neither
+required nor exposed.
+
+Score charts normalize every run to cumulative Agent execution time starting
+at `0h`; the horizontal axis never uses calendar time. Continuation gaps and
+infrastructure-only failed segments are excluded, while live runs extend the
+current active segment until the next gateway refresh.
 
 ## Ownership and layout
 
@@ -201,9 +271,9 @@ Back up the two data directories first. The archive CLI runs on the same host
 as the recorder so its exclusive writer-lock checks are meaningful:
 
 ```sh
-cargo build --release --locked --manifest-path tools/observer/runtime/Cargo.toml --bins
-tools/observer/runtime/target/release/run-archive --root . --chunk-mib 16
-tools/observer/runtime/target/release/run-archive --root . --chunk-mib 16 --apply
+cargo build --release --locked --manifest-path observer/runtime/Cargo.toml --bins
+observer/runtime/target/release/run-archive --root . --chunk-mib 16
+observer/runtime/target/release/run-archive --root . --chunk-mib 16 --apply
 ```
 
 The dry run reports planned segments and size totals. `--apply` writes verified
@@ -214,17 +284,17 @@ repeatable; original event bytes and legacy IDs are preserved. To inspect a
 chain without materializing it:
 
 ```sh
-tools/observer/runtime/target/release/run-archive --cat .harbor/run-journals/<id>
+observer/runtime/target/release/run-archive --cat .harbor/run-journals/<id>
 ```
 
 Deploy from the repository root:
 
 ```sh
-npm --prefix observer-platform ci
-npm --prefix observer-platform test
-cargo test --manifest-path tools/observer/runtime/Cargo.toml
-python3 observer-platform/scripts/publish_docker.py --preview
-python3 observer-platform/scripts/publish_docker.py
+npm --prefix observer/web ci
+npm --prefix observer/web test
+cargo test --manifest-path observer/runtime/Cargo.toml
+python3 observer/web/scripts/publish_docker.py --preview
+python3 observer/web/scripts/publish_docker.py
 ```
 
 The publisher builds immutable image tags and the host recorder, starts a
@@ -243,6 +313,17 @@ first. Docker/OrbStack must be running for restart policies to take effect.
 Relevant upstream references: [Compose health dependencies](https://docs.docker.com/compose/how-tos/startup-order/),
 [zstd streaming encoder](https://docs.rs/zstd/latest/zstd/stream/write/struct.Encoder.html),
 [rusqlite connections](https://docs.rs/rusqlite/latest/rusqlite/struct.Connection.html).
+
+## Public path
+
+The console at [live.benchmark.3720.org](https://live.benchmark.3720.org) holds
+one `/api/live/v1/subscribe` connection. JSON detail and replay responses use HTTP
+gzip; immutable assets use year-long content-hash caching. Vinext forwards the
+strict read-only allowlist to the loopback gateway on port 3740. A named
+Cloudflare Tunnel connects the local site to
+`benchmark-live-origin.3720.org`, and a Worker custom domain exposes the final
+hostname. Game commands, session files, Docker, and Harbor artifacts are never
+directly reachable from the internet.
 
 ## WebGL scenes and direct replay export
 

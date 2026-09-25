@@ -1,4 +1,4 @@
-import { asNumber, asRecord, asString, type GameState, type Json } from "../../../observer-platform/app/game-observer";
+import { asNumber, asRecord, asString, type GameState, type Json } from "../../../observer/web/app/game-observer";
 
 export type Coord3 = { x: number; y: number; z: number };
 export type SceneEntity = {

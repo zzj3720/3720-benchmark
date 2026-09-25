@@ -7,8 +7,8 @@ import {
   type GameObserverModule,
   type GameState,
   type ObserverEvent,
-} from "../../../observer-platform/app/game-observer";
-import { exportScale, registerCanvasExport } from "../../../observer-platform/app/webgl/export-source";
+} from "../../../observer/web/app/game-observer";
+import { exportScale, registerCanvasExport } from "../../../observer/web/app/webgl/export-source";
 import type { SausageScene as SausageSceneRuntime } from "./scene";
 import { readSceneState } from "./scene-state";
 

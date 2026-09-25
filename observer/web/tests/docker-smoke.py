@@ -8,8 +8,8 @@ import tempfile
 import time
 import urllib.request
 
-ROOT = Path(__file__).resolve().parents[2]
-RECORDER = ROOT / "tools/observer/runtime/target/release/run-recorder"
+ROOT = Path(__file__).resolve().parents[3]
+RECORDER = ROOT / "observer/runtime/target/release/run-recorder"
 
 
 def now():

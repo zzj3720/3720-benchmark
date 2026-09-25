@@ -1,5 +1,5 @@
-import { num, rec, str, records, strings, clock } from "../../../observer-platform/app/webgl/data";
-import { Painter, type SceneBuilder } from "../../../observer-platform/app/webgl/scene";
+import { num, rec, str, records, strings, clock } from "../../../observer/web/app/webgl/data";
+import { Painter, type SceneBuilder } from "../../../observer/web/app/webgl/scene";
 
 const colors: Record<string, string> = { police: "#719eff", medical: "#ff7189", fire: "#ffbd58" };
 const roleColor = (role: string) => colors[role] ?? "#9ebbae";

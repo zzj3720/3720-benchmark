@@ -16,7 +16,7 @@ from tools.observer.run_journal import RUN_EVENT_SCHEMA, RunJournalPlugin
 
 
 def journal_rows(path: Path):
-    archive = Path(__file__).parent / "runtime/target/release/run-archive"
+    archive = Path(__file__).resolve().parents[2] / "observer/runtime/target/release/run-archive"
     decoded = subprocess.check_output([str(archive), "--cat", str(path.parent)], text=True)
     return [json.loads(line) for line in decoded.splitlines()]
 

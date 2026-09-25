@@ -1,5 +1,5 @@
-import type { GameObserverModule, GameState } from "../../../observer-platform/app/game-observer";
-import { GameCanvas } from "../../../observer-platform/app/webgl/game-canvas";
+import type { GameObserverModule, GameState } from "../../../observer/web/app/game-observer";
+import { GameCanvas } from "../../../observer/web/app/webgl/game-canvas";
 import { buildOperatorScene } from "./webgl";
 export function OperatorState({ state }: { state: GameState }) { return <GameCanvas state={state} build={buildOperatorScene} label="Operator" />; }
 

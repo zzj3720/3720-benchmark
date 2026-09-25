@@ -18,5 +18,5 @@ games/<game>/
 
 Not every game uses the same language or needs every subdirectory. The
 ownership boundary is the important part: game-specific behavior belongs here.
-`observer-platform/` provides only the shared live-console shell and transport,
+`observer/` provides only the shared live-console shell, recorder, and transport,
 while `tasks/` contains generated, self-contained Harbor packages.

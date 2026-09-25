@@ -1,6 +1,6 @@
 # Live observability architecture
 
-The current storage/deployment details are in [Live platform v2](../live-platform-v2.md).
+The current storage/deployment details are in [Live platform](../live-platform.md).
 The authority now consists of 16 MiB (or configured 32 MiB) decoded zstd
 segments plus an open JSONL tail. A disposable disk index replaces the old
 in-memory live projection. Logical identity and effective-time ownership below
@@ -88,7 +88,7 @@ infrastructure attempt counts.
 ### 2. Runtime control plane and run recorder
 
 The Harbor adapter creates a stable `chain_id` once and a new `segment_id` for
-each trial. The persistent Rust recorder in `tools/observer/runtime` is the only
+each trial. The persistent Rust recorder in `observer/runtime` is the only
 writer for that chain; `tools/observer/run_journal.py` is a thin Harbor hook
 adapter that forwards lifecycle messages over a JSON-lines control pipe.
 Runtime lifecycle changes enter it directly; sidecar observer events enter

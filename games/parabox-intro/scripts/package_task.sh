@@ -19,7 +19,7 @@ docker buildx build \
   --progress plain \
   --platform linux/amd64,linux/arm64 \
   --output "type=local,dest=$relay_staging" \
-  "$repo_root/tools/observer-relay"
+  "$repo_root/observer/relay"
 
 for architecture in amd64 arm64; do
   source_dir="$staging/linux_$architecture/$architecture"

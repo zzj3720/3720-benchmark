@@ -211,7 +211,7 @@ deliver an alarm, trigger a model cooldown, or enter the scoring audit.
 The private operations console follows all enabled tasks concurrently and
 renders game-specific state, the latest Agent action, progress, connection
 health, and one merged timeline. See
-[`docs/observer-platform.md`](../observer-platform.md) for the protocol and
+[`docs/live-platform.md`](../live-platform.md) for the protocol and
 local port configuration.
 
 ## Parabox score

@@ -1,7 +1,7 @@
-import { asNumber, asRecord, asString, type GameObserverModule, type GameState, type ObserverEvent } from "../../../observer-platform/app/game-observer";
-import { GameCanvas } from "../../../observer-platform/app/webgl/game-canvas";
-import { tileBoardScene } from "../../../observer-platform/app/webgl/boards";
-import type { SceneBuilder } from "../../../observer-platform/app/webgl/scene";
+import { asNumber, asRecord, asString, type GameObserverModule, type GameState, type ObserverEvent } from "../../../observer/web/app/game-observer";
+import { GameCanvas } from "../../../observer/web/app/webgl/game-canvas";
+import { tileBoardScene } from "../../../observer/web/app/webgl/boards";
+import type { SceneBuilder } from "../../../observer/web/app/webgl/scene";
 
 const buildScene: SceneBuilder = (state, view) => tileBoardScene("sokoban", state, view);
 function SokobanState({ state }: { state: GameState }) { return <GameCanvas state={state} build={buildScene} label="Sokoban" />; }

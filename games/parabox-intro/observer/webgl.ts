@@ -1,6 +1,6 @@
-import type { GameState, Json } from "../../../observer-platform/app/game-observer";
-import { num, rec, str, records } from "../../../observer-platform/app/webgl/data";
-import { Painter, intersect, mix, rgb, type Rect, type SceneBuilder } from "../../../observer-platform/app/webgl/scene";
+import type { GameState, Json } from "../../../observer/web/app/game-observer";
+import { num, rec, str, records } from "../../../observer/web/app/webgl/data";
+import { Painter, intersect, mix, rgb, type Rect, type SceneBuilder } from "../../../observer/web/app/webgl/scene";
 
 const BOX_COLORS = ["#40d9b5", "#f2aa3b", "#4dbbff", "#e94b82", "#9fd43c", "#ff795e", "#8c7cf4", "#36cfe8", "#efcc4f", "#64d477"];
 const mapRows = (value: Json | undefined) => Array.isArray(value) ? value.map(row => typeof row === "string" ? [...row] : Array.isArray(row) ? row : []) : [];

@@ -41,5 +41,5 @@ the relay.
 Run the normalization tests with:
 
 ```bash
-cargo test --manifest-path tools/observer-relay/Cargo.toml
+cargo test --manifest-path observer/relay/Cargo.toml
 ```

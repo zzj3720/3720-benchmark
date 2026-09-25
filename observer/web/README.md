@@ -2,15 +2,16 @@
 
 The supported deployment is now `compose.yaml`: immutable web/gateway images,
 read-only history mounts, and a separate disposable query-cache volume. See
-[`docs/live-platform-v2.md`](../docs/live-platform-v2.md) for the storage/API
+[`docs/live-platform.md`](../../docs/live-platform.md) for the storage/API
 contract, memory budgets, migration, and rollback.
 
 
-`observer-platform/` is the public, read-only live console for 3720 game
+`observer/web/` is the public, read-only live console for 3720 game
 benchmarks. It shows real Harbor runs rather than browser fixtures:
 
-- a separate scoreboard for Parabox, Swarm, Sausage, Emergency Operator, and
-  Sokoban;
+- a separate scoreboard for each game registered in `app/game-registry.tsx`
+  (currently Parabox, Swarm, Sausage, Emergency Operator, Kitchen Terminal,
+  Minesweeper, and Sokoban);
 - one score-over-effective-agent-time series per model, measured from the
   logical run's first eligible Agent execution window and excluding pauses,
   infrastructure-only attempts, and gaps between continuation segments;
@@ -60,7 +61,7 @@ A separately launched Sausage sidecar on port 3733 is also shown, but is marked
 shown as unavailable—there is no demo-data fallback.
 
 The runtime ledger and migration boundary are specified in
-[`docs/tracks/live-observability.md`](../docs/tracks/live-observability.md).
+[`docs/tracks/live-observability.md`](../../docs/tracks/live-observability.md).
 
 The production URL is [live.benchmark.3720.org](https://live.benchmark.3720.org).
 A Cloudflare Worker accepts only `GET` and `HEAD`, rewrites `/api/live/v1/*` to
@@ -76,11 +77,11 @@ Docker Compose, Node.js 24+ (for host checks), and Rust (for the host recorder)
 are required. From the repository root:
 
 ```bash
-npm --prefix observer-platform ci
-npm --prefix observer-platform test
-cargo test --manifest-path tools/observer/runtime/Cargo.toml
-python3 observer-platform/scripts/publish_docker.py --preview
-python3 observer-platform/scripts/publish_docker.py
+npm --prefix observer/web ci
+npm --prefix observer/web test
+cargo test --manifest-path observer/runtime/Cargo.toml
+python3 observer/web/scripts/publish_docker.py --preview
+python3 observer/web/scripts/publish_docker.py
 ```
 
 Publication builds versioned images and the host recorder, verifies the

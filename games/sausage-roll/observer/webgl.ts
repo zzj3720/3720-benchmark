@@ -1,6 +1,6 @@
-import type { GameState } from "../../../observer-platform/app/game-observer";
-import { Painter } from "../../../observer-platform/app/webgl/scene";
-import { rec, str, num } from "../../../observer-platform/app/webgl/data";
+import type { GameState } from "../../../observer/web/app/game-observer";
+import { Painter } from "../../../observer/web/app/webgl/scene";
+import { rec, str, num } from "../../../observer/web/app/webgl/data";
 import type { SausageSceneState } from "./scene-state";
 
 export function sausageHud(state: GameState, scene: SausageSceneState, width: number, height: number) {

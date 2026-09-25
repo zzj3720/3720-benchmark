@@ -86,6 +86,6 @@ load remains responsive.
 
 - `cargo fmt --manifest-path games/parabox-intro/Cargo.toml -- --check`
 - `cargo test --manifest-path games/parabox-intro/Cargo.toml`
-- `vp lint` in `observer-platform/`
-- `vp run test` in `observer-platform/`
+- `vp lint` in `observer/web/`
+- `vp run test` in `observer/web/`
 - `git diff --check`

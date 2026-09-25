@@ -1,12 +1,12 @@
 import { memo } from "react";
 
-import operator from "../../games/emergency-operator/observer";
-import kitchen from "../../games/kitchen-terminal/observer";
-import minesweeper from "../../games/minesweeper/observer";
-import parabox from "../../games/parabox-intro/observer";
-import sausage from "../../games/sausage-roll/observer";
-import sokoban from "../../games/sokoban/observer";
-import swarm from "../../games/swarm-farming/observer";
+import operator from "../../../games/emergency-operator/observer";
+import kitchen from "../../../games/kitchen-terminal/observer";
+import minesweeper from "../../../games/minesweeper/observer";
+import parabox from "../../../games/parabox-intro/observer";
+import sausage from "../../../games/sausage-roll/observer";
+import sokoban from "../../../games/sokoban/observer";
+import swarm from "../../../games/swarm-farming/observer";
 
 import {
   asString,

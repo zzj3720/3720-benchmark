@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 
-import { ParaboxState } from "../games/parabox-intro/observer";
-import { SausageState } from "../games/sausage-roll/observer";
-import { OperatorState } from "../games/emergency-operator/observer";
-import KitchenState from "../games/kitchen-terminal/observer";
+import { ParaboxState } from "../../games/parabox-intro/observer";
+import { SausageState } from "../../games/sausage-roll/observer";
+import { OperatorState } from "../../games/emergency-operator/observer";
+import KitchenState from "../../games/kitchen-terminal/observer";
 import type { GameState } from "./app/game-observer";
 import "./app/globals.css";
 import "./qa-gallery.css";
@@ -102,7 +102,7 @@ function Gallery() {
       </header>
       {error ? (
         <p className="qa-error">
-          加载失败：{error}。请在 observer-platform 运行 `vp run {game === "sausage" ? "qa:sausage:data" : game === "operator" ? "qa:operator:data" : game === "kitchen" ? "qa:kitchen:data" : "qa:parabox:data"}`。
+          加载失败：{error}。请在 observer/web 运行 `vp run {game === "sausage" ? "qa:sausage:data" : game === "operator" ? "qa:operator:data" : game === "kitchen" ? "qa:kitchen:data" : "qa:parabox:data"}`。
         </p>
       ) : null}
       {samples.length > PAGE_SIZE ? (

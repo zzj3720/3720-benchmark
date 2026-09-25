@@ -6,6 +6,6 @@ run-journals
 jobs
 results
 tasks
-observer-platform/node_modules
-observer-platform/.vinext
-observer-platform/.wrangler
+observer/web/node_modules
+observer/web/.vinext
+observer/web/.wrangler

@@ -1,5 +1,5 @@
-import { asNumber, asRecord, asString, type GameObserverModule, type GameState, type ObserverEvent } from "../../../observer-platform/app/game-observer";
-import { GameCanvas } from "../../../observer-platform/app/webgl/game-canvas";
+import { asNumber, asRecord, asString, type GameObserverModule, type GameState, type ObserverEvent } from "../../../observer/web/app/game-observer";
+import { GameCanvas } from "../../../observer/web/app/webgl/game-canvas";
 import { buildSwarmScene } from "./webgl";
 function SwarmState({ state }: { state: GameState }) { return <GameCanvas state={state} build={buildSwarmScene} label="Swarm" />; }
 

@@ -13,7 +13,7 @@ import time
 import urllib.request
 
 PROJECT = Path(__file__).resolve().parent.parent
-ROOT = PROJECT.parent
+ROOT = PROJECT.parents[1]
 COMPOSE = PROJECT / "compose.yaml"
 STATE = ROOT / ".harbor" / "live-deploy"
 LEGACY_LABELS = ("org.3720.benchmark-live-site", "org.3720.benchmark-live-gateway")
@@ -116,7 +116,7 @@ def publish(release: str, skip_build: bool, preview: bool) -> None:
     if not skip_build:
         compose(release, True, "build")
     # The host Harbor recorder must provide the cross-container writer lease.
-    command(["cargo", "build", "--release", "--locked", "--manifest-path", str(ROOT / "tools/observer/runtime/Cargo.toml"), "--bins"])
+    command(["cargo", "build", "--release", "--locked", "--manifest-path", str(ROOT / "observer/runtime/Cargo.toml"), "--bins"])
     compose(release, True, "up", "-d", "--no-build", "--wait", "--wait-timeout", "240")
     candidate = verify(14000, 14740)
     try:

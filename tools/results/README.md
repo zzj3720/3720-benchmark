@@ -10,7 +10,7 @@ Audit a completed or live chain with the Rust runtime:
 
 ```bash
 cargo run --release \
-  --manifest-path tools/observer/runtime/Cargo.toml \
+  --manifest-path observer/runtime/Cargo.toml \
   --bin run-audit -- \
   .harbor/run-journals/<chain>/journal.jsonl \
   results/audits/<chain>.json

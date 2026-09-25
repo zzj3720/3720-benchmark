@@ -19,6 +19,11 @@ The repository starts from Harbor's official
 ├── games/                       # Complete per-game vertical slices
 ├── tasks/                       # Harbor task bank
 │   └── hello-world/             # Toolchain smoke task; not a scored case
+├── observer/                    # Live console: recorder, gateway, relay, web
+├── tools/
+│   ├── observer/                # harbor-run and the Harbor recorder hook
+│   ├── agents/                  # Harbor agent adapters (game_support/ for game hooks)
+│   └── results/                 # Result matrix runners
 ├── results/                     # Reviewed scores and acceptance evidence
 ├── docs/
 │   └── tracks/                  # Track-specific goals and case design
@@ -40,7 +45,7 @@ snapshot into the corresponding Harbor task. Raw model trajectories and
 recovery workspaces remain local rather than entering the repository.
 
 Each game sidecar also exposes a common read-only state subscription. The
-private [live operations console](docs/observer-platform.md) can watch Agent
+private [live operations console](docs/live-platform.md) can watch Agent
 actions, authoritative environment state, virtual time, progress, and results
 across concurrent benchmark runs.
 

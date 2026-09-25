@@ -37,7 +37,8 @@ class RunJournalPlugin:
         self.recorder_path = (
             Path(configured_recorder).expanduser()
             if configured_recorder
-            else Path(__file__).parent
+            else Path(__file__).resolve().parents[2]
+            / "observer"
             / "runtime"
             / "target"
             / "release"

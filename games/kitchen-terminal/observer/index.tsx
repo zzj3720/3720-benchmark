@@ -1,6 +1,6 @@
-import { asNumber, asRecord, type GameObserverModule, type GameState } from "../../../observer-platform/app/game-observer";
-import { GameCanvas } from "../../../observer-platform/app/webgl/game-canvas";
-import { clock } from "../../../observer-platform/app/webgl/data";
+import { asNumber, asRecord, type GameObserverModule, type GameState } from "../../../observer/web/app/game-observer";
+import { GameCanvas } from "../../../observer/web/app/webgl/game-canvas";
+import { clock } from "../../../observer/web/app/webgl/data";
 import { buildKitchenScene } from "./webgl";
 function KitchenState({ state }: { state: GameState }) { return <GameCanvas state={state} build={buildKitchenScene} label="Kitchen" />; }
 
