@@ -19,7 +19,7 @@ import {
   Rewind,
   type LucideIcon,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState, type ButtonHTMLAttributes } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ButtonHTMLAttributes } from "react";
 
 import {
   GAME_IDS,
@@ -43,12 +43,7 @@ import type { ReplayExportFormat } from "./replay-export";
 
 import type { RunSummary, RunDetail, ElapsedScorePoint, ReplayFrame, ReplayGroupSummary, LoadedAttemptReplay } from "./live-contract";
 import { LiveResource, RequestGate, applySubscription, effectiveDuration } from "./live-client";
-
-function seriesColor(id: string) {
-  let hash = 2166136261;
-  for (const character of id) hash = Math.imul(hash ^ character.charCodeAt(0), 16777619);
-  return `hsl(${(hash >>> 0) % 360} 78% 70%)`;
-}
+import { harnessName, modelName, rankRuns, runLabels, seriesColors, viewerStatus } from "./run-labels";
 
 function clockTime(timestamp?: number | null) {
   if (!timestamp) return "—";
@@ -113,34 +108,18 @@ function scoreTimeline(run: RunSummary, now: number): ElapsedScorePoint[] {
     : points;
 }
 
-const RUN_STATUS = {
-  live: { label: "正在运行", className: "live" },
-  orphaned: { label: "连接中断 · 可恢复", className: "resumable" },
-  resumable: { label: "已暂停 · 可继续", className: "resumable" },
-  agent_stopped: { label: "Agent 已停止", className: "agent-stopped" },
-  completed: { label: "游戏已结束", className: "completed" },
-  stopped: { label: "已停止", className: "finished" },
-  no_agent: { label: "等待 Agent", className: "waiting" },
-} as const;
+const STATUS_CLASS = { live: "live", done: "completed", ended: "finished", waiting: "waiting" } as const;
 
 function runStatus(run: RunSummary) {
-  return RUN_STATUS[run.termination?.kind ?? (run.live ? "live" : "stopped")];
+  const status = viewerStatus(run);
+  return { ...status, className: STATUS_CLASS[status.tone] };
 }
 
-// Distinct runs of the same model are indistinguishable by name alone (e.g.
-// six kitchen deepseek-v4-flash runs), so duplicates get the short trial
-// suffix as a discriminator wherever runs are listed.
-function trialTag(run: RunSummary) {
-  const suffix = run.trial?.split("__").pop()?.trim();
-  return suffix ? `#${suffix}` : null;
-}
-
-function duplicateModels(runs: RunSummary[]) {
-  const counts = new Map<string, number>();
-  for (const run of runs) counts.set(run.model, (counts.get(run.model) ?? 0) + 1);
-  return new Set(
-    [...counts.entries()].filter(([, count]) => count > 1).map(([model]) => model),
-  );
+function sinceLastScore(run: RunSummary, now: number) {
+  if (typeof run.last_score_elapsed_ms !== "number") return "没有得分";
+  if (!run.live) return `最后一分在第 ${durationLabel(run.last_score_elapsed_ms)}`;
+  const silence = noScoreDuration(run, now) ?? 0;
+  return silence < 60_000 ? "刚刚得分" : `${durationLabel(silence)}前得分`;
 }
 
 function actionLabel(action?: Record<string, Json> | null) {
@@ -335,10 +314,15 @@ export default function Home() {
       Object.fromEntries(
         GAME_IDS.map((game) => [
           game,
-          runs.filter((run) => run.game === game),
+          rankRuns(runs.filter((run) => run.game === game)),
         ]),
       ) as Record<GameId, RunSummary[]>,
     [runs],
+  );
+  // Labels only need to tell runs of the same game apart.
+  const labels = useMemo(
+    () => new Map(GAME_IDS.flatMap((game) => [...runLabels(grouped[game])])),
+    [grouped],
   );
   const visibleRuns = grouped[selectedGame];
   const liveCount = runs.filter((run) => run.live).length;
@@ -393,23 +377,22 @@ export default function Home() {
                 : connection === "connecting" ? "正在连接" : "连接中断"}
         </div>
         <div className="top-actions">
-          <button onClick={() => setPaused((value) => !value)}>{paused ? "恢复更新" : "暂停更新"}</button>
+          {(paused || liveCount > 0) && <button onClick={() => setPaused((value) => !value)}>{paused ? "恢复更新" : "暂停更新"}</button>}
         </div>
       </header>
 
       <aside className="run-sidebar">
         <div className="sidebar-label">游戏</div>
         <nav className="game-switcher" aria-label="选择游戏">
-          {GAME_IDS.map(game => <button key={game} aria-pressed={selectedGame === game} onClick={() => showDashboard(game)}><span>{GAME_META[game].short}</span><small>{grouped[game].length}</small></button>)}
+          {GAME_IDS.filter(game => grouped[game].length || selectedGame === game).map(game => <button key={game} aria-pressed={selectedGame === game} onClick={() => showDashboard(game)}><span>{GAME_META[game].short}</span><small>{grouped[game].length}</small></button>)}
         </nav>
         <div className="mobile-switcher">
-          <LiveSelect label="切换游戏" value={selectedGame} onChange={value => showDashboard(value as GameId)} options={GAME_IDS.map(game => ({ value: game, label: GAME_META[game].short }))} />
-          <LiveSelect label="切换运行" value={selectedId ?? "__overview"} onChange={value => { const run = runs.find(run => run.id === value); if (run) selectRun(run); else showDashboard(); }} options={[{ value: "__overview", label: "得分总览" }, ...visibleRuns.map(run => ({ value: run.id, label: `${run.model} · ${run.score} 分 ${trialTag(run) ?? ""}` }))]} />
+          <LiveSelect label="切换游戏" value={selectedGame} onChange={value => showDashboard(value as GameId)} options={GAME_IDS.filter(game => grouped[game].length || selectedGame === game).map(game => ({ value: game, label: GAME_META[game].short }))} />
+          <LiveSelect label="切换运行" value={selectedId ?? "__overview"} onChange={value => { const run = runs.find(run => run.id === value); if (run) selectRun(run); else showDashboard(); }} options={[{ value: "__overview", label: "得分总览" }, ...visibleRuns.map(run => ({ value: run.id, label: `${labels.get(run.id)} · ${run.score} 分` }))]} />
         </div>
         {[selectedGame].map((game) => {
           const meta = GAME_META[game];
           const gameRuns = grouped[game];
-          const duplicated = duplicateModels(gameRuns);
           return (
             <section
               className={`game-group ${selectedGame === game ? "current" : ""}`}
@@ -426,10 +409,9 @@ export default function Home() {
                   >
                     <span className={`run-dot ${runStatus(run).className}`} />
                     <span className="model-copy">
-                      <strong>{run.model}</strong>
+                      <strong>{labels.get(run.id)}</strong>
                       <small>
-                        {run.objective}
-                        {duplicated.has(run.model) && trialTag(run) ? ` · ${trialTag(run)}` : ""}
+                        {[harnessName(run.agent), durationLabel(taskDuration(run, snapshotNow)), runStatus(run).tone === "ended" ? "" : runStatus(run).label].filter(Boolean).join(" · ")}
                       </small>
                     </span>
                     <b>{run.score}</b>
@@ -454,7 +436,7 @@ export default function Home() {
             onBack={() => showDashboard(selectedGame)}
           />
         ) : (
-          <GameDashboard key={selectedGame} game={selectedGame} runs={visibleRuns} now={snapshotNow} onSelect={selectRun} />
+          <GameDashboard key={selectedGame} game={selectedGame} runs={visibleRuns} labels={labels} now={snapshotNow} onSelect={selectRun} />
         )}
       </section>
     </main>
@@ -464,106 +446,94 @@ export default function Home() {
 function GameDashboard({
   game,
   runs,
+  labels,
   now,
   onSelect,
 }: {
   game: GameId;
   runs: RunSummary[];
+  labels: Map<string, string>;
   now: number;
   onSelect: (run: RunSummary) => void;
 }) {
-  const [scope, setScope] = useState<"recent" | "active" | "all">("recent");
   const [compared, setCompared] = useState<Set<string> | null>(null);
   const meta = GAME_META[game];
-  const matching = runs.slice()
-    .sort((a, b) => Number(b.live) - Number(a.live) || (b.started_at ?? 0) - (a.started_at ?? 0) || a.id.localeCompare(b.id));
-  const shown = scope === "recent" ? matching.slice(0, 8) : scope === "active" ? matching.filter(run => run.live) : matching;
-  const selected = compared ?? new Set(shown.slice(0, 6).map(run => run.id));
-  const curves = shown.filter(run => selected.has(run.id)).slice(0, 8);
-  const leader = runs.slice().sort((a, b) => b.score - a.score)[0];
-  const duplicated = duplicateModels(runs);
+  const colors = useMemo(() => seriesColors(runs), [runs]);
+  const selected = compared ?? new Set(runs.slice(0, 6).map(run => run.id));
+  const curves = runs.filter(run => selected.has(run.id)).slice(0, 8);
+  const [scale, setScale] = useState<ChartScale | null>(null);
+  const chartScale = scale ?? preferredScale(curves, now);
+  const best = runs.slice().sort((a, b) => b.score - a.score)[0];
+  const liveRuns = runs.filter((run) => run.live).length;
+  let rank = 0;
   return (
     <div className="dashboard-page" style={{ "--accent": meta.accent } as React.CSSProperties}>
       <header className="page-heading">
         <div>
-          <p className="eyebrow">模型对比</p>
           <h1>{meta.label}</h1>
           <p className="page-subtitle">
-            按实验记录比较得分与有效运行时间，选择记录查看现场和历史尝试。
+            {best
+              ? `${runs.length} 次运行，最好成绩是 ${labels.get(best.id)} 的 ${best.score} / ${best.total || "—"}。点开一次运行可以看现场画面和每次尝试的回放。`
+              : "新的运行开始后会出现在这里。"}
           </p>
         </div>
         <div className="heading-metrics">
-          <Metric label="运行记录" value={String(runs.length)} />
-          <Metric label="正在运行" value={String(runs.filter((run) => run.live).length)} />
-          <Metric label="最高得分" value={leader ? `${leader.score}` : "—"} />
+          <Metric label="运行" value={String(runs.length)} />
+          <Metric label="直播中" value={String(liveRuns)} />
+          <Metric label="最高分" value={best ? `${best.score}` : "—"} />
         </div>
       </header>
 
-      <div className="run-filters" role="group" aria-label="筛选实验记录">
-        <LiveSelect label="运行范围" value={scope} onChange={value => { setScope(value as typeof scope); setCompared(null); }} options={[{ value: "recent", label: "最近 8 次" }, { value: "active", label: "正在运行" }, { value: "all", label: "全部记录" }]} />
-        <span>{shown.length} / {runs.length} 条记录</span>
-      </div>
-      <section className="chart-card">
-        <div className="section-title">
-          <div>
-
-            <strong>模型得分轨迹</strong>
+      {runs.length > 0 && (
+        <section className="chart-card">
+          <div className="section-title">
+            <strong>得分随运行时间的变化</strong>
+            <div className="scale-switch" role="group" aria-label="横轴刻度">
+              {(["linear", "log"] as const).map(option => (
+                <button key={option} aria-pressed={chartScale === option} onClick={() => setScale(option)}>
+                  {option === "linear" ? "线性时间" : "对数时间"}
+                </button>
+              ))}
+            </div>
           </div>
-          <small>横轴累计有效运行时间 · 纵轴得分</small>
-        </div>
-        <ScoreChart runs={curves} now={now} onSelect={onSelect} />
-        <div className="compare-picker" role="group" aria-label="选择对比曲线">
-          <span>对比曲线 · 最多 8 条</span>
-          {shown.map(run => <Toggle.Root className="series-toggle" key={run.id} style={{ "--series": seriesColor(run.id) } as React.CSSProperties} pressed={selected.has(run.id)} disabled={!selected.has(run.id) && curves.length >= 8} onPressedChange={pressed => setCompared(() => { const next = new Set(selected); if (pressed) next.add(run.id); else next.delete(run.id); return next; })}><span className="series-toggle-check"><Check size={12} aria-hidden="true" /></span><span>{run.model} · {run.effort} {trialTag(run)}</span></Toggle.Root>)}
-        </div>
-      </section>
+          <ScoreChart runs={curves} now={now} colors={colors} labels={labels} scale={chartScale} onSelect={onSelect} />
+          <div className="compare-picker" role="group" aria-label="选择对比曲线">
+            <span>对比曲线（最多 8 条）</span>
+            {runs.map(run => <Toggle.Root className="series-toggle" key={run.id} style={{ "--series": colors.get(run.id) } as React.CSSProperties} pressed={selected.has(run.id)} disabled={!selected.has(run.id) && curves.length >= 8} onPressedChange={pressed => setCompared(() => { const next = new Set(selected); if (pressed) next.add(run.id); else next.delete(run.id); return next; })}><span className="series-toggle-check"><Check size={12} aria-hidden="true" /></span><span>{labels.get(run.id)}</span></Toggle.Root>)}
+          </div>
+        </section>
+      )}
 
       <section className="run-grid">
-        {shown.map((run) => {
-          const elapsed = taskDuration(run, now);
-          const scoreSilence = noScoreDuration(run, now);
+        {runs.map((run) => {
           const status = runStatus(run);
+          const place = run.live ? null : ++rank;
           return (
             <button
               className="run-card"
               key={run.id}
               onClick={() => onSelect(run)}
-              style={
-                { "--series": seriesColor(run.id) } as React.CSSProperties
-              }
+              style={{ "--series": colors.get(run.id) } as React.CSSProperties}
             >
               <div className="run-card-top">
-                <span className={`status-badge ${status.className}`}>
-                  {status.label}
-                </span>
+                {place !== null && <span className="run-rank" aria-label={`第 ${place} 名`}>{place}</span>}
+                <span className={`status-badge ${status.className}`} title={status.detail}>{status.label}</span>
+                {status.tone === "ended" && <small>{status.detail}</small>}
               </div>
-              <h2 className="model-title">
-                {run.model}
-                <span>
-                  {run.effort.toUpperCase()}
-                  {duplicated.has(run.model) && trialTag(run) ? ` · ${trialTag(run)}` : ""}
-                </span>
-              </h2>
+              <h2 className="model-title">{labels.get(run.id)}</h2>
               <div className="score-block">
                 <strong>{run.score}</strong>
                 <span>/ {run.total || "—"}</span>
               </div>
-              <p>{run.objective}</p>
+              <p>{run.live ? "正在玩" : "停在"} {run.objective}</p>
               <div className="run-card-meta">
-                <span>运行 {durationLabel(elapsed)}</span>
-                <span>
-                  未得分 {scoreSilence === null ? "全程" : durationLabel(scoreSilence)}
-                </span>
+                <span>运行 {durationLabel(taskDuration(run, now))}</span>
+                <span>{sinceLastScore(run, now)}</span>
               </div>
             </button>
           );
         })}
-        {!shown.length && (
-          <EmptyState
-            title={runs.length ? "没有匹配的运行" : "尚无运行记录"}
-            body={runs.length ? "切换到全部记录查看历史运行。" : "新的游戏测试开始后会出现在这里。"}
-          />
-        )}
+        {!runs.length && <EmptyState title="还没有运行" body="新的运行开始后会出现在这里。" />}
       </section>
     </div>
   );
@@ -842,8 +812,8 @@ function RunDetails({
         <div className="detail-title-row">
           <div>
             <h1 className="model-title">
-              {run.model}
-              <span>{run.effort.toUpperCase()}</span>
+              {modelName(run.model)}
+              {run.effort !== "default" && <span>{run.effort}</span>}
             </h1>
           </div>
           <div className="score-hero">
@@ -853,10 +823,14 @@ function RunDetails({
           </div>
         </div>
         <div className="detail-strip">
-          <span className={`status-badge ${status.className}`}>
+          <span className={`status-badge ${status.className}`} title={status.detail}>
             {status.label}
           </span>
-          {run.termination?.kind !== "no_agent" && <span>累计运行 {durationLabel(elapsed)}</span>}
+          {status.tone === "ended" && <span>{status.detail}</span>}
+          {run.termination?.kind !== "no_agent" && <span>运行 {durationLabel(elapsed)}</span>}
+          {run.termination?.kind !== "no_agent" && <span>{sinceLastScore(run, now)}</span>}
+          {harnessName(run.agent) && <span>{harnessName(run.agent)}</span>}
+          {run.started_at && <span>{new Intl.DateTimeFormat("zh-CN", { month: "numeric", day: "numeric" }).format(run.started_at)} 开始</span>}
         </div>
       </header>
 
@@ -905,7 +879,7 @@ function RunDetails({
         </div>
       </section>
 
-      <LiveDisclosure className="analysis-disclosure" title="运行分析与活动">
+      <LiveDisclosure className="analysis-disclosure" title="得分与 Agent 活动" defaultOpen>
         <div className="disclosure-body">
 
       <section className="detail-chart chart-card">
@@ -916,7 +890,7 @@ function RunDetails({
           </div>
           <small>累计有效时间 {durationLabel(taskDuration(run, now))}</small>
         </div>
-        <ScoreChart runs={[run]} now={now} />
+        <ScoreChart runs={[run]} now={now} colors={new Map([[run.id, meta.accent]])} />
       </section>
 
       <section className="activity-grid">
@@ -1251,81 +1225,111 @@ function ExperiencePanel({ experience }: { experience?: RunDetail["agent_experie
   );
 }
 
+type ChartScale = "linear" | "log";
+
+const MINUTE = 60_000;
+
+/** Log time when the compared runs' lengths differ by more than 5×. */
+function preferredScale(runs: RunSummary[], now: number): ChartScale {
+  const lengths = runs.map(run => taskDuration(run, now)).filter(length => length > 0);
+  return lengths.length > 1 && Math.max(...lengths) > 5 * Math.min(...lengths) ? "log" : "linear";
+}
+
+function logTickLabel(value: number) {
+  if (value === 0) return "0";
+  return value < 60 * MINUTE ? `${Math.round(value / MINUTE)}m` : `${Math.round(value / (60 * MINUTE))}h`;
+}
+
+function subscribeNarrow(callback: () => void) {
+  const query = window.matchMedia("(max-width: 700px)");
+  query.addEventListener("change", callback);
+  return () => query.removeEventListener("change", callback);
+}
+
+function useNarrowScreen() {
+  return useSyncExternalStore(subscribeNarrow, () => window.matchMedia("(max-width: 700px)").matches, () => false);
+}
+
 function ScoreChart({
   runs,
   now,
+  colors,
+  labels,
+  scale = "linear",
   onSelect,
 }: {
   runs: RunSummary[];
   now: number;
+  colors: Map<string, string>;
+  labels?: Map<string, string>;
+  scale?: ChartScale;
   onSelect?: (run: RunSummary) => void;
 }) {
-  const width = 960;
-  const height = 284;
-  const pad = { left: 52, right: 22, top: 24, bottom: 42 };
+  const narrow = useNarrowScreen();
+  const width = narrow ? 560 : 960;
+  const height = narrow ? 360 : 300;
+  const pad = { left: narrow ? 56 : 48, right: labels ? (narrow ? 150 : 210) : 24, top: 20, bottom: narrow ? 48 : 40 };
   const timelines = runs.map((run) => ({ run, points: scoreTimeline(run, now) }));
   const points = timelines.flatMap((timeline) => timeline.points);
-  const maxDuration = Math.max(1, ...points.map((point) => point.elapsed_ms));
-  const observedMax = Math.max(
-    1,
-    ...runs.map((run) => run.score),
-    ...points.map((point) => point.score),
-  );
+  const maxDuration = Math.max(MINUTE, ...points.map((point) => point.elapsed_ms));
+  const observedMax = Math.max(1, ...runs.map((run) => run.score), ...points.map((point) => point.score));
   // Scores can go negative (e.g. kitchen penalties); a zero-floored axis
   // would draw those trajectories outside the chart.
-  const observedMin = Math.min(
-    0,
-    ...runs.map((run) => run.score),
-    ...points.map((point) => point.score),
-  );
+  const observedMin = Math.min(0, ...runs.map((run) => run.score), ...points.map((point) => point.score));
   const yMax = observedMax <= 10 ? 10 : Math.ceil(observedMax / 10) * 10;
   const yMin = observedMin === 0 ? 0 : Math.floor(observedMin / 10) * 10;
-  const x = (value: number) => pad.left + (value / maxDuration) * (width - pad.left - pad.right);
-  const y = (value: number) =>
-    pad.top + (1 - (value - yMin) / (yMax - yMin)) * (height - pad.top - pad.bottom);
-  const ticks = Array.from({ length: 5 }, (_, index) => {
-    const value = yMin + ((yMax - yMin) * index) / 4;
-    return { value, y: y(value) };
-  });
-  const duplicated = duplicateModels(runs);
+  const plotWidth = width - pad.left - pad.right;
+  const position = scale === "log"
+    ? (value: number) => Math.log1p(value / MINUTE) / Math.log1p(maxDuration / MINUTE)
+    : (value: number) => value / maxDuration;
+  const x = (value: number) => pad.left + position(value) * plotWidth;
+  const y = (value: number) => pad.top + (1 - (value - yMin) / (yMax - yMin)) * (height - pad.top - pad.bottom);
+  const yTicks = Array.from({ length: 5 }, (_, index) => yMin + ((yMax - yMin) * index) / 4);
+  const xTicks = (scale === "log"
+    ? [0, 10 * MINUTE, 60 * MINUTE, 3 * 60 * MINUTE, 10 * 60 * MINUTE, 24 * 60 * MINUTE, 72 * 60 * MINUTE, 240 * 60 * MINUTE]
+    : [0, 0.25, 0.5, 0.75, 1].map((ratio) => maxDuration * ratio))
+    .filter((value) => value <= maxDuration)
+    .reduce<number[]>((kept, value) => kept.length && x(value) - x(kept[kept.length - 1]) < (narrow ? 70 : 56) ? kept : [...kept, value], []);
+  // End labels sit in a column right of the plot, spread so they never overlap.
+  const gap = narrow ? 24 : 17;
+  const ends = timelines
+    .map(({ run, points: history }) => ({ run, last: history[history.length - 1] }))
+    .map((end) => ({ ...end, labelY: y(end.last.score) }))
+    .sort((a, b) => a.labelY - b.labelY);
+  for (let index = 1; index < ends.length; index += 1) {
+    ends[index].labelY = Math.max(ends[index].labelY, ends[index - 1].labelY + gap);
+  }
+  const overflow = ends.length ? ends[ends.length - 1].labelY - (height - pad.bottom) : 0;
+  if (overflow > 0) for (const end of ends) end.labelY = Math.max(pad.top, end.labelY - overflow);
+  const labelX = width - pad.right + 14;
+  const labelChars = narrow ? 11 : 20;
 
   return (
     <div className="score-chart-wrap">
       <svg
-        className="score-chart"
+        className={`score-chart ${narrow ? "narrow" : ""}`}
         viewBox={`0 0 ${width} ${height}`}
         role="img"
-        aria-label="模型分数随累计有效运行时间变化图"
+        aria-label="模型得分随累计有效运行时间变化图"
       >
-        {ticks.map((tick) => (
-          <g key={tick.value}>
-            <line
-              x1={pad.left}
-              x2={width - pad.right}
-              y1={tick.y}
-              y2={tick.y}
-              className="grid-line"
-            />
-            <text x={pad.left - 10} y={tick.y + 4} textAnchor="end">
-              {Math.round(tick.value)}
-            </text>
+        {yTicks.map((value) => (
+          <g key={value}>
+            <line x1={pad.left} x2={width - pad.right} y1={y(value)} y2={y(value)} className="grid-line" />
+            <text x={pad.left - 10} y={y(value) + 4} textAnchor="end">{Math.round(value)}</text>
           </g>
         ))}
-        {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
-          const duration = maxDuration * ratio;
-          return (
-            <text
-              key={ratio}
-              x={x(duration)}
-              y={height - 12}
-              textAnchor={ratio === 0 ? "start" : ratio === 1 ? "end" : "middle"}
-            >
-              {durationLabel(duration, maxDuration)}
-            </text>
-          );
-        })}
+        {xTicks.map((value, index) => (
+          <text
+            key={value}
+            x={x(value)}
+            y={height - (narrow ? 16 : 12)}
+            textAnchor={index === 0 ? "start" : x(value) > width - pad.right - 30 ? "end" : "middle"}
+          >
+            {scale === "log" ? logTickLabel(value) : durationLabel(value, maxDuration)}
+          </text>
+        ))}
         {timelines.map(({ run, points: history }) => {
-          const color = seriesColor(run.id);
+          const color = colors.get(run.id) ?? "var(--accent)";
           const path = history
             .map((point, pointIndex) => {
               if (!pointIndex) return `M ${x(point.elapsed_ms)} ${y(point.score)}`;
@@ -1335,32 +1339,27 @@ function ScoreChart({
             .join(" ");
           const last = history[history.length - 1];
           return (
-            <g
-              key={run.id}
-              className={onSelect ? "clickable-series" : ""}
-              onClick={() => onSelect?.(run)}
-            >
-              <path d={path} fill="none" stroke={color} strokeWidth="3" />
-              <circle cx={x(last.elapsed_ms)} cy={y(last.score)} r="4.5" fill={color} />
-              <title>
-                {run.model}: {run.score} / {durationLabel(last.elapsed_ms)}
-              </title>
+            <g key={run.id} className={onSelect ? "clickable-series" : ""} onClick={() => onSelect?.(run)}>
+              <path d={path} fill="none" stroke={color} strokeWidth={narrow ? 4 : 3} />
+              <circle cx={x(last.elapsed_ms)} cy={y(last.score)} r={narrow ? 6 : 4.5} fill={color} />
+              <title>{labels?.get(run.id) ?? modelName(run.model)}：{run.score} 分 · 运行 {durationLabel(last.elapsed_ms)}</title>
+            </g>
+          );
+        })}
+        {labels && ends.map(({ run, last, labelY }) => {
+          const color = colors.get(run.id) ?? "var(--accent)";
+          const name = labels.get(run.id) ?? modelName(run.model);
+          const short = name.length > labelChars ? `${name.slice(0, labelChars - 1)}…` : name;
+          return (
+            <g key={run.id} className={onSelect ? "clickable-series series-label" : "series-label"} onClick={() => onSelect?.(run)}>
+              <path d={`M ${x(last.elapsed_ms) + 6} ${y(last.score)} L ${labelX - 4} ${labelY - 4}`} stroke={color} className="label-leader" />
+              <text x={labelX} y={labelY} fill={color}>
+                <tspan className="label-score">{run.score}</tspan> {short}
+              </text>
             </g>
           );
         })}
       </svg>
-      <div className="chart-legend">
-        {runs.map((run) => (
-          <button key={run.id} onClick={() => onSelect?.(run)} disabled={!onSelect}>
-            <i style={{ background: seriesColor(run.id) }} />
-            <span>
-              {run.model}
-              {duplicated.has(run.model) && trialTag(run) ? ` ${trialTag(run)}` : ""}
-            </span>
-            <strong>{run.score}</strong>
-          </button>
-        ))}
-      </div>
     </div>
   );
 }

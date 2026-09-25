@@ -38,22 +38,20 @@ test("server-renders the benchmark operations console", async () => {
   assert.match(html, /<title>3720 Live Operations<\/title>/i);
   assert.match(html, /Benchmark Live/);
   assert.match(html, /Patrick/);
-  assert.match(html, />SWARM</);
-  assert.match(html, />SAUSAGE</);
-  assert.match(html, />OPERATOR</);
+  // Games without runs stay out of the switcher; the empty dashboard says why.
+  assert.match(html, />PARABOX</);
+  assert.doesNotMatch(html, />SWARM</);
+  assert.match(html, /还没有运行/);
   assert.match(html, /https:\/\/observer\.example\/og\.png/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
 });
 
-test("renders range and comparison controls without search", async () => {
+test("renders navigation controls without search or demo data", async () => {
   const html = await (await render()).text();
-  assert.match(html, /筛选实验记录/);
-  assert.match(html, /最近 8 次/);
-  assert.match(html, /aria-label="运行范围"/);
+  assert.match(html, /aria-label="切换游戏"/);
   assert.match(html, /role="combobox"/);
+  assert.doesNotMatch(html, /最近 8 次/);
   assert.doesNotMatch(html, /<input[^>]*type="search"/);
-  assert.match(html, /选择对比曲线/);
-  assert.match(html, /最多 8 条/);
   assert.doesNotMatch(html, /DEMO_STATES|DEMO FIXTURE/);
   await access(new URL("../dist/standalone/server.js", import.meta.url));
   await access(new URL("../public/og.png", import.meta.url));

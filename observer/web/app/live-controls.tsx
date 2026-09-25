@@ -54,13 +54,14 @@ export function LiveSlider({ value, max, onChange, disabled }: {
   );
 }
 
-export function LiveDisclosure({ title, className = "", children }: {
+export function LiveDisclosure({ title, className = "", defaultOpen = false, children }: {
   title: string;
   className?: string;
+  defaultOpen?: boolean;
   children: ReactNode;
 }) {
   return (
-    <Collapsible.Root className={`live-disclosure ${className}`}>
+    <Collapsible.Root className={`live-disclosure ${className}`} defaultOpen={defaultOpen}>
       <Collapsible.Trigger className="live-disclosure-trigger"><ChevronRight size={14} aria-hidden="true" />{title}</Collapsible.Trigger>
       <Collapsible.Content className="live-disclosure-content">{children}</Collapsible.Content>
     </Collapsible.Root>

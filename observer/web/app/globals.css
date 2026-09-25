@@ -436,34 +436,64 @@ p {
 .clickable-series:hover path {
   stroke-width: 5;
 }
-.chart-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  padding: 0 2px;
+.series-label text {
+  font: 600 12px var(--font-geist-sans);
 }
-.chart-legend button {
-  display: flex;
-  align-items: center;
-  gap: 7px;
+.series-label .label-score {
+  font: 800 12px var(--font-geist-mono);
+}
+.label-leader {
+  fill: none;
+  stroke-width: 1;
+  opacity: 0.45;
+}
+.score-chart.narrow {
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 560 / 360;
+}
+.score-chart.narrow text {
+  font-size: 17px;
+}
+.score-chart.narrow .series-label text,
+.score-chart.narrow .series-label .label-score {
+  font-size: 18px;
+}
+.scale-switch {
+  display: inline-flex;
   border: 1px solid var(--soft-line);
-  background: #0c0f0f;
-  padding: 7px 9px;
+  border-radius: var(--radius-control);
+  overflow: hidden;
+}
+.scale-switch button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 5px 10px;
+  font-size: 12px;
   cursor: pointer;
 }
-.chart-legend button:disabled {
-  cursor: default;
+.scale-switch button[aria-pressed="true"] {
+  background: var(--surface-2);
+  color: var(--foreground);
 }
-.chart-legend i {
-  width: 7px;
-  height: 7px;
+.scale-switch button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
 }
-.chart-legend span {
-  color: #8d9892;
-  font-size: 9px;
+.run-rank {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--series);
+  color: #0b0e0d;
+  font: 800 12px/1 var(--font-geist-mono);
 }
-.chart-legend strong {
-  font: 800 10px/1 var(--font-geist-mono);
+.run-card-top small {
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .run-grid {
@@ -1216,13 +1246,6 @@ p {
   .run-grid {
     grid-template-columns: 1fr;
   }
-  .score-chart {
-    min-height: 190px;
-    height: 210px;
-  }
-  .chart-legend button {
-    flex: 1 1 42%;
-  }
   .score-hero strong {
     font-size: 42px;
   }
@@ -1491,11 +1514,10 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
 .disclosure { margin-top: var(--space-md); }
 .disclosure > summary { padding-block: var(--space-md); font-size: var(--text-sm); }
 .disclosure > summary > span { display: none; }
-.dashboard-page .chart-legend { display: none; }
 .compare-picker { padding: var(--space-md); gap: var(--space-sm) var(--space-lg); }
 .compare-picker input { accent-color: var(--series); }
 .run-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-sm) var(--space-lg); padding: var(--space-lg); }
-.run-card-top { grid-column: 1; }
+.run-card-top { grid-column: 1; justify-content: flex-start; gap: var(--space-sm); }
 .run-card h2.model-title { grid-column: 1; grid-row: 2; margin: 0; font-size: var(--text-lg); }
 .run-card h2.model-title > span { margin-top: var(--space-xs); }
 .run-card .score-block { grid-column: 2; grid-row: 1 / span 3; margin: 0; }
@@ -1621,3 +1643,6 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
 .game-render-error { padding: var(--space-lg); color: var(--danger); font-size: var(--text-sm); }
 .game-webgl-surface { position: relative; }
 .game-canvas-tooltip { position: absolute; z-index: 5; max-width: 260px; padding: var(--space-sm) var(--space-md); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface); color: var(--foreground); font: 400 var(--text-xs)/1.5 var(--font-body); pointer-events: none; }
+
+/* Detail summary: status, why it ended, runtime, last score, harness, start. */
+.detail-strip { justify-content: flex-start; flex-wrap: wrap; gap: var(--space-sm) var(--space-lg); color: var(--muted); font-size: var(--text-sm); }
