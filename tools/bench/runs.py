@@ -170,6 +170,34 @@ def account_env(profile: Profile, account: str | None) -> dict[str, str]:
 # ---------------------------------------------------------------- launching
 
 
+def docker_config(root: Path) -> Path:
+    """A Docker client config without a credential store.
+
+    The macOS keychain helper cannot be unlocked from non-interactive sessions
+    (ssh, launchd), which makes every image pull fail; public pulls need no
+    credentials. Plugins and the active context come from the user's config.
+    """
+    directory = root / ".harbor" / "docker-config"
+    user = Path.home() / ".docker" / "config.json"
+    current = json.loads(user.read_text()) if user.is_file() else {}
+    # An explicit empty Docker Hub entry stops the CLI from falling back to
+    # the keychain helper for anonymous pulls.
+    config = {
+        "auths": {"https://index.docker.io/v1/": {}},
+        "cliPluginsExtraDirs": [str(Path.home() / ".docker" / "cli-plugins")],
+    }
+    if current.get("currentContext"):
+        config["currentContext"] = current["currentContext"]
+        contexts = Path.home() / ".docker" / "contexts"
+        if contexts.is_dir() and not (directory / "contexts").exists():
+            directory.mkdir(parents=True, exist_ok=True)
+            (directory / "contexts").symlink_to(contexts)
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / "config.json").write_text(json.dumps(config, indent=2) + "\n")
+    return directory
+
+
+
 def launch(root: Path, run: Run, index: int, env: dict[str, str], foreground: bool) -> int | None:
     """Start Harbor for a segment; returns its process-group leader, or None once a foreground run ends."""
     segment = run.segment_dir(index)
@@ -181,6 +209,7 @@ def launch(root: Path, run: Run, index: int, env: dict[str, str], foreground: bo
         "HARBOR_TELEMETRY": "off",
         "PYTHONPATH": str(root),
     }
+    environment.setdefault("DOCKER_CONFIG", str(docker_config(root)))
     if foreground:
         subprocess.run(command, cwd=root, env=environment, check=False)
         return None
