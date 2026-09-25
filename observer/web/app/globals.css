@@ -2024,3 +2024,36 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
 .model-list .family-heading { color: var(--foreground); }
 .model-list .family-heading .family-icon { color: var(--foreground); }
 .overview-matrix tr.overview-family th small { margin-left: 2px; }
+
+/* Fewer rules: spacing and tinted family bands separate things instead of
+   lines; family names and marks are the landmarks. */
+.model-family + .model-family { border-top: 0; }
+.model-family > h2 { padding: 12px var(--space-lg); font-size: var(--text-sm); }
+.model-line { border-top: 0; padding-block: 6px; }
+.model-family > .model-line:last-child { padding-bottom: var(--space-md); }
+.depth-chip { border-color: transparent; background: color-mix(in srgb, var(--foreground) 4%, var(--surface)); }
+.depth-chip:hover { border-color: color-mix(in srgb, var(--series) 55%, transparent); }
+
+.overview-matrix th, .overview-matrix td { border-top: 0; }
+.overview-matrix tr.overview-family th { padding-block: 12px; font-size: var(--text-sm); }
+.overview-matrix tbody tr:not(.overview-family):hover { background: color-mix(in srgb, var(--foreground) 3%, transparent); }
+
+.model-list .family-heading { margin-top: var(--space-lg); font-size: var(--text-sm); gap: 8px; }
+.model-list .model-run.child .model-copy { border-left: 0; }
+
+.attempt-board .family-heading { font-size: var(--text-sm); color: var(--foreground); gap: 8px; }
+.model-title .model-family { font-size: var(--text-base, 15px); color: var(--foreground); gap: 8px; }
+
+/* Card titles and the compare picker are set apart by space, not rules. */
+.section-title { border-bottom-color: transparent; }
+.compare-picker { border-top: 0; padding-top: var(--space-sm); }
+.overview-matrix tr.overview-family th { border-top: 0; }
+.overview-matrix tr.overview-family th small { margin-left: 8px; }
+
+/* Run page and tabs: space instead of rules; the selected tab keeps its underline. */
+.game-tabs { border-bottom-color: transparent; }
+.detail-strip { border-top-color: transparent; border-bottom-color: transparent; }
+.live-footer { border-top-color: transparent; }
+.agent-feed article { border-bottom-color: transparent; padding-block: 10px; }
+.score-log li { border-bottom-color: transparent; }
+.live-disclosure.runtime-details { border-top-color: transparent; }

@@ -125,7 +125,7 @@ export function Overview({
               </thead>
               {familyGroups(rows, firstSeen(runs)).map(([family, familyRows]) => (
               <tbody key={family}>
-                <tr className="overview-family"><th scope="rowgroup" colSpan={games.length + 1}><FamilyIcon family={family} />{family}<small>{familyRows.length} 个模型</small></th></tr>
+                <tr className="overview-family"><th scope="rowgroup" colSpan={games.length + 1}><FamilyIcon family={family} size={18} />{family}<small>{familyRows.length} 个模型</small></th></tr>
                 {familyRows.map(row => (
                   <tr key={row.model}>
                     <th scope="row">

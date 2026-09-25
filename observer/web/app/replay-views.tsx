@@ -482,7 +482,7 @@ export function LevelWatch({
               const family = familyOf.get(item.run);
               return (
                 <Fragment key={item.run}>
-                {family !== (index > 0 ? familyOf.get(levelRuns[index - 1].run) : undefined) && <div className="family-heading">{family && <FamilyIcon family={family} size={12} />}{family}</div>}
+                {family !== (index > 0 ? familyOf.get(levelRuns[index - 1].run) : undefined) && <div className="family-heading">{family && <FamilyIcon family={family} size={16} />}{family}</div>}
                 <section className="attempt-run" style={{ "--series": colors.get(item.run) } as React.CSSProperties}>
                   <header>
                     <i />
