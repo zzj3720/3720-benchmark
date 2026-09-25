@@ -265,7 +265,10 @@ def stop(root: Path, run_id: str, timeout: float) -> None:
     if not pid or not alive(pid):
         print(f"{run_id}: no active segment")
         return
-    os.killpg(pid, signal.SIGINT)
+    # Interrupt Harbor only: it cancels the trial, collects artifacts, and lets
+    # the journal plugin seal the segment. Signalling the whole process group
+    # would also kill the recorder before it records segment_finished.
+    os.kill(pid, signal.SIGINT)
     deadline = time.monotonic() + timeout
     while alive(pid) and time.monotonic() < deadline:
         time.sleep(2)
