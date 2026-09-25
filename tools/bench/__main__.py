@@ -8,6 +8,7 @@
     bench package [game...]                   rebuild task packages and dataset digests
     bench check [task...]                     static checks, data copies, digests
     bench audit <run>                         results/audits/<run>.json from the journal
+    bench compact [job...]                    zstd large agent logs of finished jobs
 """
 
 from __future__ import annotations
@@ -52,6 +53,7 @@ def main(argv: list[str] | None = None) -> int:
     commands.add_parser("package").add_argument("games", nargs="*")
     commands.add_parser("check").add_argument("tasks", nargs="*")
     commands.add_parser("audit").add_argument("run")
+    commands.add_parser("compact").add_argument("jobs", nargs="*")
 
     args = parser.parse_args(argv)
     if args.command == "package":
@@ -60,6 +62,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if tasks.check(ROOT, args.tasks) else 1
     elif args.command == "audit":
         print(tasks.audit(ROOT, args.run))
+    elif args.command == "compact":
+        files, saved = runs.compact(ROOT, args.jobs or None)
+        print(f"compressed {files} logs, saved {saved / 1e9:.2f} GB")
     elif args.action == "new":
         created = runs.new_run(ROOT, args.game, args.profile, args.id, args.account, args.dry_run, args.foreground)
         print(f"{created.id}: {'prepared' if args.dry_run else 'started'} ({created.dir})")

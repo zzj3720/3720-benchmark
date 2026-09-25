@@ -12,6 +12,7 @@ tools/bench/bench run resume <run> --account backup --note fix.md
 tools/bench/bench check                      # before committing task changes
 tools/bench/bench package sokoban            # rebuild a task from games/sokoban
 tools/bench/bench audit <run>
+tools/bench/bench compact                    # zstd large agent logs of finished jobs
 ```
 
 ## What a run records
@@ -62,3 +63,11 @@ the game, and passes each checkpoint artifact to the agent keyword it accepts
 `resume_game_audit_path`, `resume_game_events_path`). It fails before launching
 if the agent requires state the checkpoint does not hold. `--note` files become
 Harbor extra instructions for that segment and are kept with the run.
+
+## Storage
+
+Agent stdout transcripts repeat the native session and can reach hundreds of
+megabytes per trial. `bench run checkpoint` compresses the segment's large
+agent logs (`*.txt`, `*.json`, `*.jsonl`, `*.log` directly in `agent/`) with
+zstd; `bench compact` does the same for every finished job. Sessions and
+workspaces are never compressed because resuming reads them.

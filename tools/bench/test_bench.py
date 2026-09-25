@@ -77,3 +77,20 @@ def test_dirty_tree_blocks_scored_runs(tmp_path):
 def test_task_data_copies_match_their_game_sources():
     for game in tasks.games_with_tasks(ROOT):
         assert tasks.data_mismatches(ROOT, game) == []
+
+
+def test_compact_only_touches_finished_agent_logs(tmp_path):
+    trial = tmp_path / ".harbor/jobs/job-a/trial-1/agent"
+    (trial / "sessions").mkdir(parents=True)
+    (trial / "claude-code.txt").write_text("x" * (2 << 20))
+    (trial / "small.txt").write_text("x")
+    (trial / "sessions/session.jsonl").write_text("y" * (2 << 20))
+    running = tmp_path / ".harbor/jobs/job-b/trial-1/agent"
+    running.mkdir(parents=True)
+    (running / "claude-code.txt").write_text("x" * (2 << 20))
+    (tmp_path / ".harbor/jobs/job-a/result.json").write_text("{}")
+    files, saved = runs.compact(tmp_path)
+    assert files == 1 and saved > 0
+    assert (trial / "claude-code.txt.zst").is_file() and not (trial / "claude-code.txt").exists()
+    assert (trial / "small.txt").is_file() and (trial / "sessions/session.jsonl").is_file()
+    assert (running / "claude-code.txt").is_file()

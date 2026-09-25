@@ -385,6 +385,7 @@ def checkpoint(root: Path, run_id: str, allow_unsealed: bool = False) -> Path:
     os.replace(temporary, target / "manifest.json")
     segment["checkpoint"] = str(target.relative_to(run.dir))
     run.save(manifest)
+    compact(root, [segment["job"]])
     return target
 
 
@@ -399,6 +400,36 @@ def verify_checkpoint(directory: Path) -> dict[str, Any]:
         if artifact and tree_digest(directory / artifact["path"]) != artifact["sha256"]:
             raise BenchError(f"{path}: {role} does not match its recorded hash")
     return manifest
+
+
+# ---------------------------------------------------------------- storage
+
+LOG_SUFFIXES = (".txt", ".log", ".json", ".jsonl")
+COMPACT_BYTES = 1 << 20
+
+
+def compact(root: Path, jobs: list[str] | None = None) -> tuple[int, int]:
+    """zstd-compress large agent output logs of finished Harbor jobs.
+
+    Only files directly in each trial's agent/ directory are touched (stdout
+    transcripts and trajectories, which repeat the native session). Sessions
+    and workspaces stay as they are because resuming reads them.
+    Returns (files compressed, bytes saved).
+    """
+    files = saved = 0
+    base = root / ".harbor" / "jobs"
+    for job in sorted(jobs if jobs is not None else (path.name for path in base.iterdir() if path.is_dir())):
+        job_dir = base / job
+        if not (job_dir / "result.json").is_file():
+            continue  # still running or never finished
+        for log in job_dir.glob("*/agent/*"):
+            if not log.is_file() or log.suffix not in LOG_SUFFIXES or log.stat().st_size < COMPACT_BYTES:
+                continue
+            before = log.stat().st_size
+            subprocess.run(["zstd", "-q", "-10", "--long=27", "--rm", "-f", str(log)], check=True)
+            saved += before - log.with_name(log.name + ".zst").stat().st_size
+            files += 1
+    return files, saved
 
 
 # ---------------------------------------------------------------- resuming
