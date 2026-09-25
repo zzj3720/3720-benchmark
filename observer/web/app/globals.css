@@ -2094,3 +2094,17 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
 
 .detail-nav { margin-bottom: var(--space-xs); }
 @media (max-width: 820px) { .detail-nav { margin-bottom: var(--space-md); } }
+
+/* Tabs: text only; the current one is brighter with a thin line on the top
+   bar's bottom edge, in the game's colour (white for the overview). */
+.top-nav { align-self: stretch; gap: 0; }
+.top-nav button { position: relative; height: 100%; padding: 0 14px; border-radius: 0; background: none; color: var(--muted); box-shadow: none; }
+.top-nav button:hover { background: none; color: var(--foreground); }
+.top-nav button[aria-current="page"],
+.top-nav button:first-child[aria-current="page"] { background: none; color: var(--foreground); box-shadow: none; }
+.top-nav button[aria-current="page"]::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: -1px; height: 2px; border-radius: 2px 2px 0 0; background: var(--accent, var(--foreground)); }
+.top-nav button:first-child[aria-current="page"]::after { background: var(--foreground); }
+@media (max-width: 820px) {
+  .topbar { padding-bottom: 0; }
+  .top-nav { height: 40px; margin-inline: calc(-1 * var(--space-md)); padding-inline: 2px; }
+}
