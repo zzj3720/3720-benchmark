@@ -340,6 +340,11 @@ export default function Home() {
             key={selectedId}
             run={detail ?? runs.find((run) => run.id === selectedId) ?? null}
             now={snapshotNow}
+            standing={(() => {
+              const byScore = visibleRuns.slice().sort((a, b) => b.score - a.score);
+              const place = byScore.findIndex(run => run.id === selectedId);
+              return place >= 0 ? { place: place + 1, of: byScore.length } : null;
+            })()}
             onBack={() => showDashboard(selectedGame)}
             onReplays={() => showReplays(selectedGame, selectedId)}
           />
@@ -468,17 +473,39 @@ function GameDashboard({
   );
 }
 
+/** Score increases, newest first, from the run's score history. */
+function recentScores(run: RunSummary, limit: number) {
+  const history = run.score_history ?? [];
+  const changes: { score: number; delta: number; elapsed: number; at: number }[] = [];
+  for (let index = 1; index < history.length; index += 1) {
+    const delta = history[index].score - history[index - 1].score;
+    if (delta) changes.push({ score: history[index].score, delta, elapsed: history[index].elapsed_ms ?? 0, at: history[index].timestamp_ms });
+  }
+  return changes.slice(-limit).reverse();
+}
+
+function relativeTime(timestamp: number | null | undefined, now: number) {
+  if (!timestamp) return "—";
+  const seconds = Math.max(0, Math.round((now - timestamp) / 1000));
+  if (seconds < 60) return `${seconds} 秒前`;
+  if (seconds < 3600) return `${Math.round(seconds / 60)} 分钟前`;
+  return clockTime(timestamp);
+}
+
 function LiveRun({
   run,
   now,
+  standing,
   onBack,
   onReplays,
 }: {
   run: RunDetail | RunSummary | null;
   now: number;
+  standing: { place: number; of: number } | null;
   onBack: () => void;
   onReplays: () => void;
 }) {
+  const [allMessages, setAllMessages] = useState(false);
   const runDetail = run && "state" in run ? run as RunDetail : null;
   const game = run?.game;
   const state = useMemo(
@@ -492,10 +519,11 @@ function LiveRun({
   const status = runStatus(run);
   const elapsed = taskDuration(run, now);
   const environmentContext = gameStateContext(run.game, state);
-  const operations = runDetail.live_replay?.operations ?? [];
+  const messages = runDetail.recent_activity ?? [];
+  const scores = recentScores(run, 12);
 
   return (
-    <div className="detail-page" style={{ "--accent": meta.accent } as React.CSSProperties}>
+    <div className={`detail-page live-page ${run.live ? "is-live" : ""}`} style={{ "--accent": meta.accent } as React.CSSProperties}>
       <header className="detail-heading">
         <button className="back-button" onClick={onBack}>
           ← 返回 {meta.short} 成绩
@@ -506,17 +534,21 @@ function LiveRun({
               {modelName(run.model)}
               {run.effort !== "default" && <span>{run.effort}</span>}
             </h1>
+            <div className="live-badges">
+              <span className={`status-badge ${status.className}`} title={status.detail}>
+                {run.live && <i className="live-pulse" aria-hidden="true" />}
+                {status.label}
+              </span>
+              {standing && <span className="standing">{meta.short} 第 {standing.place} 名 / 共 {standing.of} 次运行</span>}
+            </div>
           </div>
           <div className="score-hero">
-            <span>当前得分</span>
+            <span>{run.live ? "当前得分" : "最终得分"}</span>
             <strong>{run.score}</strong>
             <small>/ {run.total || "—"}</small>
           </div>
         </div>
         <div className="detail-strip">
-          <span className={`status-badge ${status.className}`} title={status.detail}>
-            {status.label}
-          </span>
           {status.tone === "ended" && <span>{status.detail}</span>}
           {run.termination?.kind !== "no_agent" && <span>运行 {durationLabel(elapsed)}</span>}
           {run.termination?.kind !== "no_agent" && <span>{sinceLastScore(run, now)}</span>}
@@ -525,65 +557,67 @@ function LiveRun({
         </div>
       </header>
 
-      <section className="detail-grid">
+      <section className="live-stage">
         <div className="environment-card">
           <div className="section-title environment-title">
-            <strong title={environmentContext ?? undefined}>{run.objective}</strong>
-            <small>{run.live ? "实时画面" : "结束时的画面"}</small>
+            <strong title={environmentContext ?? undefined}>{run.live ? "正在玩 " : "停在 "}{run.objective}</strong>
+            <small>{run.live ? `最近动作 ${relativeTime(run.last_activity_at, now)}` : `结束于 ${clockTime(run.finished_at ?? run.last_activity_at)}`}</small>
           </div>
           <GameState game={run.game} state={state} previousState={null} />
           <div className="live-footer">
-            <span>{run.live ? `最近动作 ${clockTime(run.last_activity_at)}` : `结束于 ${clockTime(run.finished_at ?? run.last_activity_at)}`}</span>
+            <span>{run.live ? "画面随 Agent 的每一步实时更新" : "这是运行结束时的画面"}</span>
             <button type="button" className="replay-export-button" onClick={onReplays}>看这次运行的关卡回放</button>
           </div>
         </div>
+        <aside className={`agent-feed ${allMessages ? "expanded" : ""}`} aria-label="Agent 实况">
+          <div className="section-title">
+            <strong>Agent 实况</strong>
+            <small>{messages.length ? `最近 ${messages.length} 条` : ""}</small>
+          </div>
+          <div className="agent-feed-list">
+            {messages.length
+              ? messages.map((item, index) => (
+                <article key={`${item.timestamp_ms}-${index}`} className={index === 0 ? "latest" : ""}>
+                  <time>{index === 0 && run.live ? relativeTime(item.timestamp_ms, now) : clockTime(item.timestamp_ms)}</time>
+                  <p>{item.text}</p>
+                </article>
+              ))
+              : <EmptyState title="还没有可见消息" body="Agent 在运行中说的话会出现在这里。" />}
+          </div>
+          {messages.length > 4 && (
+            <button type="button" className="agent-feed-more" onClick={() => setAllMessages(value => !value)}>
+              {allMessages ? "收起" : `展开全部 ${messages.length} 条`}
+            </button>
+          )}
+        </aside>
       </section>
 
-      <LiveDisclosure className="analysis-disclosure" title="得分与 Agent 活动" defaultOpen>
-        <div className="disclosure-body">
-          <section className="detail-chart chart-card">
-            <div className="section-title">
-              <strong>分数轨迹</strong>
-              <small>累计有效时间 {durationLabel(elapsed)}</small>
-            </div>
-            <ScoreChart runs={[run]} now={now} colors={new Map([[run.id, meta.accent]])} />
-          </section>
-          <section className="activity-grid">
-            <div className="activity-card">
-              <div className="section-title"><strong>Agent 最近说了什么</strong></div>
-              <div className="activity-list">
-                {runDetail.recent_activity?.length
-                  ? runDetail.recent_activity.map((item, index) => (
-                    <article key={`${item.timestamp_ms}-${index}`}>
-                      <time>{clockTime(item.timestamp_ms)}</time>
-                      <p>{item.text}</p>
-                    </article>
-                  ))
-                  : <EmptyState title="暂无可见消息" body="Agent 的可见消息会出现在这里。" />}
-              </div>
-            </div>
-            <div className="event-card">
-              <div className="section-title"><strong>最近的操作</strong></div>
-              <div className="event-list">
-                {operations.length
-                  ? operations.slice().reverse().map(operation => {
-                    const event: ObserverEvent = { sequence: operation.sequence, timestamp_ms: operation.timestamp_ms, action: operation.action, score_delta: operation.score_delta };
-                    return (
-                      <div className="event-row" key={operation.sequence}>
-                        <time>{clockTime(operation.timestamp_ms)}</time>
-                        <strong>{describeGameEvent(run.game, event, null).title}</strong>
-                        <span>{operation.score_delta ? `${operation.score_delta > 0 ? "+" : ""}${operation.score_delta} 分` : `${operation.frame_count} 帧`}</span>
-                      </div>
-                    );
-                  })
-                  : <EmptyState title="暂无操作" body="" />}
-              </div>
-            </div>
-          </section>
-          <ExperiencePanel experience={runDetail.agent_experience} />
-          <LiveDisclosure className="runtime-details" title="运行信息"><dl><dt>运行 ID</dt><dd>{run.id}</dd><dt>Agent</dt><dd>{run.agent}</dd><dt>停止原因</dt><dd>{run.termination?.reason ?? "—"}</dd><dt>最近动作</dt><dd>{clockTime(run.last_activity_at)}</dd></dl></LiveDisclosure>
-        </div>
-      </LiveDisclosure>
+      <section className="live-lower">
+        <section className="chart-card">
+          <div className="section-title">
+            <strong>分数轨迹</strong>
+            <small>横轴是累计有效运行时间</small>
+          </div>
+          <ScoreChart runs={[run]} now={now} colors={new Map([[run.id, meta.accent]])} />
+        </section>
+        <section className="score-log">
+          <div className="section-title"><strong>最近得分</strong></div>
+          {scores.length ? (
+            <ol>
+              {scores.map(change => (
+                <li key={`${change.elapsed}-${change.score}`}>
+                  <b className={change.delta > 0 ? "up" : "down"}>{change.delta > 0 ? `+${change.delta}` : change.delta}</b>
+                  <span>到 {change.score} 分</span>
+                  <small>第 {durationLabel(change.elapsed)}{change.at ? ` · ${clockTime(change.at)}` : ""}</small>
+                </li>
+              ))}
+            </ol>
+          ) : <EmptyState title="还没有得分" body="" />}
+        </section>
+      </section>
+
+      <ExperiencePanel experience={runDetail.agent_experience} />
+      <LiveDisclosure className="runtime-details" title="运行信息"><dl><dt>运行 ID</dt><dd>{run.id}</dd><dt>Agent</dt><dd>{run.agent}</dd><dt>停止原因</dt><dd>{run.termination?.reason ?? "—"}</dd><dt>最近动作</dt><dd>{clockTime(run.last_activity_at)}</dd></dl></LiveDisclosure>
     </div>
   );
 }

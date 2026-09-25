@@ -1774,3 +1774,39 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
   .level-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); }
   .watch-heading h1 { font-size: 22px; }
 }
+
+/* Live run page: the game as the stream, the Agent's narration beside it. */
+.live-badges { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm); margin-top: var(--space-sm); }
+.live-badges .status-badge { gap: 6px; }
+.standing { color: var(--muted); font-size: var(--text-sm); }
+.live-pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--acid); box-shadow: 0 0 0 0 color-mix(in srgb, var(--acid) 60%, transparent); animation: live-pulse 1.6s ease-out infinite; }
+@keyframes live-pulse { to { box-shadow: 0 0 0 7px transparent; } }
+@media (prefers-reduced-motion: reduce) { .live-pulse { animation: none; } }
+.live-stage { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: var(--space-lg); align-items: start; margin-top: var(--space-lg); }
+.live-stage > .environment-card { min-width: 0; }
+.agent-feed { display: flex; flex-direction: column; min-height: 0; max-height: min(640px, calc(100vh - 160px)); border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--surface); overflow: hidden; }
+.agent-feed-list { flex: 1; overflow-y: auto; padding: 0 var(--space-lg) var(--space-lg); }
+.agent-feed article { padding: var(--space-md) 0; border-bottom: 1px solid var(--soft-line); }
+.agent-feed article:last-child { border-bottom: 0; }
+.agent-feed article time { display: block; margin-bottom: 4px; color: var(--muted); font: 600 11px/1 var(--font-data); }
+.agent-feed article p { margin: 0; color: #c9d3cd; font-size: var(--text-sm); line-height: 1.55; }
+.agent-feed article.latest { margin: 0 calc(-1 * var(--space-lg)); padding: var(--space-md) var(--space-lg); background: color-mix(in srgb, var(--accent) 8%, transparent); border-left: 2px solid var(--accent); }
+.agent-feed article.latest p { color: var(--foreground); }
+.agent-feed-more { display: none; }
+.live-lower { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: var(--space-lg); margin-top: var(--space-lg); }
+.live-lower .score-chart { height: 220px; min-height: 0; }
+.score-log { border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--surface); }
+.score-log ol { list-style: none; margin: 0; padding: 0 var(--space-lg) var(--space-md); max-height: 260px; overflow-y: auto; }
+.score-log li { display: grid; grid-template-columns: 44px 1fr auto; align-items: baseline; gap: var(--space-sm); padding: 7px 0; border-bottom: 1px solid var(--soft-line); font-size: var(--text-sm); }
+.score-log li:last-child { border-bottom: 0; }
+.score-log b { font: 800 13px/1 var(--font-data); color: var(--accent); }
+.score-log b.down { color: var(--danger); }
+.score-log small { color: var(--muted); font: 600 11px/1 var(--font-data); }
+.live-page .experience-card,
+.live-page .runtime-details { margin-top: var(--space-lg); }
+@media (max-width: 1100px) {
+  .live-stage, .live-lower { grid-template-columns: 1fr; }
+  .agent-feed { max-height: none; }
+  .agent-feed:not(.expanded) .agent-feed-list article:nth-child(n + 5) { display: none; }
+  .agent-feed-more { display: block; margin: 0 var(--space-lg) var(--space-lg); height: 34px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--background); color: var(--foreground); font-size: var(--text-sm); cursor: pointer; }
+}
