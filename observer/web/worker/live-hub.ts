@@ -70,7 +70,7 @@ export class LiveHub {
     const update = this.state.applyRuns(message, now);
     const sql = this.ctx.storage.sql;
     for (const run of message.runs) sql.exec("INSERT OR REPLACE INTO runs (id, body) VALUES (?, ?)", run.id, JSON.stringify(run));
-    for (const id of message.removed) sql.exec("DELETE FROM runs WHERE id = ?", id);
+    for (const id of update?.removed ?? []) sql.exec("DELETE FROM runs WHERE id = ?", id);
     this.saveMeta();
     if (update) await this.broadcast(update, now);
     return Response.json({ ok: true, revision: this.state.revision });

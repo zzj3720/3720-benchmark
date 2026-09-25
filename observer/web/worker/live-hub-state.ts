@@ -43,9 +43,12 @@ export class HubState {
       this.runs.set(run.id, run);
       updates.push(update);
     }
-    const removed = message.removed.filter(id => this.runs.delete(id));
+    // `order` is the publisher's complete run list: a run deleted on the
+    // benchmark host disappears here even if this publisher never sent it.
+    const listed = new Set(message.order);
+    const removed = [...new Set([...message.removed, ...this.runs.keys()])]
+      .filter(id => !listed.has(id) && this.runs.delete(id));
     this.order = message.order.filter(id => this.runs.has(id));
-    for (const id of this.runs.keys()) if (!this.order.includes(id)) this.order.push(id);
     this.seen(now);
     if (!updates.length && !removed.length) return null;
     this.revision += 1;

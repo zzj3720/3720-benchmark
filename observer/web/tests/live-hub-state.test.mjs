@@ -48,3 +48,11 @@ test("the feed goes offline without heartbeats and keeps the last runs", () => {
   assert.equal(hub.heartbeat("studio", 99_999), true);
   assert.equal(hub.feed.connected, true);
 });
+
+test("runs missing from the publisher's order are removed", () => {
+  const hub = new HubState();
+  hub.applyRuns({ order: ["a", "b"], runs: [run("a", []), run("b", [])], removed: [] }, 0);
+  const update = hub.applyRuns({ order: ["a"], runs: [], removed: [] }, 1);
+  assert.deepEqual(update.removed, ["b"]);
+  assert.deepEqual(hub.runsResponse(1).runs.map(value => value.id), ["a"]);
+});
