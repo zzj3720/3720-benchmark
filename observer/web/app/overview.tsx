@@ -140,12 +140,17 @@ export function Overview({
                       return (
                         <td key={game} style={{ "--accent": GAME_META[game].accent } as React.CSSProperties}>
                           <button type="button" onClick={() => onRun(run)} title={`${row.model}${detail ? ` · ${detail}` : ""} · ${run.score} / ${run.total}`}>
+                            {/* Score with its share at the top right; harness and thinking depth under the bar. */}
                             <span className="overview-score">
                               {run.live && <i className="live-pulse" aria-label="直播中" />}
                               <b>{run.score}</b><small> / {run.total || "—"}</small>
+                              <small className="overview-share">{Math.round(share * 100)}%</small>
                             </span>
                             <span className="overview-bar" aria-hidden="true"><i style={{ width: `${Math.max(2, share * 100)}%` }} /></span>
-                            <small>{Math.round(share * 100)}%{run.effort !== "default" ? ` · ${run.effort}` : ""}{harnessName(run.agent) && <> · <HarnessTag harness={harnessName(run.agent)} /></>}</small>
+                            <span className="overview-run-meta">
+                              <HarnessTag harness={harnessName(run.agent)} />
+                              <small>{run.effort && run.effort !== "default" ? run.effort : "默认"}</small>
+                            </span>
                           </button>
                         </td>
                       );

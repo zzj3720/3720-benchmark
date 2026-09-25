@@ -2061,3 +2061,9 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
 /* A harness name with its mark, inline in meta lines. */
 .harness-tag { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; vertical-align: bottom; }
 .harness-tag .family-icon { vertical-align: 0; }
+
+/* Overview cell: share at the top right; harness left and depth right below the bar. */
+.overview-score { display: flex; }
+.overview-share { margin-left: auto; }
+.overview-run-meta { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); color: var(--muted); font: 400 var(--text-xs)/1.2 var(--font-body); }
+.overview-run-meta small { font: 500 var(--text-xs)/1.2 var(--font-data); color: var(--muted); }
