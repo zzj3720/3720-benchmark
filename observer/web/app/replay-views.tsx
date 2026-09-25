@@ -8,7 +8,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { GAME_META, GameState, clearedGameState, describeGameEvent, resolveGameFrameState, type GameId } from "./game-registry";
 import { EmptyState, REPLAY_CAPTURE_ATTRIBUTE, type ObserverEvent } from "./game-observer";
 import { LiveActionMenu, LiveSelect, LiveSlider } from "./live-controls";
-import type { LoadedAttemptReplay, ReplayFrame, ReplayOperation, RunDetail, RunSummary } from "./live-contract";
+import type { LoadedAttemptReplay, ReplayFrame, ReplayGroupSummary, ReplayOperation, RunDetail, RunSummary } from "./live-contract";
 import { RequestGate } from "./live-client";
 import {
   EXPORT_HOLD_MS,
@@ -235,6 +235,61 @@ export function ReplayLibrary({
           {shown.map(level => <LevelCard key={level.key} level={level} run={runFilter} onOpen={() => onOpenLevel(level.key)} />)}
         </div>
         {levels && !shown.length && <EmptyState title="没有符合条件的关卡" body="换一个结果或模型筛选试试。" />}
+      </section>
+    </ThumbnailProvider>
+  );
+}
+
+// ---------------------------------------------------------------- one run's shelf
+
+/** Level index key: the first 16 hex digits of sha256(reference), as the publisher writes it. */
+export async function levelKey(reference: string) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(reference));
+  return [...new Uint8Array(digest)].slice(0, 8).map(byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
+const SHELF_SIZE = 12;
+
+/**
+ * The levels one run played, newest first, under its live view. Each card
+ * opens that level with this run's latest attempt playing.
+ */
+export function RunReplayShelf({ run, onPlay, onAll }: { run: RunDetail; onPlay: (key: string, sample: LevelSample) => void; onAll: () => void }) {
+  const groups = run.replay_groups ?? [];
+  if (!groups.length) return null;
+  const recent = groups.slice(-SHELF_SIZE).reverse();
+  const levels = groups.filter(group => group.kind === "level");
+  const passed = levels.filter(group => group.attempts.some(attempt => attempt.successful)).length;
+  const partial = run.replay_catalog_more || groups.length > SHELF_SIZE;
+  const open = async (group: ReplayGroupSummary) => {
+    const attempt = group.attempts.at(-1);
+    if (attempt) onPlay(await levelKey(group.reference), { run: run.id, attempt: attempt.id });
+  };
+  return (
+    <ThumbnailProvider game={run.game} baseRun={run.id}>
+      <section className="run-shelf">
+        <div className="section-title">
+          <strong>这个 Agent 的回放</strong>
+          <small>{run.replay_catalog_more ? `最近 ${recent.length} 关` : `${levels.length} 关 · 通过 ${passed}`}</small>
+        </div>
+        <div className="level-grid">
+          {recent.map(group => {
+            const attempt = group.attempts.at(-1);
+            const running = attempt?.status === "running";
+            const won = group.attempts.some(item => item.successful);
+            const tone = running ? "map" : group.kind === "overworld" ? "map" : won ? "passed" : "failed";
+            const badge = running ? "进行中" : group.kind === "overworld" ? `${group.attempts.length} 段` : won ? "已通过" : "未通过";
+            return (
+              <button type="button" key={`${group.kind}:${group.reference}`} className={`level-card ${tone}`} onClick={() => void open(group)} title={levelName({ reference: group.reference, title: group.title ?? null, kind: group.kind })}>
+                <LevelThumbnail sample={attempt ? { run: run.id, attempt: attempt.id } : null} label={group.kind === "overworld" ? "大地图" : group.reference} />
+                <span className="level-card-badge">{badge}</span>
+                <span className="level-card-count">{group.attempts.length} 次尝试</span>
+                <strong>{levelName({ reference: group.reference, title: group.title ?? null, kind: group.kind })}</strong>
+              </button>
+            );
+          })}
+        </div>
+        {partial && <button type="button" className="run-shelf-all" onClick={onAll}>查看这个 Agent 的全部回放</button>}
       </section>
     </ThumbnailProvider>
   );

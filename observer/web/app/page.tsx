@@ -19,7 +19,7 @@ import type { RunSummary, RunDetail, ElapsedScorePoint } from "./live-contract";
 import { LiveResource, applySubscription, effectiveDuration } from "./live-client";
 import { harnessName, modelName, rankRuns, runLabels, seriesColors, viewerStatus } from "./run-labels";
 import { clockTime, durationLabel, gatewayUrl, hydrateRunAssets } from "./live-shared";
-import { GameTabs, LevelWatch, ReplayLibrary, type LevelSample } from "./replay-views";
+import { GameTabs, LevelWatch, ReplayLibrary, RunReplayShelf, type LevelSample } from "./replay-views";
 
 
 function taskDuration(run: RunSummary, now: number) {
@@ -347,6 +347,7 @@ export default function Home() {
             })()}
             onBack={() => showDashboard(selectedGame)}
             onReplays={() => showReplays(selectedGame, selectedId)}
+            onPlay={(key, sample) => openLevel(key, sample)}
           />
         ) : route.level ? (
           <LevelWatch
@@ -498,12 +499,14 @@ function LiveRun({
   standing,
   onBack,
   onReplays,
+  onPlay,
 }: {
   run: RunDetail | RunSummary | null;
   now: number;
   standing: { place: number; of: number } | null;
   onBack: () => void;
   onReplays: () => void;
+  onPlay: (key: string, sample: LevelSample) => void;
 }) {
   const [allMessages, setAllMessages] = useState(false);
   const runDetail = run && "state" in run ? run as RunDetail : null;
@@ -616,6 +619,7 @@ function LiveRun({
         </section>
       </section>
 
+      <RunReplayShelf run={runDetail} onPlay={onPlay} onAll={onReplays} />
       <ExperiencePanel experience={runDetail.agent_experience} />
       <LiveDisclosure className="runtime-details" title="运行信息"><dl><dt>运行 ID</dt><dd>{run.id}</dd><dt>Agent</dt><dd>{run.agent}</dd><dt>停止原因</dt><dd>{run.termination?.reason ?? "—"}</dd><dt>最近动作</dt><dd>{clockTime(run.last_activity_at)}</dd></dl></LiveDisclosure>
     </div>
