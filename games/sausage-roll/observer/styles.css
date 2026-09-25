@@ -1,7 +1,4 @@
 .sausage-state {
-  min-height: 460px;
-  display: grid;
-  grid-template-rows: auto minmax(340px, 1fr) auto;
   overflow: hidden;
   background: #121717;
 }
@@ -56,18 +53,28 @@
 .sausage-scene-header .ready dd { color: #a7ff78; }
 .sausage-scene-header .locked dd { color: #a7b0ac; }
 
+/* A fixed frame: the canvas fills it instead of sizing it, so the drawing
+   buffer and the layout cannot feed back into each other. */
 .sausage-stage {
   position: relative;
   container-type: inline-size;
-  min-height: 340px;
+  aspect-ratio: 16 / 10;
+  max-height: 72vh;
+  width: 100%;
   background: #526c77;
 }
 
 .sausage-stage canvas {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   display: block;
   touch-action: none;
+}
+
+@media (max-width: 640px) {
+  .sausage-stage { aspect-ratio: 1; }
 }
 
 .sausage-environment {

@@ -66,7 +66,8 @@ export const buildOperatorScene: SceneBuilder = (state, view) => {
   const detailTop = y + 4;
   p.text(16, detailTop, "INCIDENT SCENES", 12, "#9bb3a5", true);
   let incidentY = detailTop + 24;
-  const visible = incidents.filter(incident => str(incident.status) !== "hidden").slice(-8).reverse();
+  // One column stacks everything, so narrow views keep only the latest entries.
+  const visible = incidents.filter(incident => str(incident.status) !== "hidden").slice(wide ? -8 : -4).reverse();
   for (const incident of visible) {
     p.text(16, incidentY, short(str(incident.title), columnWidth, 12), 12, "#d4e3da", true); incidentY += 18;
     p.text(16, incidentY, str(incident.status).toUpperCase(), 10, "#83a694"); incidentY += 18;
@@ -84,8 +85,8 @@ export const buildOperatorScene: SceneBuilder = (state, view) => {
   if (call || !wide) unitBottom = drawUnits(wide ? 16 + columnWidth + gap : 16, wide ? detailTop : incidentY + 16, columnWidth);
   const memoryX = wide ? 16 + (columns - 1) * (columnWidth + gap) : 16;
   let memoryY = wide ? detailTop : Math.max(incidentY, unitBottom) + 16;
-  const reports = calls.flatMap(call => strings(call.after_action_report)).slice(-6).reverse();
-  const facts = calls.flatMap(call => Object.entries(rec(call.facts) ?? {})).slice(-6).reverse();
+  const reports = calls.flatMap(call => strings(call.after_action_report)).slice(wide ? -6 : -3).reverse();
+  const facts = calls.flatMap(call => Object.entries(rec(call.facts) ?? {})).slice(wide ? -6 : -3).reverse();
   const pending = alarms.filter(alarm => ["pending", "due"].includes(str(alarm.status))).slice(-12);
   if (reports.length || facts.length || pending.length) {
     p.text(memoryX, memoryY, "MEMORY & AFTER ACTION", 12, "#9bb3a5", true); memoryY += 26;

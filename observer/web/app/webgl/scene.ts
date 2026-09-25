@@ -63,18 +63,22 @@ export class Painter {
   finish(height: number, description: string): GameScene { return { width: this.width, height: Math.max(1, Math.ceil(height)), background: this.background, description, commands: this.commands, hits: this.hits }; }
 }
 
+/** Greedy wrap that keeps Latin words whole; wide characters count double and break anywhere. */
 export function wrap(text: string, columns: number, maxLines = 5) {
+  const measure = (piece: string) => [...piece].reduce((units, char) => units + (char.charCodeAt(0) > 255 ? 2 : 1), 0);
+  const tokens = text.replace(/\s+/g, " ").trim().match(/ |[\u0021-\u00ff]+|./gu) ?? [];
+  const pieces = tokens.flatMap(token => token.length > columns && measure(token) === token.length ? token.match(new RegExp(`.{1,${columns}}`, "g"))! : [token]);
   const lines: string[] = []; let line = "", units = 0;
-  const input = [...text.replace(/\s+/g, " ").trim()];
-  for (let i = 0; i < input.length; i++) {
-    const char = input[i], size = char.charCodeAt(0) > 255 ? 2 : 1;
-    if (units + size > columns) {
-      if (lines.length === maxLines - 1) { lines.push(line.slice(0, -1) + "…"); return lines; }
-      lines.push(line); line = ""; units = 0;
+  for (const piece of pieces) {
+    const size = measure(piece);
+    if (units + size > columns && line) {
+      if (lines.length === maxLines - 1) { lines.push(line.trimEnd().slice(0, -1) + "…"); return lines; }
+      lines.push(line.trimEnd()); line = ""; units = 0;
     }
-    line += char; units += size;
+    if (!line && piece === " ") continue;
+    line += piece; units += size;
   }
-  if (line) lines.push(line);
+  if (line) lines.push(line.trimEnd());
   return lines;
 }
 

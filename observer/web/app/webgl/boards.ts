@@ -7,8 +7,11 @@ export function tileBoardScene(kind: "sokoban" | "minesweeper", state: GameState
   const board = rec(state.board), level = rec(state.level), campaign = rec(state.campaign);
   const map = strings(board?.map), cols = Math.max(1, num(board?.width, map[0]?.length ?? 1)), rows = Math.max(1, map.length);
   const tiers = records(state.tiers), wide = view.width >= 680, aside = wide && tiers.length ? 220 : 0;
-  const boardArea = { x: 16, y: 60, width: view.width - aside - 32, height: Math.max(240, Math.min(410, view.height * .43)) };
-  const tile = Math.min(mines ? 36 : 32, (boardArea.width - 20) / cols, (boardArea.height - 20) / rows);
+  // The board takes the tile size that fits the width and a share of the
+  // window height, and the area shrinks to it so no band is left empty.
+  const areaWidth = view.width - aside - 32, maxHeight = Math.max(240, Math.min(600, view.height * (wide ? .55 : .42)));
+  const tile = Math.min(mines ? 44 : 40, (areaWidth - 20) / cols, (maxHeight - 20) / rows);
+  const boardArea = { x: 16, y: 60, width: areaWidth, height: map.length ? rows * tile + 20 : 240 };
   const left = boardArea.x + (boardArea.width - cols * tile) / 2, top = boardArea.y + (boardArea.height - rows * tile) / 2;
   const p = new Painter(view.width, mines ? "#09100f" : "#0b0d0d");
   p.rect(0, 0, view.width, 46, "#111d1b");
