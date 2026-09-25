@@ -15,7 +15,7 @@ from harbor.agents.installed.base import (
 from harbor.environments.base import BaseEnvironment
 from harbor.models.agent.context import AgentContext
 
-from tools.agents.parabox_resume import ParaboxResume
+from tools.agents.game_support.parabox import ParaboxResume
 
 
 class OpenCodeGo(BaseInstalledAgent):

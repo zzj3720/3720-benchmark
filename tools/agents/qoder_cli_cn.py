@@ -14,7 +14,7 @@ from harbor.environments.base import BaseEnvironment
 from harbor.models.agent.context import AgentContext
 from harbor.models.trial.paths import EnvironmentPaths
 
-from tools.agents.parabox_resume import ParaboxResume
+from tools.agents.game_support.parabox import ParaboxResume
 
 
 class QoderCliCn(BaseInstalledAgent):

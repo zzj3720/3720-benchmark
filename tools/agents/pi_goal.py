@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import re
 import shutil
 import time
 from pathlib import Path
@@ -13,177 +12,11 @@ from harbor.agents.installed.pi import Pi
 from harbor.environments.base import BaseEnvironment
 from harbor.models.agent.context import AgentContext
 
-from tools.agents.parabox_resume import ParaboxResume
-
-
-_SHIFT_COMPLETE = re.compile(r"(?im)^shift status:\s*complete\s*$")
-_SUBMIT_COMPLETE = re.compile(r"(?im)^complete:\s*true\s*$")
-
-
-def _completion_from_tool_text(text: str) -> dict[str, Any] | None:
-    """Recognize either raw API JSON or a concise projection printed by Pi."""
-
-    try:
-        response = json.loads(text)
-    except json.JSONDecodeError:
-        response = None
-
-    if isinstance(response, dict):
-        if response.get("api_version") != "emergency-operator-api-v1":
-            return None
-        data = response.get("data")
-        if not isinstance(data, dict):
-            return None
-        state = data.get("state", data)
-        shift = state.get("shift") if isinstance(state, dict) else None
-        status = shift.get("status") if isinstance(shift, dict) else None
-        if data.get("complete") is True or status == "complete":
-            return {
-                "command": response.get("command"),
-                "complete": data.get("complete") is True,
-                "shift_status": status,
-                "source": "api_json",
-            }
-        return None
-
-    shift_complete = _SHIFT_COMPLETE.search(text) is not None
-    submit_complete = _SUBMIT_COMPLETE.search(text) is not None
-    if not shift_complete and not submit_complete:
-        return None
-    return {
-        "command": "submit" if submit_complete else "show",
-        "complete": submit_complete,
-        "shift_status": "complete" if shift_complete else None,
-        "source": "tool_projection",
-    }
-
-
-def _operator_completion_evidence(logs_dir: Path) -> dict[str, Any] | None:
-    """Read terminal game evidence already observed by the model."""
-
-    sessions_dir = logs_dir / "pi" / "sessions"
-    try:
-        sessions = sorted(
-            sessions_dir.glob("*.jsonl"),
-            key=lambda path: path.stat().st_mtime_ns,
-            reverse=True,
-        )
-    except OSError:
-        return None
-
-    for session in sessions:
-        try:
-            lines = session.read_text(encoding="utf-8").splitlines()
-        except OSError:
-            continue
-        for line in reversed(lines):
-            try:
-                event = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            message = event.get("message")
-            if not isinstance(message, dict) or message.get("role") != "toolResult":
-                continue
-            if message.get("isError") is True:
-                continue
-            content = message.get("content")
-            if not isinstance(content, list):
-                continue
-            for part in content:
-                if not isinstance(part, dict) or not isinstance(part.get("text"), str):
-                    continue
-                evidence = _completion_from_tool_text(part["text"])
-                if evidence is not None:
-                    return evidence
-    return None
-
-
-def _campaign_completion_evidence(
-    logs_dir: Path, api_version: str, max_score: int
-) -> dict[str, Any] | None:
-    """Read a completed deterministic campaign response already observed by Pi."""
-
-    sessions_dir = logs_dir / "pi" / "sessions"
-    try:
-        sessions = sorted(
-            sessions_dir.glob("*.jsonl"),
-            key=lambda path: path.stat().st_mtime_ns,
-            reverse=True,
-        )
-    except OSError:
-        return None
-
-    for session in sessions:
-        try:
-            lines = session.read_text(encoding="utf-8").splitlines()
-        except OSError:
-            continue
-        for line in reversed(lines):
-            try:
-                event = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            message = event.get("message")
-            if not isinstance(message, dict) or message.get("role") != "toolResult":
-                continue
-            if message.get("isError") is True:
-                continue
-            content = message.get("content")
-            if not isinstance(content, list):
-                continue
-            for part in content:
-                if not isinstance(part, dict) or not isinstance(part.get("text"), str):
-                    continue
-                try:
-                    response = json.loads(part["text"])
-                except json.JSONDecodeError:
-                    continue
-                if (
-                    not isinstance(response, dict)
-                    or response.get("api_version") != api_version
-                    or response.get("ok") is not True
-                ):
-                    continue
-                data = response.get("data")
-                if not isinstance(data, dict):
-                    continue
-                state = data.get("state", data)
-                campaign = state.get("campaign") if isinstance(state, dict) else None
-                score = (
-                    data.get("score")
-                    if isinstance(data.get("score"), int)
-                    else campaign.get("score")
-                    if isinstance(campaign, dict)
-                    else None
-                )
-                reported_max = (
-                    data.get("max_score")
-                    if isinstance(data.get("max_score"), int)
-                    else campaign.get("max_score")
-                    if isinstance(campaign, dict)
-                    else None
-                )
-                complete = data.get("complete") is True or (
-                    isinstance(campaign, dict) and campaign.get("complete") is True
-                )
-                if (
-                    complete
-                    and isinstance(score, int)
-                    and score <= max_score
-                    and (reported_max is None or reported_max == max_score)
-                ):
-                    return {
-                        "command": response.get("command"),
-                        "complete": True,
-                        "score": score,
-                        "max_score": max_score,
-                        "source": "api_json",
-                    }
-    return None
-
-
-def _sokoban_completion_evidence(logs_dir: Path) -> dict[str, Any] | None:
-    return _campaign_completion_evidence(logs_dir, "sokoban-api-v1", 305)
+from tools.agents.game_support.campaign import campaign_completion_evidence
+from tools.agents.game_support.emergency_operator import (
+    operator_completion_evidence,
+)
+from tools.agents.game_support.parabox import ParaboxResume
 
 
 def _last_pi_stop(logs_dir: Path, after_id: str | None = None) -> dict[str, Any]:
@@ -295,7 +128,7 @@ class EmergencyOperatorGoalPi(Pi):
             shutil.copyfile(aggregate, self.logs_dir / self._OUTPUT_FILENAME)
 
     def _find_completion_evidence(self) -> dict[str, Any] | None:
-        return _operator_completion_evidence(self.logs_dir)
+        return operator_completion_evidence(self.logs_dir)
 
     async def run(
         self,
@@ -414,7 +247,7 @@ class CampaignGoalPi(EmergencyOperatorGoalPi):
         )
 
     def _find_completion_evidence(self) -> dict[str, Any] | None:
-        return _campaign_completion_evidence(
+        return campaign_completion_evidence(
             self.logs_dir, self._api_version, self._max_score
         )
 

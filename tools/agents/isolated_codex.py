@@ -10,8 +10,8 @@ from harbor.environments.base import BaseEnvironment
 from harbor.models.agent.context import AgentContext
 from harbor.models.trial.paths import EnvironmentPaths
 
-from tools.agents.parabox_resume import ParaboxResume
-from tools.agents.swarm_resume import SwarmResume
+from tools.agents.game_support.parabox import ParaboxResume
+from tools.agents.game_support.swarm import SwarmResume
 
 
 _GOAL_CONTEXT_MARKER = '<codex_internal_context source="goal">'

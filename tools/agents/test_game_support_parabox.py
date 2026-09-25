@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 
-from tools.agents.parabox_resume import ParaboxResume
+from tools.agents.game_support.parabox import ParaboxResume
 
 
 class _ResumeFixture(ParaboxResume):

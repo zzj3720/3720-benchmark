@@ -12,7 +12,7 @@ from harbor.models.agent.context import AgentContext
 from tools.agents.claude_goal import NativeClaudeGoal
 from tools.agents.claude_resume import ClaudeSessionResume
 from tools.agents.deepseek_claude_code import DeepSeekClaudeCode
-from tools.agents.parabox_resume import ParaboxResume
+from tools.agents.game_support.parabox import ParaboxResume
 
 
 class OpenCodeGoClaudeCode(DeepSeekClaudeCode):

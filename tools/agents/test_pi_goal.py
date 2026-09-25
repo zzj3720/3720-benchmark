@@ -4,13 +4,14 @@ from pathlib import Path
 
 from harbor.models.agent.context import AgentContext
 
-from tools.agents.pi_goal import (
-    EmergencyOperatorGoalPi,
-    _campaign_completion_evidence,
-    _last_pi_stop,
-    _operator_completion_evidence,
-    _sokoban_completion_evidence,
+from tools.agents.game_support.campaign import (
+    campaign_completion_evidence,
+    sokoban_completion_evidence,
 )
+from tools.agents.game_support.emergency_operator import (
+    operator_completion_evidence,
+)
+from tools.agents.pi_goal import EmergencyOperatorGoalPi, _last_pi_stop
 
 
 def _tool_result(status: str, *, complete: bool = False) -> dict:
@@ -117,10 +118,10 @@ def _assistant_stop(
 
 def test_completion_requires_authoritative_terminal_state(tmp_path):
     _write_session(tmp_path, [_tool_result("running", complete=False)])
-    assert _operator_completion_evidence(tmp_path) is None
+    assert operator_completion_evidence(tmp_path) is None
 
     _write_session(tmp_path, [_tool_result("complete", complete=True)])
-    assert _operator_completion_evidence(tmp_path) == {
+    assert operator_completion_evidence(tmp_path) == {
         "command": "submit",
         "complete": True,
         "shift_status": "complete",
@@ -130,10 +131,10 @@ def test_completion_requires_authoritative_terminal_state(tmp_path):
 
 def test_sokoban_completion_requires_authoritative_full_campaign(tmp_path):
     _write_session(tmp_path, [_sokoban_tool_result(304, complete=False)])
-    assert _sokoban_completion_evidence(tmp_path) is None
+    assert sokoban_completion_evidence(tmp_path) is None
 
     _write_session(tmp_path, [_sokoban_tool_result(305, complete=True)])
-    assert _sokoban_completion_evidence(tmp_path) == {
+    assert sokoban_completion_evidence(tmp_path) == {
         "command": "submit",
         "complete": True,
         "score": 305,
@@ -145,11 +146,11 @@ def test_sokoban_completion_requires_authoritative_full_campaign(tmp_path):
 def test_minesweeper_completion_accepts_a_terminal_partial_score(tmp_path):
     _write_session(tmp_path, [_minesweeper_tool_result(2, complete=False)])
     assert (
-        _campaign_completion_evidence(tmp_path, "minesweeper-api-v2", 5) is None
+        campaign_completion_evidence(tmp_path, "minesweeper-api-v2", 5) is None
     )
 
     _write_session(tmp_path, [_minesweeper_tool_result(2, complete=True)])
-    assert _campaign_completion_evidence(tmp_path, "minesweeper-api-v2", 5) == {
+    assert campaign_completion_evidence(tmp_path, "minesweeper-api-v2", 5) == {
         "command": "submit",
         "complete": True,
         "score": 2,
@@ -160,10 +161,10 @@ def test_minesweeper_completion_accepts_a_terminal_partial_score(tmp_path):
 
 def test_kitchen_completion_uses_the_configured_score_ceiling(tmp_path):
     _write_session(tmp_path, [_kitchen_tool_result(24, complete=False)])
-    assert _campaign_completion_evidence(tmp_path, "overcooked-api-v4", 260) is None
+    assert campaign_completion_evidence(tmp_path, "overcooked-api-v4", 260) is None
 
     _write_session(tmp_path, [_kitchen_tool_result(-6, complete=True)])
-    assert _campaign_completion_evidence(tmp_path, "overcooked-api-v4", 260) == {
+    assert campaign_completion_evidence(tmp_path, "overcooked-api-v4", 260) == {
         "command": "submit",
         "complete": True,
         "score": -6,
@@ -322,7 +323,7 @@ def test_completion_accepts_successful_concise_operator_projection(tmp_path):
             }
         ],
     )
-    assert _operator_completion_evidence(tmp_path) == {
+    assert operator_completion_evidence(tmp_path) == {
         "command": "show",
         "complete": False,
         "shift_status": "complete",
@@ -341,9 +342,9 @@ def test_completion_rejects_failed_or_nonterminal_projection(tmp_path):
         },
     }
     _write_session(tmp_path, [event])
-    assert _operator_completion_evidence(tmp_path) is None
+    assert operator_completion_evidence(tmp_path) is None
 
     event["message"]["isError"] = False
     event["message"]["content"][0]["text"] = "Complete: False\n"
     _write_session(tmp_path, [event])
-    assert _operator_completion_evidence(tmp_path) is None
+    assert operator_completion_evidence(tmp_path) is None
