@@ -42,6 +42,23 @@ export function modelName(model: string) {
   return words.join(" ") || model;
 }
 
+const FAMILIES: [RegExp, string][] = [
+  [/(^|[/-])(gpt|o\d|codex)([-.\d]|$)|^openai\//i, "OpenAI"],
+  [/claude|^anthropic\//i, "Anthropic"],
+  [/deepseek/i, "DeepSeek"],
+  [/gemini|^google\//i, "Google"],
+  [/kimi|moonshot/i, "Moonshot"],
+  [/glm|zhipu|z-ai/i, "Zhipu"],
+  [/qwen|alibaba/i, "Qwen"],
+  [/grok|^x-ai\//i, "xAI"],
+];
+
+/** The lab behind a model id: `openai/gpt-5.6-sol` → `OpenAI`. Unlisted or stealth models are `其他`. */
+export function modelFamily(model: string) {
+  const bare = model.toLowerCase();
+  return FAMILIES.find(([pattern]) => pattern.test(bare))?.[1] ?? "其他";
+}
+
 /** The harness driving the model, from the agent import path. */
 export function harnessName(agent = "") {
   const module = agent.split(":")[0].split(".").pop() ?? "";

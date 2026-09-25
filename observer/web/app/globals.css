@@ -311,6 +311,7 @@ select:focus-visible {
   padding: 27px clamp(20px, 3vw, 42px) 48px;
 }
 .dashboard-page,
+.overview-page,
 .detail-page {
   max-width: 1460px;
   margin: 0 auto;
@@ -1843,3 +1844,68 @@ summary:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3
 .run-shelf-all { display: block; margin: var(--space-md) auto 0; height: 34px; padding: 0 var(--space-lg); border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--surface); color: var(--foreground); font: 500 var(--text-sm)/1 var(--font-body); cursor: pointer; }
 .run-shelf-all:hover { border-color: var(--accent); }
 .run-shelf-all:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+/* Overview: every game at once. The model x game table is the page; the live
+   strip above it and the game cards below it are ways in. */
+.overview-link { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 40px; margin-bottom: var(--space-lg); padding: var(--space-sm); border: 1px solid transparent; border-radius: var(--radius-control); background: none; color: var(--foreground); font: 600 var(--text-sm)/1 var(--font-body); cursor: pointer; }
+.overview-link small { color: var(--muted); font: 500 var(--text-xs)/1 var(--font-body); }
+.overview-link[aria-pressed="true"] { background: var(--surface-2); border-color: var(--line); }
+.overview-link:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+.overview-live { margin-top: var(--space-lg); color: var(--muted); font-size: var(--text-sm); }
+.overview-live p { margin: 0; }
+.overview-live.on { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-md); }
+.overview-live-title { display: inline-flex; align-items: center; gap: var(--space-sm); color: var(--foreground); font-weight: 600; }
+.overview-live-list { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+.overview-live-run { display: inline-flex; align-items: baseline; gap: var(--space-sm); min-height: 40px; padding: var(--space-sm) var(--space-md); border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--line)); border-radius: var(--radius-control); background: var(--surface); color: var(--foreground); cursor: pointer; }
+.overview-live-run span { color: var(--accent); font: 600 var(--text-xs)/1 var(--font-data); }
+.overview-live-run strong { font: 500 var(--text-sm)/1 var(--font-body); }
+.overview-live-run b { font: 600 var(--text-sm)/1 var(--font-data); }
+.overview-live-run small { color: var(--muted); font-weight: 400; }
+
+.overview-matrix-card { margin-top: var(--space-xl); border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--surface); overflow: clip; }
+.overview-matrix-card > .section-title { padding: 0 var(--space-lg); }
+.overview-matrix-scroll { overflow-x: auto; }
+.overview-matrix { width: 100%; border-collapse: collapse; }
+.overview-matrix th, .overview-matrix td { border-top: 1px solid var(--soft-line, var(--line)); text-align: left; vertical-align: middle; }
+.overview-matrix thead th { padding: var(--space-sm) var(--space-md); color: var(--muted); font: 500 var(--text-xs)/1 var(--font-body); }
+.overview-matrix thead th button { padding: var(--space-xs) 0; border: 0; background: none; color: var(--accent); font: 600 var(--text-xs)/1 var(--font-data); letter-spacing: 0.04em; cursor: pointer; }
+.overview-matrix thead th button:hover { text-decoration: underline; }
+.overview-matrix tbody th { min-width: 180px; padding: var(--space-md) var(--space-lg); }
+.overview-matrix tbody th strong { display: block; font: 600 var(--text-sm)/1.3 var(--font-body); }
+.overview-matrix tbody th small { display: block; margin-top: 4px; color: var(--muted); font-size: var(--text-xs); }
+.overview-matrix td { min-width: 150px; padding: 0; }
+.overview-matrix td.empty { padding: var(--space-md); color: color-mix(in srgb, var(--muted) 55%, transparent); }
+.overview-matrix td button { display: grid; gap: 6px; width: 100%; padding: var(--space-md); border: 0; background: none; color: var(--foreground); text-align: left; cursor: pointer; }
+.overview-matrix td button:hover { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.overview-matrix td button:focus-visible { outline: 2px solid var(--color-focus); outline-offset: -2px; }
+.overview-score { display: inline-flex; align-items: center; gap: 6px; font: 600 var(--text-base, 15px)/1 var(--font-data); }
+.overview-score small, .overview-matrix td button > small { color: var(--muted); font: 400 var(--text-xs)/1.2 var(--font-data); }
+.overview-bar { display: block; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.overview-bar i { display: block; height: 100%; background: var(--accent); }
+
+.overview-games { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--space-md); margin-top: var(--space-xl); }
+.overview-game { display: grid; gap: var(--space-sm); padding: var(--space-lg); border: 1px solid var(--line); border-top: 2px solid var(--accent); border-radius: var(--radius-panel); background: var(--surface); color: var(--foreground); text-align: left; cursor: pointer; }
+.overview-game:hover { border-color: color-mix(in srgb, var(--accent) 60%, var(--line)); }
+.overview-game:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.overview-game-name { font: 600 var(--text-sm)/1.3 var(--font-body); }
+.overview-game-lead { display: flex; align-items: baseline; gap: var(--space-sm); }
+.overview-game-lead b { font: 600 22px/1 var(--font-data); color: var(--accent); }
+.overview-game-lead b small { color: var(--muted); font-size: var(--text-xs); font-weight: 400; }
+.overview-game-lead span { color: var(--muted); font-size: var(--text-xs); }
+.overview-game-meta { color: var(--muted); font-size: var(--text-xs); }
+
+/* Model families: a group row in the overview table, a label on the run page. */
+.overview-matrix tr.overview-family th { padding: var(--space-md) var(--space-lg) var(--space-xs); border-top: 1px solid var(--line); color: var(--foreground); font: 600 var(--text-xs)/1 var(--font-body); letter-spacing: 0.02em; background: color-mix(in srgb, var(--foreground) 3%, transparent); }
+.overview-matrix tr.overview-family th small { margin-left: var(--space-sm); color: var(--muted); font-weight: 400; }
+.model-title .model-family { display: block; margin-bottom: 6px; color: var(--muted); font: 500 var(--text-sm)/1 var(--font-body); letter-spacing: 0; }
+
+.overview-matrix tr.overview-family th small { display: inline; margin-top: 0; }
+@media (max-width: 820px) {
+  /* The mobile switcher already offers the overview. */
+  .overview-link { display: none; }
+  /* The model column stays in view while the games scroll sideways. */
+  .overview-matrix tbody th:not([colspan]), .overview-matrix thead th:first-child { position: sticky; left: 0; z-index: 1; min-width: 132px; max-width: 132px; background: var(--surface); }
+  .overview-matrix tbody th { padding: var(--space-md); }
+  .overview-matrix td { min-width: 132px; }
+}

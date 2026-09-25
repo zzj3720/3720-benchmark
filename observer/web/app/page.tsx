@@ -17,9 +17,10 @@ import { LiveDisclosure, LiveSelect } from "./live-controls";
 
 import type { RunSummary, RunDetail, ElapsedScorePoint } from "./live-contract";
 import { LiveResource, applySubscription, effectiveDuration } from "./live-client";
-import { harnessName, modelName, rankRuns, runLabels, seriesColors, viewerStatus } from "./run-labels";
+import { harnessName, modelFamily, modelName, rankRuns, runLabels, seriesColors, viewerStatus } from "./run-labels";
 import { clockTime, durationLabel, gatewayUrl, hydrateRunAssets } from "./live-shared";
 import { GameTabs, LevelWatch, ReplayLibrary, RunReplayShelf, type LevelSample } from "./replay-views";
+import { Overview } from "./overview";
 
 
 function taskDuration(run: RunSummary, now: number) {
@@ -102,7 +103,8 @@ export default function Home() {
   const [selectedGame, setSelectedGame] = useState<GameId>(GAME_IDS[0]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   // Replays live on their own pages: a per-game library and a per-level watch page.
-  const [route, setRoute] = useState<{ view: "dashboard" | "replays"; level: string | null; play: LevelSample | null; model: string | null }>({ view: "dashboard", level: null, play: null, model: null });
+  // With no run, game or replay in the URL the console opens on the overview of every game.
+  const [route, setRoute] = useState<{ view: "overview" | "dashboard" | "replays"; level: string | null; play: LevelSample | null; model: string | null }>({ view: "overview", level: null, play: null, model: null });
   const [detail, setDetail] = useState<RunDetail | null>(null);
   const [connection, setConnection] = useState<"connecting" | "live" | "offline">("connecting");
   const [paused, setPaused] = useState(false);
@@ -136,7 +138,7 @@ export default function Home() {
       setDetail(current => current?.id === runId ? current : null);
       setSelectedId(runId);
       setRoute({
-        view: params.get("view") === "replays" || params.get("level") ? "replays" : "dashboard",
+        view: params.get("view") === "replays" || params.get("level") ? "replays" : runId || game ? "dashboard" : "overview",
         level: params.get("level"),
         play: play?.length === 2 && /^\d+$/.test(play[1]) ? { run: play[0], attempt: Number(play[1]) } : null,
         model: params.get("model"),
@@ -234,6 +236,7 @@ export default function Home() {
   );
   const visibleRuns = grouped[selectedGame];
   const liveCount = runs.filter((run) => run.live).length;
+  const overview = !selectedId && route.view === "overview";
   const sourceOffline = feed !== null && !feed.connected && feed.last_seen_ms !== null;
   /** Every page is addressable: push the URL, then derive state from it. */
   function go(params: Record<string, string | null | undefined>) {
@@ -251,7 +254,11 @@ export default function Home() {
   }
 
   function showDashboard(game = selectedGame) {
-    go({ game: game === GAME_IDS[0] ? null : game });
+    go({ game });
+  }
+
+  function showOverview() {
+    go({});
   }
 
   function showReplays(game = selectedGame, model?: string) {
@@ -267,8 +274,8 @@ export default function Home() {
       <header className="topbar">
         <button
           className="brand"
-          onClick={() => showDashboard(selectedGame)}
-          aria-label="返回直播大盘"
+          onClick={showOverview}
+          aria-label="返回大盘"
         >
           <span>3720</span>
           <strong>Benchmark Live</strong>
@@ -289,15 +296,16 @@ export default function Home() {
       </header>
 
       <aside className="run-sidebar">
+        <button type="button" className="overview-link" aria-pressed={overview} onClick={showOverview}>大盘<small>全部游戏</small></button>
         <div className="sidebar-label">游戏</div>
         <nav className="game-switcher" aria-label="选择游戏">
-          {GAME_IDS.filter(game => grouped[game].length || selectedGame === game).map(game => <button key={game} aria-pressed={selectedGame === game} onClick={() => showDashboard(game)}><span>{GAME_META[game].short}</span><small>{grouped[game].length}</small></button>)}
+          {GAME_IDS.filter(game => grouped[game].length || selectedGame === game).map(game => <button key={game} aria-pressed={!overview && selectedGame === game} onClick={() => showDashboard(game)}><span>{GAME_META[game].short}</span><small>{grouped[game].length}</small></button>)}
         </nav>
         <div className="mobile-switcher">
-          <LiveSelect label="切换游戏" value={selectedGame} onChange={value => showDashboard(value as GameId)} options={GAME_IDS.filter(game => grouped[game].length || selectedGame === game).map(game => ({ value: game, label: GAME_META[game].short }))} />
-          <LiveSelect label="切换运行" value={selectedId ?? (route.view === "replays" ? "__replays" : "__overview")} onChange={value => { const run = runs.find(run => run.id === value); if (run) selectRun(run); else if (value === "__replays") showReplays(); else showDashboard(); }} options={[{ value: "__overview", label: "得分总览" }, { value: "__replays", label: "关卡回放" }, ...visibleRuns.map(run => ({ value: run.id, label: `${labels.get(run.id)} · ${run.score} 分` }))]} />
+          <LiveSelect label="切换游戏" value={overview ? "__overview" : selectedGame} onChange={value => value === "__overview" ? showOverview() : showDashboard(value as GameId)} options={[{ value: "__overview", label: "大盘" }, ...GAME_IDS.filter(game => grouped[game].length || selectedGame === game).map(game => ({ value: game, label: GAME_META[game].short }))]} />
+          {!overview && <LiveSelect label="切换运行" value={selectedId ?? (route.view === "replays" ? "__replays" : "__overview")} onChange={value => { const run = runs.find(run => run.id === value); if (run) selectRun(run); else if (value === "__replays") showReplays(); else showDashboard(); }} options={[{ value: "__overview", label: "得分总览" }, { value: "__replays", label: "关卡回放" }, ...visibleRuns.map(run => ({ value: run.id, label: `${labels.get(run.id)} · ${run.score} 分` }))]} />}
         </div>
-        {[selectedGame].map((game) => {
+        {(overview ? [] : [selectedGame]).map((game) => {
           const meta = GAME_META[game];
           const gameRuns = grouped[game];
           return (
@@ -361,6 +369,8 @@ export default function Home() {
             onOpenLevel={key => openLevel(key)}
             onPlay={sample => openLevel(route.level!, sample)}
           />
+        ) : overview ? (
+          <Overview runs={runs} now={snapshotNow} onRun={run => go({ run: run.id })} onGame={game => showDashboard(game)} />
         ) : route.view === "replays" ? (
           <div className="dashboard-page" style={{ "--accent": GAME_META[selectedGame].accent } as React.CSSProperties}>
             <header className="page-heading"><div><h1>{GAME_META[selectedGame].label}</h1></div></header>
@@ -534,6 +544,7 @@ function LiveRun({
         <div className="detail-title-row">
           <div>
             <h1 className="model-title">
+              <small className="model-family">{modelFamily(run.model)}</small>
               {modelName(run.model)}
               {run.effort !== "default" && <span>{run.effort}</span>}
             </h1>

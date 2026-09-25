@@ -37,11 +37,13 @@ test("server-renders the benchmark operations console", async () => {
   const html = await response.text();
   assert.match(html, /<title>3720 Live Operations<\/title>/i);
   assert.match(html, /Benchmark Live/);
-  assert.match(html, /Patrick/);
-  // Games without runs stay out of the switcher; the empty dashboard says why.
+  // The home page is the overview of every game; empty, it says what will appear.
+  assert.match(html, /3720 Benchmark/);
+  assert.match(html, /aria-pressed="true">大盘/);
+  assert.match(html, /新的运行开始后会出现在这里/);
+  // Games without runs stay out of the switcher.
   assert.match(html, />PARABOX</);
   assert.doesNotMatch(html, />SWARM</);
-  assert.match(html, /还没有运行/);
   assert.match(html, /https:\/\/observer\.example\/og\.png/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
 });
